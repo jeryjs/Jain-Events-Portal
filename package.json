@@ -1,0 +1,23 @@
+{
+	"name": "jain-events-portal",
+	"version": "0.0.1",
+	"description": "A web portal for Jain University Events.",
+	"main": "index.js",
+	"scripts": {
+		"start:backend": "cd backend && npm run dev",
+		"start:userview": "cd userview && npm run dev",
+		"start:adminview": "cd adminview && npm run dev",
+		"dev": "concurrently \"npm run start:backend\" \"npm run start:userview\" \"npm run start:adminview\"",
+
+		"init:backend": "cd backend && npm install",
+		"init:userview": "cd userview && npm install",
+		"init:adminview": "cd adminview && npm install",
+		"init": "npm install && concurrently \"npm run init:backend\" \"npm run init:userview\" \"npm run init:adminview\""
+	},
+	"keywords": [],
+	"author": "Jery",
+	"license": "MIT",
+	"dependencies": {
+		"concurrently": "^8.2.2"
+	}
+}
