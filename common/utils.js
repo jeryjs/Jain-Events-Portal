@@ -1,9 +1,19 @@
-import Activity from '@common/models/Activity';
-import Participant from '@common/models/Participant';
-import CulturalActivity from '@common/models/culturals/CulturalActivity';
-import SportActivity from '@common/models/sports/SportsActivity';
-import { CricketPlayer, FootballPlayer, BasketballPlayer } from '@common/models/sports/SportsParticipant';
-import { EVENT_TYPE } from '@common/constants';
+import Event from './models/Event';
+import Activity from './models/Activity';
+import Participant from './models/Participant';
+import CulturalActivity from './models/culturals/CulturalActivity';
+import SportActivity from './models/sports/SportsActivity';
+import { CricketPlayer, FootballPlayer, BasketballPlayer } from './models/sports/SportsParticipant';
+import { EVENT_TYPE } from './constants';
+
+function parseEvent(data) {    
+    return new Event(
+        data.id,
+        data.name,
+        // data.activities.map(parseActivity),
+        data.type
+    );
+}
 
 function parseActivity(data) {
     switch (data.eventType) {
@@ -38,4 +48,4 @@ function getPrimaryEventType(data) {
     if (data.eventType > 1000) return SportActivity;
 }
 
-export { parseActivity, parseParticipant };
+export { parseEvent, parseActivity, parseParticipant };
