@@ -1,5 +1,5 @@
 const { verifyToken } = require('../utils/authUtils');
-const { ROLE } = require('../../common/constants');
+const { ROLE } = require('@common/constants');
 
 /**
  * @description Middleware to authenticate user based on JWT token.

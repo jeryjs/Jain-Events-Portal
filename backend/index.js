@@ -1,4 +1,6 @@
+require('module-alias/register')
 require("dotenv").config();
+
 const express = require('express');
 const cors = require("cors");
 const { adminMiddleware } = require('./middleware/auth');
@@ -19,4 +21,4 @@ app.use("/api/user", userRoutes);
 app.use("/api/admin", adminMiddleware, adminRoutes);
 
 const PORT = process.env.PORT;
-app.listen(PORT, "0.0.0.0", () => console.log(`Api server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Api server running on port ${PORT}`));

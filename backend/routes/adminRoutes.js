@@ -1,5 +1,5 @@
 const express = require('express');
-const { ROLE } = require('../constants');
+const { ROLE } = require('@common/constants');
 const { generateToken } = require('../utils/authUtils');
 
 const router = express.Router();
