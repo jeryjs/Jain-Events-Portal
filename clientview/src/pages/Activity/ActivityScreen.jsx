@@ -1,18 +1,18 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-function MatchScreen() {
+function ActivityScreen() {
 	const { eventId, activityId } = useParams();
-	// Dummy details for match
+	// Dummy details for Activity
 	const dummyDetails = ['Detail A', 'Detail B', 'Detail C'];
 
 	return (
 		<div className="container">
-			<h1>Match: {activityId}</h1>
+			<h1>Activity: {activityId}</h1>
 			{/* Back to Event */}
 			<div style={{ marginBottom: '1rem' }}>
 				<Link 
-					to={`/event/${eventId}`} 
+					to={`/${eventId}`} 
 					style={{
 						padding: '0.5rem 1rem',
 						backgroundColor: '#6c757d',
@@ -24,7 +24,7 @@ function MatchScreen() {
 					Back to Event
 				</Link>
 			</div>
-			{/* Match details */}
+			{/* Activity details */}
 			<ul style={{ listStyle: 'none', padding: 0 }}>
 				{dummyDetails.map((detail, index) => (
 					<li 
@@ -44,4 +44,4 @@ function MatchScreen() {
 	);
 }
 
-export default MatchScreen;
+export default ActivityScreen;
