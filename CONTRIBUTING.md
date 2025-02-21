@@ -25,7 +25,7 @@ Welcome to the Jain Events Portal project! This document outlines how to contrib
 ## Additional Notes
 - All assets should be prepared by ourselves or the design team (Avoid taking from online, which might cause issues when applying for patent).
 - Maintain a list of references for any external components you take from online.
-- Use the TODO.md files in sub-project directories (e.g., `/backend`, `/userview`) to track TODOs.
+- Use the TODO.md files in sub-project directories (e.g., `/backend`, `/clientview`) to track TODOs.
   - Use a tick (✓) for completed items, a cross (✖) for items that are not planned, and a dash (—) for pending items (default).
 - Update this document as new practices evolve.
 

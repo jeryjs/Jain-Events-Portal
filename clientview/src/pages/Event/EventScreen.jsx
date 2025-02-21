@@ -3,11 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 
 function EventScreen() {
     const { eventId } = useParams();
-    // Dummy matches for this event with unique text-based IDs
-    const dummyMatches = [
-        { id: 'match-1', name: 'Match 1' },
-        { id: 'match-2', name: 'Match 2' },
-        { id: 'match-3', name: 'Match 3' }
+    // Dummy Activities for this event with unique text-based IDs
+    const dummyActivities = [
+        { id: 'activity-1', name: 'Activity 1' },
+        { id: 'activity-2', name: 'Activity 2' },
+        { id: 'activity-3', name: 'Activity 3' }
     ];
 
     return (
@@ -28,12 +28,12 @@ function EventScreen() {
                     Back to Home
                 </Link>
             </div>
-            {/* List of match buttons */}
+            {/* List of Activity buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {dummyMatches.map((match) => (
+                {dummyActivities.map((Activity) => (
                     <Link
-                        key={match.id}
-                        to={`/event/${eventId}/${match.id}`}
+                        key={Activity.id}
+                        to={`/${eventId}/${Activity.id}`}
                         style={{
                             padding: '0.75rem 1.5rem',
                             backgroundColor: '#28a745',
@@ -44,7 +44,7 @@ function EventScreen() {
                             textAlign: 'center'
                         }}
                     >
-                        {match.name}
+                        {Activity.name}
                     </Link>
                 ))}
             </div>

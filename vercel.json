@@ -6,10 +6,10 @@
             "use": "@vercel/node"
         },
         {
-            "src": "userview/package.json",
+            "src": "clientview/package.json",
             "use": "@vercel/static-build",
             "config": {
-                "outDir": "./userview/dist"
+                "outDir": "./clientview/dist"
             }
         },
         {
@@ -35,7 +35,7 @@
         },
         {
             "src": "/(.*)",
-            "dest": "/userview/$1"
+            "dest": "/clientview/$1"
         }
     ]
 }

@@ -18,7 +18,7 @@ function HomeScreen() {
                     <Button
                         key={event.id}
                         component={Link}
-                        to={`/event/${event.id}`}
+                        to={`/${event.id}`}
                         sx={{
                             padding: '0.75rem 1.5rem',
                             backgroundColor: '#007bff',
