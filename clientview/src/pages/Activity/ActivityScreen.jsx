@@ -2,13 +2,13 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 function MatchScreen() {
-	const { eventId, matchId } = useParams();
+	const { eventId, activityId } = useParams();
 	// Dummy details for match
 	const dummyDetails = ['Detail A', 'Detail B', 'Detail C'];
 
 	return (
 		<div className="container">
-			<h1>Match: {matchId}</h1>
+			<h1>Match: {activityId}</h1>
 			{/* Back to Event */}
 			<div style={{ marginBottom: '1rem' }}>
 				<Link 

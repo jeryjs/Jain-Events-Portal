@@ -7,7 +7,7 @@
 - [—] Provide usage guidelines
 
 ## Components
-- [—] Refactor `Event` and `Match` to more generic names in consideration of culturals and other categories
+- [✓] Refactor `Event` and `Match` to more generic names in consideration of culturals and other categories
 - [—] Migrate to `styled components` instead of emotion library (https://mui.com/material-ui/getting-started/installation/#with-styled-components)
 - [—] Implement `HomePage` component
 - [—] Implement `EventPage` component
