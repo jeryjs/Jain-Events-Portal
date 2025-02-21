@@ -10,7 +10,7 @@ A React app with UI in MUI and Express.js backend for managing events at Jain Un
 - **Express Backend**: Handles API requests and serves the React app.
 - **Event Management**: Create, update, and manage events.
 - **Scalability**: Designed to handle thousands of visitors.
-- **Customisable**: Options for Payment/UPI settings, Firestore Database, etc.
+- **Customisable**: Options for ... etc.
 
 ## Preview
 <img src="https://github.com/user-attachments/assets/sample1" width="49%" alt="Login Page">
@@ -19,7 +19,7 @@ A React app with UI in MUI and Express.js backend for managing events at Jain Un
 <img src="https://github.com/user-attachments/assets/sample4" width="49%" alt="Gallery Page">
 <img src="https://github.com/user-attachments/assets/sample5" width="99%" alt=" Matches Page">
 
-## Installation
+## Build
 
 #### Prerequisites
 - Node.js
@@ -33,7 +33,7 @@ cd Jain-Events-Portal
 
 #### Install Dependencies
 ```bash
-npm run init:all
+npm run init
 ```
 
 ---
