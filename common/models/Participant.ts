@@ -1,13 +1,14 @@
-class Participant {
-  id: number;
-  name: string;
-  age: number;
+import { EventType, Gender } from "@common/constants";
 
-  constructor(id: number, name: string, age: number) {
-    this.id = id;
-    this.name = name;
-    this.age = age;
+export default class Participant {
+  constructor(
+    public usn: string,
+    public name: string,
+    public gender: Gender,
+    public event: EventType
+  ) {}
+
+  static parse(data: any): Participant {
+    return new Participant(data.usn, data.name, data.gender, data.event);
   }
 }
-
-export default Participant;

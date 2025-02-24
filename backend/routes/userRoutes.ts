@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
-import { Role } from '../../common/constants';
-import { generateToken } from '../utils/authUtils';
+import { Role } from '@common/constants';
+import { generateToken } from '@utils/authUtils';
+import { authenticateUser } from '@services/auth';
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ router.post('/authenticate', async (req: Request, res: Response) => {
             role: Role.USER
         };
 
-        if (password === 'test') {
+        if (await authenticateUser(username, password)) {
             const token = generateToken(userdata, Role.USER);
             res.json({ userData: userdata, token });
         } else {

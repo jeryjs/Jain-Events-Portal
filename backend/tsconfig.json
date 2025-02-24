@@ -3,7 +3,12 @@
         "target": "es6",
         "module": "commonjs",
         "paths": {
-            "@common/*": ["../common/*"]
+            "@common/*": ["../common/*"],
+            "@config/*": ["./config/*"],
+            "@middlewares/*": ["./middlewares/*"],
+            "@routes/*": ["./routes/*"],
+            "@services/*": ["./services/*"],
+            "@utils/*": ["./utils/*"]
         },
         "strict": true,
         "esModuleInterop": true,

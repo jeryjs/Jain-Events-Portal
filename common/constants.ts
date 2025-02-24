@@ -1,9 +1,21 @@
 export enum EventType {
+    GENERAL = 0,
+
     SPORTS = 1000,
-    VOLEYBALL = 1001,
+    VOLLEYBALL = 1001,
     FOOTBALL = 1002,
-    CRICKET = 1100,
+    CRICKET = 1003,
+    
     CULTURAL = 2000,
+    DANCE = 2001,
+    SINGING = 2002,
+    DJ = 2003,
+
+    TECH = 3000,
+    CODING = 3001,
+    HACKATHON = 3002,
+    QUIZ = 3003,
+    WORKSHOP = 3004,
 }
 
 export enum Role {
@@ -11,4 +23,10 @@ export enum Role {
     USER = 'user',
     GUEST = 'guest',
     MANAGER = 'manager',
+}
+
+export enum Gender {
+    MALE = 'male',    
+    FEMALE = 'female',
+    OTHER = 'other',
 }

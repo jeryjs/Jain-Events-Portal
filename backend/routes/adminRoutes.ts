@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
-import { Role } from '../../common/constants';
-import { generateToken } from '../utils/authUtils';
-import { authenticateUser } from '../services/auth';
+import { Role } from '@common/constants';
+import { generateToken } from '@utils/authUtils';
+import { authenticateUser } from '@services/auth';
 
 const router = express.Router();
 

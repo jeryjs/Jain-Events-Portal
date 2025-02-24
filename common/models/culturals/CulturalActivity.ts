@@ -11,6 +11,11 @@ class CulturalActivity extends Activity {
   ) {
     super(activityId, name, participants, EventType.CULTURAL);
   }
+
+  static parse(data: any): CulturalActivity {
+    const participants = data.participants.map((p: any) => Participant.parse(p));
+    return new CulturalActivity(data.activityId, data.name, participants, data.performanceDetails);
+  }
 }
 
 export default CulturalActivity;

@@ -1,13 +1,16 @@
 import Participant from './Participant';
 import { EventType } from '../constants';
 
-class Activity {
+export default class Activity {
     constructor(
-        public activityId: string,
+        public id: string,
         public name: string,
         public participants: Participant[],
         public eventType: EventType
     ) {}
-}
 
-export default Activity;
+    static parse(data: any): Activity {
+        const participants = data.participants.map((p: any) => Participant.parse(p));
+        return new Activity(data.activityId, data.name, participants, data.eventType);
+    }
+}
