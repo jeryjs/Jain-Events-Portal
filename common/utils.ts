@@ -1,22 +1,22 @@
-import Event from './models/Event';
+import EventModel from './models/EventModel';
 import Activity from './models/Activity';
 import Participant from './models/Participant';
 import CulturalActivity from './models/culturals/CulturalActivity';
 import SportActivity from './models/sports/SportsActivity';
 import { CricketPlayer, FootballPlayer, BasketballPlayer } from './models/sports/SportsParticipant';
-import { EVENT_TYPE } from './constants';
+import { EventType } from './constants';
 
 // Define types for event, activity, and participant data
 interface EventData {
-    id: number;
+    id: string;
     name: string;
-    type: number;
+    type: EventType;
 }
 
 interface ActivityData {
-    activityId: number;
+    activityId: string;
     name: string;
-    eventType: number;
+    eventType: EventType;
     participants: ParticipantData[];
     rounds?: number;
     performanceDetails?: string;
@@ -30,8 +30,8 @@ interface ParticipantData {
     [key: string]: any; // Allows for additional dynamic properties
 }
 
-function parseEvent(data: EventData): Event {    
-    return new Event(
+function parseEvent(data: EventData): EventModel {    
+    return new EventModel(
         data.id,
         data.name,
         // data.activities.map(parseActivity), // Uncomment if needed
@@ -41,22 +41,22 @@ function parseEvent(data: EventData): Event {
 
 function parseActivity(data: ActivityData): Activity {
     switch (data.eventType) {
-        case EVENT_TYPE.SPORTS:
-        case EVENT_TYPE.VOLEYBALL:
-        case EVENT_TYPE.FOOTBALL:
-        case EVENT_TYPE.CRICKET:
+        case EventType.SPORTS:
+        case EventType.VOLEYBALL:
+        case EventType.FOOTBALL:
+        case EventType.CRICKET:
             return new SportActivity(
                 data.activityId,
                 data.name,
                 data.participants.map(parseParticipant),
-                data.rounds
+                data.rounds || 0
             );
-        case EVENT_TYPE.CULTURAL:
+        case EventType.CULTURAL:
             return new CulturalActivity(
                 data.activityId,
                 data.name,
                 data.participants.map(parseParticipant),
-                data.performanceDetails
+                data.performanceDetails || ''
             );
         default:
             return new Activity(
@@ -79,12 +79,6 @@ function parseParticipant(data: ParticipantData): Participant {
         default:
             return new Participant(data.id, data.name, data.age);
     }
-}
-
-function getPrimaryEventType(data: { eventType: number }): typeof Activity {
-    if (data.eventType > EVENT_TYPE.CULTURAL) return CulturalActivity;
-    if (data.eventType > EVENT_TYPE.SPORTS) return SportActivity;
-    throw new Error('Invalid event type'); // Ensures safety
 }
 
 export { parseEvent, parseActivity, parseParticipant };

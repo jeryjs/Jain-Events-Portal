@@ -4,7 +4,7 @@ interface UserData {
   username: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 /**
  * Generates a JSON Web Token (JWT) for user authentication

@@ -1,21 +1,34 @@
 import db from '../config/firebase';
 import { cache, TTL } from '../config/cache';
-import Event from '@common/models/Event';
+// import EventModel from '@common/models/EventModel';
 import Activity from '@common/models/Activity';
-import { parseActivity } from '@common/utils';
+import {parseActivity} from '../../common/utils';
+class EventModel {
+	eventId: string;
+	name: string;
+	eventType: number;
+	constructor(eventId: string, name: string, eventType: number) {
+		this.eventId = eventId;
+		this.name = name;
+		// this.activities = activities; // array of Activity (or subclass) instances
+		this.eventType = eventType;
+	}
+}
 
-const getEvents = async (): Promise<Event[]> => {
+// export default EventModel;
+
+const getEvents = async (): Promise<EventModel[]> => {
     const cachedEvents = cache.get("events");
 
     if (cachedEvents) {
         console.log(`📦 Serving cached events`);
-        return cachedEvents as Event[];
+        return cachedEvents as EventModel[];
     }
 
     const snapshot = await db.collection("events").get();
     const events = snapshot.docs.map((doc: any) => {
         const data = doc.data();
-        return new Event(data.id, data.name, data.type);
+        return new EventModel(data.id, data.name, data.type);
     });
     
     cache.set("events", events, TTL.EVENTS);

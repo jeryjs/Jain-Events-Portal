@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { ROLE } from '@common/constants';
+import { Role } from '../../common/constants';
 import { generateToken } from '../utils/authUtils';
 
 const router = express.Router();
@@ -17,16 +17,16 @@ router.post('/authenticate', async (req: Request, res: Response) => {
         // TODO: implement proper function to authenticate user
         const userdata: UserData = {
             username,
-            role: ROLE.USER
+            role: Role.USER
         };
 
         if (password === 'test') {
-            const token = generateToken(userdata, ROLE.USER);
+            const token = generateToken(userdata, Role.USER);
             res.json({ userData: userdata, token });
         } else {
             res.status(401).send('Invalid credentials');
         }
-    } catch (e) {
+    } catch (e: any) {
         res.status(500).send(`Login failed: ${e.message}`);
     }
 });

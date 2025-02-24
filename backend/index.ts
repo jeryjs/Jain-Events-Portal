@@ -1,13 +1,11 @@
 // import 'module-alias/register';
-import * as dotenv from 'dotenv';
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 // import cors from 'cors';
 
 import eventRoutes from './routes/eventRoutes';
 import userRoutes from './routes/userRoutes';
 import adminRoutes from './routes/adminRoutes';
-
-dotenv.config();
 
 const app = express();
 

@@ -1,7 +1,11 @@
-import Participant from '@common/models/Participant';
+import Participant from '../Participant';
 
 class CricketPlayer extends Participant {
-  constructor(id, name, age, runs, wickets) {
+  role: string;
+  runs: number;
+  wickets: number;
+
+  constructor(id: number, name: string, age: number, runs: number, wickets: number) {
     super(id, name, age);
     this.role = "CricketPlayer";
     this.runs = runs;
@@ -10,7 +14,12 @@ class CricketPlayer extends Participant {
 }
 
 class FootballPlayer extends Participant {
-  constructor(id, name, age, position, goals, assists) {
+  role: string;
+  position: string;
+  goals: number;
+  assists: number;
+
+  constructor(id: number, name: string, age: number, position: string, goals: number, assists: number) {
     super(id, name, age);
     this.role = "FootballPlayer";
     this.position = position;
@@ -20,7 +29,14 @@ class FootballPlayer extends Participant {
 }
 
 class BasketballPlayer extends Participant {
-  constructor(id, name, age, points, rebounds, assists, steals, blocks) {
+  role: string;
+  points: number;
+  rebounds: number;
+  assists: number;
+  steals: number;
+  blocks: number;
+
+  constructor(id: number, name: string, age: number, points: number, rebounds: number, assists: number, steals: number, blocks: number) {
     super(id, name, age);
     this.role = "BasketballPlayer";
     this.points = points;
