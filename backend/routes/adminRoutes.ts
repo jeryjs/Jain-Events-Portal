@@ -1,11 +1,18 @@
-const express = require('express');
-const { ROLE } = require('@common/constants');
-const { generateToken } = require('../utils/authUtils');
+import express, { Request, Response } from 'express';
+import { ROLE } from '@common/constants';
+import { generateToken } from '../utils/authUtils';
 
 const router = express.Router();
 
+interface AuthRequest extends Request {
+    body: {
+        username: string;
+        password: string;
+    };
+}
+
 // Route to authenticate admin and generate jwt token
-router.post('/authenticate', async (req, res) => {
+router.post('/authenticate', async (req: AuthRequest, res: Response) => {
     try {
         const { username, password } = req.body;
 
@@ -15,7 +22,7 @@ router.post('/authenticate', async (req, res) => {
             role: ROLE.ADMIN
         };
 
-        if (password == 'test') {
+        if (password === 'test') {
             const token = generateToken(userdata, ROLE.ADMIN);
             res.json({ userData: userdata, token });
         } else {
@@ -26,4 +33,4 @@ router.post('/authenticate', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

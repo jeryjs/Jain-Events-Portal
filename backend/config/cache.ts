@@ -1,4 +1,4 @@
-const NodeCache = require('node-cache');
+import NodeCache from 'node-cache';
 
 // TTL in seconds
 const TTL = {
@@ -12,4 +12,4 @@ const cache = new NodeCache({
     checkperiod: 120,
 });
 
-module.exports = { TTL, cache };
+export { cache, TTL };

@@ -1,9 +1,9 @@
-const { Router } = require('express');
-const { getEvents } = require("../services/events");
+import { Router, Request, Response } from 'express';
+import { getEvents, getActivities } from "../services/events";
 
 const router = Router();
 
-router.get('/events', async (_, res) => {
+router.get('/events', async (_: Request, res: Response) => {
     try {
         const events = await getEvents();
         res.json(events);
@@ -13,7 +13,7 @@ router.get('/events', async (_, res) => {
     }
 });
 
-router.get('/activities/:eventId', async (req, res) => {
+router.get('/activities/:eventId', async (req: Request, res: Response) => {
     try {
         const activities = await getActivities(req.params.eventId);
         res.json(activities);
@@ -23,4 +23,4 @@ router.get('/activities/:eventId', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

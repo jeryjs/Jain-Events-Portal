@@ -1,11 +1,16 @@
-const { verifyToken } = require('../utils/authUtils');
-const { ROLE } = require('@common/constants');
+import { Request, Response, NextFunction } from 'express';
+import { verifyToken } from '../utils/authUtils';
+import { ROLE } from '@common/constants';
+
+interface AuthenticatedRequest extends Request {
+  user?: any;
+}
 
 /**
  * @description Middleware to authenticate user based on JWT token.
  * @returns {Object} - Returns error response if token is missing or invalid, otherwise calls next middleware.
  */
-const authMiddleware = (req, res, next) => {
+const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction): Response | void => {
   const token = req.headers.authorization?.split(' ')[1];
   
   if (!token) {
@@ -25,11 +30,11 @@ const authMiddleware = (req, res, next) => {
  * @description Middleware to authorize user with admin role.
  * @returns {Object} - Returns error response if user is not an admin, otherwise calls next middleware.
  */
-const adminMiddleware = (req, res, next) => {
+const adminMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction): Response | void => {
   if (req.user?.role !== ROLE.ADMIN) {
     return res.status(403).json({ message: 'Admin access required' });
   }
   next();
 };
 
-module.exports = { authMiddleware, adminMiddleware };
+export { authMiddleware, adminMiddleware };
