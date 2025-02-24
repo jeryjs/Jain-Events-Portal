@@ -1,21 +1,26 @@
-const express = require('express');
-const { ROLE } = require('../constants');
-const { generateToken } = require('../utils/authUtils');
+import express, { Request, Response } from 'express';
+import { ROLE } from '@common/constants';
+import { generateToken } from '../utils/authUtils';
 
 const router = express.Router();
 
+interface UserData {
+    username: string;
+    role: string;
+}
+
 // Route to authenticate user and generate jwt token
-router.post('/authenticate', async (req, res) => {
+router.post('/authenticate', async (req: Request, res: Response) => {
     try {
         const { username, password } = req.body;
 
         // TODO: implement proper function to authenticate user
-        const userdata = {
+        const userdata: UserData = {
             username,
             role: ROLE.USER
         };
 
-        if (password == 'test') {
+        if (password === 'test') {
             const token = generateToken(userdata, ROLE.USER);
             res.json({ userData: userdata, token });
         } else {
@@ -26,4 +31,4 @@ router.post('/authenticate', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

@@ -13,7 +13,7 @@ const ROLE = {
     GUEST: 'guest',
 }
 
-module.exports = {
+export {
     EVENT_TYPE,
     ROLE,
 }
