@@ -1,17 +1,16 @@
 // import 'module-alias/register';
-import * as dotenv from 'dotenv';
+import 'dotenv/config';
+import 'module-alias/register';
 import express, { Request, Response } from 'express';
-// import cors from 'cors';
+import cors from 'cors';
 
-import eventRoutes from './routes/eventRoutes';
-import userRoutes from './routes/userRoutes';
-import adminRoutes from './routes/adminRoutes';
-
-dotenv.config();
+import eventRoutes from '@routes/eventRoutes';
+import userRoutes from '@routes/userRoutes';
+import adminRoutes from '@routes/adminRoutes';
 
 const app = express();
 
-// app.use(cors());
+app.use(cors<Request>());
 app.use(express.json());
 
 app.get("/api", (req: Request, res: Response) => {

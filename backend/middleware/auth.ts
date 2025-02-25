@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '../utils/authUtils';
-import { ROLE } from '@common/constants';
+import { verifyToken } from '@utils/authUtils';
+import { Role } from '@common/constants';
 
 interface AuthenticatedRequest extends Request {
   user?: any;
@@ -31,7 +31,7 @@ const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunc
  * @returns {Object} - Returns error response if user is not an admin, otherwise calls next middleware.
  */
 const adminMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction): Response | void => {
-  if (req.user?.role !== ROLE.ADMIN) {
+  if (req.user?.role !== Role.ADMIN) {
     return res.status(403).json({ message: 'Admin access required' });
   }
   next();
