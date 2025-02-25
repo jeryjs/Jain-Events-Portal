@@ -13,8 +13,8 @@ export default class Event {
 		public venue: string
 	) {
 		this.time = {
-			start: this.timings[0].toDate(),
-			end: this.timings[this.timings.length - 1].toDate()
+			start: Date(this.timings[0]._seconds),
+			end: Date(this.timings[this.timings.length - 1]._seconds),
 		};
 	}
 
