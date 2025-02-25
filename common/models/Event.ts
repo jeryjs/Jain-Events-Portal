@@ -1,37 +1,50 @@
 import { EventType } from "@common/constants";
-import { Timestamp } from 'firebase-admin/firestore';
 
 export default class Event {
-	public time: { start: Date; end: Date };
+  public timings: Date[];
 
-	constructor(
-		public id: string,
-		public name: string,
-		public eventType: EventType,
-		public timings: Timestamp[],
-		public description: string,
-		public venue: string
-	) {
-		this.time = {
-			start: Date(this.timings[0]._seconds),
-			end: Date(this.timings[this.timings.length - 1]._seconds),
-		};
-	}
+  constructor(
+    public id: string,
+    public name: string,
+    public type: EventType,
+    timings: any[] | Date[],
+    public description: string,
+    public venue: string
+  ) {
+    // Convert Timestamp-like objects (from firestore) to Date
+    this.timings = timings.map(t => {
+		// If already a Date object
+		if (t instanceof Date) return t;
+		
+		// If it's a seconds+nanoseconds format (Firestore serialized timestamp)
+		if (t && typeof t._seconds === 'number' && typeof t._nanoseconds === 'number') {
+		  return new Date((t._seconds * 1000) + (t._nanoseconds / 1000000));
+		}
+      return new Date(t as any);
+    });
+  }
 
-	static parse(data: any): Event {
-		return new Event(
-			data.id,
-			data.name,
-			data.eventType,
-			data.timings,
-			data.description,
-			data.venue
-		);
-	}
+  static parse(data: any): Event {
+    return new Event(
+      data.id,
+      data.name,
+      data.type,
+      data.timings,
+      data.description,
+      data.venue
+    );
+  }
 
-	getDuration(): number {
-		const start = this.time.start.getTime();
-		const end = this.timings[this.timings.length - 1].toDate().getTime();
-		return end - start;
-	}
+  get time() {
+    return {
+      start: this.timings[0],
+      end: this.timings[this.timings.length - 1],
+    };
+  }
+
+  get duration() {
+    const start = this.time.start.getTime();
+    const end = this.time.end.getTime();
+    return end - start;
+  }
 }
