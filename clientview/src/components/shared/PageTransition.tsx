@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { styled } from '@mui/material/styles';
-import Event from '@common/models/Event';
 
 const TransitionWrapper = styled(motion.div)(({ theme }) => ({
   width: '100%',
