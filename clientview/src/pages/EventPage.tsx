@@ -18,11 +18,9 @@ import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { motion } from 'framer-motion';
-import { useEvents } from '../hooks/useEvents';
-import { useActivities } from '../hooks/useActivities';
-import ActivityCard from '../components/shared/ActivityCard';
+import { useEvents, useActivities } from '../hooks/useApi';
+import ActivityCard from '@components/shared/ActivityCard';
 import PhotoGallery from '../components/shared/PhotoGallery';
 import PageTransition from '../components/shared/PageTransition';
 import { EventType } from '@common/constants';
@@ -82,19 +80,19 @@ const ActivitySectionContainer = styled(Box)(({ theme }) => ({
 
 // Helper function to get event type text based on EventType enum
 const getEventTypeText = (type: number): string => {
-  if (type >= 1000 && type < 2000) return 'Sports Event';
-  if (type >= 2000 && type < 3000) return 'Cultural Event';
-  if (type >= 3000 && type < 4000) return 'Tech Event';
+  if (type >= EventType.TECH) return 'Tech Event';
+  if (type >= EventType.CULTURAL) return 'Cultural Event';
+  if (type >= EventType.SPORTS) return 'Sports Event';
   return 'General Event';
 };
 
 // Helper function to get default image based on event type
 const getDefaultImage = (eventType: number): string => {
-  if (eventType >= 1000 && eventType < 2000) {
+  if (eventType >= EventType.TECH) {
     return 'https://picsum.photos/480/360?random';
-  } else if (eventType >= 2000 && eventType < 3000) {
+  } else if (eventType >= EventType.CULTURAL) {
     return 'https://picsum.photos/480/360?random';
-  } else if (eventType >= 3000) {
+  } else if (eventType >= EventType.SPORTS) {
     return 'https://picsum.photos/480/360?random';
   } else {
     return 'https://picsum.photos/480/360?random';
@@ -104,6 +102,9 @@ const getDefaultImage = (eventType: number): string => {
 // Activity list component with React.Suspense
 const ActivitiesSection = ({ eventId }: { eventId: string }) => {
   const { data: activities, isLoading } = useActivities(eventId);
+
+  // Fix type issue with .length
+  const activitiesLength = activities && Array.isArray(activities) ? activities.length : 0;
 
   if (isLoading) {
     return (
@@ -117,7 +118,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
     );
   }
 
-  if (!activities || activities.length === 0) {
+  if (!activities || activitiesLength === 0) {
     return (
       <Paper sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
         <Typography color="text.secondary">No activities found for this event</Typography>
@@ -127,7 +128,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
 
   return (
     <Box>
-      {activities.map((activity, index) => (
+      {activities && Array.isArray(activities) && activities.map((activity, index) => (
         <ActivityCard
           key={activity.id}
           activity={activity}

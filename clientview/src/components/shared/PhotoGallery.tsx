@@ -78,7 +78,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         </Button>
       </TitleContainer>
 
-      <ImageGrid container component={motion.div} whileTap={{ cursor: 'grabbing' }}>
+      <ImageGrid container sx={{ '&:active': { scale: 0.95 } }}>
         {isLoading ? (
           Array(4).fill(0).map((_, index) => (
             <Box key={index} sx={{ width: 150, height: 150, mr: 1 }}>

@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { useEvents } from '../hooks/useEvents';
+import { useEvents } from '../hooks/useApi';
 import EventCard from '../components/shared/EventCard';
 import PageTransition from '../components/shared/PageTransition';
 import { ColorModeContext } from '../App';
@@ -203,7 +203,13 @@ function HomePage() {
           </Button>
         </SectionHeader>
 
-        <Box>
+        <Box 
+          sx={{ 
+            '&:active': {
+              scale: 0.95
+            }
+          }}
+        >
           {isLoading ? 
             renderEventCardShimmers(3, 'horizontal') :
             upcomingEvents.map((event, index) => (

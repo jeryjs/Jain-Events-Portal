@@ -117,10 +117,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
         <Link to={`/${event.id}`} style={{ textDecoration: 'none' }}>
           <Card sx={{ display: 'flex', mb: 2, borderRadius: 2 }}>
             <CardMedia
-              component="img"
-              sx={{ width: 120, height: 120 }}
+              sx={{ height: 140 }}
               image={getDefaultImage()}
-              alt={event.name}
+              title={event.name}
             />
             <Box sx={{ display: 'flex', flexDirection: 'column', p: 2 }}>
               <Typography component="div" variant="h6" sx={{ fontWeight: 'bold' }}>
