@@ -46,10 +46,10 @@ const Image = styled('img')({
 
 // Sample placeholder images
 const placeholderImages = [
-  'https://picsum.photos/480/360?random',
-  'https://picsum.photos/480/360?random',
-  'https://picsum.photos/480/360?random',
-  'https://picsum.photos/480/360?random',
+  'https://picsum.photos/480/360?random=1',
+  'https://picsum.photos/480/360?random=2',
+  'https://picsum.photos/480/360?random=3',
+  'https://picsum.photos/480/360?random=4',
 ];
 
 interface PhotoGalleryProps {
@@ -67,7 +67,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   return (
     <GalleryContainer>
       <TitleContainer>
-        <Typography variant="h6" fontWeight="bold">{title}</Typography>
+        <Typography variant="h6" color='text.primary' fontWeight="bold">{title}</Typography>
         <Button
           endIcon={<ArrowForwardIcon />}
           color="inherit"
@@ -78,7 +78,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         </Button>
       </TitleContainer>
 
-      <ImageGrid container component={motion.div} whileTap={{ cursor: 'grabbing' }}>
+      <ImageGrid container sx={{ '&:active': { scale: 0.95 } }}>
         {isLoading ? (
           Array(4).fill(0).map((_, index) => (
             <Box key={index} sx={{ width: 150, height: 150, mr: 1 }}>

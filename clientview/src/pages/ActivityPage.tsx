@@ -1,44 +1,47 @@
-import React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
+
+const ActivityContainer = styled('div')`
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+`;
+const BackButton = styled(Link)(({ theme }) => `
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #6c757d;
+  color: ${theme.palette.text.primary};
+  border-radius: 4px;
+  text-decoration: none;
+`);
+const DetailList = styled('ul')`
+  list-style: none;
+  padding: 0;
+`;
+const DetailItem = styled('li')`
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+`;
 
 function ActivityPage() {
-  const { eventId, activityId } = useParams<{ eventId: string; activityId: string }>()
-  const dummyDetails = ['Detail A', 'Detail B', 'Detail C']
+  const { eventId, activityId } = useParams<{ eventId: string; activityId: string }>();
+  const dummyDetails = ['Detail A', 'Detail B', 'Detail C'];
 
   return (
-    <div className="container">
+    <ActivityContainer>
       <h1>Activity: {activityId}</h1>
       <div style={{ marginBottom: '1rem' }}>
-        <Link
-          to={`/${eventId}`}
-          style={{
-            padding: '0.5rem 1rem',
-            backgroundColor: '#6c757d',
-            color: '#fff',
-            borderRadius: '4px',
-            textDecoration: 'none'
-          }}
-        >
-          Back to Event
-        </Link>
+        <BackButton to={`/${eventId}`}>Back to Event</BackButton>
       </div>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+      <DetailList>
         {dummyDetails.map((detail, index) => (
-          <li
-            key={index}
-            style={{
-              padding: '0.75rem',
-              backgroundColor: '#f8f9fa',
-              marginBottom: '0.5rem',
-              borderRadius: '4px'
-            }}
-          >
-            {detail}
-          </li>
+          <DetailItem key={index}>{detail}</DetailItem>
         ))}
-      </ul>
-    </div>
-  )
+      </DetailList>
+    </ActivityContainer>
+  );
 }
 
-export default ActivityPage
+export default ActivityPage;

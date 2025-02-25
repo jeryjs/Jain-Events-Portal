@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [react()],
   base: '/admin/',  
   server: {
-    port: 5781
+    port: 5781,
+    host: "0.0.0.0"
   },
   resolve: {
     alias: {

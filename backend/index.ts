@@ -21,5 +21,5 @@ app.use("/api", eventRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Api server running on port ${PORT}`));
+const PORT = (process.env.PORT || 3000) as number;
+app.listen(PORT, "0.0.0.0", () => console.log(`Api server running on port ${PORT}`));
