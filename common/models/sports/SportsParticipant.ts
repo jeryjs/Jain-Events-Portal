@@ -17,6 +17,17 @@ export interface Cricket {
   wickets: number;
 }
 
+export interface Basketball {
+  points: number;
+  rebounds: number;
+  assists: number;
+}
+
+export interface Throwball {
+  points: number;
+  catches: number;
+}
+
 export type Sport = Volleyball | Football | Cricket;
 
 export default class SportsPlayer<T extends Sport> extends Participant {
