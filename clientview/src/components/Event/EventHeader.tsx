@@ -4,7 +4,7 @@ const EventHeader: React.FC = () => {
   return (
     <header>
       {/* Event header implementation */}
-      Event Header Component
+      Event Header Component 
     </header>
   )
 }
