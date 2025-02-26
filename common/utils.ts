@@ -1,21 +1,16 @@
 import { EventType } from './constants';
-import Activity from './models/Activity';
-import CulturalActivity from './models/culturals/CulturalActivity';
-import SportsActivity from './models/sports/SportsActivity';
+import { Event, Activity } from './models';
 
-function parseActivity(data: any): Activity {
-    switch (getBaseEventType(data.eventType)) {
-        case EventType.SPORTS: return SportsActivity.parse(data);
-        case EventType.CULTURAL: return CulturalActivity.parse(data);
-        default: return Activity.parse(data);
-    }
+export function parseEvents(data: any[]): Event[] {
+    return data.map((it: any) => Event.parse(it));
 }
 
-const getBaseEventType = (it: number): EventType => {
+export function parseActivities(data: any[]): Activity[] {
+    return data.map((it: any) => Activity.parse(it));
+}
+
+export const getBaseEventType = (it: number): EventType => {
     if (it >= EventType.CULTURAL) return EventType.CULTURAL;
     else if (it >= EventType.SPORTS) return EventType.SPORTS;
     else return EventType.GENERAL;
 };
-
-export { parseActivity };
-

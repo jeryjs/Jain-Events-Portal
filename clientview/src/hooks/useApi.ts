@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import Activity from '@common/models/Activity';
 import Event from '@common/models/Event';
-import { parseActivity } from '@common/utils';
+import { parseActivities } from '@common/utils';
 import config from '../config';
 
 const _fetchEvents = async (): Promise<Event[]> => {
@@ -41,7 +41,7 @@ const _fetchActivities = async (eventId: string): Promise<Activity[]> => {
   }
   
   const data: any = await response.json();
-  return data.map((activity: any) => parseActivity(activity));
+  return parseActivities(data);
 };
 
 export const useActivities = (eventId: string | undefined) => {

@@ -3,7 +3,7 @@ import NodeCache from 'node-cache';
 // TTL in seconds
 const TTL = {
     EVENTS: 300, // 5 mins
-    ACTIVITY: 60, // 1 min
+    ACTIVITIES: 60, // 1 min
     USER_DATA: 1800, // 30 mins
 };
 

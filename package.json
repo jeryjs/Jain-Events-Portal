@@ -8,17 +8,14 @@
 		"start:clientview": "cd clientview && npm run dev",
 		"start:adminview": "cd adminview && npm run dev",
 		"dev": "concurrently \"npm run start:backend\" \"npm run start:clientview\" \"npm run start:adminview\"",
-
 		"init:backend": "cd backend && npm install",
 		"init:clientview": "cd clientview && npm install",
 		"init:adminview": "cd adminview && npm install",
 		"init": "npm install && concurrently \"npm run init:backend\" \"npm run init:clientview\" \"npm run init:adminview\"",
-
 		"update:backend": "cd backend && npm update",
 		"update:clientview": "cd clientview && npm update",
 		"update:adminview": "cd adminview && npm update",
 		"update": "npm update && concurrently \"npm run update:backend\" \"npm run update:clientview\" \"npm run update:adminview\"",
-
 		"clean:backend": "cd backend && npm cache clean --force && rm -rf node_modules",
 		"clean:clientview": "cd clientview && npm cache clean --force && rm -rf node_modules",
 		"clean:adminview": "cd adminview && npm cache clean --force && rm -rf node_modules",
@@ -28,6 +25,7 @@
 	"author": "Jery",
 	"license": "MIT",
 	"dependencies": {
-		"concurrently": "^8.2.2"
+		"concurrently": "^8.2.2",
+		"jiti": "^2.4.2"
 	}
 }

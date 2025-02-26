@@ -2,7 +2,7 @@ import Activity from "../Activity";
 import { EventType } from "../../constants";
 import SportsPlayer, { Sport } from "./SportsParticipant";
 
-class SportActivity extends Activity {
+class SportsActivity extends Activity {
     constructor(
         public id: string, 
         public name: string,   
@@ -12,9 +12,9 @@ class SportActivity extends Activity {
         super(id, name, participants, eventType);
     }
 
-    static parse(data: any): SportActivity {
+    static parse(data: any): SportsActivity {
         const participants = data.participants.map((p: any) => SportsPlayer.parse(p));
-        return new SportActivity(data.id, data.name, participants, data.eventType);
+        return new SportsActivity(data.id, data.name, participants, data.eventType);
     }
 
     getTotalParticipants(): number {
@@ -22,4 +22,4 @@ class SportActivity extends Activity {
     }
 }
 
-export default SportActivity;
+export default SportsActivity;
