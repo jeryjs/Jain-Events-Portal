@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -32,10 +32,36 @@ const ContentSection = styled(Box)(({ theme }) => `
   color: ${theme.palette.text.primary};
   margin: ${theme.spacing(3)} 0;
 `);
-const InfoIconWrapper = styled(Box)(({ theme }) => `
-  color: ${theme.palette.text.secondary};
-  display: flex; align-items: flex-start; margin-bottom: ${theme.spacing(2)};
+const DescriptionText = styled(Typography)(({ theme }) => ({
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  display: '-webkit-box',
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: 'vertical',
+  marginBottom: theme.spacing(1)
+}));
+const IconSquircle = styled(Box)(({ theme }) => `
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background-color: ${theme.palette.hover};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: ${theme.spacing(2)};
 `);
+const InfoIconWrapper = styled(Box)(({ theme }) => `
+  display: flex;
+  align-items: center;
+  margin-bottom: ${theme.spacing(3)};
+  padding: ${theme.spacing(1.5)};
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  &:hover {
+    background-color: ${theme.palette.hover};
+  }
+`);
+        
 const ActivitySectionContainer = styled(Box)(({ theme }) => `
   margin: ${theme.spacing(3)} 0;
 `);
@@ -62,7 +88,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
       <Box>
         {Array(3).fill(0).map((_, index) => (
           <Box key={index} sx={{ mb: 2 }}>
-            <Skeleton variant="rectangular" height={80} sx={{ borderRadius: 1 }} />
+            <Skeleton variant="rounded" height={80} sx={{ borderRadius: 1 }} />
           </Box>
         ))}
       </Box>
@@ -88,6 +114,21 @@ function EventPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const { data: event, isLoading: eventLoading } = useEvent(eventId);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  
+  // Check if description is truncated
+  useEffect(() => {
+    if (descriptionRef.current && event?.description) {
+      const element = descriptionRef.current;
+      setIsDescriptionTruncated(
+        element.scrollHeight > element.clientHeight || 
+        element.offsetHeight < element.scrollHeight
+      );
+    }
+  }, [event?.description]);
+  
   const formatEventDate = () => {
     if (!event) return { date: '', dayTime: '' };
     const start = new Date(event.time.start);
@@ -107,7 +148,7 @@ function EventPage() {
       <PageTransition>
         <Container maxWidth="lg" sx={{ pt: 2, pb: 8 }}>
           <Box sx={{ mb: 2 }}>
-            <Skeleton variant="rectangular" height={250} />
+            <Skeleton variant="rounded" height={250} />
           </Box>
           <Box sx={{ mb: 2 }}>
             <Skeleton variant="text" height={60} width="80%" />
@@ -160,28 +201,37 @@ function EventPage() {
       <Container maxWidth="lg" sx={{ pt: 3, pb: 8 }}>
         
         {/* Event Title */}
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 3 }}>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 3, color: 'text.primary' }}>
           {event.name}
         </Typography>
 
         {/* Date, Time, Location Info */}
         <InfoIconWrapper>
-          <CalendarTodayIcon sx={{ mr: 2, color: 'text.secondary' }} />
+          <IconSquircle>
+            <CalendarTodayIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+          </IconSquircle>
           <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
               {formattedDate.date}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="subtitle1" color="text.secondary">
               {formattedDate.dayTime}
             </Typography>
           </Box>
         </InfoIconWrapper>
         
         <InfoIconWrapper>
-          <LocationOnIcon sx={{ mr: 2, color: 'text.secondary' }} />
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            {event.venue}
-          </Typography>
+          <IconSquircle>
+            <LocationOnIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+          </IconSquircle>
+          <Box>
+            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
+              {event.venue}
+            </Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              Tap for directions
+            </Typography>
+          </Box>
         </InfoIconWrapper>
 
         <Divider sx={{ my: 3 }} />
@@ -191,22 +241,51 @@ function EventPage() {
           <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
             About Event
           </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            {event.description?.length > 150 ? `${event.description.substring(0, 150)}... ` : event.description}
-            {event.description?.length > 150 && (
-              <Typography 
-                component="span" 
-                sx={{ 
-                  color: 'primary.main', 
-                  fontWeight: 'medium',
-                  cursor: 'pointer',
-                  '&:hover': { textDecoration: 'underline' }
-                }}
+          {showFullDescription ? (
+            <Typography variant="body1" color="text.secondary" paragraph>
+              {event.description}
+              {isDescriptionTruncated && (
+                <Typography 
+                  component="span" 
+                  sx={{ 
+                    color: 'primary.main', 
+                    fontWeight: 'medium',
+                    cursor: 'pointer',
+                    display: 'block',
+                    mt: 1,
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
+                  onClick={() => setShowFullDescription(false)}
+                >
+                  Show Less
+                </Typography>
+              )}
+            </Typography>
+          ) : (
+            <>
+              <DescriptionText 
+                variant="body1" 
+                color="text.secondary"
+                ref={descriptionRef}
               >
-                Read More
-              </Typography>
-            )}
-          </Typography>
+                {event.description}
+              </DescriptionText>
+              {isDescriptionTruncated && (
+                <Typography 
+                  component="span" 
+                  sx={{ 
+                    color: 'primary.main', 
+                    fontWeight: 'medium',
+                    cursor: 'pointer',
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
+                  onClick={() => setShowFullDescription(true)}
+                >
+                  Read More
+                </Typography>
+              )}
+            </>
+          )}
         </ContentSection>
         <ActivitySectionContainer>
           <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
@@ -227,6 +306,9 @@ function EventPage() {
 
         <Divider sx={{ my: 3 }} />
 
+        <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
+            Photos
+          </Typography>
         {/* Photo Gallery Section */}
         <PhotoGallery />
 
