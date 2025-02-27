@@ -53,6 +53,7 @@ export const EventsList = memo(({ selectedEventId, onSelectEvent, onCreateEvent 
     >
       <Box
         component="header"
+        onClick={toggleCollapsed}
         sx={{
           p: 2,
           borderBottom: '1px solid',
@@ -60,12 +61,12 @@ export const EventsList = memo(({ selectedEventId, onSelectEvent, onCreateEvent 
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          cursor: 'pointer',
         }}
       >
         <Typography variant="h6" component="h2">Events</Typography>
         <Tooltip title={collapsed ? "Expand events" : "Collapse events"}>
           <IconButton
-            onClick={toggleCollapsed}
             size="small"
             aria-label={collapsed ? "Expand events" : "Collapse events"}
             sx={{
