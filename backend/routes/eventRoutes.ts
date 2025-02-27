@@ -1,36 +1,79 @@
+// filepath: y:\All-Projects\Jain-Events-Portal\backend\routes\eventRoutes.ts
 import { Router, Request, Response } from 'express';
-import { getEvents, getActivities } from "@services/events";
+import { 
+    getEvents, 
+    getEventById, 
+    createEvent, 
+    updateEvent, 
+    deleteEvent,
+} from "../services/events";
 
 const router = Router();
 
+/**
+ * Event Routes
+ */
+
+// Get all events
 router.get('/events', async (_: Request, res: Response) => {
     try {
         const events = await getEvents();
         res.json(events);
     } catch (error) {
         console.error('Error fetching events:', error);
-        res.status(500).json({ message: 'Error fetching events' });
+        res.status(500).json({ message: 'Error fetching events', details: error });
     }
 });
 
-router.get('/event/:eventId', async (req: Request, res: Response) => {
+// Get event by ID
+router.get('/events/:eventId', async (req: Request, res: Response) => {
     try {
-        const events = await getEvents();
-        const event = events.find((event) => event.id === req.params.eventId);
-        res.json(event);
+        const event = await getEventById(req.params.eventId);
+        if (event) {
+            res.json(event);
+        } else {
+            res.status(404).json({ message: 'Event not found' });
+        }
     } catch (error) {
         console.error('Error fetching event:', error);
-        res.status(500).json({ message: 'Error fetching event' });
+        res.status(500).json({ message: 'Error fetching event', details: error });
     }
 });
 
-router.get('/activities/:eventId', async (req: Request, res: Response) => {
+// Create new event
+router.post('/events', async (req: Request, res: Response) => {
     try {
-        const activities = await getActivities(req.params.eventId);
-        res.json(activities);
+        const newEvent = await createEvent(req.body);
+        res.status(201).json(newEvent);
     } catch (error) {
-        console.error('Error fetching activities:', error);
-        res.status(500).json({ message: 'Error fetching activities' });
+        console.error('Error creating event:', error);
+        res.status(500).json({ message: 'Error creating event', details: error });
+    }
+});
+
+// Update event
+router.patch('/events/:eventId', async (req: Request, res: Response) => {
+    try {
+        const updatedEvent = await updateEvent(req.params.eventId, req.body);
+        res.json(updatedEvent);
+    } catch (error) {
+        console.error('Error updating event:', error);
+        res.status(500).json({ message: 'Error updating event', details: JSON.stringify(error) });
+    }
+});
+
+// Delete event
+router.delete('/events/:eventId', async (req: Request, res: Response) => {
+    try {
+        const result = await deleteEvent(req.params.eventId);
+        if (result) {
+            res.json({ message: 'Event successfully deleted' });
+        } else {
+            res.status(404).json({ message: 'Event not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting event:', error);
+        res.status(500).json({ message: 'Error deleting event', details: error });
     }
 });
 

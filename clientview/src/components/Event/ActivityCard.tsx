@@ -6,20 +6,18 @@ import { EventType } from '@common/constants';
 import Activity from '@common/models/Activity';
 import { Link } from 'react-router-dom';
 
-const StyledCard = styled(Card)(({ theme }) => ({
-  margin: theme.spacing(1),
-  borderRadius: theme.shape.borderRadius,
-  overflow: 'hidden',
-  transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: theme.shadows[4],
-  },
-}));
+const StyledCard = styled(Card)(({ theme }) => `
+  margin: ${theme.spacing(1)};
+  border-radius: ${theme.shape.borderRadius};
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: ${theme.shadows[4]};
+  }
+`);
 
-const MotionBox = styled(motion.div)({
-  display: 'block',
-});
+const MotionBox = styled(motion.div)(() => ` display: block; `);
 
 interface ActivityCardProps {
   activity: Activity;
@@ -29,25 +27,30 @@ interface ActivityCardProps {
 
 // Helper function to get activity type text
 const getActivityType = (type: EventType): string => {
-  if (type >= 1000 && type < 2000) return 'Sports';
-  if (type >= 2000 && type < 3000) return 'Cultural';
-  if (type >= 3000 && type < 4000) return 'Technical';
-  return 'General';
+  const activityTypes = {
+    [EventType.TECH]: 'Technical',
+    [EventType.CULTURAL]: 'Cultural',
+    [EventType.SPORTS]: 'Sports',
+    [EventType.GENERAL]: 'General'
+  };
+  return activityTypes[type] || 'General';
 };
 
 // Helper function to get chip color based on activity type
 const getChipColor = (type: EventType): string => {
-  if (type >= 1000 && type < 2000) return '#1976d2';
-  if (type >= 2000 && type < 3000) return '#dc004e';
-  if (type >= 3000 && type < 4000) return '#2e7d32';
-  return '#9c27b0';
+  const typeColors = {
+    [EventType.TECH]: '#2e7d32',     // Green
+    [EventType.CULTURAL]: '#dc004e',  // Pink
+    [EventType.SPORTS]: '#1976d2',    // Blue
+    [EventType.GENERAL]: '#9c27b0'    // Purple
+  };
+  return typeColors[type] || typeColors[EventType.GENERAL];
 };
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 0 }) => {
   const activityType = getActivityType(activity.eventType);
   const chipColor = getChipColor(activity.eventType);
   const participantCount = activity.participants?.length || 0;
-
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
@@ -60,7 +63,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
       }
     }
   };
-
   return (
     <MotionBox
       variants={cardVariants}

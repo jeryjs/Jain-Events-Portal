@@ -1,38 +1,103 @@
-import db from '@config/firebase';
-import { cache, TTL } from '@config/cache';
 import Event from '@common/models/Event';
-import Activity from '@common/models/Activity';
-import { parseActivity } from '@common/utils';
+import { parseEvents } from '@common/utils';
+import { cache, TTL } from '@config/cache';
+import db from '@config/firebase';
 
-const getEvents = async (): Promise<Event[]> => {
+// Collection references
+const eventsCollection = db.collection('events');
+
+
+/**
+ * Get all events
+ */
+export const getEvents = async () => {
     const cachedEvents = cache.get("events");
 
     if (cachedEvents) {
         console.log(`📦 Serving cached events`);
         return cachedEvents as Event[];
     }
+    const snapshot = await eventsCollection.get();
+    const events = parseEvents(snapshot.docs.map(doc => doc.data()));
 
-    const snapshot = await db.collection("events").get();
-    const events = snapshot.docs.map((doc: any) => Event.parse(doc.data()));
-    
     cache.set("events", events, TTL.EVENTS);
+
     return events;
 };
 
-const getActivities = async (eventId: string): Promise<Activity[]> => {
-    const cacheKey = `activities_${eventId}`;
-    const cachedActivities = cache.get(cacheKey);
+/**
+ * Get event by ID
+ */
+export const getEventById = async (eventId: string) => {
+    const cachedEvent = cache.get(`events-${eventId}`);
 
-    if (cachedActivities) {
-        console.log(`📦 Serving cached activities for event '${eventId}'`);
-        return cachedActivities as Activity[];
+    if (cachedEvent) {
+        console.log(`📦 Serving cached event ${eventId}`);
+        return cachedEvent as Event;
     }
 
-    const snapshot = await db.collection("events").doc(eventId).collection("activities").get();
-    const activities = snapshot.docs.map((doc: any) => parseActivity(doc.data()));
+    const doc = await eventsCollection.doc(eventId).get();
     
-    cache.set(cacheKey, activities, TTL.EVENTS);
-    return activities;
+    if (!doc.exists) return null;
+
+    const eventData = Event.parse(doc.data());
+    cache.set(`events-${eventId}`, eventData, TTL.EVENTS);
+    
+    return eventData;
 };
 
-export { getEvents, getActivities };
+/**
+ * Create new event
+ */
+export const createEvent = async (eventData: any) => {
+    const event = Event.parse(eventData);
+    const eventDoc = eventsCollection.doc(event.id);
+    
+    await eventDoc.set(event.toJSON());
+
+    cache.set(`events-${event.id}`, event, TTL.EVENTS);
+    cache.del("events");
+    
+    return event;
+};
+
+/**
+ * Update existing event
+ */
+export const updateEvent = async (eventId: string, eventData: any) => {
+    const event = Event.parse(eventData);
+    const eventDoc = eventsCollection.doc(event.id);
+    
+    await eventDoc.update(event.toJSON());
+
+    cache.set(`events-${eventId}`, event, TTL.EVENTS);
+    cache.del("events");
+
+    return event;
+};
+
+/**
+ * Delete event
+ */
+export const deleteEvent = async (eventId: string) => {
+    const eventDoc = eventsCollection.doc(eventId);
+    const doc = await eventDoc.get();
+    
+    if (!doc.exists) return false;
+    
+    // Delete all activities/subCollections first
+    const eventSubCollections = await eventDoc.listCollections();
+    const batch = db.batch();
+    await Promise.all(eventSubCollections.map(async collection => {
+      const collectionDocs = await collection.get();
+      collectionDocs.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+    }));
+    
+    // Then delete the event itself
+    batch.delete(eventDoc);
+    await batch.commit();
+    
+    return true;
+};
