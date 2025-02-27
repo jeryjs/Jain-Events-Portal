@@ -17,5 +17,7 @@
             "@utils/*": ["./utils/*"],
             "*": ["node_modules/*", "types/*"]
         }
-    }
+    },
+    "include": ["**/*"],
+    "exclude": ["node_modules"]
 }
