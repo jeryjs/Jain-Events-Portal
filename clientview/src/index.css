@@ -1,5 +1,6 @@
 #root {
   max-width: 1280px;
+  width: 100vw;
   /* margin: 0 auto; */
   text-align: start;
 
@@ -29,8 +30,8 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-	color: red;
-	background-color: red;
+	color: black;
+	background-color: white;
 	font-family: 'Helvetica Neue', sans-serif;
   place-items: center;
 }
@@ -42,8 +43,8 @@ h1 {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: red;
-    background-color: red;
+    color: black;
+    background-color: white;
   }
   a:hover {
     color: #747bff;

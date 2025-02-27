@@ -45,7 +45,7 @@ const IconSquircle = styled(Box)(({ theme }) => `
   width: 48px;
   height: 48px;
   border-radius: 16px;
-  background-color: ${theme.palette.hover};
+  background-color: ${theme.palette.action.focus};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,7 +59,7 @@ const InfoIconWrapper = styled(Box)(({ theme }) => `
   border-radius: 12px;
   transition: all 0.2s ease;
   &:hover {
-    background-color: ${theme.palette.hover};
+    background-color: ${theme.palette.action.disabledBackground};
   }
 `);
         
