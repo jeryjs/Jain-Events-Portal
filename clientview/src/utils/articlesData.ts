@@ -1,4 +1,4 @@
-export const articles = [
+const articles = [
   {
     id: 1,
     title: "How to Make the Most of Your Event",
@@ -36,3 +36,5 @@ export const articles = [
     summary: "A guide to technology events on campus."
   }
 ];
+
+export default articles;

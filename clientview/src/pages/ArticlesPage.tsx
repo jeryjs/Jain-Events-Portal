@@ -1,13 +1,14 @@
 import React from 'react';
-import { Container, Typography, Grid, Card, CardMedia, CardContent, Box, IconButton } from '@mui/material';
+import { Container, Typography, Card, CardMedia, CardContent, Box, IconButton } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/shared/PageTransition';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Grid2 } from '@mui/material';
 
 // Import articles data
-import { articles } from '../utils/articlesData';
+import articles from '../utils/articlesData';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   position: 'relative',
@@ -29,6 +30,7 @@ const ArticleCard = styled(Card)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius * 2,
   transition: 'transform 0.3s, box-shadow 0.3s',
   overflow: 'hidden',
+  textDecoration: 'none',
   '&:hover': {
     transform: 'translateY(-8px)',
     boxShadow: theme.shadows[8],
@@ -68,7 +70,7 @@ function ArticlesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-          ></motion.div>
+          >
             <Typography variant="h3" component="h1" color="white" sx={{ fontWeight: 'bold' }}>
               Articles
             </Typography>
@@ -90,29 +92,31 @@ function ArticlesPage() {
       </HeroSection>
       
       <Container maxWidth="lg" sx={{ pb: 8 }}>
-        <Grid container spacing={3}>
+        <Grid2 container spacing={3}>
           {articles.map((article, index) => (
-            <Grid item key={article.id} xs={12} sm={6} md={4}>
+            <Grid2  key={article.id} size={{xs:12, sm:6, md:4}}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <ArticleCard component={Link} to={`/articles/${article.id}`} sx={{ textDecoration: 'none' }}>
-                  <ArticleImage image={article.image} title={article.title} />
-                  <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                    <Typography gutterBottom variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
-                      {article.title}
-                    </Typography>
-                    <Typography color="text.secondary">
-                      {article.summary}
-                    </Typography>
-                  </CardContent>
-                </ArticleCard>
+                <Link to={`/articles/${article.id}`} style={{ textDecoration: 'none' }}>
+                  <ArticleCard>
+                    <ArticleImage image={article.image} title={article.title} />
+                    <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                      <Typography gutterBottom variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
+                        {article.title}
+                      </Typography>
+                      <Typography color="text.secondary">
+                        {article.summary}
+                      </Typography>
+                    </CardContent>
+                  </ArticleCard>
+                </Link>
               </motion.div>
-            </Grid>
+            </Grid2>
           ))}
-        </Grid>
+        </Grid2>
       </Container>
     </PageTransition>
   );

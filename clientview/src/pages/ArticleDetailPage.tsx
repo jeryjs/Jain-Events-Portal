@@ -8,7 +8,7 @@ import PageTransition from '../components/shared/PageTransition';
 import { motion } from 'framer-motion';
 
 // Import articles data
-import { articles } from '../utils/articlesData';
+import articles from '../utils/articlesData';
 
 // Generate a random date in the past 30 days
 const getRandomDate = () => {

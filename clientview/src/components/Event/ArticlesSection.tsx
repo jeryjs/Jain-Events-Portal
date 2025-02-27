@@ -6,7 +6,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { motion } from 'framer-motion';
 
 // Import articles from shared data
-import { articles } from '../../utils/articlesData';
+import articles from '../../utils/articlesData';
 
 const SectionTitle = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -25,7 +25,7 @@ const HorizontalContainer = styled(motion.div)(({ theme }) => ({
   scrollbarWidth: 'none',
 }));
 
-const ArticleCard = styled(Card)(({ theme }) => ({
+const ArticleCard = styled(Link)(({ theme }) => ({
   minWidth: 280,
   maxWidth: 300,
   flexShrink: 0,
@@ -69,7 +69,7 @@ const ArticlesSection: React.FC = () => {
         {displayedArticles.map((article, index) => (
           <ArticleCard
             key={article.id}
-            component={Link}
+            
             to={`/articles/${article.id}`}
             sx={{ textDecoration: 'none' }}
           >
