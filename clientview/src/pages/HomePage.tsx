@@ -8,6 +8,7 @@ import { useEvents } from '../hooks/useApi';
 import { ColorModeContext } from '../App';
 import { styled } from '@mui/material/styles';
 import PhotoGallery from '@components/shared/PhotoGallery';
+import ArticlesSection from '@components/Event/ArticlesSection'; // <-- new import
 
 const SectionHeader = styled(Box)(({ theme }) => `
   display: flex;
@@ -110,7 +111,6 @@ function HomePage() {
             </Box>
           )}
         </Box>
-
         <SectionHeader>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Photos</Typography>
           <Button endIcon={<ArrowForwardIcon />} color="inherit" size="small" sx={{ color:'text.secondary' }}>
@@ -119,6 +119,12 @@ function HomePage() {
         </SectionHeader>
 
         <PhotoGallery isLoading={isLoading} />
+
+        {/* New Articles Section added on HomePage */}
+        <Box sx={{ my: 4 }}>
+          <ArticlesSection />
+        </Box>
+
       </Container>
     </PageTransition>
   );

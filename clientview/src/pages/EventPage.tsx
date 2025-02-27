@@ -308,6 +308,8 @@ function EventPage() {
 
         <Divider sx={{ my: 3 }} />
 
+        <Divider sx={{ my: 3 }} />
+          
         <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
             Photos
           </Typography>

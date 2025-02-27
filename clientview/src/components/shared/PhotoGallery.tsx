@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Box, Grid, Skeleton, Dialog, IconButton, Backdrop, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 // Styled components
 const GalleryContainer = styled(Box)(({ theme }) => ({
@@ -108,16 +106,12 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const getMaxImagesCount = () => {
     const rowsObj = typeof rows === 'number' ? { xs: rows, sm: rows, md: rows, lg: rows, xl: rows } : rows;
     
-    // Calculate max images for each breakpoint and find the largest one
-    return Object.keys(columns).reduce((maxCount, key) => {
-      const breakpoint = key as keyof typeof columns;
-      const colsForBreakpoint = columns[breakpoint] || 1;
-      const rowsForBreakpoint = rowsObj[breakpoint] || 
-                               (rowsObj.xl || rowsObj.lg || rowsObj.md || rowsObj.sm || rowsObj.xs || 1);
-      
-      const breakpointCount = colsForBreakpoint * rowsForBreakpoint;
-      return Math.max(maxCount, breakpointCount);
-    }, 0);
+    let maxImages = 0;
+    if(columns.xs && rowsObj.xs){
+      maxImages = columns.xs * rowsObj.xs
+    }
+    
+    return maxImages
   };
   
   const calcMaxImagesCount = getMaxImagesCount();

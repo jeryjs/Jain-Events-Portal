@@ -6,6 +6,8 @@ import { useMemo, useState, createContext } from 'react';
 import HomePage from './pages/HomePage';
 import EventPage from './pages/EventPage';
 import ActivityPage from './pages/ActivityPage';
+import ArticlesPage from './pages/ArticlesPage';
+import ArticleDetailPage from './pages/ArticleDetailPage';
 import queryClient from './utils/QueryClient';
 
 interface ColorMode {
@@ -49,9 +51,14 @@ function App() {
           <CssBaseline />
           <Router>
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/:eventId" element={<EventPage />} />
+              {/* Articles routes - specific ones first */}
+              <Route path="/articles/:articleId" element={<ArticleDetailPage />} />
+              <Route path="/articles" element={<ArticlesPage />} />
+              
+              {/* Event routes */}
               <Route path="/:eventId/:activityId" element={<ActivityPage />} />
+              <Route path="/:eventId" element={<EventPage />} />
+              <Route path="/" element={<HomePage />} />
             </Routes>
           </Router>
         </ThemeProvider>
