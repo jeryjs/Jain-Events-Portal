@@ -5,6 +5,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { useContext } from 'react';
 import { ColorModeContext } from '../../App';
+import { EventType } from '@common/constants';
 
 const AppHeader = styled(Box)(({ theme }) => `
   padding: 32px 0 16px;
@@ -33,16 +34,18 @@ const HeaderWrapper = styled(Box)(({ theme }) => `
 `);
 
 const categories = [
-  { id: 'discover', label: 'Discover' },
-  { id: 'sports', label: 'Sports' },
-  { id: 'tech', label: 'Tech' },
-  { id: 'cultural', label: 'Cultural' },
-  { id: 'other', label: 'Other' },
+  { id: -1, label: 'Discover' },
+  ...Object.entries(EventType)
+    .filter(([key]) => key == '0' || key.endsWith('00'))
+    .map(([key, value]) => ({
+      id: Number(key),
+      label: value,
+    })),
 ];
 
 interface HomeHeaderProps {
   tabValue: number;
-  onTabChange: (evt: React.SyntheticEvent, newValue: number) => void;
+  onTabChange: (newTabId: number, newCatId: number) => void;
 }
 
 const HomeHeader: React.FC<HomeHeaderProps> = ({ tabValue, onTabChange }) => {
@@ -61,7 +64,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ tabValue, onTabChange }) => {
         </HeaderWrapper>
       </AppHeader>
       <TabsContainer>
-        <Tabs value={tabValue} onChange={onTabChange} variant="scrollable" scrollButtons="auto" TabIndicatorProps={{ style: { display: 'none' } }}>
+        <Tabs value={tabValue} onChange={(_, idx) => onTabChange(idx, categories[idx].id)} variant="scrollable" scrollButtons="auto" TabIndicatorProps={{ style: { display: 'none' } }}>
           {categories.map((cat, idx) => (
             <StyledTab key={cat.id} label={cat.label} />
           ))}

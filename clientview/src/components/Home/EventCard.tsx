@@ -21,18 +21,24 @@ const StyledCard = styled(Card)(({ theme }) => `
   }
 `);
 
-const DateBadge = styled(Box)(({ theme }) => `
+const DateBadge = styled(motion.div)(({ theme }) => `
   position: absolute;
   top: 8px;
   left: 8px;
   padding: ${theme.spacing(1)};
-  background-color: ${theme.palette.action.active};
-  color: #fff;
+  background-color: ${theme.palette.action.hover};
+  backdrop-filter: blur(12px);
+  color: ${theme.palette.action.active};
   border-radius: 8px;
   z-index: 1;
   box-shadow: ${theme.shadows[4]};
   text-align: center;
   min-width: 60px;
+  font-size: ${theme.typography.body2.fontSize};
+  &:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease-in-out;
+  }
 `);
 
 const StyledCardMedia = styled(CardMedia)(`

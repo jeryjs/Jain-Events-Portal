@@ -36,12 +36,13 @@ function HomePage() {
   const colorMode = useContext(ColorModeContext);
   const { data: events, isLoading, error } = useEvents();
   
-  const [tabValue, setTabValue] = useState(0);
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => setTabValue(newValue);
+  const [catTabId, setTabId] = useState([0, 0]);
+  const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
   
+  const filteredEvents = events?.filter(event => catTabId[1] > 0 ? event.type === catTabId[1] : true) || [];
   
-  const latestEvents = events?.slice(0, 3) || [];
-  const upcomingEvents = events?.slice(0, 5) || [];
+  const latestEvents = filteredEvents?.slice(0, 3) || [];
+  const upcomingEvents = filteredEvents?.slice(0, 5) || [];
 
   const renderEventCardShimmers = (count: number, variant: 'horizontal' | 'vertical' = 'vertical') => 
     Array(count).fill(0).map((_, i) => variant==='horizontal' ? (
@@ -67,7 +68,7 @@ function HomePage() {
   return (
     <PageTransition>
       <Container maxWidth="lg">
-        <HomeHeader tabValue={tabValue} onTabChange={handleTabChange} />
+        <HomeHeader tabValue={catTabId[0]} onTabChange={handleTabChange} />
 
         <SectionHeader>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Happening Now</Typography>

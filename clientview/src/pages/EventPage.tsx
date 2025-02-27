@@ -17,10 +17,10 @@ const HeroContainer = styled(motion.div)(({ theme }) => `
   height: 30vh; min-height: 250px; max-height: 350px; width: 100%; overflow: hidden;
 `);
 const HeroImage = styled('img')(({ theme }) => `
-  width: 100%; height: 100%; object-fit: cover;
+  width: 100%; height: 100%; object-fit: cover; border-radius: 0 0 36px 36px;
 `);
 const HeroOverlay = styled(Box)(({ theme }) => `
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 0 0 36px 36px;
   background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.3) 100%);
   display: flex; flex-direction: column; justify-content: space-between; padding: 16px;
 `);
