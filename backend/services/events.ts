@@ -56,7 +56,7 @@ export const createEvent = async (eventData: any) => {
     await eventDoc.set(event.toJSON());
 
     cache.set(`events-${event.id}`, event, TTL.EVENTS);
-    cache.set("events", (cache.get("events") as Event[] || []).concat(event), TTL.EVENTS);
+    cache.del("events");
     
     return event;
 };
@@ -71,7 +71,7 @@ export const updateEvent = async (eventId: string, eventData: any) => {
     await eventDoc.update(event.toJSON());
 
     cache.set(`events-${eventId}`, event, TTL.EVENTS);
-    cache.set("events", (cache.get("events") as Event[] || []).map(e => e.id === eventId ? event : e), TTL.EVENTS);
+    cache.del("events");
 
     return event;
 };
