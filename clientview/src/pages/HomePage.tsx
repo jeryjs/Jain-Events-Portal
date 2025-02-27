@@ -7,6 +7,7 @@ import PageTransition from '../components/shared/PageTransition';
 import { useEvents } from '../hooks/useApi';
 import { ColorModeContext } from '../App';
 import { styled } from '@mui/material/styles';
+import PhotoGallery from '@components/shared/PhotoGallery';
 
 const SectionHeader = styled(Box)(({ theme }) => `
   display: flex;
@@ -116,14 +117,7 @@ function HomePage() {
           </Button>
         </SectionHeader>
 
-        <GallerySection>
-          <Typography variant="h6" gutterBottom>Gallery</Typography>
-          <Typography variant="body2" color="text.secondary" paragraph>
-            Photo gallery coming soon! This section will showcase event photos and memories.
-          </Typography>
-          <Button variant="outlined" color="primary">View Demo Gallery</Button>
-        </GallerySection>
-        {/* ...existing admin link commented out... */}
+        <PhotoGallery isLoading={isLoading} />
       </Container>
     </PageTransition>
   );
