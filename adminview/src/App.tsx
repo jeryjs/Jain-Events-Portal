@@ -8,7 +8,7 @@ import HomePage from './pages/HomePage';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1565c0', // Dark blue
+      main: '#000', // Dark blue
     },
     secondary: {
       main: '#2e7d32', // Dark green

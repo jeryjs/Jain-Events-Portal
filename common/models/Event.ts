@@ -27,9 +27,9 @@ export default class Event {
 
 	static parse(data: any): Event {
 		return new Event(
-			data.id,
-			data.name,
-			data.type,
+			data.id || '',
+			data.name || '',
+			data.type || EventType.GENERAL,
 			data.timings || [],
 			data.description || '',
 			data.venue || '',

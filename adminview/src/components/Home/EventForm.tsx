@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import {
   Box, TextField, Typography, Button,
   FormControl, InputLabel, Select, MenuItem,
@@ -22,17 +22,15 @@ import { Event } from '@common/models';
 interface EventFormProps {
   event?: Event;
   isCreating: boolean;
-  onSave: (eventData: Event) => Promise<void>;
+  onSave: (eventData: Partial<Event>) => Promise<void>;
 }
 
 export function EventForm({ event, isCreating, onSave }: EventFormProps) {
-  // States for form fields
-  const [name, setName] = useState('');
-  const [type, setType] = useState<EventType>(EventType.CULTURAL);
-  const [description, setDescription] = useState('');
-  const [venue, setVenue] = useState('');
-  const [timings, setTimings] = useState<Date[]>([new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000)]);
-  const [banner, setBannerImage] = useState<Record<string, string>>({});
+  // Default States for form fields
+  const [formData, setFormData] = useState<Partial<Event>>({
+    ...Event.parse({}).toJSON(),
+    timings: [new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000)]
+  });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isImageEditOpen, setIsImageEditOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -41,20 +39,9 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
   // Populate form with event data if editing
   useEffect(() => {
     if (event) {
-      setName(event.name);
-      setType(event.type);
-      setDescription(event.description);
-      setVenue(event.venue);
-      setTimings(event.timings || [event.time.start, event.time.end]);
-      setBannerImage(event.banner);
+      setFormData(event);
     } else if (isCreating) {
-      // Reset form for create mode
-      setName('');
-      setType(EventType.GENERAL);
-      setDescription('');
-      setVenue('');
-      setTimings([new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000)]);
-      setBannerImage({});
+      setFormData(Event.parse({}));
     }
   }, [event, isCreating]);
 
@@ -63,21 +50,26 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
     if (saveSuccess) {
       setSaveSuccess(false);
     }
-  }, [name, type, description, venue, timings, banner]);
+  }, [formData]);
 
   // Validate form
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
-    if (!name.trim()) errors.name = 'Name is required';
-    if (!venue.trim()) errors.venue = 'Venue is required';
-    if (!description.trim()) errors.description = 'Description is required';
-    if (timings.length < 2 || timings[1] <= timings[0]) {
+    if (!formData.name?.trim()) errors.name = 'Name is required';
+    if (!formData.venue?.trim()) errors.venue = 'Venue is required';
+    if (!formData.description?.trim()) errors.description = 'Description is required';
+    if (formData.timings.length < 2 || formData.timings[1] <= formData.timings[0]) {
       errors.timings = 'End time must be after start time';
     }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
+  };
+
+  // Utility to update formData
+  const editFormData = (key: string, value: any) => {
+    setFormData(Event.parse({...formData.toJSON(), [key]: value}));
   };
 
   // Handle form submission
@@ -86,17 +78,7 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
 
     setIsSaving(true);
     try {
-      const eventData: Event = Event.parse({
-        id: event?.id,
-        name,
-        type,
-        timings,
-        description,
-        venue,
-        banner
-      });
-
-      await onSave(eventData);
+      await onSave(formData);
       setSaveSuccess(true);
       
       // Reset success state after 2 seconds
@@ -110,18 +92,10 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
     }
   };
 
-  // Handle image URL change
-  const handleImageUrlChange = (url: string) => {
-    setBannerImage(prev => ({ ...prev, url }));
-  };
-
-  // Handle custom CSS change
-  const handleCustomCssChange = (customCss: string) => {
-    setBannerImage(prev => ({ ...prev, customCss }));
-  };
-
   return (
+    <Suspense fallback={<CircularProgress />}>
     <Paper
+      key={formData.id}
       sx={{
         bgcolor: 'background.paper',
         borderRadius: 2,
@@ -138,8 +112,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
           position: 'relative',
           width: '100%',
           height: '350px',
-          bgcolor: banner.url ? 'transparent' : '#F0F0F0',
-          borderBottom: banner.url ? 'none' : '2px dashed #CCCCCC',
+          bgcolor: formData.banner.url ? 'transparent' : '#F0F0F0',
+          borderBottom: formData.banner.url ? 'none' : '2px dashed #CCCCCC',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -148,17 +122,17 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
         }}
         onClick={() => setIsImageEditOpen(!isImageEditOpen)}
       >
-        {banner.url ? (
+        {formData.banner.url ? (
           <>
             <Box
               component="img"
-              src={banner.url}
-              alt={name}
+              src={formData.banner.url}
+              alt={formData.name}
               sx={{ width: '100%', height: '100%' }}
               style={
-                banner.customCss
+                formData.banner.customCss
                   ? Object.fromEntries(
-                    banner.customCss.split(';')
+                    formData.banner.customCss.split(';')
                       .filter(prop => prop.trim())
                       .map(prop => {
                         const [key, value] = prop.split(':').map(p => p.trim());
@@ -212,7 +186,7 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
           }}
         >
           <Typography fontWeight="bold" variant="body2">
-            {type} Event
+            {formData.type} Event
           </Typography>
         </Box>
       </Box>
@@ -227,8 +201,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
             placeholder="Enter image URL here..."
             fullWidth
             margin="normal"
-            value={banner.url || ''}
-            onChange={(e) => handleImageUrlChange(e.target.value)}
+            value={formData.banner.url || ''}
+            onChange={(e) => editFormData('banner', { ...formData.banner, url: e.target.value })}
             sx={{ mb: 2 }}
           />
 
@@ -237,8 +211,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
             placeholder="e.g., object-fit: cover; object-position: center top;"
             fullWidth
             margin="normal"
-            value={banner.customCss || ''}
-            onChange={(e) => handleCustomCssChange(e.target.value)}
+            value={formData.banner.customCss || ''}
+            onChange={(e) => editFormData('banner', { ...formData.banner, customCss: e.target.value })}
             multiline
             helperText="Enter CSS properties for fine-tuning image display"
             sx={{ mb: 2 }}
@@ -254,8 +228,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
           fullWidth
           variant="filled"
           margin="normal"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={formData.name}
+          onChange={(e) => editFormData('name', e.target.value)}
           error={!!formErrors.name}
           helperText={formErrors.name}
           required
@@ -285,8 +259,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
           <FormControl fullWidth margin="normal" >
             <InputLabel>Event Type</InputLabel>
             <Select
-              value={type}
-              onChange={(e) => setType(e.target.value as EventType)}
+              value={formData.type}
+              onChange={(e) => editFormData('type', e.target.value)}
               label="Event Type"
             >
               <MenuItem value={EventType.GENERAL}>General</MenuItem>
@@ -318,10 +292,10 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
             <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
               <DateTimePicker
                 label="Start Time"
-                value={timings[0]}
+                value={formData.timings[0]}
                 onChange={(newValue) => {
                   if (newValue) {
-                    setTimings([newValue, timings[1]]);
+                    editFormData('timings', [newValue, formData.timings[1]]);
                   }
                 }}
                 sx={{ flex: 1 }}
@@ -329,10 +303,10 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
 
               <DateTimePicker
                 label="End Time"
-                value={timings[1]}
+                value={formData.timings[1]}
                 onChange={(newValue) => {
                   if (newValue) {
-                    setTimings([timings[0], newValue]);
+                    editFormData('timings', [formData.timings[0], newValue]);
                   }
                 }}
                 sx={{ flex: 1 }}
@@ -368,8 +342,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
             placeholder="Enter venue name..."
             fullWidth
             margin="normal"
-            value={venue}
-            onChange={(e) => setVenue(e.target.value)}
+            value={formData.venue}
+            onChange={(e) => editFormData('venue', e.target.value)}
             error={!!formErrors.venue}
             helperText={formErrors.venue}
             required
@@ -400,8 +374,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
             margin="normal"
             multiline
             rows={5}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={formData.description}
+            onChange={(e) => editFormData('description', e.target.value)}
             error={!!formErrors.description}
             helperText={formErrors.description}
             required
@@ -443,5 +417,6 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
         </Box>
       </Box>
     </Paper>
+    </Suspense>
   );
 };
