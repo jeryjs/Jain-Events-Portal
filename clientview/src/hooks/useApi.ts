@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import Activity from '@common/models/Activity';
 import Event from '@common/models/Event';
-import { parseActivities } from '@common/utils';
+import { parseActivities, parseEvents } from '@common/utils';
 import config from '../config';
 
 const _fetchEvents = async (): Promise<Event[]> => {
@@ -16,7 +16,7 @@ const _fetchEvents = async (): Promise<Event[]> => {
   }
   
   const data: any = await response.json();
-  return data.map((event: any) => Event.parse(event));
+  return parseEvents(data);
 };
 
 export const useEvents = () => {
@@ -27,6 +27,14 @@ export const useEvents = () => {
     refetchOnWindowFocus: false,
   });
 };
+
+export const useEvent = (eventId: string) => {
+  return useQuery({
+    queryKey: ['event', eventId],
+    queryFn: () => _fetchEvents().then(events => events.find(e => e.id === eventId)),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
 
 
 const _fetchActivities = async (eventId: string): Promise<Activity[]> => {
@@ -44,11 +52,11 @@ const _fetchActivities = async (eventId: string): Promise<Activity[]> => {
   return parseActivities(data);
 };
 
-export const useActivities = (eventId: string | undefined) => {
+export const useActivities = (eventId: string) => {
   return useQuery({
     queryKey: ['activities', eventId],
-    queryFn: () => eventId ? _fetchActivities(eventId) : Promise.resolve([]),
+    queryFn: () => _fetchActivities(eventId),
     staleTime: 1000 * 60 * 5, // 5 minutes
-    enabled: !!eventId,
+    refetchOnWindowFocus: false,
   });
 };

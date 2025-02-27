@@ -1,12 +1,12 @@
-import React, { Suspense } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Suspense } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { motion } from 'framer-motion';
-import { useEvents, useActivities } from '../hooks/useApi';
+import { useActivities, useEvent } from '../hooks/useApi';
 import ActivityCard from '@components/Event/ActivityCard';
 import PhotoGallery from '../components/shared/PhotoGallery';
 import PageTransition from '../components/shared/PageTransition';
@@ -48,17 +48,9 @@ const getEventTypeText = (type: number): string => {
   return 'General Event';
 };
 
-// Helper function to get default image based on event type
-const getDefaultImage = (eventType: number): string => {
-  if (eventType >= EventType.TECH) {
-    return 'https://picsum.photos/480/360?random';
-  } else if (eventType >= EventType.CULTURAL) {
-    return 'https://picsum.photos/480/360?random';
-  } else if (eventType >= EventType.SPORTS) {
-    return 'https://picsum.photos/480/360?random';
-  } else {
-    return 'https://picsum.photos/480/360?random';
-  }
+// Helper function to get default image if banner image is not set
+const getDefaultImage = (src): string => {
+  return src || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg';
 };
 
 // Activity list component with React.Suspense
@@ -95,8 +87,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
 function EventPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
-  const { data: events, isLoading: eventsLoading } = useEvents();
-  const event = events?.find(e => e.id === eventId);
+  const { data: event, isLoading: eventLoading } = useEvent(eventId);
   const formatEventDate = () => {
     if (!event) return { date: '', dayTime: '' };
     const start = new Date(event.time.start);
@@ -109,10 +100,9 @@ function EventPage() {
   };
   const formattedDate = formatEventDate();
   const eventTypeText = event ? getEventTypeText(event.type) : 'Event';
-  const heroImage = event ? getDefaultImage(event.type) : getDefaultImage(0);
 
   // Loading skeleton for event details
-  if (eventsLoading || !event) {
+  if (eventLoading || !event) {
     return (
       <PageTransition>
         <Container maxWidth="lg" sx={{ pt: 2, pb: 8 }}>
@@ -145,10 +135,15 @@ function EventPage() {
   }
 
   return (
+    <Suspense fallback={null}>
     <PageTransition>
       {/* Hero Section with Background Image */}
       <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-        <HeroImage src={heroImage} alt={event.name} />
+        <HeroImage 
+          src={getDefaultImage(event.banner.url)} 
+          alt={event.name} 
+          style={event.eventBannerStyles}
+        />
         <HeroOverlay>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <IconButton onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
@@ -237,6 +232,7 @@ function EventPage() {
 
       </Container>
     </PageTransition>
+    </Suspense>
   );
 }
 

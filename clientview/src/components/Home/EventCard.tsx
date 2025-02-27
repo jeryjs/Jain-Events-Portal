@@ -96,15 +96,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
   const day = startDate.getDate();
   const month = startDate.toLocaleString('default', { month: 'short' });
 
-  // TODO: Default image based on event type
-  const getDefaultImage = async () => {
-    const response = await fetch(`https://picsum.photos/480/360?random=${Math.random()}`);
-    return response.url;
+  // Load the event image and show shimmer while loading
+  const getEventImage = async () => {
+    const imageSrc = event.banner.url ?? `https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg`;
+    try { await fetch(imageSrc) } catch { };  // To figure out how long to show the shimmer for the image on load
+    return imageSrc;
   };
 
   const { isLoading, error, data: imageSrc } = useQuery({
     queryKey: ['eventImage', event.id],
-    queryFn: getDefaultImage,
+    queryFn: getEventImage,
     staleTime: Infinity,
   });
 
@@ -136,7 +137,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
             <Box sx={{ width: { xs: 130, sm: 220 }, height: { xs: 130, sm: 160 }, position: 'relative' }}>
               {isLoading && <Shimmer />}
               <StyledCardMedia
-                sx={{ width: '100%', height: '100%', objectFit: 'cover', display: isLoading ? 'none' : 'block' }}
+                sx={{ width: '100%', height: '100%', display: 'block' }}
+                style={event.eventBannerStyles}
                 image={imageSrc}
                 title={event.name}
               />
@@ -175,7 +177,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
             <Box sx={{ height: 200, position: 'relative' }}>
               {isLoading && <Shimmer />}
               <StyledCardMedia
-                sx={{ height: '100%', objectFit: 'cover', display: isLoading ? 'none' : 'block' }}
+                sx={{ height: '100%', display: 'block' }}
+                style={event.eventBannerStyles}
                 image={imageSrc}
                 title={event.name}
               />

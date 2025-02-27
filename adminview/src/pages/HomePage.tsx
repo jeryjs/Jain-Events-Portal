@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Container, Paper, Grid2 as Grid } from '@mui/material';
 
-import { EventForm, EventFormData } from '../components/Home/EventForm';
+import { EventForm } from '../components/Home/EventForm';
 import { EventsList, ActivityButton } from '../components/Home';
 import { useEvent, useCreateEvent, useUpdateEvent } from '@hooks/App';
 import slugify from '../utils/Slugify';

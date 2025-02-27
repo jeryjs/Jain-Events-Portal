@@ -14,7 +14,7 @@ const router = express.Router();
  */
 
 // Get all activities for an event
-router.get('/events/:eventId/activities', async (req: Request, res: Response) => {
+router.get('/activities/:eventId', async (req: Request, res: Response) => {
     try {
         const activities = await getActivities(req.params.eventId);
         res.json(activities || []);
@@ -25,7 +25,7 @@ router.get('/events/:eventId/activities', async (req: Request, res: Response) =>
 });
 
 // Get specific activity by ID
-router.get('/events/:eventId/activities/:activityId', async (req: Request, res: Response) => {
+router.get('/activities/:eventId/:activityId', async (req: Request, res: Response) => {
     try {
         const activity = await getActivityById(req.params.eventId, req.params.activityId);
         if (activity) {
@@ -40,7 +40,7 @@ router.get('/events/:eventId/activities/:activityId', async (req: Request, res: 
 });
 
 // Create new activity
-router.post('/events/:eventId/activities', async (req: Request, res: Response) => {
+router.post('/activities/:eventId', async (req: Request, res: Response) => {
     try {
         const newActivity = await createActivity(req.params.eventId, req.body);
         res.status(201).json(newActivity);
@@ -51,7 +51,7 @@ router.post('/events/:eventId/activities', async (req: Request, res: Response) =
 });
 
 // Update activity
-router.patch('/events/:eventId/activities/:activityId', async (req: Request, res: Response) => {
+router.patch('/activities/:eventId/:activityId', async (req: Request, res: Response) => {
     try {
         const updatedActivity = await updateActivity(
             req.params.eventId, 
@@ -70,7 +70,7 @@ router.patch('/events/:eventId/activities/:activityId', async (req: Request, res
 });
 
 // Delete activity
-router.delete('/events/:eventId/activities/:activityId', async (req: Request, res: Response) => {
+router.delete('/activities/:eventId/:activityId', async (req: Request, res: Response) => {
     try {
         const result = await deleteActivity(req.params.eventId, req.params.activityId);
         if (result) {

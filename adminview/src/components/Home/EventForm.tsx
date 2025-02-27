@@ -2,29 +2,22 @@ import { useState, useEffect } from 'react';
 import {
   Box, TextField, Typography, Button,
   FormControl, InputLabel, Select, MenuItem,
-  Paper, IconButton,
-  Checkbox, FormControlLabel, Collapse,
-  Snackbar, Alert
+  Paper, IconButton, Collapse, CircularProgress
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
 import CategoryIcon from '@mui/icons-material/Category';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import DescriptionIcon from '@mui/icons-material/Description';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import { EventType } from '@common/constants';
 import { Event } from '@common/models';
-
-interface HeroImageData {
-  url?: string;
-  position?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
-  showHero?: boolean;
-}
 
 interface EventFormProps {
   event?: Event;
@@ -32,32 +25,18 @@ interface EventFormProps {
   onSave: (eventData: Event) => Promise<void>;
 }
 
-export interface EventFormData {
-  id?: string;
-  name: string;
-  type: EventType;
-  timings: Date[];
-  description: string;
-  venue: string;
-  heroImage?: HeroImageData;
-}
-
-export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
+export function EventForm({ event, isCreating, onSave }: EventFormProps) {
   // States for form fields
   const [name, setName] = useState('');
   const [type, setType] = useState<EventType>(EventType.CULTURAL);
   const [description, setDescription] = useState('');
   const [venue, setVenue] = useState('');
   const [timings, setTimings] = useState<Date[]>([new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000)]);
-  const [heroImage, setHeroImage] = useState<HeroImageData>({
-    position: 'cover',
-    showHero: true,
-  });
+  const [banner, setBannerImage] = useState<Record<string, string>>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isImageEditOpen, setIsImageEditOpen] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Populate form with event data if editing
   useEffect(() => {
@@ -67,17 +46,24 @@ export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
       setDescription(event.description);
       setVenue(event.venue);
       setTimings(event.timings || [event.time.start, event.time.end]);
-      setHeroImage(event.heroImage || { position: 'cover', showHero: true });
+      setBannerImage(event.banner);
     } else if (isCreating) {
       // Reset form for create mode
       setName('');
-      setType(EventType.CULTURAL);
+      setType(EventType.GENERAL);
       setDescription('');
       setVenue('');
       setTimings([new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000)]);
-      setHeroImage({ position: 'cover', showHero: true });
+      setBannerImage({});
     }
   }, [event, isCreating]);
+
+  // Reset success state when form changes
+  useEffect(() => {
+    if (saveSuccess) {
+      setSaveSuccess(false);
+    }
+  }, [name, type, description, venue, timings, banner]);
 
   // Validate form
   const validateForm = (): boolean => {
@@ -96,13 +82,9 @@ export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
 
   // Handle form submission
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      setSnackbarMessage('Please correct the errors in the form.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-      return;
-    }
+    if (!validateForm()) return;
 
+    setIsSaving(true);
     try {
       const eventData: Event = Event.parse({
         id: event?.id,
@@ -111,49 +93,31 @@ export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
         timings,
         description,
         venue,
-        heroImage
+        banner
       });
 
       await onSave(eventData);
-      setSnackbarMessage(`Event ${isCreating ? 'created' : 'updated'} successfully!`);
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
+      setSaveSuccess(true);
+      
+      // Reset success state after 2 seconds
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 2000);
     } catch (error) {
       console.error('Failed to save event:', error);
-      setSnackbarMessage('Failed to save event. Please try again.');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   // Handle image URL change
   const handleImageUrlChange = (url: string) => {
-    setHeroImage(prev => ({ ...prev, url }));
+    setBannerImage(prev => ({ ...prev, url }));
   };
 
-  // Handle image position change
-  const handlePositionChange = (position: string) => {
-    setHeroImage(prev => ({
-      ...prev,
-      position: position as 'cover' | 'contain' | 'fill' | 'none' | 'scale-down'
-    }));
-  };
-
-  // Handle show hero toggle
-  const handleShowHeroToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setHeroImage(prev => ({ ...prev, showHero: event.target.checked }));
-  };
-
-  // Clear hero image
-  const handleClearImage = () => {
-    setHeroImage(prev => ({ ...prev, url: undefined }));
-  };
-
-  const handleSnackbarClose = (event: any, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
+  // Handle custom CSS change
+  const handleCustomCssChange = (customCss: string) => {
+    setBannerImage(prev => ({ ...prev, customCss }));
   };
 
   return (
@@ -168,14 +132,14 @@ export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
         padding: { xs: 2, md: 3 }
       }}
     >
-      {/* Hero Image Section */}
+      {/* Banner Image Section */}
       <Box
         sx={{
           position: 'relative',
           width: '100%',
-          height: { xs: '200px', md: '250px' },
-          bgcolor: heroImage.url ? 'transparent' : '#F0F0F0',
-          borderBottom: heroImage.url ? 'none' : '2px dashed #CCCCCC',
+          height: '350px',
+          bgcolor: banner.url ? 'transparent' : '#F0F0F0',
+          borderBottom: banner.url ? 'none' : '2px dashed #CCCCCC',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -184,17 +148,25 @@ export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
         }}
         onClick={() => setIsImageEditOpen(!isImageEditOpen)}
       >
-        {heroImage.url ? (
+        {banner.url ? (
           <>
             <Box
               component="img"
-              src={heroImage.url}
+              src={banner.url}
               alt={name}
-              sx={{
-                width: '100%',
-                height: '100%',
-                objectFit: heroImage.position || 'cover'
-              }}
+              sx={{ width: '100%', height: '100%' }}
+              style={
+                banner.customCss
+                  ? Object.fromEntries(
+                    banner.customCss.split(';')
+                      .filter(prop => prop.trim())
+                      .map(prop => {
+                        const [key, value] = prop.split(':').map(p => p.trim());
+                        return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
+                      })
+                  )
+                  : {}
+              }
             />
             <IconButton
               sx={{
@@ -206,10 +178,10 @@ export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                setIsImageEditOpen(true);
+                setIsImageEditOpen(!isImageEditOpen);
               }}
             >
-              <EditIcon />
+              {isImageEditOpen ? <CloseIcon /> : <EditIcon />}
             </IconButton>
           </>
         ) : (
@@ -222,7 +194,7 @@ export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
           >
             <AddPhotoAlternateIcon sx={{ fontSize: 48, color: '#999999' }} />
             <Typography variant="subtitle1" color="#999999" mt={1}>
-              Add Hero Image
+              Add Banner Image
             </Typography>
           </Box>
         )}
@@ -248,61 +220,29 @@ export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
       {/* Image Edit Overlay */}
       <Collapse in={isImageEditOpen}>
         <Box sx={{ p: 2, bgcolor: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }}>
-          <Typography variant="h6" gutterBottom>Edit Hero Image</Typography>
+          <Typography variant="h6" gutterBottom>Edit Banner Image</Typography>
 
           <TextField
-            label="Hero Image URL"
+            label="Banner Image URL"
             placeholder="Enter image URL here..."
             fullWidth
             margin="normal"
-            value={heroImage.url || ''}
+            value={banner.url || ''}
             onChange={(e) => handleImageUrlChange(e.target.value)}
             sx={{ mb: 2 }}
           />
 
-          <FormControl fullWidth margin="normal" sx={{ mb: 2 }}>
-            <InputLabel>Image Fit</InputLabel>
-            <Select
-              value={heroImage.position || 'cover'}
-              onChange={(e) => handlePositionChange(e.target.value)}
-              label="Image Fit"
-            >
-              <MenuItem value="cover">Cover</MenuItem>
-              <MenuItem value="contain">Contain</MenuItem>
-              <MenuItem value="fill">Fill</MenuItem>
-              <MenuItem value="none">None</MenuItem>
-              <MenuItem value="scale-down">Scale Down</MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={heroImage.showHero ?? true}
-                onChange={handleShowHeroToggle}
-              />
-            }
-            label="Show hero image on event page"
+          <TextField
+            label="Custom CSS"
+            placeholder="e.g., object-fit: cover; object-position: center top;"
+            fullWidth
+            margin="normal"
+            value={banner.customCss || ''}
+            onChange={(e) => handleCustomCssChange(e.target.value)}
+            multiline
+            helperText="Enter CSS properties for fine-tuning image display"
+            sx={{ mb: 2 }}
           />
-
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-            <Button
-              variant="outlined"
-              color="error"
-              startIcon={<DeleteOutlineIcon />}
-              onClick={handleClearImage}
-              disabled={!heroImage.url}
-            >
-              Remove Image
-            </Button>
-
-            <Button
-              variant="contained"
-              onClick={() => setIsImageEditOpen(false)}
-            >
-              Apply
-            </Button>
-          </Box>
         </Box>
       </Collapse>
 
@@ -474,23 +414,34 @@ export const EventForm = ({ event, isCreating, onSave }: EventFormProps) => {
             variant="contained"
             size="large"
             onClick={handleSubmit}
-            sx={{ px: 4, py: 1 }}
+            disabled={isSaving || saveSuccess || Object.keys(formErrors).length > 0}
+            sx={{ 
+              px: 4, 
+              py: 1, 
+              minWidth: 180,
+              position: 'relative'
+            }}
           >
-            {isCreating ? 'Create Event' : 'Save Changes'}
+            {!isSaving && !saveSuccess && (isCreating ? 'Create Event' : 'Save Changes')}
+            
+            {/* Loading Spinner */}
+            {isSaving && (
+              <CircularProgress 
+                size={24} 
+                sx={{ 
+                  color: 'white',
+                  position: 'absolute'
+                }}
+              />
+            )}
+            
+            {/* Success Checkmark */}
+            {saveSuccess && (
+                <CheckCircleIcon sx={{ color: 'white', animation: 'checkmark 0.3s ease-out' }} />
+            )}
           </Button>
         </Box>
       </Box>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </Paper>
   );
 };

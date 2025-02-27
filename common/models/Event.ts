@@ -1,14 +1,7 @@
 import { EventType } from "@common/constants";
 
-type heroImageFit = "cover" | "contain" | "fill" | "none" | "scale-down";
-
 export default class Event {
 	public timings: Date[];
-	public heroImage?: {
-		url?: string;
-		position?: heroImageFit;
-		showHero?: boolean;
-	};
 
 	constructor(
 		public id: string,
@@ -17,7 +10,7 @@ export default class Event {
 		timings: any[] | Date[],
 		public description: string,
 		public venue: string,
-		heroImage?: { url?: string; position?: heroImageFit; showHero?: boolean }
+		public banner: { url?: string; customCss?: string }
 	) {
 		// Convert Timestamp-like objects (from firestore) to Date
 		this.timings = timings.map((t) => {
@@ -30,15 +23,6 @@ export default class Event {
 			}
 			return new Date(t as any);
 		});
-
-		// Set hero image if provided
-		if (heroImage) {
-			this.heroImage = {
-				url: heroImage.url,
-				position: heroImage.position as heroImageFit,
-				showHero: heroImage.showHero ?? true,
-			};
-		}
 	}
 
 	static parse(data: any): Event {
@@ -46,10 +30,10 @@ export default class Event {
 			data.id,
 			data.name,
 			data.type,
-			data.timings || (data.time ? [data.time.start, data.time.end] : []),
-			data.description,
-			data.venue,
-			data.heroImage
+			data.timings || [],
+			data.description || '',
+			data.venue || '',
+			data.banner || {}
 		);
 	}
 
@@ -65,7 +49,7 @@ export default class Event {
 			timings: this.timings.map((t) => t.toISOString()),
 			description: this.description,
 			venue: this.venue,
-			heroImage: this.heroImage,
+			banner: this.banner,
 		};
 	}
 
@@ -81,4 +65,22 @@ export default class Event {
 		const end = this.time.end.getTime();
 		return end - start;
 	}
+
+  // Convert event image CSS string to object
+  get eventBannerStyles(): Record<string, string> {
+    if (!this.banner.customCss) return {};
+    
+    return this.banner.customCss
+      .split(";")
+      .filter(Boolean)
+      .reduce<Record<string, string>>((styleObj, rule) => {
+        const [prop, value] = rule.split(":").map(s => s.trim());
+        if (prop && value) {
+          // Convert kebab-case to camelCase
+          const camelProp = prop.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+          styleObj[camelProp] = value;
+        }
+        return styleObj;
+      }, {});
+  }
 }

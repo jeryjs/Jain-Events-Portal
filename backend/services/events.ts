@@ -54,6 +54,9 @@ export const createEvent = async (eventData: any) => {
     const eventDoc = eventsCollection.doc(event.id);
     
     await eventDoc.set(event.toJSON());
+
+    cache.set(`events-${event.id}`, event, TTL.EVENTS);
+    cache.set("events", (cache.get("events") as Event[] || []).concat(event), TTL.EVENTS);
     
     return event;
 };
