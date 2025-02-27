@@ -14,7 +14,7 @@ import { EventType } from '@common/constants';
 
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
-  height: 40vh; min-height: 250px; max-height: 350px; width: 100%; overflow: hidden;
+  height: 30vh; min-height: 250px; max-height: 350px; width: 100%; overflow: hidden;
 `);
 const HeroImage = styled('img')(({ theme }) => `
   width: 100%; height: 100%; object-fit: cover;
@@ -25,8 +25,9 @@ const HeroOverlay = styled(Box)(({ theme }) => `
   display: flex; flex-direction: column; justify-content: space-between; padding: 16px;
 `);
 const EventTypeChip = styled(Chip)(({ theme }) => `
-  position: absolute; bottom: 16px; left: 16px; font-weight: bold;
-  background-color: white; color: ${theme.palette.text.primary};
+  position: absolute; margin-top: -30px; left: 50%; transform: translateX(-50%);
+  width: 70%; height: 52px; font-size: 24px; font-weight: bold; border-radius: 24px;
+  background-color: ${theme.palette.background.paper}; color: ${theme.palette.text.secondary};
 `);
 const ContentSection = styled(Box)(({ theme }) => `
   color: ${theme.palette.text.primary};
@@ -179,29 +180,30 @@ function EventPage() {
     <Suspense fallback={null}>
     <PageTransition>
       {/* Hero Section with Background Image */}
-      <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-        <HeroImage 
-          src={getDefaultImage(event.banner.url)} 
-          alt={event.name} 
-          style={event.eventBannerStyles}
-        />
-        <HeroOverlay>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <IconButton onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
-              <ArrowBackIcon />
-            </IconButton>
-            <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
-              Event Details
-            </Typography>
-            <Box sx={{ width: 40 }} /> {/* Empty box for spacing */}
-          </Box>
-          <EventTypeChip label={eventTypeText} />
-        </HeroOverlay>
-      </HeroContainer>
-      <Container maxWidth="lg" sx={{ pt: 3, pb: 8 }}>
+      <Box>
+        <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+          <HeroImage 
+            src={getDefaultImage(event.banner.url)} 
+            alt={event.name} 
+            style={event.eventBannerStyles}
+          />
+          <HeroOverlay>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+              <IconButton onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
+                <ArrowBackIcon />
+              </IconButton>
+              <Typography variant="h5" sx={{ color: 'white', fontWeight: '500', ml: 3 }}>
+                Event Details
+              </Typography>
+            </Box>
+          </HeroOverlay>
+        </HeroContainer>
+        <EventTypeChip label={eventTypeText} />
+      </Box>
         
+      <Container maxWidth="lg" sx={{ pt: 3, pb: 8 }}>
         {/* Event Title */}
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 3, color: 'text.primary' }}>
+        <Typography variant="h4" sx={{ fontWeight: '500', my: 3, color: 'text.primary' }}>
           {event.name}
         </Typography>
 
