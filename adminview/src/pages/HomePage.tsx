@@ -20,6 +20,7 @@ const HomePage = () => {
 
   // Handle event selection
   const handleSelectEvent = (id: string) => {
+    setIsCreating(false);
     navigate(`/${id}`);
   };
 
