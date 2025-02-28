@@ -28,6 +28,90 @@
         }
     },
     {
+        "id": "winter-tech-conference-2025",
+        "name": "Winter Tech Conference 2025",
+        "type": 3000,
+        "timings": [
+            "2025-02-26T09:00:00.000Z",
+            "2025-02-28T17:00:00.000Z"
+        ],
+        "description": "Join us for the premier winter technology conference of 2025. Three days of keynotes, workshops, and networking with industry leaders discussing the latest innovations and future trends in technology.",
+        "venue": "Alpine Convention Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=124"
+        }
+        },
+        {
+            "id": "spring-cultural-festival-2025",
+            "name": "Spring Cultural Festival 2025",
+            "type": 2000,
+            "timings": [
+                "2025-02-27T14:00:00.000Z",
+                "2025-03-02T22:00:00.000Z"
+            ],
+            "description": "Celebrate the arrival of spring with a vibrant cultural festival featuring performances, art exhibitions, and culinary experiences from around the world. A four-day event perfect for the whole family.",
+            "venue": "Bloom Gardens",
+            "banner": {
+                "url": "https://picsum.photos/720/480?random=125"
+            }
+        },
+        {
+            "id": "basketball-championship-2025",
+            "name": "Regional Basketball Championship 2025",
+            "type": 1000,
+            "timings": [
+                "2025-02-28T08:30:00.000Z",
+                "2025-03-01T20:00:00.000Z"
+            ],
+            "description": "Watch the best basketball teams in the region compete for the championship title. Fast-paced games, skilled athletes, and an electric atmosphere guaranteed.",
+            "venue": "Metro Sports Arena",
+            "banner": {
+                "url": "https://picsum.photos/720/480?random=126"
+            }
+        },
+        {
+            "id": "coding-bootcamp-weekend-2025",
+            "name": "Intensive Coding Bootcamp Weekend 2025",
+            "type": 3001,
+            "timings": [
+                "2025-03-01T09:00:00.000Z",
+                "2025-03-02T18:00:00.000Z"
+            ],
+            "description": "Transform your coding skills in just one weekend with our intensive bootcamp. Expert instructors, hands-on projects, and valuable networking opportunities for developers of all levels.",
+            "venue": "Digital Learning Hub",
+            "banner": {
+                "url": "https://picsum.photos/720/480?random=127"
+            }
+        },
+        {
+            "id": "dance-showcase-2025",
+            "name": "Contemporary Dance Showcase 2025",
+            "type": 2001,
+            "timings": [
+                "2025-02-26T18:00:00.000Z",
+                "2025-02-27T22:30:00.000Z"
+            ],
+            "description": "Experience the beauty and emotion of contemporary dance at this exclusive two-night showcase featuring award-winning choreographers and talented performers pushing the boundaries of movement and expression.",
+            "venue": "Modern Arts Theater",
+            "banner": {
+                "url": "https://picsum.photos/720/480?random=128"
+            }
+        },
+        {
+            "id": "wellness-retreat-2025",
+            "name": "Weekend Wellness Retreat 2025",
+            "type": 1000,
+            "timings": [
+                "2025-03-01T07:00:00.000Z",
+                "2025-03-02T16:00:00.000Z"
+            ],
+            "description": "Rejuvenate your mind and body with our weekend wellness retreat featuring yoga sessions, meditation workshops, nutritional guidance, and relaxation techniques led by certified wellness experts.",
+            "venue": "Serenity Resort & Spa",
+            "banner": {
+                "url": "https://picsum.photos/720/480?random=129"
+            }
+    },
+    {
         "id": "ignite-tech-2015",
         "name": "Ignite Tech Summit 2015",
         "type": 3000,

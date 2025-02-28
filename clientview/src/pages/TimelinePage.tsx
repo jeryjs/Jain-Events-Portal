@@ -18,7 +18,7 @@ import TimelineEventCard from '@components/Timeline/TimelineEventCard';
 import { Event } from '@common/models';
 import { getBaseEventType } from '@common/utils';
 import TimelineHeader from '@components/Timeline/TimelineHeader';
-import { useDummyEvents } from '@hooks/useApi';
+import { useEvents } from '@hooks/useApi';
 
 // Types
 interface MarkerType {
@@ -116,7 +116,7 @@ const LoadingPlaceholder = () => (
 
 function TimelinePage() {
   const theme = useTheme();
-  const { data: events, isLoading } = useDummyEvents(20);
+  const { data: events, isLoading } = useEvents();
   const timelineRef = useRef<HTMLDivElement>(null);
   const [activeMarker, setActiveMarker] = useState<MarkerType | null>(null);
   const [itemRefs, setItemRefs] = useState<Record<string, React.RefObject<HTMLElement>>>({});
