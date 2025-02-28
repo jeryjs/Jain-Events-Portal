@@ -9,6 +9,7 @@ import { Box, Container, Skeleton, Typography, useMediaQuery, useTheme } from '@
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import PageTransition from '@components/shared/PageTransition';
 import FastScrollbar from '@components/Timeline/FastScrollbar';
@@ -121,6 +122,8 @@ function TimelinePage() {
   const [itemRefs, setItemRefs] = useState<Record<string, React.RefObject<HTMLElement>>>({});
   const isWideScreen = useMediaQuery('(min-width: 900px)');
   const [selectedEventType, setSelectedEventType] = useState(-1);
+  const location = useLocation();
+  const scrolledToHashRef = useRef(false);
 
   // Memoize expensive calculations
   const groupedEvents = useMemo<GroupedEvents>(() => {
@@ -250,6 +253,24 @@ function TimelinePage() {
       month: 'short'
     });
   }, []);
+
+  // scroll to section specified in URL hash using React refs
+  useEffect(() => {
+    // Only process hash navigation once when component mounts or on a true navigation change
+    if (!scrolledToHashRef.current && location.hash && Object.keys(itemRefs).length > 0) {
+      const hash = location.hash;
+      const elementId = hash.substring(1);
+      
+      if (itemRefs[elementId]?.current) {
+        setTimeout(() => {
+          const element = itemRefs[elementId].current;
+          timelineRef.current?.scrollTo({ top: element.offsetTop });
+          // Mark as scrolled so we don't do it again
+          scrolledToHashRef.current = true;
+        }, 100);
+      }
+    }
+  }, [itemRefs]);
 
   return (
     <PageTransition>

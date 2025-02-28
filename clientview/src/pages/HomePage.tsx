@@ -9,6 +9,7 @@ import { ColorModeContext } from '../App';
 import { styled } from '@mui/material/styles';
 import PhotoGallery from '@components/shared/PhotoGallery';
 import ArticlesSection from '@components/Event/ArticlesSection'; // <-- new import
+import { Link } from 'react-router-dom';
 
 const SectionHeader = styled(Box)(({ theme }) => `
   display: flex;
@@ -36,35 +37,42 @@ const GallerySection = styled(Box)(({ theme }) => `
 function HomePage() {
   const colorMode = useContext(ColorModeContext);
   const { data: events, isLoading, error } = useEvents();
-  
+
   const [catTabId, setTabId] = useState([0, 0]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
-  
+
   const filteredEvents = events?.filter(event => catTabId[1] > 0 ? event.type === catTabId[1] : true) || [];
-  
+
   const latestEvents = filteredEvents?.slice(0, 3) || [];
   const upcomingEvents = filteredEvents?.slice(0, 5) || [];
 
-  const renderEventCardShimmers = (count: number, variant: 'horizontal' | 'vertical' = 'vertical') => 
-    Array(count).fill(0).map((_, i) => variant==='horizontal' ? (
-      <Box key={i} sx={{ display:'flex', mb:2, width:'100%' }}>
+  const renderEventCardShimmers = (count: number, variant: 'horizontal' | 'vertical' = 'vertical') =>
+    Array(count).fill(0).map((_, i) => variant === 'horizontal' ? (
+      <Box key={i} sx={{ display: 'flex', mb: 2, width: '100%' }}>
         <Skeleton variant="rectangular" width={120} height={120} sx={{ borderRadius: 2 }} />
-        <Box sx={{ pl:2, width:'100%' }}>
+        <Box sx={{ pl: 2, width: '100%' }}>
           <Skeleton variant="text" width="80%" height={30} />
-          <Skeleton variant="text" width="60%" height={20} sx={{ mt:1 }} />
-          <Skeleton variant="text" width="40%" height={20} sx={{ mt:1 }} />
+          <Skeleton variant="text" width="60%" height={20} sx={{ mt: 1 }} />
+          <Skeleton variant="text" width="40%" height={20} sx={{ mt: 1 }} />
         </Box>
       </Box>
     ) : (
-      <Box key={i} sx={{ minWidth:300, m:1 }}>
-        <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius:'16px 16px 0 0' }} />
-        <Box sx={{ p:2 }}>
+      <Box key={i} sx={{ minWidth: 300, m: 1 }}>
+        <Skeleton variant="rectangular" width="100%" height={200} sx={{ borderRadius: '16px 16px 0 0' }} />
+        <Box sx={{ p: 2 }}>
           <Skeleton variant="text" width="80%" height={30} />
-          <Skeleton variant="text" width="60%" height={20} sx={{ mt:1 }} />
-          <Skeleton variant="text" width="40%" height={20} sx={{ mt:1 }} />
+          <Skeleton variant="text" width="60%" height={20} sx={{ mt: 1 }} />
+          <Skeleton variant="text" width="40%" height={20} sx={{ mt: 1 }} />
         </Box>
       </Box>
     ));
+
+  const getTimelineLink = (events) => {
+    if (events.length > 0) {
+      return `/timeline#${events[0].time.start.getFullYear()}-${events[0].time.start.toLocaleString('en-US', { month: 'long' })}`;
+    }
+    return '/timeline';
+  }
 
   return (
     <PageTransition>
@@ -73,22 +81,22 @@ function HomePage() {
 
         <SectionHeader>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Happening Now</Typography>
-          <Button endIcon={<ArrowForwardIcon />} color="inherit" size="small" sx={{ color:'text.secondary' }}>
+          <Button component={Link} to={getTimelineLink(latestEvents)} endIcon={<ArrowForwardIcon />} color="inherit" size="small" sx={{ color: 'text.secondary' }}>
             See all
           </Button>
         </SectionHeader>
 
-        <HorizontalScroll whileTap={{ cursor:'grabbing' }}>
-          {isLoading 
-            ? renderEventCardShimmers(3) 
+        <HorizontalScroll whileTap={{ cursor: 'grabbing' }}>
+          {isLoading
+            ? renderEventCardShimmers(3)
             : latestEvents.map((event, idx) => <EventCard key={event.id} event={event} delay={idx} />)}
-          {!isLoading && latestEvents.length===0 && !error && (
-            <Box sx={{ p:4, textAlign:'center' }}>
+          {!isLoading && latestEvents.length === 0 && !error && (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
               <Typography>No events available</Typography>
             </Box>
           )}
           {error && (
-            <Box sx={{ p:4, textAlign:'center' }}>
+            <Box sx={{ p: 4, textAlign: 'center' }}>
               <Typography color="error">Failed to load events</Typography>
             </Box>
           )}
@@ -96,24 +104,24 @@ function HomePage() {
 
         <SectionHeader>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Upcoming Events</Typography>
-          <Button endIcon={<ArrowForwardIcon />} color="inherit" size="small" sx={{ color:'text.secondary' }}>
+          <Button component={Link} to={getTimelineLink(upcomingEvents)} endIcon={<ArrowForwardIcon />} color="inherit" size="small" sx={{ color: 'text.secondary' }}>
             See all
           </Button>
         </SectionHeader>
 
-        <Box sx={{ alignItems:'flex-start', '&:active':{ scale:0.95 } }}>
-          {isLoading 
-            ? renderEventCardShimmers(3, 'horizontal') 
+        <Box sx={{ alignItems: 'flex-start', '&:active': { scale: 0.95 } }}>
+          {isLoading
+            ? renderEventCardShimmers(3, 'horizontal')
             : upcomingEvents.map((event, idx) => <EventCard key={`${event.id}-${idx}`} event={event} variant="horizontal" delay={idx} />)}
-          {!isLoading && upcomingEvents.length===0 && !error && (
-            <Box sx={{ p:4, textAlign:'center' }}>
+          {!isLoading && upcomingEvents.length === 0 && !error && (
+            <Box sx={{ p: 4, textAlign: 'center' }}>
               <Typography>No upcoming events</Typography>
             </Box>
           )}
         </Box>
         <SectionHeader>
           <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Photos</Typography>
-          <Button endIcon={<ArrowForwardIcon />} color="inherit" size="small" sx={{ color:'text.secondary' }}>
+          <Button endIcon={<ArrowForwardIcon />} color="inherit" size="small" sx={{ color: 'text.secondary' }}>
             See all
           </Button>
         </SectionHeader>
