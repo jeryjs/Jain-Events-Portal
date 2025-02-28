@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
-import { Card, Typography, Box, Chip, styled } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Card, Typography, Box, Chip, styled, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { EventType } from '@common/constants';
 
 // Types
@@ -12,7 +14,7 @@ interface TimelineHeaderProps {
 // Styled components
 const HeaderCard = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(2),
-  padding: theme.spacing(2),
+  // padding: theme.spacing(2),
   borderRadius: theme.shape.borderRadius * 2,
   position: 'sticky',
   top: 0,
@@ -41,12 +43,9 @@ const EventTypeFilters: React.FC<
     { id: -1, label: 'All Events' },
     ...Object.entries(EventType)
       .filter(([key]) => key.endsWith('00'))
-      .map(([key, value]) => ({
-        id: Number(key),
-        label: value,
-      })),
+      .map(([key, value]) => ({ id: Number(key), label: value })),
   ], []);
-  
+
   return (
     <ChipScroller sx={{ mt: 1 }}>
       {eventTypes.map((type) => (
@@ -69,9 +68,12 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({
   selectedEventType,
   onEventTypeChange
 }) => {
+  const navigate = useNavigate();
+
   return (
     <HeaderCard elevation={2}>
-      <Box sx={{ mb: 1 }}>
+      <Box sx={{ mb: 1, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <ArrowBackIcon onClick={() => navigate(-1)} sx={{ mr: 2, cursor: 'pointer' }} />
         <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme => theme.palette.primary.main }}>
           Timeline
           <Typography component="span" variant="body1" color="text.secondary" sx={{ ml: 1 }}>
