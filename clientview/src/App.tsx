@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useMemo, useState, createContext } from 'react';
 import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useMemo, useState, createContext } from 'react';
 import HomePage from './pages/HomePage';
 import EventPage from './pages/EventPage';
 import ActivityPage from './pages/ActivityPage';
 import ArticlesPage from './pages/ArticlesPage';
 import ArticleDetailPage from './pages/ArticleDetailPage';
+import TimelinePage from './pages/TimelinePage'; // Add this import';
 import queryClient from './utils/QueryClient';
 
 interface ColorMode {
@@ -54,7 +54,8 @@ function App() {
               {/* Articles routes - specific ones first */}
               <Route path="/articles/:articleId" element={<ArticleDetailPage />} />
               <Route path="/articles" element={<ArticlesPage />} />
-              
+              {/* Timeline route */}
+              <Route path="/timeline" element={<TimelinePage />} />
               {/* Event routes */}
               <Route path="/:eventId/:activityId" element={<ActivityPage />} />
               <Route path="/:eventId" element={<EventPage />} />

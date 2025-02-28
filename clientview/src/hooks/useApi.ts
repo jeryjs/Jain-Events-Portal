@@ -20,6 +20,8 @@ const _fetchEvents = async (): Promise<Event[]> => {
 };
 
 export const useEvents = () => {
+  return useDummyEvents(20);  // Use dummy events for now while testing
+
   return useQuery({
     queryKey: ['events'],
     queryFn: _fetchEvents,
@@ -29,13 +31,31 @@ export const useEvents = () => {
 };
 
 export const useEvent = (eventId: string) => {
+  const eventsQuery = useEvents();
+  
   return useQuery({
     queryKey: ['event', eventId],
-    queryFn: () => _fetchEvents().then(events => events.find(e => e.id === eventId)),
+    queryFn: async () => 
+      eventsQuery.data?.find(e => e.id === eventId) || 
+      (await _fetchEvents()).find(e => e.id === eventId),
     staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: !eventsQuery.isLoading,
+  });
+};
+
+export const useDummyEvents = (count = 100) => {
+  return useQuery({
+    queryKey: ['dummy-events', count],
+    queryFn: async () => {
+      return fetch('/dummy_events.json')
+        .then(res => res.json())
+        .then(data => parseEvents(data).slice(0, count))  // Limit to the first `count` events
+        .then(it => new Promise<typeof it>(resolve => setTimeout(() => resolve(it), 1000))) // Simulate network delay
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 }
-
 
 const _fetchActivities = async (eventId: string): Promise<Activity[]> => {
   const response = await fetch(`${config.API_BASE_URL}/activities/${eventId}`, {
