@@ -6,6 +6,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { EventType } from '@common/constants';
 import { Link } from 'react-router-dom';
+import { getBaseEventType } from '@common/utils';
 
 interface TimelineEventCardProps {
   event: any;
@@ -61,13 +62,13 @@ const EventTypeChip = styled(Chip, {
   shouldForwardProp: (prop) => prop !== 'type',
 })<EventTypeChipProps>(({ theme, type }) => {
   const getChipColor = (type: EventType): string => {
-    const typeColors = {
-      [EventType.TECH]: theme.palette.success.main,
-      [EventType.CULTURAL]: theme.palette.error.main,
-      [EventType.SPORTS]: theme.palette.info.main,
-      [EventType.GENERAL]: theme.palette.secondary.main,
-    };
-    return typeColors[type] || typeColors[EventType.GENERAL];
+    switch(getBaseEventType(type)) {
+      case EventType.TECH: return theme.palette.success.main;
+      case EventType.CULTURAL: return theme.palette.error.main;
+      case EventType.SPORTS: return theme.palette.info.main;
+      case EventType.GENERAL: return theme.palette.secondary.main;
+      default: return theme.palette.grey[500];
+    }
   };
 
   return {

@@ -1,7 +1,3 @@
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { Box, Container, Skeleton, Typography, useMediaQuery, useTheme, Chip, FormControl, MenuItem, Select, Card, Stack, Grid, Button, Divider } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { motion } from 'framer-motion';
 import Timeline from '@mui/lab/Timeline';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
@@ -9,17 +5,19 @@ import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import { Box, Container, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { motion } from 'framer-motion';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import PageTransition from '@components/shared/PageTransition';
 import FastScrollbar from '@components/Timeline/FastScrollbar';
 import TimelineEventCard from '@components/Timeline/TimelineEventCard';
 
-import { useDummyEvents } from '@hooks/useApi';
 import { Event } from '@common/models';
+import { getBaseEventType } from '@common/utils';
 import TimelineHeader from '@components/Timeline/TimelineHeader';
+import { useDummyEvents } from '@hooks/useApi';
 
 // Types
 interface MarkerType {
@@ -58,7 +56,7 @@ const itemVariants = {
 const TimelineContainer = styled(motion.div)(({ theme }) => ({
   display: 'flex',
   position: 'relative',
-  height: 'calc(100vh - 120px)',
+  height: 'calc(100vh - 170px)',
   overflowY: 'auto',
   scrollBehavior: 'smooth',
   '&::-webkit-scrollbar': {
@@ -131,7 +129,7 @@ function TimelinePage() {
     // Filter events if an event type is selected
     const filteredEvents = selectedEventType === -1
       ? events 
-      : events.filter(event => event.type === selectedEventType);
+      : events.filter(event => getBaseEventType(event.type) === selectedEventType);
 
     return filteredEvents.reduce((groups: GroupedEvents, event) => {
       const date = new Date(event.time.start);
@@ -151,26 +149,10 @@ function TimelinePage() {
     }, {});
   }, [events, selectedEventType]);
 
-  // Extract available years for the dropdown
-  const availableYears = useMemo(() => {
-    return Object.keys(groupedEvents).sort((a, b) => parseInt(b) - parseInt(a));
-  }, [groupedEvents]);
-
   // Total number of events
   const totalEventCount = useMemo(() => {
     return events?.length || 0;
   }, [events]);
-
-  // Handle year selection from dropdown
-  const handleYearSelect = useCallback((year: string) => {
-    if (!year || !groupedEvents[year]) return;
-    
-    // Find the first month in the selected year
-    const firstMonth = Object.keys(groupedEvents[year])[0];
-    if (firstMonth) {
-      scrollToSection({ year, month: firstMonth });
-    }
-  }, [groupedEvents]);
 
   // Create timeline markers for the scrollbar
   const timelineMarkers = useMemo<MarkerType[]>(() => {
@@ -273,9 +255,11 @@ function TimelinePage() {
     <PageTransition>
       <Container maxWidth="lg" sx={{ pt: 2, pb: 2 }}>
 
-        <Typography variant="h4" color='text.primary' sx={{ mb: 1, fontWeight: 'bold' }}>
-          Timeline
-        </Typography>
+        <TimelineHeader 
+          totalEvents={totalEventCount}
+          selectedEventType={selectedEventType}
+          onEventTypeChange={setSelectedEventType}
+        />
 
         {isLoading ? (
           <LoadingPlaceholder />
