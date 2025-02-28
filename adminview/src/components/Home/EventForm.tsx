@@ -1,3 +1,4 @@
+import { Suspense, useEffect, useState } from 'react';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -11,10 +12,11 @@ import {
   Paper, Select, TextField, Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { Suspense, useEffect, useState } from 'react';
+import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
+import dayjs from 'dayjs';
 
 import { EventType } from '@common/constants';
 import { Event } from '@common/models';
@@ -329,36 +331,32 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
               Date & Time
             </Typography>
 
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
                 <DateTimePicker
                   label="Start Time"
-                  value={formData.timings[0]}
-                  onChange={(newValue) => {
-                    if (newValue) {
-                      editFormData('timings', [newValue, formData.timings[1]]);
-                    }
-                  }}
+                  value={dayjs(formData.timings[0])}
+                  onChange={(newValue) => newValue && editFormData('timings', [newValue, formData.timings[1]])}
                   sx={{ flex: 1 }}
+                  viewRenderers={{
+                    hours: renderTimeViewClock,
+                    minutes: renderTimeViewClock,
+                    seconds: renderTimeViewClock,
+                  }}
+                  slotProps={{ textField: { error: !!formErrors.timings, helperText: formErrors.timings } }}
                 />
-
                 <DateTimePicker
                   label="End Time"
-                  value={formData.timings[1]}
-                  onChange={(newValue) => {
-                    if (newValue) {
-                      editFormData('timings', [formData.timings[0], newValue]);
-                    }
-                  }}
+                  value={dayjs(formData.timings[1])}
+                  onChange={(newValue) => newValue && editFormData('timings', [formData.timings[0], newValue])}
                   sx={{ flex: 1 }}
-                  slotProps={{
-                    textField: {
-                      error: !!formErrors.timings,
-                      helperText: formErrors.timings
-                    }
+                  viewRenderers={{
+                    hours: renderTimeViewClock,
+                    minutes: renderTimeViewClock,
                   }}
+                  slotProps={{ textField: { error: !!formErrors.timings, helperText: formErrors.timings } }}
                 />
-              </Box>
+                </Box>
             </LocalizationProvider>
           </Box>
 
