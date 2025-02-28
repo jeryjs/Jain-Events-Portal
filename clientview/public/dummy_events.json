@@ -1,0 +1,1836 @@
+[
+    {
+        "id": "culturals-2025",
+        "name": "Culturals 2025",
+        "type": 2000,
+        "timings": [
+            "2025-03-13T03:30:18.695Z",
+            "2025-03-15T16:30:18.695Z"
+        ],
+        "description": "Get ready for the Culturals Meeting! This is a 3-day event that will be held at Sprintoor from March 13, 2025, at 9:00 AM to March 15, 2025, at 10:00 PM. The event will feature a variety of cultural performances, workshops, and competitions. There will also be food vendors and merchandise stalls. This is a great opportunity to learn about different cultures and meet new people. Don't miss out on this exciting event!",
+        "venue": "Sprintoor",
+        "banner": {
+            "url": "https://img.pikbest.com/pikbest/pic/00/46/80/05h888piCSsf.jpg"
+        }
+    },
+    {
+        "id": "sportastica-2025",
+        "name": "Sportastica 2025",
+        "type": 1000,
+        "timings": [
+            "2025-03-30T07:30:00.147Z",
+            "2025-03-30T10:30:00.188Z"
+        ],
+        "description": "Indulge in your most cherished dishes and revel in the delightful company of your friends and family as you create lasting memories together. A delectable array of culinary delights awaits, promising to tantalize your taste buds and leave you craving for more. For those seeking a more adventurous gastronomic experience, a diverse selection of food from local food trucks will be available for purchase, offering a tantalizing fusion of flavors and cuisines. Prepare to embark on a culinary journey that will delight your senses and leave you utterly satisfied.",
+        "venue": "Gala Convention Center",
+        "banner": {
+            "url": "https://media.licdn.com/dms/image/v2/D4D12AQHJJAm7BTX2zQ/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1736499714444?e=2147483647&v=beta&t=Je_c6DHqmUlos7W_HsGufFc55MpMR4wiMNDqgFSGrk8"
+        }
+    },
+    {
+        "id": "ignite-tech-2015",
+        "name": "Ignite Tech Summit 2015",
+        "type": 3000,
+        "timings": [
+            "2015-01-15T09:00:00.000Z",
+            "2015-01-17T17:00:00.000Z"
+        ],
+        "description": "A groundbreaking tech summit featuring visionary speakers, cutting-edge workshops, and unparalleled networking opportunities. Explore the future of technology and innovation.",
+        "venue": "Tech Innovation Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=1"
+        }
+    },
+    {
+        "id": "rhythmic-dance-2016",
+        "name": "Rhythmic Dance Fest 2016",
+        "type": 2001,
+        "timings": [
+            "2016-02-20T18:00:00.000Z",
+            "2016-02-21T22:00:00.000Z"
+        ],
+        "description": "Experience the magic of dance at the Rhythmic Dance Fest! From ballet to hip-hop, witness breathtaking performances and celebrate the art of movement.",
+        "venue": "Grand Ballroom",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=2"
+        }
+    },
+    {
+        "id": "sports-mania-2017",
+        "name": "Sports Mania 2017",
+        "type": 1000,
+        "timings": [
+            "2017-03-25T10:00:00.000Z",
+            "2017-03-26T18:00:00.000Z"
+        ],
+        "description": "Get your adrenaline pumping at Sports Mania! A weekend of thrilling competitions, games, and sports activities for all ages.",
+        "venue": "City Sports Complex",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=3"
+        }
+    },
+    {
+        "id": "coding-conquest-2018",
+        "name": "Coding Conquest 2018",
+        "type": 3001,
+        "timings": [
+            "2018-04-01T09:00:00.000Z",
+            "2018-04-03T17:00:00.000Z"
+        ],
+        "description": "Embark on a coding adventure at Coding Conquest! Solve challenging puzzles, learn new programming skills, and compete for glory.",
+        "venue": "Innovation Lab",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=5"
+        }
+    },
+    {
+        "id": "harmony-singing-2019",
+        "name": "Harmony Singing Gala 2019",
+        "type": 2002,
+        "timings": [
+            "2019-05-10T19:00:00.000Z",
+            "2019-05-11T23:00:00.000Z"
+        ],
+        "description": "Experience the power of music at the Harmony Singing Gala! Talented vocalists will captivate you with their enchanting melodies and harmonies.",
+        "venue": "Concert Hall",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=6"
+        }
+    },
+    {
+        "id": "volley-slam-2020",
+        "name": "Volley Slam 2020",
+        "type": 1001,
+        "timings": [
+            "2020-06-15T11:00:00.000Z",
+            "2020-06-16T19:00:00.000Z"
+        ],
+        "description": "Spike, set, and score at Volley Slam! A high-energy volleyball tournament featuring skilled athletes and intense matches.",
+        "venue": "Beachfront Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=7"
+        }
+    },
+    {
+        "id": "tech-workshop-2021",
+        "name": "Tech Innovation Workshop 2021",
+        "type": 3004,
+        "timings": [
+            "2021-07-01T14:00:00.000Z",
+            "2021-07-02T17:00:00.000Z"
+        ],
+        "description": "Unlock your potential at the Tech Innovation Workshop! Learn from industry experts, explore emerging technologies, and create innovative solutions.",
+        "venue": "Tech Incubator",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=8"
+        }
+    },
+    {
+        "id": "cultural-fiesta-2022",
+        "name": "Cultural Fiesta 2022",
+        "type": 2000,
+        "timings": [
+            "2022-08-12T17:00:00.000Z",
+            "2022-08-14T21:00:00.000Z"
+        ],
+        "description": "Celebrate diversity at the Cultural Fiesta! Experience vibrant traditions, captivating performances, and delicious cuisine from around the world.",
+        "venue": "Global Village",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=9"
+        }
+    },
+    {
+        "id": "football-frenzy-2023",
+        "name": "Football Frenzy 2023",
+        "type": 1002,
+        "timings": [
+            "2023-09-20T10:00:00.000Z",
+            "2023-09-21T18:00:00.000Z"
+        ],
+        "description": "Cheer on your favorite team at Football Frenzy! A weekend of thrilling football matches, tailgating, and team spirit.",
+        "venue": "Stadium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=10"
+        }
+    },
+    {
+        "id": "hackathon-x-2024",
+        "name": "Hackathon X 2024",
+        "type": 3002,
+        "timings": [
+            "2024-10-27T09:00:00.000Z",
+            "2024-10-29T17:00:00.000Z"
+        ],
+        "description": "Unleash your creativity at Hackathon X! Collaborate with talented developers, design innovative solutions, and compete for amazing prizes.",
+        "venue": "Innovation Hub",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=11"
+        }
+    },
+    {
+        "id": "quiz-mania-2026",
+        "name": "Quiz Mania 2026",
+        "type": 3003,
+        "timings": [
+            "2026-11-05T14:00:00.000Z",
+            "2026-11-06T17:00:00.000Z"
+        ],
+        "description": "Test your knowledge at Quiz Mania! A fun-filled trivia competition with exciting prizes for the winners.",
+        "venue": "Community Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=12"
+        }
+    },
+    {
+        "id": "cricket-carnival-2015",
+        "name": "Cricket Carnival 2015",
+        "type": 1003,
+        "timings": [
+            "2015-04-05T08:00:00.000Z",
+            "2015-04-06T20:00:00.000Z"
+        ],
+        "description": "Join us for a weekend of cricket fever at the Cricket Carnival! Enjoy thrilling matches, delicious food, and fun activities for the whole family.",
+        "venue": "Cricket Grounds",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=13"
+        }
+    },
+    {
+        "id": "dj-extravaganza-2016",
+        "name": "DJ Extravaganza 2016",
+        "type": 2003,
+        "timings": [
+            "2016-05-12T21:00:00.000Z",
+            "2016-05-13T03:00:00.000Z"
+        ],
+        "description": "Dance the night away at the DJ Extravaganza! Featuring top DJs, electrifying music, and a vibrant atmosphere.",
+        "venue": "Nightclub",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=14"
+        }
+    },
+    {
+        "id": "tech-fair-2017",
+        "name": "Tech Fair 2017",
+        "type": 3000,
+        "timings": [
+            "2017-06-18T10:00:00.000Z",
+            "2017-06-19T18:00:00.000Z"
+        ],
+        "description": "Discover the latest innovations at the Tech Fair! Explore interactive exhibits, attend informative seminars, and connect with industry leaders.",
+        "venue": "Exhibition Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=15"
+        }
+    },
+    {
+        "id": "dance-showcase-2018",
+        "name": "Dance Showcase 2018",
+        "type": 2001,
+        "timings": [
+            "2018-07-22T19:00:00.000Z",
+            "2018-07-23T22:00:00.000Z"
+        ],
+        "description": "Be mesmerized by the talent at the Dance Showcase! Featuring a variety of dance styles, from classical to contemporary.",
+        "venue": "Theater",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=16"
+        }
+    },
+    {
+        "id": "sports-fest-2019",
+        "name": "Sports Fest 2019",
+        "type": 1000,
+        "timings": [
+            "2019-08-28T09:00:00.000Z",
+            "2019-08-29T17:00:00.000Z"
+        ],
+        "description": "Compete in a variety of sports at the Sports Fest! From track and field to team sports, there's something for everyone.",
+        "venue": "Sports Complex",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=17"
+        }
+    },
+    {
+        "id": "coding-challenge-2020",
+        "name": "Coding Challenge 2020",
+        "type": 3001,
+        "timings": [
+            "2020-09-05T10:00:00.000Z",
+            "2020-09-06T18:00:00.000Z"
+        ],
+        "description": "Test your coding skills at the Coding Challenge! Solve complex problems and compete for prizes.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=18"
+        }
+    },
+    {
+        "id": "singing-competition-2021",
+        "name": "Singing Competition 2021",
+        "type": 2002,
+        "timings": [
+            "2021-10-11T19:00:00.000Z",
+            "2021-10-12T22:00:00.000Z"
+        ],
+        "description": "Showcase your vocal talent at the Singing Competition! Compete for the title of best singer.",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=19"
+        }
+    },
+    {
+        "id": "volleyball-tournament-2022",
+        "name": "Volleyball Tournament 2022",
+        "type": 1001,
+        "timings": [
+            "2022-11-17T11:00:00.000Z",
+            "2022-11-18T19:00:00.000Z"
+        ],
+        "description": "Join the action at the Volleyball Tournament! Compete against other teams and show off your skills.",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=20"
+        }
+    },
+    {
+        "id": "tech-conference-2023",
+        "name": "Tech Conference 2023",
+        "type": 3000,
+        "timings": [
+            "2023-12-23T09:00:00.000Z",
+            "2023-12-24T17:00:00.000Z"
+        ],
+        "description": "Learn about the latest trends in technology at the Tech Conference! Attend keynote speeches, workshops, and networking events.",
+        "venue": "Convention Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=21"
+        }
+    },
+    {
+        "id": "dance-gala-2024",
+        "name": "Dance Gala 2024",
+        "type": 2001,
+        "timings": [
+            "2024-01-29T18:00:00.000Z",
+            "2024-01-30T22:00:00.000Z"
+        ],
+        "description": "Celebrate the art of dance at the Dance Gala! Featuring performances by renowned dancers and choreographers.",
+        "venue": "Opera House",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=22"
+        }
+    },
+    {
+        "id": "sports-challenge-2025",
+        "name": "Sports Challenge 2025",
+        "type": 1000,
+        "timings": [
+            "2025-02-04T10:00:00.000Z",
+            "2025-02-05T18:00:00.000Z"
+        ],
+        "description": "Test your athletic abilities at the Sports Challenge! Compete in a variety of events and win prizes.",
+        "venue": "Stadium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=23"
+        }
+    },
+    {
+        "id": "coding-symposium-2026",
+        "name": "Coding Symposium 2026",
+        "type": 3001,
+        "timings": [
+            "2026-03-10T09:00:00.000Z",
+            "2026-03-11T17:00:00.000Z"
+        ],
+        "description": "Expand your coding knowledge at the Coding Symposium! Attend workshops, listen to keynote speakers, and network with other developers.",
+        "venue": "Tech Institute",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=24"
+        }
+    },
+    {
+        "id": "singing-fest-2015",
+        "name": "Singing Fest 2015",
+        "type": 2002,
+        "timings": [
+            "2015-05-15T19:00:00.000Z",
+            "2015-05-16T22:00:00.000Z"
+        ],
+        "description": "Celebrate the joy of singing at the Singing Fest! Featuring performances by local and international artists.",
+        "venue": "Music Hall",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=25"
+        }
+    },
+    {
+        "id": "volleyball-classic-2016",
+        "name": "Volleyball Classic 2016",
+        "type": 1001,
+        "timings": [
+            "2016-06-20T11:00:00.000Z",
+            "2016-06-21T19:00:00.000Z"
+        ],
+        "description": "Witness the best volleyball action at the Volleyball Classic! Featuring top teams from around the region.",
+        "venue": "Sports Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=26"
+        }
+    },
+    {
+        "id": "tech-expo-2017",
+        "name": "Tech Expo 2017",
+        "type": 3000,
+        "timings": [
+            "2017-07-26T10:00:00.000Z",
+            "2017-07-27T18:00:00.000Z"
+        ],
+        "description": "Explore the future of technology at the Tech Expo! Featuring exhibits, demonstrations, and workshops.",
+        "venue": "Exhibition Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=27"
+        }
+    },
+    {
+        "id": "dance-festival-2018",
+        "name": "Dance Festival 2018",
+        "type": 2001,
+        "timings": [
+            "2018-08-01T19:00:00.000Z",
+            "2018-08-02T22:00:00.000Z"
+        ],
+        "description": "Immerse yourself in the world of dance at the Dance Festival! Featuring performances, workshops, and masterclasses.",
+        "venue": "Dance Studio",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=28"
+        }
+    },
+    {
+        "id": "sports-gala-2019",
+        "name": "Sports Gala 2019",
+        "type": 1000,
+        "timings": [
+            "2019-09-07T09:00:00.000Z",
+            "2019-09-08T17:00:00.000Z"
+        ],
+        "description": "Celebrate sportsmanship at the Sports Gala! Featuring awards, entertainment, and a celebration of athletic achievement.",
+        "venue": "Banquet Hall",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=29"
+        }
+    },
+    {
+        "id": "coding-retreat-2020",
+        "name": "Coding Retreat 2020",
+        "type": 3001,
+        "timings": [
+            "2020-10-13T10:00:00.000Z",
+            "2020-10-14T18:00:00.000Z"
+        ],
+        "description": "Escape to the Coding Retreat! A weekend of intensive coding, collaboration, and relaxation.",
+        "venue": "Mountain Resort",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=30"
+        }
+    },
+    {
+        "id": "singing-showdown-2021",
+        "name": "Singing Showdown 2021",
+        "type": 2002,
+        "timings": [
+            "2021-11-19T19:00:00.000Z",
+            "2021-11-20T22:00:00.000Z"
+        ],
+        "description": "Witness the ultimate singing battle at the Singing Showdown! Featuring talented singers competing for the top prize.",
+        "venue": "Concert Venue",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=31"
+        }
+    },
+    {
+        "id": "volleyball-fest-2022",
+        "name": "Volleyball Fest 2022",
+        "type": 1001,
+        "timings": [
+            "2022-12-25T11:00:00.000Z",
+            "2022-12-26T19:00:00.000Z"
+        ],
+        "description": "Celebrate the sport of volleyball at the Volleyball Fest! Featuring tournaments, clinics, and fun activities.",
+        "venue": "Beach Resort",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=32"
+        }
+    },
+    {
+        "id": "tech-summit-2023",
+        "name": "Tech Summit 2023",
+        "type": 3000,
+        "timings": [
+            "2023-01-31T09:00:00.000Z",
+            "2023-02-01T17:00:00.000Z"
+        ],
+        "description": "Join industry leaders at the Tech Summit! Discuss the latest trends, network with peers, and explore new opportunities.",
+        "venue": "Conference Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=33"
+        }
+    },
+    {
+        "id": "dance-competition-2024",
+        "name": "Dance Competition 2024",
+        "type": 2001,
+        "timings": [
+            "2024-02-06T18:00:00.000Z",
+            "2024-02-07T22:00:00.000Z"
+        ],
+        "description": "Witness the best dancers compete at the Dance Competition! Featuring a variety of styles and age groups.",
+        "venue": "Theater",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=34"
+        }
+    },
+    {
+        "id": "sports-tournament-2025",
+        "name": "Sports Tournament 2025",
+        "type": 1000,
+        "timings": [
+            "2025-03-15T10:00:00.000Z",
+            "2025-03-16T18:00:00.000Z"
+        ],
+        "description": "Compete in a variety of sports at the Sports Tournament! Featuring team and individual events.",
+        "venue": "Sports Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=35"
+        }
+    },
+    {
+        "id": "coding-hackathon-2026",
+        "name": "Coding Hackathon 2026",
+        "type": 3002,
+        "timings": [
+            "2026-04-21T09:00:00.000Z",
+            "2026-04-22T17:00:00.000Z"
+        ],
+        "description": "Join the Coding Hackathon and create innovative solutions! Work with a team and compete for prizes.",
+        "venue": "Tech Incubator",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=36"
+        }
+    },
+    {
+        "id": "singing-contest-2015",
+        "name": "Singing Contest 2015",
+        "type": 2002,
+        "timings": [
+            "2015-06-27T19:00:00.000Z",
+            "2015-06-28T22:00:00.000Z"
+        ],
+        "description": "Showcase your vocal talent at the Singing Contest! Compete for the title of best singer.",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=37"
+        }
+    },
+    {
+        "id": "volleyball-league-2016",
+        "name": "Volleyball League 2016",
+        "type": 1001,
+        "timings": [
+            "2016-07-02T11:00:00.000Z",
+            "2016-07-03T19:00:00.000Z"
+        ],
+        "description": "Join the Volleyball League and compete against other teams! Play weekly matches and improve your skills.",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=38"
+        }
+    },
+    {
+        "id": "tech-workshop-series-2017",
+        "name": "Tech Workshop Series 2017",
+        "type": 3004,
+        "timings": [
+            "2017-08-08T10:00:00.000Z",
+            "2017-08-09T18:00:00.000Z"
+        ],
+        "description": "Attend the Tech Workshop Series and learn new skills! Featuring workshops on coding, design, and more.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=39"
+        }
+    },
+    {
+        "id": "dance-workshop-2018",
+        "name": "Dance Workshop 2018",
+        "type": 2001,
+        "timings": [
+            "2018-09-14T19:00:00.000Z",
+            "2018-09-15T22:00:00.000Z"
+        ],
+        "description": "Improve your dance skills at the Dance Workshop! Featuring classes in a variety of styles.",
+        "venue": "Dance Studio",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=40"
+        }
+    },
+    {
+        "id": "sports-camp-2019",
+        "name": "Sports Camp 2019",
+        "type": 1000,
+        "timings": [
+            "2019-10-20T09:00:00.000Z",
+            "2019-10-21T17:00:00.000Z"
+        ],
+        "description": "Join the Sports Camp and improve your athletic abilities! Featuring training in a variety of sports.",
+        "venue": "Sports Complex",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=41"
+        }
+    },
+    {
+        "id": "coding-bootcamp-2020",
+        "name": "Coding Bootcamp 2020",
+        "type": 3001,
+        "timings": [
+            "2020-11-26T10:00:00.000Z",
+            "2020-11-27T18:00:00.000Z"
+        ],
+        "description": "Learn to code at the Coding Bootcamp! Featuring intensive training in web development.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=42"
+        }
+    },
+    {
+        "id": "singing-competition-2021",
+        "name": "Global Singing Competition 2021",
+        "type": 2002,
+        "timings": [
+            "2021-12-01T19:00:00.000Z",
+            "2021-12-02T22:00:00.000Z"
+        ],
+        "description": "Witness the best singers around the world, compete for the title of best singer!",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=43"
+        }
+    },
+    {
+        "id": "volleyball-championship-2022",
+        "name": "Volleyball Championship 2022",
+        "type": 1001,
+        "timings": [
+            "2022-01-05T11:00:00.000Z",
+            "2022-01-06T19:00:00.000Z"
+        ],
+        "description": "Witness the best volleyball teams around the world, compete for the title of champion!",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=44"
+        }
+    },
+    {
+        "id": "tech-convention-2023",
+        "name": "Tech Convention 2023",
+        "type": 3000,
+        "timings": [
+            "2023-02-10T09:00:00.000Z",
+            "2023-02-11T17:00:00.000Z"
+        ],
+        "description": "Learn about the latest trends in technology at the Tech Convention! Attend keynote speeches, workshops, and networking events.",
+        "venue": "Convention Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=45"
+        }
+    },
+    {
+        "id": "dance-battle-2024",
+        "name": "Dance Battle 2024",
+        "type": 2001,
+        "timings": [
+            "2024-03-15T18:00:00.000Z",
+            "2024-03-16T22:00:00.000Z"
+        ],
+        "description": "Witness the best dancers compete at the Dance Battle! Featuring a variety of styles and age groups.",
+        "venue": "Theater",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=46"
+        }
+    },
+    {
+        "id": "sports-meet-2025",
+        "name": "Sports Meet 2025",
+        "type": 1000,
+        "timings": [
+            "2025-04-20T10:00:00.000Z",
+            "2025-04-21T18:00:00.000Z"
+        ],
+        "description": "Compete in a variety of sports at the Sports Meet! Featuring team and individual events.",
+        "venue": "Sports Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=47"
+        }
+    },
+    {
+        "id": "coding-olympics-2026",
+        "name": "Coding Olympics 2026",
+        "type": 3002,
+        "timings": [
+            "2026-05-25T09:00:00.000Z",
+            "2026-05-26T17:00:00.000Z"
+        ],
+        "description": "Join the Coding Olympics and create innovative solutions! Work with a team and compete for prizes.",
+        "venue": "Tech Incubator",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=48"
+        }
+    },
+    {
+        "id": "singing-idol-2015",
+        "name": "Singing Idol 2015",
+        "type": 2002,
+        "timings": [
+            "2015-07-01T19:00:00.000Z",
+            "2015-07-02T22:00:00.000Z"
+        ],
+        "description": "Showcase your vocal talent at the Singing Idol! Compete for the title of best singer.",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=49"
+        }
+    },
+    {
+        "id": "volleyball-mania-2016",
+        "name": "Volleyball Mania 2016",
+        "type": 1001,
+        "timings": [
+            "2016-08-05T11:00:00.000Z",
+            "2016-08-06T19:00:00.000Z"
+        ],
+        "description": "Join the Volleyball Mania and compete against other teams! Play weekly matches and improve your skills.",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=50"
+        }
+    },
+    {
+        "id": "tech-seminar-series-2017",
+        "name": "Tech Seminar Series 2017",
+        "type": 3004,
+        "timings": [
+            "2017-09-10T10:00:00.000Z",
+            "2017-09-11T18:00:00.000Z"
+        ],
+        "description": "Attend the Tech Seminar Series and learn new skills! Featuring workshops on coding, design, and more.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=51"
+        }
+    },
+    {
+        "id": "dance-marathon-2018",
+        "name": "Dance Marathon 2018",
+        "type": 2001,
+        "timings": [
+            "2018-10-15T19:00:00.000Z",
+            "2018-10-16T22:00:00.000Z"
+        ],
+        "description": "Improve your dance skills at the Dance Marathon! Featuring classes in a variety of styles.",
+        "venue": "Dance Studio",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=52"
+        }
+    },
+    {
+        "id": "sports-extravaganza-2019",
+        "name": "Sports Extravaganza 2019",
+        "type": 1000,
+        "timings": [
+            "2019-11-20T09:00:00.000Z",
+            "2019-11-21T17:00:00.000Z"
+        ],
+        "description": "Join the Sports Extravaganza and improve your athletic abilities! Featuring training in a variety of sports.",
+        "venue": "Sports Complex",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=53"
+        }
+    },
+    {
+        "id": "coding-camp-2020",
+        "name": "Coding Camp 2020",
+        "type": 3001,
+        "timings": [
+            "2020-12-25T10:00:00.000Z",
+            "2020-12-26T18:00:00.000Z"
+        ],
+        "description": "Learn to code at the Coding Camp! Featuring intensive training in web development.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=54"
+        }
+    },
+    {
+        "id": "singing-gala-2021",
+        "name": "Singing Gala 2021",
+        "type": 2002,
+        "timings": [
+            "2021-01-30T19:00:00.000Z",
+            "2021-01-31T22:00:00.000Z"
+        ],
+        "description": "Witness the best singers around the world, compete for the title of best singer!",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=55"
+        }
+    },
+    {
+        "id": "volleyball-tournament-2022",
+        "name": "Volleyball Tournament 2022",
+        "type": 1001,
+        "timings": [
+            "2022-02-05T11:00:00.000Z",
+            "2022-02-06T19:00:00.000Z"
+        ],
+        "description": "Witness the best volleyball teams around the world, compete for the title of champion!",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=56"
+        }
+    },
+    {
+        "id": "tech-conference-2023",
+        "name": "Tech Conference 2023",
+        "type": 3000,
+        "timings": [
+            "2023-03-10T09:00:00.000Z",
+            "2023-03-11T17:00:00.000Z"
+        ],
+        "description": "Learn about the latest trends in technology at the Tech Conference! Attend keynote speeches, workshops, and networking events.",
+        "venue": "Convention Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=57"
+        }
+    },
+    {
+        "id": "dance-competition-2024",
+        "name": "Dance Competition 2024",
+        "type": 2001,
+        "timings": [
+            "2024-04-15T18:00:00.000Z",
+            "2024-04-16T22:00:00.000Z"
+        ],
+        "description": "Witness the best dancers compete at the Dance Competition! Featuring a variety of styles and age groups.",
+        "venue": "Theater",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=58"
+        }
+    },
+    {
+        "id": "sports-festival-2025",
+        "name": "Sports Festival 2025",
+        "type": 1000,
+        "timings": [
+            "2025-05-20T10:00:00.000Z",
+            "2025-05-21T18:00:00.000Z"
+        ],
+        "description": "Compete in a variety of sports at the Sports Festival! Featuring team and individual events.",
+        "venue": "Sports Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=59"
+        }
+    },
+    {
+        "id": "coding-challenge-2026",
+        "name": "Coding Challenge 2026",
+        "type": 3002,
+        "timings": [
+            "2026-06-25T09:00:00.000Z",
+            "2026-06-26T17:00:00.000Z"
+        ],
+        "description": "Join the Coding Challenge and create innovative solutions! Work with a team and compete for prizes.",
+        "venue": "Tech Incubator",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=60"
+        }
+    },
+    {
+        "id": "singing-showcase-2015",
+        "name": "Singing Showcase 2015",
+        "type": 2002,
+        "timings": [
+            "2015-08-01T19:00:00.000Z",
+            "2015-08-02T22:00:00.000Z"
+        ],
+        "description": "Showcase your vocal talent at the Singing Showcase! Compete for the title of best singer.",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=61"
+        }
+    },
+    {
+        "id": "volleyball-league-2016",
+        "name": "Volleyball League 2016",
+        "type": 1001,
+        "timings": [
+            "2016-09-05T11:00:00.000Z",
+            "2016-09-06T19:00:00.000Z"
+        ],
+        "description": "Join the Volleyball League and compete against other teams! Play weekly matches and improve your skills.",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=62"
+        }
+    },
+    {
+        "id": "tech-expo-2017",
+        "name": "Tech Expo 2017",
+        "type": 3000,
+        "timings": [
+            "2017-10-10T10:00:00.000Z",
+            "2017-10-11T18:00:00.000Z"
+        ],
+        "description": "Attend the Tech Expo and learn new skills! Featuring workshops on coding, design, and more.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=63"
+        }
+    },
+    {
+        "id": "dance-workshop-2018",
+        "name": "Dance Workshop 2018",
+        "type": 2001,
+        "timings": [
+            "2018-11-15T19:00:00.000Z",
+            "2018-11-16T22:00:00.000Z"
+        ],
+        "description": "Improve your dance skills at the Dance Workshop! Featuring classes in a variety of styles.",
+        "venue": "Dance Studio",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=64"
+        }
+    },
+    {
+        "id": "sports-camp-2019",
+        "name": "Sports Camp 2019",
+        "type": 1000,
+        "timings": [
+            "2019-12-20T09:00:00.000Z",
+            "2019-12-21T17:00:00.000Z"
+        ],
+        "description": "Join the Sports Camp and improve your athletic abilities! Featuring training in a variety of sports.",
+        "venue": "Sports Complex",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=65"
+        }
+    },
+    {
+        "id": "coding-retreat-2020",
+        "name": "Coding Retreat 2020",
+        "type": 3001,
+        "timings": [
+            "2020-01-25T10:00:00.000Z",
+            "2020-01-26T18:00:00.000Z"
+        ],
+        "description": "Learn to code at the Coding Retreat! Featuring intensive training in web development.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=66"
+        }
+    },
+    {
+        "id": "singing-competition-2021",
+        "name": "Singing Competition 2021",
+        "type": 2002,
+        "timings": [
+            "2021-02-30T19:00:00.000Z",
+            "2021-02-31T22:00:00.000Z"
+        ],
+        "description": "Witness the best singers around the world, compete for the title of best singer!",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=67"
+        }
+    },
+    {
+        "id": "volleyball-championship-2022",
+        "name": "Volleyball Championship 2022",
+        "type": 1001,
+        "timings": [
+            "2022-03-05T11:00:00.000Z",
+            "2022-03-06T19:00:00.000Z"
+        ],
+        "description": "Witness the best volleyball teams around the world, compete for the title of champion!",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=68"
+        }
+    },
+    {
+        "id": "tech-convention-2023",
+        "name": "Tech Convention 2023",
+        "type": 3000,
+        "timings": [
+            "2023-04-10T09:00:00.000Z",
+            "2023-04-11T17:00:00.000Z"
+        ],
+        "description": "Learn about the latest trends in technology at the Tech Convention! Attend keynote speeches, workshops, and networking events.",
+        "venue": "Convention Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=69"
+        }
+    },
+    {
+        "id": "dance-battle-2024",
+        "name": "Dance Battle 2024",
+        "type": 2001,
+        "timings": [
+            "2024-05-15T18:00:00.000Z",
+            "2024-05-16T22:00:00.000Z"
+        ],
+        "description": "Witness the best dancers compete at the Dance Battle! Featuring a variety of styles and age groups.",
+        "venue": "Theater",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=70"
+        }
+    },
+    {
+        "id": "sports-meet-2025",
+        "name": "Sports Meet 2025",
+        "type": 1000,
+        "timings": [
+            "2025-06-20T10:00:00.000Z",
+            "2025-06-21T18:00:00.000Z"
+        ],
+        "description": "Compete in a variety of sports at the Sports Meet! Featuring team and individual events.",
+        "venue": "Sports Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=71"
+        }
+    },
+    {
+        "id": "coding-olympics-2026",
+        "name": "Coding Olympics 2026",
+        "type": 3002,
+        "timings": [
+            "2026-07-25T09:00:00.000Z",
+            "2026-07-26T17:00:00.000Z"
+        ],
+        "description": "Join the Coding Olympics and create innovative solutions! Work with a team and compete for prizes.",
+        "venue": "Tech Incubator",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=72"
+        }
+    },
+    {
+        "id": "singing-idol-2015",
+        "name": "Singing Idol 2015",
+        "type": 2002,
+        "timings": [
+            "2015-09-01T19:00:00.000Z",
+            "2015-09-02T22:00:00.000Z"
+        ],
+        "description": "Showcase your vocal talent at the Singing Idol! Compete for the title of best singer.",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=73"
+        }
+    },
+    {
+        "id": "volleyball-mania-2016",
+        "name": "Volleyball Mania 2016",
+        "type": 1001,
+        "timings": [
+            "2016-10-05T11:00:00.000Z",
+            "2016-10-06T19:00:00.000Z"
+        ],
+        "description": "Join the Volleyball Mania and compete against other teams! Play weekly matches and improve your skills.",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=74"
+        }
+    },
+    {
+        "id": "tech-seminar-series-2017",
+        "name": "Tech Seminar Series 2017",
+        "type": 3000,
+        "timings": [
+            "2017-11-10T10:00:00.000Z",
+            "2017-11-11T18:00:00.000Z"
+        ],
+        "description": "Attend the Tech Seminar Series and learn new skills! Featuring workshops on coding, design, and more.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=75"
+        }
+    },
+    {
+        "id": "dance-marathon-2018",
+        "name": "Dance Marathon 2018",
+        "type": 2001,
+        "timings": [
+            "2018-12-15T19:00:00.000Z",
+            "2018-12-16T22:00:00.000Z"
+        ],
+        "description": "Improve your dance skills at the Dance Marathon! Featuring classes in a variety of styles.",
+        "venue": "Dance Studio",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=76"
+        }
+    },
+    {
+        "id": "sports-extravaganza-2019",
+        "name": "Sports Extravaganza 2019",
+        "type": 1000,
+        "timings": [
+            "2019-01-20T09:00:00.000Z",
+            "2019-01-21T17:00:00.000Z"
+        ],
+        "description": "Join the Sports Extravaganza and improve your athletic abilities! Featuring training in a variety of sports.",
+        "venue": "Sports Complex",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=77"
+        }
+    },
+    {
+        "id": "coding-camp-2020",
+        "name": "Coding Camp 2020",
+        "type": 3001,
+        "timings": [
+            "2020-02-25T10:00:00.000Z",
+            "2020-02-26T18:00:00.000Z"
+        ],
+        "description": "Learn to code at the Coding Camp! Featuring intensive training in web development.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=78"
+        }
+    },
+    {
+        "id": "singing-gala-2021",
+        "name": "Singing Gala 2021",
+        "type": 2002,
+        "timings": [
+            "2021-03-30T19:00:00.000Z",
+            "2021-03-31T22:00:00.000Z"
+        ],
+        "description": "Witness the best singers around the world, compete for the title of best singer!",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=79"
+        }
+    },
+    {
+        "id": "volleyball-tournament-2022",
+        "name": "Volleyball Tournament 2022",
+        "type": 1001,
+        "timings": [
+            "2022-04-05T11:00:00.000Z",
+            "2022-04-06T19:00:00.000Z"
+        ],
+        "description": "Witness the best volleyball teams around the world, compete for the title of champion!",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=80"
+        }
+    },
+    {
+        "id": "tech-conference-2023",
+        "name": "Tech Conference 2023",
+        "type": 3000,
+        "timings": [
+            "2023-05-10T09:00:00.000Z",
+            "2023-05-11T17:00:00.000Z"
+        ],
+        "description": "Learn about the latest trends in technology at the Tech Conference! Attend keynote speeches, workshops, and networking events.",
+        "venue": "Convention Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=81"
+        }
+    },
+    {
+        "id": "dance-competition-2024",
+        "name": "Dance Competition 2024",
+        "type": 2001,
+        "timings": [
+            "2024-06-15T18:00:00.000Z",
+            "2024-06-16T22:00:00.000Z"
+        ],
+        "description": "Witness the best dancers compete at the Dance Competition! Featuring a variety of styles and age groups.",
+        "venue": "Theater",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=82"
+        }
+    },
+    {
+        "id": "sports-festival-2025",
+        "name": "Sports Festival 2025",
+        "type": 1000,
+        "timings": [
+            "2025-07-20T10:00:00.000Z",
+            "2025-07-21T18:00:00.000Z"
+        ],
+        "description": "Compete in a variety of sports at the Sports Festival! Featuring team and individual events.",
+        "venue": "Sports Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=83"
+        }
+    },
+    {
+        "id": "coding-challenge-2026",
+        "name": "Coding Challenge 2026",
+        "type": 3002,
+        "timings": [
+            "2026-08-25T09:00:00.000Z",
+            "2026-08-26T17:00:00.000Z"
+        ],
+        "description": "Join the Coding Challenge and create innovative solutions! Work with a team and compete for prizes.",
+        "venue": "Tech Incubator",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=84"
+        }
+    },
+    {
+        "id": "singing-showcase-2015",
+        "name": "Singing Showcase 2015",
+        "type": 2002,
+        "timings": [
+            "2015-10-01T19:00:00.000Z",
+            "2015-10-02T22:00:00.000Z"
+        ],
+        "description": "Showcase your vocal talent at the Singing Showcase! Compete for the title of best singer.",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=85"
+        }
+    },
+    {
+        "id": "volleyball-league-2016",
+        "name": "Volleyball League 2016",
+        "type": 1001,
+        "timings": [
+            "2016-11-05T11:00:00.000Z",
+            "2016-11-06T19:00:00.000Z"
+        ],
+        "description": "Join the Volleyball League and compete against other teams! Play weekly matches and improve your skills.",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=86"
+        }
+    },
+    {
+        "id": "tech-expo-2017",
+        "name": "Tech Expo 2017",
+        "type": 3000,
+        "timings": [
+            "2017-12-10T10:00:00.000Z",
+            "2017-12-11T18:00:00.000Z"
+        ],
+        "description": "Attend the Tech Expo and learn new skills! Featuring workshops on coding, design, and more.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=87"
+        }
+    },
+    {
+        "id": "dance-showcase-2019",
+        "name": "Emerald Dance Showcase 2019",
+        "type": 2001,
+        "timings": [
+            "2019-02-14T18:00:00.000Z",
+            "2019-02-15T22:00:00.000Z"
+        ],
+        "description": "Witness the grace and artistry of dance at the Emerald Dance Showcase! A mesmerizing display of talent and creativity.",
+        "venue": "The Grand Ballroom",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=88"
+        }
+    },
+    {
+        "id": "global-sports-fest-2020",
+        "name": "Global Sports Fest 2020",
+        "type": 1000,
+        "timings": [
+            "2020-03-20T10:00:00.000Z",
+            "2020-03-21T18:00:00.000Z"
+        ],
+        "description": "Experience the thrill of competition at the Global Sports Fest! Athletes from around the world will compete in a variety of sports.",
+        "venue": "Olympic Stadium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=89"
+        }
+    },
+    {
+        "id": "innovate-tech-expo-2021",
+        "name": "Innovate Tech Expo 2021",
+        "type": 3000,
+        "timings": [
+            "2021-04-25T09:00:00.000Z",
+            "2021-04-26T17:00:00.000Z"
+        ],
+        "description": "Discover the future of technology at the Innovate Tech Expo! Explore cutting-edge innovations and connect with industry leaders.",
+        "venue": "Innovation Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=90"
+        }
+    },
+    {
+        "id": "harmony-music-fest-2022",
+        "name": "Harmony Music Fest 2022",
+        "type": 2002,
+        "timings": [
+            "2022-05-30T19:00:00.000Z",
+            "2022-05-31T22:00:00.000Z"
+        ],
+        "description": "Immerse yourself in the beauty of music at the Harmony Music Fest! Featuring talented musicians from diverse genres.",
+        "venue": "Concert Hall",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=91"
+        }
+    },
+    {
+        "id": "volley-champs-league-2015",
+        "name": "Volley Champs League 2015",
+        "type": 1001,
+        "timings": [
+            "2015-06-10T11:00:00.000Z",
+            "2015-06-11T19:00:00.000Z"
+        ],
+        "description": "Experience the excitement of volleyball at the Volley Champs League! Witness intense matches and cheer on your favorite team.",
+        "venue": "Indoor Sports Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=92"
+        }
+    },
+    {
+        "id": "code-fusion-hackathon-2016",
+        "name": "Code Fusion Hackathon 2016",
+        "type": 3002,
+        "timings": [
+            "2016-07-15T09:00:00.000Z",
+            "2016-07-16T17:00:00.000Z"
+        ],
+        "description": "Unleash your coding skills at the Code Fusion Hackathon! Collaborate with fellow developers and create innovative solutions.",
+        "venue": "Tech Innovation Lab",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=93"
+        }
+    },
+    {
+        "id": "rhythm-dance-off-2017",
+        "name": "Rhythm Dance Off 2017",
+        "type": 2001,
+        "timings": [
+            "2017-08-20T18:00:00.000Z",
+            "2017-08-21T22:00:00.000Z"
+        ],
+        "description": "Feel the rhythm at the Rhythm Dance Off! Dancers from various styles will compete for the title of dance champion.",
+        "venue": "Dance Theater",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=94"
+        }
+    },
+    {
+        "id": "extreme-sports-showdown-2018",
+        "name": "Extreme Sports Showdown 2018",
+        "type": 1000,
+        "timings": [
+            "2018-09-25T10:00:00.000Z",
+            "2018-09-26T18:00:00.000Z"
+        ],
+        "description": "Get your adrenaline pumping at the Extreme Sports Showdown! Witness daring athletes perform incredible feats.",
+        "venue": "Adventure Park",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=95"
+        }
+    },
+    {
+        "id": "tech-vision-conference-2019",
+        "name": "Tech Vision Conference 2019",
+        "type": 3000,
+        "timings": [
+            "2019-10-30T09:00:00.000Z",
+            "2019-10-31T17:00:00.000Z"
+        ],
+        "description": "Gain insights into the future of technology at the Tech Vision Conference! Hear from industry experts and explore emerging trends.",
+        "venue": "Conference Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=96"
+        }
+    },
+    {
+        "id": "vocal-harmony-night-2020",
+        "name": "Vocal Harmony Night 2020",
+        "type": 2002,
+        "timings": [
+            "2020-11-05T19:00:00.000Z",
+            "2020-11-06T22:00:00.000Z"
+        ],
+        "description": "Experience the magic of vocal harmony at the Vocal Harmony Night! Talented singers will enchant you with their melodies.",
+        "venue": "Music Hall",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=97"
+        }
+    },
+    {
+        "id": "volley-slam-tournament-2021",
+        "name": "Volley Slam Tournament 2021",
+        "type": 1001,
+        "timings": [
+            "2021-12-10T11:00:00.000Z",
+            "2021-12-11T19:00:00.000Z"
+        ],
+        "description": "Spike, set, and score at the Volley Slam Tournament! Witness thrilling volleyball action and cheer on your favorite team.",
+        "venue": "Beachfront Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=98"
+        }
+    },
+    {
+        "id": "code-craft-workshop-2022",
+        "name": "Code Craft Workshop 2022",
+        "type": 3004,
+        "timings": [
+            "2022-01-15T14:00:00.000Z",
+            "2022-01-16T17:00:00.000Z"
+        ],
+        "description": "Enhance your coding skills at the Code Craft Workshop! Learn from industry experts and create innovative solutions.",
+        "venue": "Tech Incubator",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=99"
+        }
+    },
+    {
+        "id": "cultural-fusion-fest-2023",
+        "name": "Cultural Fusion Fest 2023",
+        "type": 2000,
+        "timings": [
+            "2023-02-20T17:00:00.000Z",
+            "2023-02-22T21:00:00.000Z"
+        ],
+        "description": "Celebrate diversity at the Cultural Fusion Fest! Experience vibrant traditions, captivating performances, and delicious cuisine.",
+        "venue": "Global Village",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=100"
+        }
+    },
+    {
+        "id": "gridiron-glory-bowl-2024",
+        "name": "Gridiron Glory Bowl 2024",
+        "type": 1002,
+        "timings": [
+            "2024-03-25T10:00:00.000Z",
+            "2024-03-26T18:00:00.000Z"
+        ],
+        "description": "Cheer on your favorite team at the Gridiron Glory Bowl! A weekend of thrilling football matches and team spirit.",
+        "venue": "Stadium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=101"
+        }
+    },
+    {
+        "id": "code-quest-hackathon-2025",
+        "name": "Code Quest Hackathon 2025",
+        "type": 3002,
+        "timings": [
+            "2025-04-30T09:00:00.000Z",
+            "2025-05-01T17:00:00.000Z"
+        ],
+        "description": "Embark on a coding adventure at the Code Quest Hackathon! Solve challenging puzzles and compete for amazing prizes.",
+        "venue": "Innovation Hub",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=102"
+        }
+    },
+    {
+        "id": "trivia-mania-night-2026",
+        "name": "Trivia Mania Night 2026",
+        "type": 3003,
+        "timings": [
+            "2026-06-05T14:00:00.000Z",
+            "2026-06-06T17:00:00.000Z"
+        ],
+        "description": "Test your knowledge at Trivia Mania Night! A fun-filled trivia competition with exciting prizes for the winners.",
+        "venue": "Community Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=103"
+        }
+    },
+    {
+        "id": "cricket-carnival-bash-2015",
+        "name": "Cricket Carnival Bash 2015",
+        "type": 1003,
+        "timings": [
+            "2015-07-10T08:00:00.000Z",
+            "2015-07-11T20:00:00.000Z"
+        ],
+        "description": "Join us for a weekend of cricket fever at the Cricket Carnival Bash! Enjoy thrilling matches and fun activities.",
+        "venue": "Cricket Grounds",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=104"
+        }
+    },
+    {
+        "id": "dj-dance-fest-2016",
+        "name": "DJ Dance Fest 2016",
+        "type": 2003,
+        "timings": [
+            "2016-08-15T21:00:00.000Z",
+            "2016-08-16T03:00:00.000Z"
+        ],
+        "description": "Dance the night away at the DJ Dance Fest! Featuring top DJs and a vibrant atmosphere.",
+        "venue": "Nightclub",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=105"
+        }
+    },
+    {
+        "id": "tech-fair-innovations-2017",
+        "name": "Tech Fair Innovations 2017",
+        "type": 3000,
+        "timings": [
+            "2017-09-20T10:00:00.000Z",
+            "2017-09-21T18:00:00.000Z"
+        ],
+        "description": "Discover the latest innovations at the Tech Fair Innovations! Explore interactive exhibits and connect with industry leaders.",
+        "venue": "Exhibition Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=106"
+        }
+    },
+    {
+        "id": "dance-showcase-extravaganza-2018",
+        "name": "Dance Showcase Extravaganza 2018",
+        "type": 2001,
+        "timings": [
+            "2018-10-25T19:00:00.000Z",
+            "2018-10-26T22:00:00.000Z"
+        ],
+        "description": "Be mesmerized by the talent at the Dance Showcase Extravaganza! Featuring a variety of dance styles.",
+        "venue": "Theater",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=107"
+        }
+    },
+    {
+        "id": "sports-fest-mania-2019",
+        "name": "Sports Fest Mania 2019",
+        "type": 1000,
+        "timings": [
+            "2019-11-30T09:00:00.000Z",
+            "2019-12-01T17:00:00.000Z"
+        ],
+        "description": "Compete in a variety of sports at the Sports Fest Mania! There's something for everyone.",
+        "venue": "Sports Complex",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=108"
+        }
+    },
+    {
+        "id": "coding-challenge-pro-2020",
+        "name": "Coding Challenge Pro 2020",
+        "type": 3001,
+        "timings": [
+            "2020-01-05T10:00:00.000Z",
+            "2020-01-06T18:00:00.000Z"
+        ],
+        "description": "Test your coding skills at the Coding Challenge Pro! Solve complex problems and compete for prizes.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=109"
+        }
+    },
+    {
+        "id": "singing-competition-stars-2021",
+        "name": "Singing Competition Stars 2021",
+        "type": 2002,
+        "timings": [
+            "2021-02-10T19:00:00.000Z",
+            "2021-02-11T22:00:00.000Z"
+        ],
+        "description": "Showcase your vocal talent at the Singing Competition Stars! Compete for the title of best singer.",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=110"
+        }
+    },
+    {
+        "id": "volleyball-tournament-elite-2022",
+        "name": "Volleyball Tournament Elite 2022",
+        "type": 1001,
+        "timings": [
+            "2022-03-15T11:00:00.000Z",
+            "2022-03-16T19:00:00.000Z"
+        ],
+        "description": "Join the action at the Volleyball Tournament Elite! Compete against other teams and show off your skills.",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=111"
+        }
+    },
+    {
+        "id": "tech-conference-summit-2023",
+        "name": "Tech Conference Summit 2023",
+        "type": 3000,
+        "timings": [
+            "2023-04-20T09:00:00.000Z",
+            "2023-04-21T17:00:00.000Z"
+        ],
+        "description": "Learn about the latest trends in technology at the Tech Conference Summit! Attend keynote speeches and workshops.",
+        "venue": "Convention Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=112"
+        }
+    },
+    {
+        "id": "dance-gala-night-2024",
+        "name": "Dance Gala Night 2024",
+        "type": 2001,
+        "timings": [
+            "2024-05-25T18:00:00.000Z",
+            "2024-05-26T22:00:00.000Z"
+        ],
+        "description": "Celebrate the art of dance at the Dance Gala Night! Featuring performances by renowned dancers.",
+        "venue": "Opera House",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=113"
+        }
+    },
+    {
+        "id": "sports-challenge-ultimate-2025",
+        "name": "Sports Challenge Ultimate 2025",
+        "type": 1000,
+        "timings": [
+            "2025-06-30T10:00:00.000Z",
+            "2025-07-01T18:00:00.000Z"
+        ],
+        "description": "Test your athletic abilities at the Sports Challenge Ultimate! Compete in a variety of events and win prizes.",
+        "venue": "Stadium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=114"
+        }
+    },
+    {
+        "id": "coding-symposium-elite-2026",
+        "name": "Coding Symposium Elite 2026",
+        "type": 3001,
+        "timings": [
+            "2026-08-05T09:00:00.000Z",
+            "2026-08-06T17:00:00.000Z"
+        ],
+        "description": "Expand your coding knowledge at the Coding Symposium Elite! Attend workshops and network with developers.",
+        "venue": "Tech Institute",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=115"
+        }
+    },
+    {
+        "id": "singing-fest-global-2015",
+        "name": "Singing Fest Global 2015",
+        "type": 2002,
+        "timings": [
+            "2015-09-10T19:00:00.000Z",
+            "2015-09-11T22:00:00.000Z"
+        ],
+        "description": "Celebrate the joy of singing at the Singing Fest Global! Featuring performances by local and international artists.",
+        "venue": "Music Hall",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=116"
+        }
+    },
+    {
+        "id": "volleyball-classic-pro-2016",
+        "name": "Volleyball Classic Pro 2016",
+        "type": 1001,
+        "timings": [
+            "2016-10-15T11:00:00.000Z",
+            "2016-10-16T19:00:00.000Z"
+        ],
+        "description": "Witness the best volleyball action at the Volleyball Classic Pro! Featuring top teams from around the region.",
+        "venue": "Sports Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=117"
+        }
+    },
+    {
+        "id": "tech-expo-innovations-2017",
+        "name": "Tech Expo Innovations 2017",
+        "type": 3000,
+        "timings": [
+            "2017-11-20T10:00:00.000Z",
+            "2017-11-21T18:00:00.000Z"
+        ],
+        "description": "Explore the future of technology at the Tech Expo Innovations! Featuring exhibits and workshops.",
+        "venue": "Exhibition Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=118"
+        }
+    },
+    {
+        "id": "dance-festival-world-2018",
+        "name": "Dance Festival World 2018",
+        "type": 2001,
+        "timings": [
+            "2018-12-25T19:00:00.000Z",
+            "2018-12-26T22:00:00.000Z"
+        ],
+        "description": "Immerse yourself in the world of dance at the Dance Festival World! Featuring performances and masterclasses.",
+        "venue": "Dance Studio",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=119"
+        }
+    },
+    {
+        "id": "sports-gala-awards-2019",
+        "name": "Sports Gala Awards 2019",
+        "type": 1000,
+        "timings": [
+            "2019-01-30T09:00:00.000Z",
+            "2019-01-31T17:00:00.000Z"
+        ],
+        "description": "Celebrate sportsmanship at the Sports Gala Awards! Featuring awards and entertainment.",
+        "venue": "Banquet Hall",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=120"
+        }
+    },
+    {
+        "id": "coding-retreat-elite-2020",
+        "name": "Coding Retreat Elite 2020",
+        "type": 3001,
+        "timings": [
+            "2020-02-05T10:00:00.000Z",
+            "2020-02-06T18:00:00.000Z"
+        ],
+        "description": "Escape to the Coding Retreat Elite! A weekend of intensive coding and relaxation.",
+        "venue": "Mountain Resort",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=121"
+        }
+    },
+    {
+        "id": "singing-showdown-global-2021",
+        "name": "Singing Showdown Global 2021",
+        "type": 2002,
+        "timings": [
+            "2021-03-10T19:00:00.000Z",
+            "2021-03-11T22:00:00.000Z"
+        ],
+        "description": "Witness the ultimate singing battle at the Singing Showdown Global! Featuring talented singers.",
+        "venue": "Concert Venue",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=122"
+        }
+    },
+    {
+        "id": "volleyball-fest-mania-2022",
+        "name": "Volleyball Fest Mania 2022",
+        "type": 1001,
+        "timings": [
+            "2022-04-15T11:00:00.000Z",
+            "2022-04-16T19:00:00.000Z"
+        ],
+        "description": "Celebrate the sport of volleyball at the Volleyball Fest Mania! Featuring tournaments and activities.",
+        "venue": "Beach Resort",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=123"
+        }
+    },
+    {
+        "id": "tech-summit-innovate-2023",
+        "name": "Tech Summit Innovate 2023",
+        "type": 3000,
+        "timings": [
+            "2023-05-20T09:00:00.000Z",
+            "2023-05-21T17:00:00.000Z"
+        ],
+        "description": "Join industry leaders at the Tech Summit Innovate! Discuss the latest trends and explore new opportunities.",
+        "venue": "Conference Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=124"
+        }
+    },
+    {
+        "id": "dance-competition-world-2024",
+        "name": "Dance Competition World 2024",
+        "type": 2001,
+        "timings": [
+            "2024-06-25T18:00:00.000Z",
+            "2024-06-26T22:00:00.000Z"
+        ],
+        "description": "Witness the best dancers compete at the Dance Competition World! Featuring a variety of styles.",
+        "venue": "Theater",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=125"
+        }
+    },
+    {
+        "id": "sports-tournament-mania-2025",
+        "name": "Sports Tournament Mania 2025",
+        "type": 1000,
+        "timings": [
+            "2025-07-30T10:00:00.000Z",
+            "2025-07-31T18:00:00.000Z"
+        ],
+        "description": "Compete in a variety of sports at the Sports Tournament Mania! Featuring team and individual events.",
+        "venue": "Sports Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=126"
+        }
+    },
+    {
+        "id": "coding-hackathon-global-2026",
+        "name": "Coding Hackathon Global 2026",
+        "type": 3002,
+        "timings": [
+            "2026-09-05T09:00:00.000Z",
+            "2026-09-06T17:00:00.000Z"
+        ],
+        "description": "Join the Coding Hackathon Global and create innovative solutions! Work with a team and compete for prizes.",
+        "venue": "Tech Incubator",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=127"
+        }
+    },
+    {
+        "id": "singing-idol-mania-2015",
+        "name": "Singing Idol Mania 2015",
+        "type": 2002,
+        "timings": [
+            "2015-10-10T19:00:00.000Z",
+            "2015-10-11T22:00:00.000Z"
+        ],
+        "description": "Showcase your vocal talent at the Singing Idol Mania! Compete for the title of best singer.",
+        "venue": "Auditorium",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=128"
+        }
+    },
+    {
+        "id": "volleyball-mania-champs-2016",
+        "name": "Volleyball Mania Champs 2016",
+        "type": 1001,
+        "timings": [
+            "2016-11-15T11:00:00.000Z",
+            "2016-11-16T19:00:00.000Z"
+        ],
+        "description": "Join the Volleyball Mania Champs and compete against other teams! Play weekly matches and improve your skills.",
+        "venue": "Indoor Arena",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=129"
+        }
+    },
+    {
+        "id": "tech-seminar-series-pro-2017",
+        "name": "Tech Seminar Series Pro 2017",
+        "type": 3004,
+        "timings": [
+            "2017-12-20T10:00:00.000Z",
+            "2017-12-21T18:00:00.000Z"
+        ],
+        "description": "Attend the Tech Seminar Series Pro and learn new skills! Featuring workshops on coding and design.",
+        "venue": "Tech Center",
+        "banner": {
+            "url": "https://picsum.photos/720/480?random=130"
+        }
+    }
+]
