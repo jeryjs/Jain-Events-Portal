@@ -10,6 +10,7 @@ import ArticlesSection from '@components/Event/ArticlesSection';
 import PageTransition from '@components/shared/PageTransition';
 import PhotoGallery from '@components/shared/PhotoGallery';
 import { useEvents } from '@hooks/useApi';
+import { EventType } from '@common/constants';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -23,7 +24,7 @@ function HomePage() {
   const colorMode = useContext(ColorModeContext);
   const { data: events, isLoading, error } = useEvents();
 
-  const [catTabId, setTabId] = useState([0, 0]);
+  const [catTabId, setTabId] = useState([0, -1]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
 
   const filteredEvents = (events ?? [])
@@ -62,6 +63,16 @@ function HomePage() {
     return '/timeline';
   }
 
+  const getCategoryString = (catId) => {
+    const categories = [
+      ...Object.entries(EventType)
+        .filter(([key]) => key == '0' || key.endsWith('00'))
+        .map(([key, value]) => ({ id: Number(key), label: value })),
+    ];
+    const category = categories.find((cat) => cat.id === catId);
+    return category ? String(category.label).toLowerCase() + ' events' : 'events';
+  };
+
   return (
     <PageTransition>
       <Container maxWidth="lg">
@@ -76,7 +87,7 @@ function HomePage() {
           </HorizontalScroll>
           {!isLoading && ongoingEvents.length === 0 && !error && (
             <NoEventsDisplay
-              message="No events happening right now"
+              message={`No ${getCategoryString(catTabId[1])} happening right now`}
               type="ongoing"
               timelineLink={getTimelineLink(upcomingEvents)}
             />
@@ -96,7 +107,7 @@ function HomePage() {
               : upcomingEvents.map((event, idx) => <EventCard key={`${event.id}-${idx}`} event={event} variant="horizontal" delay={idx} />)}
             {!isLoading && upcomingEvents.length === 0 && !error && (
               <NoEventsDisplay
-                message="No upcoming events scheduled"
+                message={`No upcoming ${getCategoryString(catTabId[1])} scheduled`}
                 type="upcoming"
                 timelineLink={getTimelineLink(pastEvents)}
               />
@@ -112,7 +123,7 @@ function HomePage() {
               : pastEvents.map((event, idx) => <EventCard key={`${event.id}-${idx}`} event={event} variant="horizontal" delay={idx} />)}
             {!isLoading && pastEvents.length === 0 && !error && (
               <NoEventsDisplay
-                message="No past events available"
+                message={`No past ${getCategoryString(catTabId[1])} available`}
                 type="past"
                 timelineLink={getTimelineLink(upcomingEvents)}
               />
