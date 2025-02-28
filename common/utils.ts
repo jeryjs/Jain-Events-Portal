@@ -10,7 +10,8 @@ export function parseActivities(data: any[]): Activity[] {
 }
 
 export const getBaseEventType = (it: number): EventType => {
+    if (it >= EventType.TECH) return EventType.TECH;
     if (it >= EventType.CULTURAL) return EventType.CULTURAL;
-    else if (it >= EventType.SPORTS) return EventType.SPORTS;
-    else return EventType.GENERAL;
+    if (it >= EventType.SPORTS) return EventType.SPORTS;
+    return EventType.GENERAL;
 };
