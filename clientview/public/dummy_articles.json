@@ -3,7 +3,7 @@
     "id": 1,
     "title": "The Future of AI in Education",
     "summary": "Explore how artificial intelligence is transforming the way we learn and teach.",
-    "markdownContent": "# AI in Education\nAI is revolutionizing education...",
+    "content": "# AI in Education\nAI is revolutionizing education...",
     "publishedAt": "2025-02-28T14:30:00.000Z",
     "lastUpdatedAt": "2025-02-28T14:30:00.000Z",
     "author": {
@@ -32,7 +32,7 @@
     "id": 2,
     "title": "Sustainable Living on Campus",
     "summary": "Tips and tricks for students to live more sustainably while at university.",
-    "markdownContent": "# Sustainable Campus Life\nReduce your carbon footprint...",
+    "content": "# Sustainable Campus Life\nReduce your carbon footprint...",
     "publishedAt": "2025-02-18T11:00:00.000Z",
     "lastUpdatedAt": "2025-02-18T11:00:00.000Z",
     "author": {
@@ -61,7 +61,7 @@
     "id": 3,
     "title": "The Art of Effective Time Management",
     "summary": "Learn how to manage your time effectively and boost your productivity.",
-    "markdownContent": "# Time Management\nStrategies for better time use...",
+    "content": "# Time Management\nStrategies for better time use...",
     "publishedAt": "2025-02-22T16:00:00.000Z",
     "lastUpdatedAt": "2025-02-22T16:00:00.000Z",
     "author": {
@@ -90,7 +90,7 @@
     "id": 4,
     "title": "Mental Health Resources for Students",
     "summary": "A guide to the mental health resources available for students on and off campus.",
-    "markdownContent": "# Student Mental Health\nAccessing support and resources...",
+    "content": "# Student Mental Health\nAccessing support and resources...",
     "publishedAt": "2025-02-27T13:00:00.000Z",
     "lastUpdatedAt": "2025-02-27T13:00:00.000Z",
     "author": {
@@ -119,7 +119,7 @@
     "id": 5,
     "title": "The Benefits of Joining a Club or Society",
     "summary": "Discover the social and academic benefits of joining a club or society at university.",
-    "markdownContent": "# Clubs and Societies\nEnhance your university experience...",
+    "content": "# Clubs and Societies\nEnhance your university experience...",
     "publishedAt": "2025-01-30T15:00:00.000Z",
     "lastUpdatedAt": "2025-02-02T17:00:00.000Z",
     "author": {
@@ -148,7 +148,7 @@
     "id": 6,
     "title": "How to Ace Your Exams",
     "summary": "Proven strategies to help you prepare for and ace your exams.",
-    "markdownContent": "# Exam Strategies\nTips for success...",
+    "content": "# Exam Strategies\nTips for success...",
     "publishedAt": "2025-01-25T12:00:00.000Z",
     "lastUpdatedAt": "2025-01-28T14:00:00.000Z",
     "author": {
@@ -177,7 +177,7 @@
     "id": 7,
     "title": "The Importance of Networking",
     "summary": "Why networking is crucial for your career and how to do it effectively.",
-    "markdownContent": "# Networking\nBuilding professional connections...",
+    "content": "# Networking\nBuilding professional connections...",
     "publishedAt": "2025-01-20T10:00:00.000Z",
     "lastUpdatedAt": "2025-01-22T12:00:00.000Z",
     "author": {
@@ -206,7 +206,7 @@
     "id": 8,
     "title": "Volunteering Opportunities for Students",
     "summary": "Explore the various volunteering opportunities available for students.",
-    "markdownContent": "# Student Volunteering\nMaking a difference...",
+    "content": "# Student Volunteering\nMaking a difference...",
     "publishedAt": "2025-01-15T14:00:00.000Z",
     "lastUpdatedAt": "2025-01-17T16:00:00.000Z",
     "author": {
@@ -235,7 +235,7 @@
     "id": 9,
     "title": "The Role of Technology in Modern Libraries",
     "summary": "How technology is changing the way libraries operate and serve their communities.",
-    "markdownContent": "# Libraries and Technology\nAdapting to the digital age...",
+    "content": "# Libraries and Technology\nAdapting to the digital age...",
     "publishedAt": "2025-01-10T11:00:00.000Z",
     "lastUpdatedAt": "2025-01-12T13:00:00.000Z",
     "author": {
@@ -264,7 +264,7 @@
     "id": 10,
     "title": "Effective Communication Skills",
     "summary": "Improve your communication skills for better relationships and career success.",
-    "markdownContent": "# Communication Skills\nMastering the art of conversation...",
+    "content": "# Communication Skills\nMastering the art of conversation...",
     "publishedAt": "2025-01-05T15:00:00.000Z",
     "lastUpdatedAt": "2025-01-07T17:00:00.000Z",
     "author": {
@@ -293,7 +293,7 @@
     "id": 11,
     "title": "The Impact of Social Media on Society",
     "summary": "Analyzing the positive and negative impacts of social media on modern society.",
-    "markdownContent": "# Social Media Impact\nExploring the effects...",
+    "content": "# Social Media Impact\nExploring the effects...",
     "publishedAt": "2025-01-01T12:00:00.000Z",
     "lastUpdatedAt": "2025-01-03T14:00:00.000Z",
     "author": {
@@ -322,7 +322,7 @@
     "id": 12,
     "title": "Healthy Eating Habits for Students",
     "summary": "A guide to maintaining healthy eating habits while studying at university.",
-    "markdownContent": "# Healthy Eating\nTips for students...",
+    "content": "# Healthy Eating\nTips for students...",
     "publishedAt": "2024-12-25T10:00:00.000Z",
     "lastUpdatedAt": "2024-12-28T12:00:00.000Z",
     "author": {
@@ -351,7 +351,7 @@
     "id": 13,
     "title": "The Future of Work",
     "summary": "Exploring the changing landscape of work and the skills needed for future jobs.",
-    "markdownContent": "# Future of Work\nAdapting to new roles...",
+    "content": "# Future of Work\nAdapting to new roles...",
     "publishedAt": "2024-12-20T14:00:00.000Z",
     "lastUpdatedAt": "2024-12-22T16:00:00.000Z",
     "author": {
@@ -380,7 +380,7 @@
     "id": 14,
     "title": "Creative Writing Tips",
     "summary": "Improve your creative writing skills with these helpful tips and techniques.",
-    "markdownContent": "# Creative Writing\nUnleashing your imagination...",
+    "content": "# Creative Writing\nUnleashing your imagination...",
     "publishedAt": "2024-12-15T11:00:00.000Z",
     "lastUpdatedAt": "2024-12-17T13:00:00.000Z",
     "author": {
@@ -409,7 +409,7 @@
     "id": 15,
     "title": "The Benefits of Meditation",
     "summary": "Discover the mental and physical benefits of practicing meditation regularly.",
-    "markdownContent": "# Meditation Benefits\nFinding inner peace...",
+    "content": "# Meditation Benefits\nFinding inner peace...",
     "publishedAt": "2024-12-10T15:00:00.000Z",
     "lastUpdatedAt": "2024-12-12T17:00:00.000Z",
     "author": {
@@ -438,7 +438,7 @@
     "id": 16,
     "title": "Learning a New Language",
     "summary": "Tips and resources for learning a new language effectively.",
-    "markdownContent": "# Language Learning\nStrategies for success...",
+    "content": "# Language Learning\nStrategies for success...",
     "publishedAt": "2024-12-05T12:00:00.000Z",
     "lastUpdatedAt": "2024-12-07T14:00:00.000Z",
     "author": {
@@ -467,7 +467,7 @@
     "id": 17,
     "title": "The Importance of Sleep",
     "summary": "Why sleep is crucial for your health and how to improve your sleep habits.",
-    "markdownContent": "# Importance of Sleep\nImproving your sleep quality...",
+    "content": "# Importance of Sleep\nImproving your sleep quality...",
     "publishedAt": "2024-12-01T10:00:00.000Z",
     "lastUpdatedAt": "2024-12-03T12:00:00.000Z",
     "author": {
@@ -496,7 +496,7 @@
     "id": 18,
     "title": "Effective Study Techniques",
     "summary": "Maximize your study sessions with these proven techniques.",
-    "markdownContent": "# Effective Study Techniques\nStrategies for success...",
+    "content": "# Effective Study Techniques\nStrategies for success...",
     "publishedAt": "2024-11-25T14:00:00.000Z",
     "lastUpdatedAt": "2024-11-28T16:00:00.000Z",
     "author": {
@@ -525,7 +525,7 @@
     "id": 19,
     "title": "The Art of Public Speaking",
     "summary": "Improve your public speaking skills and deliver compelling presentations.",
-    "markdownContent": "# Public Speaking\nMastering the stage...",
+    "content": "# Public Speaking\nMastering the stage...",
     "publishedAt": "2024-11-20T11:00:00.000Z",
     "lastUpdatedAt": "2024-11-22T13:00:00.000Z",
     "author": {
@@ -554,7 +554,7 @@
     "id": 20,
     "title": "Managing Stress as a Student",
     "summary": "Effective strategies for managing stress and maintaining well-being as a student.",
-    "markdownContent": "# Managing Student Stress\nCoping with pressure...",
+    "content": "# Managing Student Stress\nCoping with pressure...",
     "publishedAt": "2024-11-15T15:00:00.000Z",
     "lastUpdatedAt": "2024-11-17T17:00:00.000Z",
     "author": {
@@ -583,7 +583,7 @@
     "id": 21,
     "title": "The Power of Positive Thinking",
     "summary": "How positive thinking can transform your life and improve your mental health.",
-    "markdownContent": "# Positive Thinking\nTransforming your mindset...",
+    "content": "# Positive Thinking\nTransforming your mindset...",
     "publishedAt": "2024-11-10T12:00:00.000Z",
     "lastUpdatedAt": "2024-11-12T14:00:00.000Z",
     "author": {
@@ -612,7 +612,7 @@
     "id": 22,
     "title": "Building a Strong Resume",
     "summary": "Tips and tricks for creating a resume that stands out to employers.",
-    "markdownContent": "# Resume Building\nCrafting your professional story...",
+    "content": "# Resume Building\nCrafting your professional story...",
     "publishedAt": "2024-11-05T10:00:00.000Z",
     "lastUpdatedAt": "2024-11-07T12:00:00.000Z",
     "author": {
@@ -641,7 +641,7 @@
     "id": 23,
     "title": "The Importance of Physical Activity",
     "summary": "Why physical activity is essential for your health and how to incorporate it into your daily routine.",
-    "markdownContent": "# Physical Activity\nStaying active for health...",
+    "content": "# Physical Activity\nStaying active for health...",
     "publishedAt": "2024-11-01T14:00:00.000Z",
     "lastUpdatedAt": "2024-11-03T16:00:00.000Z",
     "author": {
@@ -670,7 +670,7 @@
     "id": 24,
     "title": "Effective Note-Taking Strategies",
     "summary": "Improve your note-taking skills for better learning and retention.",
-    "markdownContent": "# Note-Taking Strategies\nMaximizing your learning...",
+    "content": "# Note-Taking Strategies\nMaximizing your learning...",
     "publishedAt": "2024-10-25T11:00:00.000Z",
     "lastUpdatedAt": "2024-10-28T13:00:00.000Z",
     "author": {
@@ -699,7 +699,7 @@
     "id": 25,
     "title": "The Benefits of Reading",
     "summary": "Why reading is crucial for your personal and professional development.",
-    "markdownContent": "# Benefits of Reading\nExpanding your horizons...",
+    "content": "# Benefits of Reading\nExpanding your horizons...",
     "publishedAt": "2024-10-20T15:00:00.000Z",
     "lastUpdatedAt": "2024-10-22T17:00:00.000Z",
     "author": {
@@ -728,7 +728,7 @@
     "id": 26,
     "title": "Time Management for Busy Students",
     "summary": "Effective time management tips for students with busy schedules.",
-    "markdownContent": "# Time Management for Students\nBalancing your commitments...",
+    "content": "# Time Management for Students\nBalancing your commitments...",
     "publishedAt": "2024-10-15T12:00:00.000Z",
     "lastUpdatedAt": "2024-10-17T14:00:00.000Z",
     "author": {
@@ -757,7 +757,7 @@
     "id": 27,
     "title": "The Art of Negotiation",
     "summary": "Improve your negotiation skills for better outcomes in personal and professional settings.",
-    "markdownContent": "# The Art of Negotiation\nMastering the deal...",
+    "content": "# The Art of Negotiation\nMastering the deal...",
     "publishedAt": "2024-10-10T10:00:00.000Z",
     "lastUpdatedAt": "2024-10-12T12:00:00.000Z",
     "author": {
@@ -786,7 +786,7 @@
     "id": 28,
     "title": "Effective Goal Setting",
     "summary": "Learn how to set and achieve your goals effectively.",
-    "markdownContent": "# Effective Goal Setting\nAchieving your dreams...",
+    "content": "# Effective Goal Setting\nAchieving your dreams...",
     "publishedAt": "2024-10-05T14:00:00.000Z",
     "lastUpdatedAt": "2024-10-07T16:00:00.000Z",
     "author": {
@@ -815,7 +815,7 @@
     "id": 29,
     "title": "The Importance of Self-Care",
     "summary": "Why self-care is essential for your well-being and how to practice it.",
-    "markdownContent": "# The Importance of Self-Care\nNurturing your well-being...",
+    "content": "# The Importance of Self-Care\nNurturing your well-being...",
     "publishedAt": "2024-10-01T11:00:00.000Z",
     "lastUpdatedAt": "2024-10-03T13:00:00.000Z",
     "author": {
@@ -844,7 +844,7 @@
     "id": 30,
     "title": "The Power of Critical Thinking",
     "summary": "How developing critical thinking skills can enhance your academic and professional life.",
-    "markdownContent": "# Critical Thinking\nSharpening your analytical skills...",
+    "content": "# Critical Thinking\nSharpening your analytical skills...",
     "publishedAt": "2024-09-25T15:00:00.000Z",
     "lastUpdatedAt": "2024-09-27T17:00:00.000Z",
     "author": {

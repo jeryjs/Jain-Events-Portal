@@ -5,7 +5,7 @@ export default class Article {
     public id: string,
     public title: string,
     public summary: string,
-    public markdownContent: string,
+    public content: string,
     public publishedAt: Date,
     public lastUpdatedAt: Date,
     public author: {
@@ -30,7 +30,7 @@ export default class Article {
       data.id || 0,
       data.title || '',
       data.summary || '',
-      data.markdownContent || '',
+      data.content || '',
       data.publishedAt ? new Date(data.publishedAt) : new Date(),
       data.lastUpdatedAt ? new Date(data.lastUpdatedAt) : new Date(),
       data.author || { id: '', name: '' },
@@ -48,7 +48,7 @@ export default class Article {
       id: this.id,
       title: this.title,
       summary: this.summary,
-      markdownContent: this.markdownContent,
+      content: this.content,
       publishedAt: this.publishedAt.toISOString(),
       lastUpdatedAt: this.lastUpdatedAt.toISOString(),
       author: this.author,
@@ -95,7 +95,7 @@ export default class Article {
   // Get estimated reading time based on content length
   get readingTimeMinutes(): number {
     const wordsPerMinute = 200;
-    const wordCount = this.markdownContent.trim().split(/\s+/).length;
+    const wordCount = this.content.trim().split(/\s+/).length;
     return Math.ceil(wordCount / wordsPerMinute);
   }
   
