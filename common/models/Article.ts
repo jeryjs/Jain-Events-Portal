@@ -2,7 +2,7 @@ import { EventType, ArticleStatus } from "@common/constants";
 
 export default class Article {
   constructor(
-    public id: string,
+    public id: number,
     public title: string,
     public summary: string,
     public markdownContent: string,
@@ -27,7 +27,7 @@ export default class Article {
   
   static parse(data: any): Article {
     return new Article(
-      data.id || '',
+      data.id || 0,
       data.title || '',
       data.summary || '',
       data.markdownContent || '',
@@ -78,7 +78,17 @@ export default class Article {
         return styleObj;
       }, {});
   }
-  
+
+  // Get article publication date as a human-readable string
+  get dateString(): string {
+    return this.publishedAt.toDateString();
+  }
+
+  // Get related event type as a human-readable string
+  get eventTypeString(): string {
+    return EventType[this.relatedEventType];
+  }
+
   // Get estimated reading time based on content length
   get readingTimeMinutes(): number {
     const wordsPerMinute = 200;
@@ -88,8 +98,13 @@ export default class Article {
   
   // Check if article is recently published (within last 7 days)
   get isRecent(): boolean {
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    return this.publishedAt > oneWeekAgo;
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+    return this.publishedAt > new Date(sevenDaysAgo);
+  }
+
+  // Check if article is trending (view count > 50)
+  get isTrending(): boolean {
+    return this.viewCount > 50;
   }
 }
