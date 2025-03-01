@@ -1,125 +1,115 @@
-import React from 'react';
-import { Container, Typography, Card, CardMedia, CardContent, Box, IconButton } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import { styled } from '@mui/material/styles';
-import { motion } from 'framer-motion';
-import PageTransition from '../components/shared/PageTransition';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Grid2 } from '@mui/material';
+import ArticleCard from '@components/Articles/ArticleCard';
+import ArticleList from '@components/Articles/ArticleList';
+import ArticlesHeader from '@components/Articles/ArticlesHeader';
+import RecentArticles from '@components/Articles/RecentArticles';
+import PageTransition from '@components/shared/PageTransition';
+import { useArticles } from '@hooks/useApi';
+import { Box, Container, Skeleton, Typography } from '@mui/material';
+import Grid2 from '@mui/material/Grid2';
+import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ColorModeContext } from '../App';
 
-// Import articles data
-import articles from '../utils/articlesData';
-
-const HeroSection = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  height: '250px',
-  width: '100%',
-  backgroundColor: theme.palette.primary.main,
-  borderRadius: '0 0 24px 24px',
-  marginBottom: theme.spacing(4),
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  overflow: 'hidden',
-}));
-
-const ArticleCard = styled(Card)(({ theme }) => ({
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  borderRadius: theme.shape.borderRadius * 2,
-  transition: 'transform 0.3s, box-shadow 0.3s',
-  overflow: 'hidden',
-  textDecoration: 'none',
-  '&:hover': {
-    transform: 'translateY(-8px)',
-    boxShadow: theme.shadows[8],
-  },
-}));
-
-const ArticleImage = styled(CardMedia)({
-  height: 200,
-  backgroundSize: 'cover',
-  transition: 'transform 0.6s',
-  '&:hover': {
-    transform: 'scale(1.05)',
-  },
-});
-
-function ArticlesPage() {
+const ArticlesPage: React.FC = () => {
+  const colorMode = useContext(ColorModeContext);
   const navigate = useNavigate();
-  
-  return (
-    <PageTransition>
-      <HeroSection>
-        <Box sx={{ position: 'absolute', top: 16, left: 16 }}>
-          <IconButton
-            onClick={() => navigate(-1)}
-            sx={{ 
-              color: 'white', 
-              bgcolor: 'rgba(255,255,255,0.2)',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
-            }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-        </Box>
-        
-        <Box sx={{ textAlign: 'center', zIndex: 2 }}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Typography variant="h3" component="h1" color="white" sx={{ fontWeight: 'bold' }}>
-              Articles
-            </Typography>
-            <Typography variant="h6" color="rgba(255,255,255,0.8)" sx={{ mt: 1 }}>
-              Insights & Updates
-            </Typography>
-          </motion.div>
-        </Box>
-        
-        {/* Background pattern */}
-        <Box sx={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '20px 20px',
-          zIndex: 1
-        }} />
-      </HeroSection>
-      
-      <Container maxWidth="lg" sx={{ pb: 8 }}>
+  const { data, isLoading } = useArticles();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [bookmarked, setBookmarked] = useState<number[]>([]);
+
+  if (isLoading) {
+    return (
+      <Container maxWidth="xl" sx={{ pb: 8, mt: 4 }}>
+        <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2, mb: 4 }} />
+        <Skeleton variant="text" height={40} width="60%" sx={{ mb: 2 }} />
         <Grid2 container spacing={3}>
-          {articles.map((article, index) => (
-            <Grid2  key={article.id} size={{xs:12, sm:6, md:4}}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-              >
-                <Link to={`/articles/${article.id}`} style={{ textDecoration: 'none' }}>
-                  <ArticleCard>
-                    <ArticleImage image={article.image} title={article.title} />
-                    <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                      <Typography gutterBottom variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
-                        {article.title}
-                      </Typography>
-                      <Typography color="text.secondary">
-                        {article.summary}
-                      </Typography>
-                    </CardContent>
-                  </ArticleCard>
-                </Link>
-              </motion.div>
+          {Array.from(new Array(6)).map((_, index) => (
+            <Grid2 key={index} size={{ xs: 12, sm: 6 }}>
+              <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2, mb: 1 }} />
+              <Skeleton variant="text" height={30} />
+              <Skeleton variant="text" height={20} width="80%" />
             </Grid2>
           ))}
         </Grid2>
       </Container>
+    );
+  }
+
+  // Filter and sort articles
+  const articles = data
+    .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
+    .filter(article => {
+      const searchText = searchTerm.toLowerCase();
+      return (
+        article.title.toLowerCase().includes(searchText) ||
+        article.summary.toLowerCase().includes(searchText) ||
+        article.author.name.toLowerCase().includes(searchText)
+      );
+    });
+
+  if (!articles || articles.length === 0) {
+    return (
+      <Container maxWidth="xl" sx={{ textAlign: 'center', mt: 6 }}>
+        <Typography variant="h5">No articles found.</Typography>
+      </Container>
+    );
+  }
+
+  const featuredArticle = articles[0];
+  const mainArticles = articles.slice(1);
+  // Get recent articles marked as recent. If empty, take the latest 7 articles
+  const recentArticles = articles.filter(article => article.isRecent).length > 3
+    ? articles.filter(article => article.isRecent)
+    : articles.slice(0, 7);
+
+  const toggleBookmark = (id: number) => {
+    setBookmarked(prev =>
+      prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
+    );
+  };
+
+  return (
+    <PageTransition>
+      <ArticlesHeader
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onBack={() => navigate(-1)}
+        toggleColorMode={colorMode.toggleColorMode}
+        isDarkMode={colorMode.mode === 'dark'}
+      />
+      <Container maxWidth="xl" sx={{ pb: 8 }}>
+        <Grid2 container spacing={4}>
+          <Grid2 size={{ xs: 12, md: 8 }}>
+            <ArticleCard
+              variant="featured"
+              article={featuredArticle}
+              bookmarked={bookmarked.includes(featuredArticle.id)}
+              onToggleBookmark={toggleBookmark}
+            />
+            <Typography variant="h5" color="text.primary" sx={{ mt: 6, mb: 3, fontWeight: 700 }}>
+              All Articles
+            </Typography>
+            <ArticleList
+              articles={mainArticles}
+              bookmarked={bookmarked}
+              onToggleBookmark={toggleBookmark}
+            />
+          </Grid2>
+          <Grid2 size={{ xs: 12, md: 4 }}>
+            <Box
+              sx={{
+                position: { md: 'sticky' },
+                top: { md: 24 },
+                mt: { xs: 4, md: 0 }
+              }}
+            >
+              <RecentArticles articles={recentArticles} />
+            </Box>
+          </Grid2>
+        </Grid2>
+      </Container>
     </PageTransition>
   );
-}
+};
 
 export default ArticlesPage;

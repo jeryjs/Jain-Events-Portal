@@ -1,0 +1,872 @@
+[
+  {
+    "id": 1,
+    "title": "The Future of AI in Education",
+    "summary": "Explore how artificial intelligence is transforming the way we learn and teach.",
+    "markdownContent": "# AI in Education\nAI is revolutionizing education...",
+    "publishedAt": "2025-02-28T14:30:00.000Z",
+    "lastUpdatedAt": "2025-02-28T14:30:00.000Z",
+    "author": {
+      "id": "auth001",
+      "name": "Dr. Emily Carter",
+      "avatar": "https://i.pravatar.cc/150?img=1"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=1",
+      "alt": "AI in Education"
+    },
+    "relatedEventType": 2001,
+    "tags": [
+      "AI",
+      "Education",
+      "Technology"
+    ],
+    "status": "published",
+    "viewCount": 87,
+    "relatedArticleIds": [
+      "2",
+      "3"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Sustainable Living on Campus",
+    "summary": "Tips and tricks for students to live more sustainably while at university.",
+    "markdownContent": "# Sustainable Campus Life\nReduce your carbon footprint...",
+    "publishedAt": "2025-02-18T11:00:00.000Z",
+    "lastUpdatedAt": "2025-02-18T11:00:00.000Z",
+    "author": {
+      "id": "auth002",
+      "name": "David Lee",
+      "avatar": "https://i.pravatar.cc/150?img=2"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=2",
+      "alt": "Sustainable Campus"
+    },
+    "relatedEventType": null,
+    "tags": [
+      "Sustainability",
+      "Campus Life",
+      "Environment"
+    ],
+    "status": "published",
+    "viewCount": 43,
+    "relatedArticleIds": [
+      "1",
+      "4"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "The Art of Effective Time Management",
+    "summary": "Learn how to manage your time effectively and boost your productivity.",
+    "markdownContent": "# Time Management\nStrategies for better time use...",
+    "publishedAt": "2025-02-22T16:00:00.000Z",
+    "lastUpdatedAt": "2025-02-22T16:00:00.000Z",
+    "author": {
+      "id": "auth003",
+      "name": "Sarah Johnson",
+      "avatar": "https://i.pravatar.cc/150?img=3"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=3",
+      "alt": "Time Management"
+    },
+    "relatedEventType": 2003,
+    "tags": [
+      "Productivity",
+      "Time Management",
+      "Study Skills"
+    ],
+    "status": "published",
+    "viewCount": 88,
+    "relatedArticleIds": [
+      "1",
+      "5"
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Mental Health Resources for Students",
+    "summary": "A guide to the mental health resources available for students on and off campus.",
+    "markdownContent": "# Student Mental Health\nAccessing support and resources...",
+    "publishedAt": "2025-02-27T13:00:00.000Z",
+    "lastUpdatedAt": "2025-02-27T13:00:00.000Z",
+    "author": {
+      "id": "auth004",
+      "name": "Michael Brown",
+      "avatar": "https://i.pravatar.cc/150?img=4"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=4",
+      "alt": "Mental Health Resources"
+    },
+    "relatedEventType": 2003,
+    "tags": [
+      "Mental Health",
+      "Resources",
+      "Student Support"
+    ],
+    "status": "published",
+    "viewCount": 50,
+    "relatedArticleIds": [
+      "2",
+      "6"
+    ]
+  },
+  {
+    "id": 5,
+    "title": "The Benefits of Joining a Club or Society",
+    "summary": "Discover the social and academic benefits of joining a club or society at university.",
+    "markdownContent": "# Clubs and Societies\nEnhance your university experience...",
+    "publishedAt": "2025-01-30T15:00:00.000Z",
+    "lastUpdatedAt": "2025-02-02T17:00:00.000Z",
+    "author": {
+      "id": "auth005",
+      "name": "Linda Wilson",
+      "avatar": "https://i.pravatar.cc/150?img=5"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=5",
+      "alt": "Clubs and Societies"
+    },
+    "relatedEventType": 1000,
+    "tags": [
+      "Clubs",
+      "Societies",
+      "Campus Life"
+    ],
+    "status": "published",
+    "viewCount": 24,
+    "relatedArticleIds": [
+      "3",
+      "7"
+    ]
+  },
+  {
+    "id": 6,
+    "title": "How to Ace Your Exams",
+    "summary": "Proven strategies to help you prepare for and ace your exams.",
+    "markdownContent": "# Exam Strategies\nTips for success...",
+    "publishedAt": "2025-01-25T12:00:00.000Z",
+    "lastUpdatedAt": "2025-01-28T14:00:00.000Z",
+    "author": {
+      "id": "auth006",
+      "name": "Thomas Green",
+      "avatar": "https://i.pravatar.cc/150?img=6"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=6",
+      "alt": "Ace Your Exams"
+    },
+    "relatedEventType": 3003,
+    "tags": [
+      "Exams",
+      "Study Skills",
+      "Academic"
+    ],
+    "status": "published",
+    "viewCount": 0,
+    "relatedArticleIds": [
+      "4",
+      "8"
+    ]
+  },
+  {
+    "id": 7,
+    "title": "The Importance of Networking",
+    "summary": "Why networking is crucial for your career and how to do it effectively.",
+    "markdownContent": "# Networking\nBuilding professional connections...",
+    "publishedAt": "2025-01-20T10:00:00.000Z",
+    "lastUpdatedAt": "2025-01-22T12:00:00.000Z",
+    "author": {
+      "id": "auth007",
+      "name": "Karen White",
+      "avatar": "https://i.pravatar.cc/150?img=7"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=7",
+      "alt": "Importance of Networking"
+    },
+    "relatedEventType": null,
+    "tags": [
+      "Networking",
+      "Career",
+      "Professional Development"
+    ],
+    "status": "published",
+    "viewCount": 21,
+    "relatedArticleIds": [
+      "5",
+      "9"
+    ]
+  },
+  {
+    "id": 8,
+    "title": "Volunteering Opportunities for Students",
+    "summary": "Explore the various volunteering opportunities available for students.",
+    "markdownContent": "# Student Volunteering\nMaking a difference...",
+    "publishedAt": "2025-01-15T14:00:00.000Z",
+    "lastUpdatedAt": "2025-01-17T16:00:00.000Z",
+    "author": {
+      "id": "auth008",
+      "name": "Robert Black",
+      "avatar": "https://i.pravatar.cc/150?img=8"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=8",
+      "alt": "Volunteering Opportunities"
+    },
+    "relatedEventType": 3002,
+    "tags": [
+      "Volunteering",
+      "Community",
+      "Student Life"
+    ],
+    "status": "published",
+    "viewCount": 91,
+    "relatedArticleIds": [
+      "6",
+      "10"
+    ]
+  },
+  {
+    "id": 9,
+    "title": "The Role of Technology in Modern Libraries",
+    "summary": "How technology is changing the way libraries operate and serve their communities.",
+    "markdownContent": "# Libraries and Technology\nAdapting to the digital age...",
+    "publishedAt": "2025-01-10T11:00:00.000Z",
+    "lastUpdatedAt": "2025-01-12T13:00:00.000Z",
+    "author": {
+      "id": "auth009",
+      "name": "Jennifer Grey",
+      "avatar": "https://i.pravatar.cc/150?img=9"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=9",
+      "alt": "Technology in Libraries"
+    },
+    "relatedEventType": 3002,
+    "tags": [
+      "Technology",
+      "Libraries",
+      "Education"
+    ],
+    "status": "published",
+    "viewCount": 80,
+    "relatedArticleIds": [
+      "7",
+      "11"
+    ]
+  },
+  {
+    "id": 10,
+    "title": "Effective Communication Skills",
+    "summary": "Improve your communication skills for better relationships and career success.",
+    "markdownContent": "# Communication Skills\nMastering the art of conversation...",
+    "publishedAt": "2025-01-05T15:00:00.000Z",
+    "lastUpdatedAt": "2025-01-07T17:00:00.000Z",
+    "author": {
+      "id": "auth010",
+      "name": "Charles Blue",
+      "avatar": "https://i.pravatar.cc/150?img=10"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=10",
+      "alt": "Communication Skills"
+    },
+    "relatedEventType": 3003,
+    "tags": [
+      "Communication",
+      "Skills",
+      "Career"
+    ],
+    "status": "published",
+    "viewCount": 39,
+    "relatedArticleIds": [
+      "8",
+      "12"
+    ]
+  },
+  {
+    "id": 11,
+    "title": "The Impact of Social Media on Society",
+    "summary": "Analyzing the positive and negative impacts of social media on modern society.",
+    "markdownContent": "# Social Media Impact\nExploring the effects...",
+    "publishedAt": "2025-01-01T12:00:00.000Z",
+    "lastUpdatedAt": "2025-01-03T14:00:00.000Z",
+    "author": {
+      "id": "auth011",
+      "name": "Alice Purple",
+      "avatar": "https://i.pravatar.cc/150?img=11"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=11",
+      "alt": "Social Media Impact"
+    },
+    "relatedEventType": 1001,
+    "tags": [
+      "Social Media",
+      "Society",
+      "Technology"
+    ],
+    "status": "published",
+    "viewCount": 66,
+    "relatedArticleIds": [
+      "9",
+      "13"
+    ]
+  },
+  {
+    "id": 12,
+    "title": "Healthy Eating Habits for Students",
+    "summary": "A guide to maintaining healthy eating habits while studying at university.",
+    "markdownContent": "# Healthy Eating\nTips for students...",
+    "publishedAt": "2024-12-25T10:00:00.000Z",
+    "lastUpdatedAt": "2024-12-28T12:00:00.000Z",
+    "author": {
+      "id": "auth012",
+      "name": "Bob Orange",
+      "avatar": "https://i.pravatar.cc/150?img=12"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=12",
+      "alt": "Healthy Eating Habits"
+    },
+    "relatedEventType": 2000,
+    "tags": [
+      "Health",
+      "Nutrition",
+      "Student Life"
+    ],
+    "status": "published",
+    "viewCount": 58,
+    "relatedArticleIds": [
+      "10",
+      "14"
+    ]
+  },
+  {
+    "id": 13,
+    "title": "The Future of Work",
+    "summary": "Exploring the changing landscape of work and the skills needed for future jobs.",
+    "markdownContent": "# Future of Work\nAdapting to new roles...",
+    "publishedAt": "2024-12-20T14:00:00.000Z",
+    "lastUpdatedAt": "2024-12-22T16:00:00.000Z",
+    "author": {
+      "id": "auth013",
+      "name": "Carol Yellow",
+      "avatar": "https://i.pravatar.cc/150?img=13"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=13",
+      "alt": "Future of Work"
+    },
+    "relatedEventType": 2003,
+    "tags": [
+      "Career",
+      "Technology",
+      "Skills"
+    ],
+    "status": "published",
+    "viewCount": 69,
+    "relatedArticleIds": [
+      "11",
+      "15"
+    ]
+  },
+  {
+    "id": 14,
+    "title": "Creative Writing Tips",
+    "summary": "Improve your creative writing skills with these helpful tips and techniques.",
+    "markdownContent": "# Creative Writing\nUnleashing your imagination...",
+    "publishedAt": "2024-12-15T11:00:00.000Z",
+    "lastUpdatedAt": "2024-12-17T13:00:00.000Z",
+    "author": {
+      "id": "auth014",
+      "name": "Daniel Lime",
+      "avatar": "https://i.pravatar.cc/150?img=14"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=14",
+      "alt": "Creative Writing Tips"
+    },
+    "relatedEventType": 3002,
+    "tags": [
+      "Writing",
+      "Skills",
+      "Creative"
+    ],
+    "status": "published",
+    "viewCount": 55,
+    "relatedArticleIds": [
+      "12",
+      "16"
+    ]
+  },
+  {
+    "id": 15,
+    "title": "The Benefits of Meditation",
+    "summary": "Discover the mental and physical benefits of practicing meditation regularly.",
+    "markdownContent": "# Meditation Benefits\nFinding inner peace...",
+    "publishedAt": "2024-12-10T15:00:00.000Z",
+    "lastUpdatedAt": "2024-12-12T17:00:00.000Z",
+    "author": {
+      "id": "auth015",
+      "name": "Eve Teal",
+      "avatar": "https://i.pravatar.cc/150?img=15"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=15",
+      "alt": "Benefits of Meditation"
+    },
+    "relatedEventType": 1003,
+    "tags": [
+      "Meditation",
+      "Health",
+      "Wellness"
+    ],
+    "status": "published",
+    "viewCount": 97,
+    "relatedArticleIds": [
+      "13",
+      "17"
+    ]
+  },
+  {
+    "id": 16,
+    "title": "Learning a New Language",
+    "summary": "Tips and resources for learning a new language effectively.",
+    "markdownContent": "# Language Learning\nStrategies for success...",
+    "publishedAt": "2024-12-05T12:00:00.000Z",
+    "lastUpdatedAt": "2024-12-07T14:00:00.000Z",
+    "author": {
+      "id": "auth016",
+      "name": "Frank Aqua",
+      "avatar": "https://i.pravatar.cc/150?img=16"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=16",
+      "alt": "Learning a New Language"
+    },
+    "relatedEventType": 1001,
+    "tags": [
+      "Language",
+      "Skills",
+      "Education"
+    ],
+    "status": "published",
+    "viewCount": 110,
+    "relatedArticleIds": [
+      "14",
+      "18"
+    ]
+  },
+  {
+    "id": 17,
+    "title": "The Importance of Sleep",
+    "summary": "Why sleep is crucial for your health and how to improve your sleep habits.",
+    "markdownContent": "# Importance of Sleep\nImproving your sleep quality...",
+    "publishedAt": "2024-12-01T10:00:00.000Z",
+    "lastUpdatedAt": "2024-12-03T12:00:00.000Z",
+    "author": {
+      "id": "auth017",
+      "name": "Grace Navy",
+      "avatar": "https://i.pravatar.cc/150?img=17"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=17",
+      "alt": "Importance of Sleep"
+    },
+    "relatedEventType": 2003,
+    "tags": [
+      "Sleep",
+      "Health",
+      "Wellness"
+    ],
+    "status": "published",
+    "viewCount": 68,
+    "relatedArticleIds": [
+      "15",
+      "19"
+    ]
+  },
+  {
+    "id": 18,
+    "title": "Effective Study Techniques",
+    "summary": "Maximize your study sessions with these proven techniques.",
+    "markdownContent": "# Effective Study Techniques\nStrategies for success...",
+    "publishedAt": "2024-11-25T14:00:00.000Z",
+    "lastUpdatedAt": "2024-11-28T16:00:00.000Z",
+    "author": {
+      "id": "auth018",
+      "name": "Harry Indigo",
+      "avatar": "https://i.pravatar.cc/150?img=18"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=18",
+      "alt": "Effective Study Techniques"
+    },
+    "relatedEventType": 0,
+    "tags": [
+      "Study",
+      "Skills",
+      "Education"
+    ],
+    "status": "published",
+    "viewCount": 65,
+    "relatedArticleIds": [
+      "16",
+      "20"
+    ]
+  },
+  {
+    "id": 19,
+    "title": "The Art of Public Speaking",
+    "summary": "Improve your public speaking skills and deliver compelling presentations.",
+    "markdownContent": "# Public Speaking\nMastering the stage...",
+    "publishedAt": "2024-11-20T11:00:00.000Z",
+    "lastUpdatedAt": "2024-11-22T13:00:00.000Z",
+    "author": {
+      "id": "auth019",
+      "name": "Ivy Violet",
+      "avatar": "https://i.pravatar.cc/150?img=19"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=19",
+      "alt": "Art of Public Speaking"
+    },
+    "relatedEventType": 3004,
+    "tags": [
+      "Speaking",
+      "Skills",
+      "Career"
+    ],
+    "status": "published",
+    "viewCount": 40,
+    "relatedArticleIds": [
+      "17",
+      "21"
+    ]
+  },
+  {
+    "id": 20,
+    "title": "Managing Stress as a Student",
+    "summary": "Effective strategies for managing stress and maintaining well-being as a student.",
+    "markdownContent": "# Managing Student Stress\nCoping with pressure...",
+    "publishedAt": "2024-11-15T15:00:00.000Z",
+    "lastUpdatedAt": "2024-11-17T17:00:00.000Z",
+    "author": {
+      "id": "auth020",
+      "name": "Jack Magenta",
+      "avatar": "https://i.pravatar.cc/150?img=20"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=20",
+      "alt": "Managing Stress"
+    },
+    "relatedEventType": 2002,
+    "tags": [
+      "Stress",
+      "Health",
+      "Student Life"
+    ],
+    "status": "published",
+    "viewCount": 41,
+    "relatedArticleIds": [
+      "18",
+      "22"
+    ]
+  },
+  {
+    "id": 21,
+    "title": "The Power of Positive Thinking",
+    "summary": "How positive thinking can transform your life and improve your mental health.",
+    "markdownContent": "# Positive Thinking\nTransforming your mindset...",
+    "publishedAt": "2024-11-10T12:00:00.000Z",
+    "lastUpdatedAt": "2024-11-12T14:00:00.000Z",
+    "author": {
+      "id": "auth021",
+      "name": "Kelly Rose",
+      "avatar": "https://i.pravatar.cc/150?img=21"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=21",
+      "alt": "Positive Thinking"
+    },
+    "relatedEventType": 2001,
+    "tags": [
+      "Mindset",
+      "Mental Health",
+      "Wellness"
+    ],
+    "status": "published",
+    "viewCount": 68,
+    "relatedArticleIds": [
+      "19",
+      "23"
+    ]
+  },
+  {
+    "id": 22,
+    "title": "Building a Strong Resume",
+    "summary": "Tips and tricks for creating a resume that stands out to employers.",
+    "markdownContent": "# Resume Building\nCrafting your professional story...",
+    "publishedAt": "2024-11-05T10:00:00.000Z",
+    "lastUpdatedAt": "2024-11-07T12:00:00.000Z",
+    "author": {
+      "id": "auth022",
+      "name": "Liam Sky",
+      "avatar": "https://i.pravatar.cc/150?img=22"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=22",
+      "alt": "Resume Building"
+    },
+    "relatedEventType": 2002,
+    "tags": [
+      "Career",
+      "Skills",
+      "Professional Development"
+    ],
+    "status": "published",
+    "viewCount": 109,
+    "relatedArticleIds": [
+      "20",
+      "24"
+    ]
+  },
+  {
+    "id": 23,
+    "title": "The Importance of Physical Activity",
+    "summary": "Why physical activity is essential for your health and how to incorporate it into your daily routine.",
+    "markdownContent": "# Physical Activity\nStaying active for health...",
+    "publishedAt": "2024-11-01T14:00:00.000Z",
+    "lastUpdatedAt": "2024-11-03T16:00:00.000Z",
+    "author": {
+      "id": "auth023",
+      "name": "Mia Cloud",
+      "avatar": "https://i.pravatar.cc/150?img=23"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=23",
+      "alt": "Physical Activity"
+    },
+    "relatedEventType": null,
+    "tags": [
+      "Health",
+      "Fitness",
+      "Wellness"
+    ],
+    "status": "published",
+    "viewCount": 55,
+    "relatedArticleIds": [
+      "21",
+      "25"
+    ]
+  },
+  {
+    "id": 24,
+    "title": "Effective Note-Taking Strategies",
+    "summary": "Improve your note-taking skills for better learning and retention.",
+    "markdownContent": "# Note-Taking Strategies\nMaximizing your learning...",
+    "publishedAt": "2024-10-25T11:00:00.000Z",
+    "lastUpdatedAt": "2024-10-28T13:00:00.000Z",
+    "author": {
+      "id": "auth024",
+      "name": "Noah Rain",
+      "avatar": "https://i.pravatar.cc/150?img=24"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=24",
+      "alt": "Note-Taking Strategies"
+    },
+    "relatedEventType": 2002,
+    "tags": [
+      "Study",
+      "Skills",
+      "Education"
+    ],
+    "status": "published",
+    "viewCount": 36,
+    "relatedArticleIds": [
+      "22",
+      "26"
+    ]
+  },
+  {
+    "id": 25,
+    "title": "The Benefits of Reading",
+    "summary": "Why reading is crucial for your personal and professional development.",
+    "markdownContent": "# Benefits of Reading\nExpanding your horizons...",
+    "publishedAt": "2024-10-20T15:00:00.000Z",
+    "lastUpdatedAt": "2024-10-22T17:00:00.000Z",
+    "author": {
+      "id": "auth025",
+      "name": "Olivia Snow",
+      "avatar": "https://i.pravatar.cc/150?img=25"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=25",
+      "alt": "Benefits of Reading"
+    },
+    "relatedEventType": 2001,
+    "tags": [
+      "Reading",
+      "Skills",
+      "Personal Development"
+    ],
+    "status": "published",
+    "viewCount": 38,
+    "relatedArticleIds": [
+      "23",
+      "27"
+    ]
+  },
+  {
+    "id": 26,
+    "title": "Time Management for Busy Students",
+    "summary": "Effective time management tips for students with busy schedules.",
+    "markdownContent": "# Time Management for Students\nBalancing your commitments...",
+    "publishedAt": "2024-10-15T12:00:00.000Z",
+    "lastUpdatedAt": "2024-10-17T14:00:00.000Z",
+    "author": {
+      "id": "auth026",
+      "name": "Owen Frost",
+      "avatar": "https://i.pravatar.cc/150?img=26"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=26",
+      "alt": "Time Management for Students"
+    },
+    "relatedEventType": 2000,
+    "tags": [
+      "Time Management",
+      "Study",
+      "Student Life"
+    ],
+    "status": "published",
+    "viewCount": 76,
+    "relatedArticleIds": [
+      "24",
+      "28"
+    ]
+  },
+  {
+    "id": 27,
+    "title": "The Art of Negotiation",
+    "summary": "Improve your negotiation skills for better outcomes in personal and professional settings.",
+    "markdownContent": "# The Art of Negotiation\nMastering the deal...",
+    "publishedAt": "2024-10-10T10:00:00.000Z",
+    "lastUpdatedAt": "2024-10-12T12:00:00.000Z",
+    "author": {
+      "id": "auth027",
+      "name": "Penelope Star",
+      "avatar": "https://i.pravatar.cc/150?img=27"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=27",
+      "alt": "The Art of Negotiation"
+    },
+    "relatedEventType": 0,
+    "tags": [
+      "Negotiation",
+      "Skills",
+      "Career"
+    ],
+    "status": "published",
+    "viewCount": 80,
+    "relatedArticleIds": [
+      "25",
+      "29"
+    ]
+  },
+  {
+    "id": 28,
+    "title": "Effective Goal Setting",
+    "summary": "Learn how to set and achieve your goals effectively.",
+    "markdownContent": "# Effective Goal Setting\nAchieving your dreams...",
+    "publishedAt": "2024-10-05T14:00:00.000Z",
+    "lastUpdatedAt": "2024-10-07T16:00:00.000Z",
+    "author": {
+      "id": "auth028",
+      "name": "Quentin Moon",
+      "avatar": "https://i.pravatar.cc/150?img=28"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=28",
+      "alt": "Effective Goal Setting"
+    },
+    "relatedEventType": null,
+    "tags": [
+      "Goal Setting",
+      "Skills",
+      "Personal Development"
+    ],
+    "status": "published",
+    "viewCount": 19,
+    "relatedArticleIds": [
+      "26",
+      "30"
+    ]
+  },
+  {
+    "id": 29,
+    "title": "The Importance of Self-Care",
+    "summary": "Why self-care is essential for your well-being and how to practice it.",
+    "markdownContent": "# The Importance of Self-Care\nNurturing your well-being...",
+    "publishedAt": "2024-10-01T11:00:00.000Z",
+    "lastUpdatedAt": "2024-10-03T13:00:00.000Z",
+    "author": {
+      "id": "auth029",
+      "name": "Rachel Sun",
+      "avatar": "https://i.pravatar.cc/150?img=29"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=29",
+      "alt": "The Importance of Self-Care"
+    },
+    "relatedEventType": 3000,
+    "tags": [
+      "Self-Care",
+      "Health",
+      "Wellness"
+    ],
+    "status": "published",
+    "viewCount": 0,
+    "relatedArticleIds": [
+      "27",
+      "30"
+    ]
+  },
+  {
+    "id": 30,
+    "title": "The Power of Critical Thinking",
+    "summary": "How developing critical thinking skills can enhance your academic and professional life.",
+    "markdownContent": "# Critical Thinking\nSharpening your analytical skills...",
+    "publishedAt": "2024-09-25T15:00:00.000Z",
+    "lastUpdatedAt": "2024-09-27T17:00:00.000Z",
+    "author": {
+      "id": "auth030",
+      "name": "Samuel Star",
+      "avatar": "https://i.pravatar.cc/150?img=30"
+    },
+    "image": {
+      "url": "https://picsum.photos/600/400?random=30",
+      "alt": "Critical Thinking"
+    },
+    "relatedEventType": 2002,
+    "tags": [
+      "Critical Thinking",
+      "Skills",
+      "Education"
+    ],
+    "status": "published",
+    "viewCount": 6,
+    "relatedArticleIds": [
+      "28",
+      "29"
+    ]
+  }
+]
