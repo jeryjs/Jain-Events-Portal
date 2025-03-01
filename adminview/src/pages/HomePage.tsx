@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, Container, Paper, Grid2 as Grid } from '@mui/material';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton } from '@mui/material';
 
 import { EventForm } from '../components/Home/EventForm';
 import { EventsList, ActivityButton } from '../components/Home';
@@ -49,9 +49,15 @@ const HomePage = () => {
 
   return (
     <Container maxWidth={false} sx={{ height: '100vh', py: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Jain FET Hub - Admin
-      </Typography>
+      <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Jain FET Hub - Admin
+        </Typography>
+
+        <IconButton component={Link} to="/articles">
+          go to articles
+        </IconButton>
+      </Card>
 
       <Grid container spacing={3} sx={{ height: '-webkit-fill-available', width: '100%' }}>
         {/* Left pane - Events list */}

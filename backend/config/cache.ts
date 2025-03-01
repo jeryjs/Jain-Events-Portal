@@ -2,14 +2,15 @@ import NodeCache from 'node-cache';
 
 // TTL in seconds
 const TTL = {
-    EVENTS: 300, // 5 mins
-    ACTIVITIES: 60, // 1 min
-    USER_DATA: 1800, // 30 mins
+    EVENTS: 1800, // 30 mins
+    ACTIVITIES: 600, // 10 min
+    ARTICLES: 5400, // 90 mins
+    USER_DATA: 3600, // 60 mins
 };
 
 const cache = new NodeCache({
-    stdTTL: 60,
-    checkperiod: 120,
+    stdTTL: 120,
+    checkperiod: 240,
 });
 
 export { cache, TTL };

@@ -105,7 +105,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
   // Load the event image and show shimmer while loading
   const getEventImage = async () => {
     const imageSrc = event.banner.url ?? `https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg`;
-    try { await fetch(imageSrc) } catch { };  // To figure out how long to show the shimmer for the image on load
+    try { await fetch(imageSrc) } catch { return imageSrc };  // To figure out how long to show the shimmer for the image on load
     return imageSrc;
   };
 
@@ -140,7 +140,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
       >
         <Link to={`/${event.id}`} style={{ textDecoration: 'none' }}>
           <StyledCard sx={{ display: 'flex', mb: 2, borderRadius: 2, width: '100%' }}>
-            <Box sx={{ width: { xs: 130, sm: 220 }, height: { xs: 130, sm: 160 }, position: 'relative' }}>
+            <Box sx={{ 
+              width: { xs: 130, sm: 220 }, 
+              height: { xs: 130, sm: 160 }, 
+              position: 'relative',
+              flexShrink: 0 
+            }}>
               {isLoading && <Shimmer />}
               <StyledCardMedia
                 sx={{ width: '100%', height: '100%', display: 'block' }}
@@ -149,10 +154,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
                 title={event.name}
               />
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', p: 2 }}>
-              <Typography component="div" variant="h6" sx={{ fontWeight: 'bold' }}>
-                {event.name}
-              </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', p: 2, overflow: 'hidden', flexGrow: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textOverflow: 'ellipsis'}}>
+                  {event.name}
+                </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                 {formattedDate}, {formattedTime}
               </Typography>

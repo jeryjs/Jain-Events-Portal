@@ -1,11 +1,12 @@
 import React from 'react';
-import { Box, Typography, IconButton, Tab, Tabs } from '@mui/material';
+import { Box, Typography, IconButton, Tab, Tabs, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { useContext } from 'react';
 import { ColorModeContext } from '../../App';
 import { EventType } from '@common/constants';
+import { Link } from 'react-router-dom';
 
 const AppHeader = styled(Box)(({ theme }) => `
   padding: 32px 0 16px;
@@ -58,9 +59,18 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ tabValue, onTabChange }) => {
             <Typography variant="h4" fontWeight="bold">Jain FET-Hub</Typography>
             <Typography variant="subtitle1" color="text.secondary">The Pulse of Jain FET</Typography>
           </Box>
-          <IconButton onClick={colorMode.toggleColorMode}>
-            {colorMode.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Button 
+              component={Link} 
+              to="/timeline"
+              sx={{ mr: 2 }}
+            >
+              Timeline
+            </Button>
+            <IconButton onClick={colorMode.toggleColorMode}>
+              {colorMode.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
+          </Box>
         </HeaderWrapper>
       </AppHeader>
       <TabsContainer>

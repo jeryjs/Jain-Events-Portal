@@ -2,17 +2,22 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "baseUrl": ".",
+        "outDir": "dist",
         "paths": {
             "@common/*": ["../common/*"],
             "@config/*": ["./config/*"],
             "@middlewares/*": ["./middlewares/*"],
             "@routes/*": ["./routes/*"],
             "@services/*": ["./services/*"],
-            "@utils/*": ["./utils/*"]
-        },
-        "strict": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
-    }
+            "@utils/*": ["./utils/*"],
+            "*": ["node_modules/*", "types/*"]
+        }
+    },
+    "include": ["**/*"],
+    "exclude": ["node_modules"]
 }
