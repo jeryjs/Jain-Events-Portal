@@ -47,9 +47,13 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
 
   // Reset form when article changes
   useEffect(() => {
+    if (isCreating) {
+      setFormData(Article.parse({}));
+      editor.replaceBlocks(editor.document, []);
+    }
     if (article) {
       setFormData(article);
-      editor.tryParseMarkdownToBlocks(article.content).then((it) => {console.log(it);
+      editor.tryParseMarkdownToBlocks(article.content).then((it) => {
         editor.replaceBlocks(editor.document, it);
       });
     }
@@ -97,7 +101,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
       // Create a new Article instance with current form data
       const fullArticle = Article.parse({
         ...formData,
-        id: formData.id || `article-${Date.now()}`,
+        id: formData.id || Math.floor(Math.random() * 10000).toString(),
         publishedAt: formData.publishedAt || new Date(),
         lastUpdatedAt: new Date(),
       });
