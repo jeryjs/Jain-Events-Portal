@@ -10,7 +10,7 @@ import React from 'react';
 interface FeaturedArticleCardProps {
   article: Article;
   bookmarked: boolean;
-  onToggleBookmark: (id: number) => void;
+  onToggleBookmark: (id: string) => void;
 }
 
 const StyledCard = styled(Card)(({ theme }) => ({

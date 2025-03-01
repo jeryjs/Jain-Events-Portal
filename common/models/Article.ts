@@ -2,7 +2,7 @@ import { EventType, ArticleStatus } from "@common/constants";
 
 export default class Article {
   constructor(
-    public id: number,
+    public id: string,
     public title: string,
     public summary: string,
     public markdownContent: string,

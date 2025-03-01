@@ -15,7 +15,7 @@ const ArticlesPage: React.FC = () => {
   const navigate = useNavigate();
   const { data, isLoading } = useArticles();
   const [searchTerm, setSearchTerm] = useState('');
-  const [bookmarked, setBookmarked] = useState<number[]>([]);
+  const [bookmarked, setBookmarked] = useState<string[]>([]);
 
   if (isLoading) {
     return (
@@ -62,7 +62,7 @@ const ArticlesPage: React.FC = () => {
     ? articles.filter(article => article.isRecent)
     : articles.slice(0, 7);
 
-  const toggleBookmark = (id: number) => {
+  const toggleBookmark = (id: string) => {
     setBookmarked(prev =>
       prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
     );

@@ -1,20 +1,12 @@
+import { Article } from '@common/models';
 import { Box, Button, Chip, Paper, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-interface RecentArticle {
-    id: number;
-    title: string;
-    image: { url: string };
-    imageStyles?: React.CSSProperties;
-    dateString?: string;
-    eventTypeString?: string;
-}
-
 interface RecentArticlesProps {
-    articles: RecentArticle[];
+    articles: Article[];
 }
 
 const SidebarTitle = styled(Typography)(({ theme }) => ({

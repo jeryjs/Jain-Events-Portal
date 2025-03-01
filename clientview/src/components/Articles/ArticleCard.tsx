@@ -32,7 +32,7 @@ export interface ArticleCardProps {
   variant: variant;
   article: Article;
   bookmarked: boolean;
-  onToggleBookmark: (id: number) => void;
+  onToggleBookmark: (id: string) => void;
 }
 
 // Styled components
@@ -119,6 +119,8 @@ const ArticleCard = memo<ArticleCardProps>(({
   bookmarked,
   onToggleBookmark
 }) => {
+  const isWideScreen = useMediaQuery('(min-width:600px)');
+
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.preventDefault();
     onToggleBookmark(article.id);
@@ -186,7 +188,7 @@ const ArticleCard = memo<ArticleCardProps>(({
                 </Box>
               )}
 
-              {variant === 'featured' && useMediaQuery('(min-width:600px)') && (
+              {variant === 'featured' && isWideScreen && (
                 <Box sx={{ display: 'flex', gap: 2, color: 'text.secondary', fontSize: '0.875rem' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <AccessTimeIcon sx={{ mr: 0.5 }} fontSize="small" />

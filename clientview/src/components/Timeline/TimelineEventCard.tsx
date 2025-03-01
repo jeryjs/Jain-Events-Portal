@@ -97,13 +97,14 @@ const InfoItem = styled(Box)(({ theme }) => ({
 }));
 
 const TimelineEventCard: React.FC<TimelineEventCardProps> = ({ event, sx }) => {
+  const isNarrowScreen = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
   // Format date for display
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
       hour: '2-digit',
       minute: '2-digit',
-      ...(useMediaQuery('(max-width:900px)') && { day: 'numeric', month: 'short' }),
+      ...(isNarrowScreen && { day: 'numeric', month: 'short' }),
     });
   };
 

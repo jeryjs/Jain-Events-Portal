@@ -5,8 +5,8 @@ import ArticleCard from './ArticleCard';
 
 interface ArticleListProps {
   articles: Article[];
-  bookmarked: number[];
-  onToggleBookmark: (id: number) => void;
+  bookmarked: string[];
+  onToggleBookmark: (id: string) => void;
 }
 
 const ArticleList: React.FC<ArticleListProps> = ({ articles, bookmarked, onToggleBookmark }) => {
