@@ -18,6 +18,7 @@ import cors from "cors";
 
 import eventRoutes from "@routes/eventRoutes";
 import activityRoutes from "@routes/activityRoutes";
+import articleRoutes from "@routes/articleRoutes";
 import userRoutes from "@routes/userRoutes";
 import adminRoutes from "@routes/adminRoutes";
 
@@ -32,6 +33,7 @@ app.get("/api", (req: Request, res: Response) => {
 
 app.use("/api", eventRoutes);
 app.use("/api", activityRoutes);
+app.use("/api", articleRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 

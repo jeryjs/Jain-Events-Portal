@@ -84,9 +84,12 @@ export default class Article {
     return this.publishedAt.toDateString();
   }
 
-  // Get related event type as a human-readable string
+    // Get related event type as a human-readable string
   get eventTypeString(): string {
-    return EventType[this.relatedEventType];
+    if (this.relatedEventType === undefined || this.relatedEventType === null) {
+      return '';
+    }
+    return EventType[this.relatedEventType] || '';
   }
 
   // Get estimated reading time based on content length
