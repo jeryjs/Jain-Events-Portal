@@ -1,101 +1,107 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, Container, Paper, Grid2 as Grid } from '@mui/material';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton } from '@mui/material';
 
 import { ArticlesList, ArticleForm } from '../components/Articles';
 import { useArticle, useCreateArticle, useUpdateArticle } from '@hooks/App';
 import { Article } from '@common/models';
 
 const ArticlesPage = () => {
-  const { articleId } = useParams<{ articleId: string }>();
-  const navigate = useNavigate();
-  const [isCreating, setIsCreating] = useState(articleId === 'create');
+    const { articleId } = useParams<{ articleId: string }>();
+    const navigate = useNavigate();
+    const [isCreating, setIsCreating] = useState(articleId === 'create');
 
-  // Fetch article data if editing
-  const articleQuery = useArticle(articleId, !isCreating && !!articleId);
-  const createMutation = useCreateArticle();
-  const updateMutation = useUpdateArticle();
+    // Fetch article data if editing
+    const articleQuery = useArticle(articleId, !isCreating && !!articleId);
+    const createMutation = useCreateArticle();
+    const updateMutation = useUpdateArticle();
 
-  // Handle article selection
-  const handleSelectArticle = (id: string) => {
-    setIsCreating(false);
-    navigate(`/articles/${id}`);
-  };
+    // Handle article selection
+    const handleSelectArticle = (id: string) => {
+        setIsCreating(false);
+        navigate(`/articles/${id}`);
+    };
 
-  // Handle create new article action
-  const handleCreateArticle = () => {
-    setIsCreating(true);
-    navigate('/articles/create');
-  };
+    // Handle create new article action
+    const handleCreateArticle = () => {
+        setIsCreating(true);
+        navigate('/articles/create');
+    };
 
-  // Handle save (create or update)
-  const handleSaveArticle = async (formData: Article) => {
-    if (isCreating) {
-      await createMutation.mutateAsync(formData, {
-        onSuccess: (newArticle) => {
-          setIsCreating(false);
-          navigate(`/articles/${newArticle.id}`);
+    // Handle save (create or update)
+    const handleSaveArticle = async (formData: Article) => {
+        if (isCreating) {
+            await createMutation.mutateAsync(formData, {
+                onSuccess: (newArticle) => {
+                    setIsCreating(false);
+                    navigate(`/articles/${newArticle.id}`);
+                }
+            });
+        } else if (articleId) {
+            await updateMutation.mutateAsync(formData, {
+                onSuccess: () => navigate(`/articles/${articleId}`),
+            });
         }
-      });
-    } else if (articleId) {
-      await updateMutation.mutateAsync(formData, {
-        onSuccess: () => navigate(`/articles/${articleId}`),
-      });
-    }
-  };
+    };
 
-  return (
-    <Container maxWidth={false} sx={{ height: '100vh', py: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Article Management
-      </Typography>
+    return (
+        <Container maxWidth={false} sx={{ height: '100vh', py: 3 }}>
+            <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Article Management
+                </Typography>
 
-      <Grid container spacing={3} sx={{ height: 'calc(100% - 60px)', width: '100%' }}>
-        {/* Left pane - Articles list */}
-        <Grid>
-          <ArticlesList
-            selectedArticleId={articleId}
-            onSelectArticle={handleSelectArticle}
-            onCreateArticle={handleCreateArticle}
-          />
-        </Grid>
+                <IconButton component={Link} to="/">
+                    go to home
+                </IconButton>
+            </Card>
 
-        {/* Right pane - Article form */}
-        <Grid flex={1}>
-          {!articleId && !isCreating ? (
-            <Paper
-              elevation={2}
-              sx={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                p: 4,
-                borderRadius: 2,
-                textAlign: 'center'
-              }}
-            >
-              <Typography variant="h5" sx={{ mb: 2 }}>
-                Select an article or create a new one
-              </Typography>
-              <Typography color="text.secondary">
-                Use the list on the left to select an existing article or click "Create Article"
-              </Typography>
-            </Paper>
-          ) : (
-            <Box sx={{ height: '100%' }}>
-              <ArticleForm
-                article={articleQuery.data}
-                isCreating={isCreating}
-                onSave={handleSaveArticle}
-              />
-            </Box>
-          )}
-        </Grid>
-      </Grid>
-    </Container>
-  );
+            <Grid container spacing={3} sx={{ height: 'calc(100% - 60px)', width: '100%' }}>
+                {/* Left pane - Articles list */}
+                <Grid>
+                    <ArticlesList
+                        selectedArticleId={articleId}
+                        onSelectArticle={handleSelectArticle}
+                        onCreateArticle={handleCreateArticle}
+                    />
+                </Grid>
+
+                {/* Right pane - Article form */}
+                <Grid flex={1}>
+                    {!articleId && !isCreating ? (
+                        <Paper
+                            elevation={2}
+                            sx={{
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                p: 4,
+                                borderRadius: 2,
+                                textAlign: 'center'
+                            }}
+                        >
+                            <Typography variant="h5" sx={{ mb: 2 }}>
+                                Select an article or create a new one
+                            </Typography>
+                            <Typography color="text.secondary">
+                                Use the list on the left to select an existing article or click "Create Article"
+                            </Typography>
+                        </Paper>
+                    ) : (
+                        <Box sx={{ height: '100%' }}>
+                            <ArticleForm
+                                article={articleQuery.data}
+                                isCreating={isCreating}
+                                onSave={handleSaveArticle}
+                            />
+                        </Box>
+                    )}
+                </Grid>
+            </Grid>
+        </Container>
+    );
 };
 
 export default ArticlesPage;
