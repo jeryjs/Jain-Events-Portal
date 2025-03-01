@@ -9,15 +9,19 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid,
-  Alert,
+  Grid2 as Grid,
   Divider,
   FormHelperText,
   CircularProgress
 } from '@mui/material';
+
+import "@blocknote/core/fonts/inter.css";
+import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/mantine/style.css";
+import { useCreateBlockNote } from "@blocknote/react";
+
 import { Article } from '@common/models';
 import { EventType } from '@common/constants';
-import { useCreateArticle, useUpdateArticle } from '@hooks/App';
 
 interface ArticleFormProps {
   article?: Article;
@@ -30,13 +34,14 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
     article || {
       title: '',
       summary: '',
-      markdownContent: '',
+      content: '',
       image: { url: '' },
       tags: [],
       author: { id: 'admin', name: 'Administrator' },
       relatedEventType: undefined,
     }
   );
+  const editor = useCreateBlockNote({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
@@ -44,6 +49,9 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
   useEffect(() => {
     if (article) {
       setFormData(article);
+      editor.tryParseMarkdownToBlocks(article.content).then((it) => {console.log(it);
+        editor.replaceBlocks(editor.document, it);
+      });
     }
   }, [article]);
 
@@ -53,13 +61,6 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
-  };
-
-  const handleImageChange = (field: string, value: string) => {
-    setFormData(prev => ({ 
-      ...prev, 
-      image: { ...prev.image, [field]: value } 
-    }));
   };
 
   const validateForm = () => {
@@ -73,8 +74,8 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
       newErrors.summary = 'Summary is required';
     }
     
-    if (!formData.markdownContent?.trim()) {
-      newErrors.markdownContent = 'Content is required';
+    if (!formData.content?.trim()) {
+      newErrors.content = 'Content is required';
     }
     
     if (!formData.image?.url?.trim()) {
@@ -128,7 +129,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
       <Divider sx={{ mb: 3 }} />
       
       <Grid container spacing={3}>
-        <Grid xs={12}>
+        <Grid size={{xs: 12}}>
           <TextField
             fullWidth
             label="Title"
@@ -140,7 +141,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
           />
         </Grid>
         
-        <Grid xs={12}>
+        <Grid size={{xs: 12}}>
           <TextField
             fullWidth
             label="Summary"
@@ -154,29 +155,29 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
           />
         </Grid>
         
-        <Grid xs={12} md={6}>
+        <Grid size={{xs: 12, md: 6}}>
           <TextField
             fullWidth
             label="Image URL"
             value={formData.image?.url || ''}
-            onChange={e => handleImageChange('url', e.target.value)}
+            onChange={e => handleChange('image', { ...formData.image, url: e.target.value })}
             error={!!errors.imageUrl}
             helperText={errors.imageUrl || 'URL for the article thumbnail image'}
             required
           />
         </Grid>
         
-        <Grid xs={12} md={6}>
+        <Grid size={{xs: 12, md: 6}}>
           <TextField
             fullWidth
             label="Image Alt Text"
             value={formData.image?.alt || ''}
-            onChange={e => handleImageChange('alt', e.target.value)}
+            onChange={e => handleChange('image', { ...formData.image, alt: e.target.value })}
             helperText="Alternative text for the image"
           />
         </Grid>
         
-        <Grid xs={12} md={6}>
+        <Grid size={{xs: 12, md: 6}}>
           <FormControl fullWidth>
             <InputLabel id="event-type-label">Related Event Type</InputLabel>
             <Select
@@ -199,7 +200,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
           </FormControl>
         </Grid>
         
-        <Grid xs={12} md={6}>
+        <Grid size={{xs: 12, md: 6}}>
           <TextField
             fullWidth
             label="Tags"
@@ -209,22 +210,43 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
           />
         </Grid>
         
-        <Grid xs={12}>
-          <TextField
-            fullWidth
-            label="Content"
-            value={formData.markdownContent || ''}
-            onChange={e => handleChange('markdownContent', e.target.value)}
-            error={!!errors.markdownContent}
-            helperText={errors.markdownContent || 'Markdown content supported'}
-            required
-            multiline
-            rows={12}
-          />
+        <Grid size={{xs: 12}} mt={2} sx={{ textAlign: 'start' }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, ml: 2, fontWeight: 700 }}>
+            Article
+            {errors.content && (
+              <Typography variant="caption" color="error" sx={{ ml: 1 }}>
+                {errors.content}
+              </Typography>
+            )}
+          </Typography>
+          
+          {/* BlockNote Editor */}
+          <Paper
+            variant="outlined"
+            sx={{
+              height: 400,
+              overflow: 'auto',
+              borderRadius: 1,
+              borderColor: errors.content ? 'error.main' : 'divider',
+              '& .bn-container': {
+                border: 'none',
+                borderRadius: 0,
+                height: '100%'
+              }
+            }}
+          >
+            <BlockNoteView
+              editor={editor}
+              theme='light'
+              onChange={() => editor.blocksToMarkdownLossy().then((it) => handleChange('content', it))} />
+          </Paper>
+          <FormHelperText sx={{ m: 2 }}>
+            Format your article using the rich text editor above. Use headings, lists, and formatting tools to make your content engaging.
+          </FormHelperText>
         </Grid>
       </Grid>
       
-      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+      <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
         <Button
           type="submit"
           variant="contained"
