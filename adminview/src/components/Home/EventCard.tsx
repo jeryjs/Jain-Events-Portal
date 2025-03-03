@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Card, CardContent, Typography, Box, Chip, CardMedia } from '@mui/material';
-import { format } from 'date-fns';
 import { styled } from '@mui/material/styles';
 
 import Event from '@common/models/Event';
@@ -87,7 +86,8 @@ export const EventCard = ({ event, isSelected, collapsed, onClick }: EventCardPr
   const firstLetter = event.name.charAt(0).toUpperCase();
 
   const formatDate = (date: Date) => {
-    return format(date, 'MMM d, yyyy');
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
   };
 
   return (

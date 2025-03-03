@@ -1,4 +1,4 @@
-import { Event, Activity } from '@common/models';
+import { Event, Activity, Article } from '@common/models';
 import { parseEvents } from '@common/utils';
 import config from '#config';
 
@@ -113,7 +113,57 @@ export const ActivitiesApi = {
     }),
 };
 
+// Article API endpoints
+export const ArticlesApi = {
+  getAll: async (): Promise<Article[]> => {
+    const response = await fetch(`${config.API_BASE_URL}/articles`);
+    if (!response.ok) throw new Error('Failed to fetch articles');
+    const data = await response.json();
+    return data.map((item: any) => Article.parse(item));
+  },
+  
+  getById: async (id: string): Promise<Article> => {
+    const response = await fetch(`${config.API_BASE_URL}/articles/${id}`);
+    if (!response.ok) throw new Error(`Failed to fetch article ${id}`);
+    const data = await response.json();
+    return Article.parse(data);
+  },
+  
+  create: async (article: Article): Promise<Article> => {
+    const response = await fetch(`${config.API_BASE_URL}/articles`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(article.toJSON()),
+    });
+    if (!response.ok) throw new Error('Failed to create article');
+    const data = await response.json();
+    return Article.parse(data);
+  },
+  
+  update: async (id: string, article: Article): Promise<Article> => {
+    const response = await fetch(`${config.API_BASE_URL}/articles/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(article.toJSON()),
+    });
+    if (!response.ok) throw new Error(`Failed to update article ${id}`);
+    const data = await response.json();
+    return Article.parse(data);
+  },
+  
+  delete: async (id: string): Promise<boolean> => {
+    const response = await fetch(`${config.API_BASE_URL}/articles/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error(`Failed to delete article ${id}`);
+    return true;
+  },
+};
+
+
+// Export all API endpoints
 export default {
   events: EventsApi,
   activities: ActivitiesApi,
+  articles: ArticlesApi,
 };
