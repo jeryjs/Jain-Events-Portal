@@ -32,8 +32,8 @@
         "name": "Winter Tech Conference 2025",
         "type": 3000,
         "timings": [
-            "2025-02-26T09:00:00.000Z",
-            "2025-02-28T17:00:00.000Z"
+            "2025-02-28T09:00:00.000Z",
+            "2025-03-08T17:00:00.000Z"
         ],
         "description": "Join us for the premier winter technology conference of 2025. Three days of keynotes, workshops, and networking with industry leaders discussing the latest innovations and future trends in technology.",
         "venue": "Alpine Convention Center",
@@ -116,8 +116,8 @@
         "name": "Ignite Tech Summit 2015",
         "type": 3000,
         "timings": [
-            "2015-01-15T09:00:00.000Z",
-            "2015-01-17T17:00:00.000Z"
+            "2015-03-01T09:00:00.000Z",
+            "2015-01-07T17:00:00.000Z"
         ],
         "description": "A groundbreaking tech summit featuring visionary speakers, cutting-edge workshops, and unparalleled networking opportunities. Explore the future of technology and innovation.",
         "venue": "Tech Innovation Center",
@@ -158,8 +158,8 @@
         "name": "Coding Conquest 2018",
         "type": 3001,
         "timings": [
-            "2018-04-01T09:00:00.000Z",
-            "2018-04-03T17:00:00.000Z"
+            "2018-03-01T09:00:00.000Z",
+            "2018-03-08T17:00:00.000Z"
         ],
         "description": "Embark on a coding adventure at Coding Conquest! Solve challenging puzzles, learn new programming skills, and compete for glory.",
         "venue": "Innovation Lab",

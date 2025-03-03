@@ -1,4 +1,4 @@
-import { Box, Container, Skeleton, Typography } from '@mui/material';
+import { Box, Container, Skeleton, Typography, CardMedia, CardContent } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { useContext, useState } from 'react';
@@ -6,11 +6,11 @@ import { ColorModeContext } from '../App';
 
 import { EventCard, HomeHeader, Section } from '@components/Home';
 import NoEventsDisplay from '@components/Home/NoEventsDisplay';
-import ArticlesSection from '@components/Event/ArticlesSection';
 import PageTransition from '@components/shared/PageTransition';
 import PhotoGallery from '@components/shared/PhotoGallery';
-import { useEvents } from '@hooks/useApi';
+import { useArticles, useEvents } from '@hooks/useApi';
 import { EventType } from '@common/constants';
+import { Link } from 'react-router-dom';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -20,9 +20,26 @@ const HorizontalScroll = styled(motion.div)(({ theme }) => `
   scrollbar-width: none;
 `);
 
+const ArticleCard = styled(Link)(({ theme }) => ({
+  minWidth: 280,
+  maxWidth: 300,
+  flexShrink: 0,
+  scrollSnapAlign: 'start',
+  cursor: 'pointer',
+  borderRadius: theme.shape.borderRadius * 2,
+  boxShadow: theme.shadows[2],
+  overflow: 'hidden',
+  transition: 'transform 0.3s, box-shadow 0.3s',
+  '&:hover': {
+    transform: 'translateY(-8px)',
+    boxShadow: theme.shadows[8],
+  },
+}));
+
 function HomePage() {
   const colorMode = useContext(ColorModeContext);
-  const { data: events, isLoading, error } = useEvents();
+  const { data: events, isLoading: isEventsLoading, error } = useEvents();
+  const { data: articles, isLoading: isArticlesLoading } = useArticles();
 
   const [catTabId, setTabId] = useState([0, -1]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
@@ -81,11 +98,11 @@ function HomePage() {
         {/* Ongoing Events Section */}
         <Section title='Happening Now' moreLink={getTimelineLink(ongoingEvents)}>
           <HorizontalScroll whileTap={{ cursor: 'grabbing' }}>
-            {isLoading
+            {isEventsLoading
               ? renderEventCardShimmers(8)
               : ongoingEvents.map((event, idx) => <EventCard key={event.id} event={event} delay={idx} />)}
           </HorizontalScroll>
-          {!isLoading && ongoingEvents.length === 0 && !error && (
+          {!isEventsLoading && ongoingEvents.length === 0 && !error && (
             <NoEventsDisplay
               message={`No ${getCategoryString(catTabId[1])} happening right now`}
               type="ongoing"
@@ -102,10 +119,10 @@ function HomePage() {
         {/* Upcoming Events Section */}
         <Section title='Upcoming Events' moreLink={getTimelineLink(upcomingEvents)}>
           <Box sx={{ alignItems: 'flex-start', '&:active': { scale: 0.95 } }}>
-            {isLoading
+            {isEventsLoading
               ? renderEventCardShimmers(3, 'horizontal')
               : upcomingEvents.map((event, idx) => <EventCard key={`${event.id}-${idx}`} event={event} variant="horizontal" delay={idx} />)}
-            {!isLoading && upcomingEvents.length === 0 && !error && (
+            {!isEventsLoading && upcomingEvents.length === 0 && !error && (
               <NoEventsDisplay
                 message={`No upcoming ${getCategoryString(catTabId[1])} scheduled`}
                 type="upcoming"
@@ -118,10 +135,10 @@ function HomePage() {
         {/* Past Events Section */}
         <Section title='Past Events' moreLink={getTimelineLink(pastEvents)}>
           <Box sx={{ alignItems: 'flex-start', '&:active': { scale: 0.95 } }}>
-            {isLoading
+            {isEventsLoading
               ? renderEventCardShimmers(3, 'horizontal')
               : pastEvents.map((event, idx) => <EventCard key={`${event.id}-${idx}`} event={event} variant="horizontal" delay={idx} />)}
-            {!isLoading && pastEvents.length === 0 && !error && (
+            {!isEventsLoading && pastEvents.length === 0 && !error && (
               <NoEventsDisplay
                 message={`No past ${getCategoryString(catTabId[1])} available`}
                 type="past"
@@ -133,12 +150,39 @@ function HomePage() {
 
         {/* Photos Section */}
         <Section title='Photos'>
-          <PhotoGallery isLoading={isLoading} />
+          <PhotoGallery isLoading={isEventsLoading} />
         </Section>
 
-        <Box sx={{ my: 4 }}>
-          <ArticlesSection />
-        </Box>
+        {/* Articles Section */}
+        <Section title='Articles' moreLink='/articles'>
+          <HorizontalScroll whileTap={{ cursor: 'grabbing' }}>
+            {isEventsLoading
+              ? renderEventCardShimmers(3)
+              : (articles || []).map((article) => (
+                <ArticleCard
+                  key={article.id}
+                  to={`/articles/${article.id}`}
+                  sx={{ textDecoration: 'none' }}
+                >
+                  <CardMedia
+                    component="img"
+                    height="160"
+                    image={article.image.url}
+                    alt={article.title}
+                    sx={{ transition: 'transform 0.5s', '&:hover': { transform: 'scale(1.05)' } }}
+                  />
+                  <CardContent>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                      {article.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {article.summary}
+                    </Typography>
+                  </CardContent>
+                </ArticleCard>
+              ))}
+          </HorizontalScroll>
+        </Section>
 
       </Container>
     </PageTransition>
