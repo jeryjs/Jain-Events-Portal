@@ -118,34 +118,30 @@ function HomePage() {
 
         {/* Upcoming Events Section */}
         <Section title='Upcoming Events' moreLink={getTimelineLink(upcomingEvents)}>
-          <Box sx={{ alignItems: 'flex-start', '&:active': { scale: 0.95 } }}>
-            {isEventsLoading
-              ? renderEventCardShimmers(3, 'horizontal')
-              : upcomingEvents.map((event, idx) => <EventCard key={`${event.id}-${idx}`} event={event} variant="horizontal" delay={idx} />)}
-            {!isEventsLoading && upcomingEvents.length === 0 && !error && (
-              <NoEventsDisplay
-                message={`No upcoming ${getCategoryString(catTabId[1])} scheduled`}
-                type="upcoming"
-                timelineLink={getTimelineLink(pastEvents)}
-              />
-            )}
-          </Box>
+          {isEventsLoading
+            ? renderEventCardShimmers(3, 'horizontal')
+            : upcomingEvents.map((event, idx) => <EventCard key={event.id} event={event} variant="horizontal" delay={idx} />)}
+          {!isEventsLoading && upcomingEvents.length === 0 && !error && (
+            <NoEventsDisplay
+              message={`No upcoming ${getCategoryString(catTabId[1])} scheduled`}
+              type="upcoming"
+              timelineLink={getTimelineLink(pastEvents)}
+            />
+          )}
         </Section>
 
         {/* Past Events Section */}
         <Section title='Past Events' moreLink={getTimelineLink(pastEvents)}>
-          <Box sx={{ alignItems: 'flex-start', '&:active': { scale: 0.95 } }}>
-            {isEventsLoading
-              ? renderEventCardShimmers(3, 'horizontal')
-              : pastEvents.map((event, idx) => <EventCard key={`${event.id}-${idx}`} event={event} variant="horizontal" delay={idx} />)}
-            {!isEventsLoading && pastEvents.length === 0 && !error && (
-              <NoEventsDisplay
-                message={`No past ${getCategoryString(catTabId[1])} available`}
-                type="past"
-                timelineLink={getTimelineLink(upcomingEvents)}
-              />
-            )}
-          </Box>
+          {isEventsLoading
+            ? renderEventCardShimmers(3, 'horizontal')
+            : pastEvents.map((event, idx) => <EventCard key={event.id} event={event} variant="horizontal" delay={idx} />)}
+          {!isEventsLoading && pastEvents.length === 0 && !error && (
+            <NoEventsDisplay
+              message={`No past ${getCategoryString(catTabId[1])} available`}
+              type="past"
+              timelineLink={getTimelineLink(upcomingEvents)}
+            />
+          )}
         </Section>
 
         {/* Photos Section */}
