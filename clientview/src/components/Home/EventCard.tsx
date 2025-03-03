@@ -140,11 +140,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
       >
         <Link to={`/${event.id}`} style={{ textDecoration: 'none' }}>
           <StyledCard sx={{ display: 'flex', mb: 2, borderRadius: 2, width: '100%' }}>
-            <Box sx={{ 
-              width: { xs: 130, sm: 220 }, 
-              height: { xs: 130, sm: 160 }, 
+            <Box sx={{
+              width: { xs: 130, sm: 220 },
+              height: { xs: 130, sm: 160 },
               position: 'relative',
-              flexShrink: 0 
+              flexShrink: 0
             }}>
               {isLoading && <Shimmer />}
               <StyledCardMedia
@@ -155,9 +155,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
               />
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', p: 2, overflow: 'hidden', flexGrow: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textOverflow: 'ellipsis'}}>
-                  {event.name}
-                </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textOverflow: 'ellipsis' }}>
+                {event.name}
+              </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                 {formattedDate}, {formattedTime}
               </Typography>
@@ -186,13 +186,15 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
               <Typography variant="caption">{month}</Typography>
             </DateBadge>
             <Box sx={{ height: 200, position: 'relative' }}>
-              {isLoading && <Shimmer />}
-              <StyledCardMedia
-                sx={{ height: '100%', display: 'block' }}
-                style={event.eventBannerStyles}
-                image={imageSrc}
-                title={event.name}
-              />
+              {isLoading
+                ? <Shimmer />
+                : <StyledCardMedia
+                  sx={{ height: '100%', display: 'block' }}
+                  style={event.eventBannerStyles}
+                  image={imageSrc}
+                  title={event.name}
+                />
+              }
             </Box>
             <CardContent>
               <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
