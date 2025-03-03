@@ -54,6 +54,9 @@ const ArticlePage: React.FC = () => {
           });
       }
     }
+    
+    // Reset page scroll on load
+    window.scrollTo(0, 0);
   }, [allArticles, articleId, article, editor]);
 
   const handleBack = () => {
