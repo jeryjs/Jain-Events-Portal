@@ -40,7 +40,7 @@ export const useEvent = (eventId: string) => {
 
 	return useQuery({
 		queryKey: ["event", eventId],
-		queryFn: async () => eventsQuery.data?.find((e) => e.id === eventId) || (await _fetchEvents()).find((e) => e.id === eventId),
+		queryFn: async () => eventsQuery.data?.find((e) => e.id === eventId),
 		staleTime: 1000 * 60 * 5, // 5 minutes
 		enabled: !eventsQuery.isLoading,
 	});
@@ -117,6 +117,17 @@ export const useArticles = () => {
     queryFn: _fetchArticles,
     staleTime: 1000 * 60 * 30, // 30 minutes
     refetchOnWindowFocus: false,
+  });
+}
+
+export const useArticle = (articleId: string) => {
+  const articlesQuery = useArticles();
+
+  return useQuery({
+	queryKey: ["article", articleId],
+	queryFn: async () => articlesQuery.data?.find((a) => a.id === articleId),
+	staleTime: 1000 * 60 * 30, // 30 minutes
+	enabled: !articlesQuery.isLoading,
   });
 }
 

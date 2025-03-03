@@ -6,8 +6,8 @@ import HomePage from './pages/HomePage';
 import EventPage from './pages/EventPage';
 import ActivityPage from './pages/ActivityPage';
 import ArticlesPage from './pages/ArticlesPage';
-import ArticleDetailPage from './pages/ArticleDetailPage';
-import TimelinePage from './pages/TimelinePage'; // Add this import';
+import ArticlePage from './pages/ArticlePage';
+import TimelinePage from './pages/TimelinePage';
 import queryClient from './utils/QueryClient';
 
 interface ColorMode {
@@ -52,7 +52,7 @@ function App() {
           <Router>
             <Routes>
               {/* Articles routes - specific ones first */}
-              <Route path="/articles/:articleId" element={<ArticleDetailPage />} />
+              <Route path="/articles/:articleId" element={<ArticlePage />} />
               <Route path="/articles" element={<ArticlesPage />} />
               {/* Timeline route */}
               <Route path="/timeline" element={<TimelinePage />} />

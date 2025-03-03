@@ -27,7 +27,7 @@ export default class Article {
   
   static parse(data: any): Article {
     return new Article(
-      data.id || 0,
+      data.id || '',
       data.title || '',
       data.summary || '',
       data.content || '',
