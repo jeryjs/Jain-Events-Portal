@@ -1,8 +1,7 @@
 import { Box, Container, Skeleton, Typography, CardMedia, CardContent } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
-import { useContext, useState } from 'react';
-import { ColorModeContext } from '../App';
+import { useState } from 'react';
 
 import { EventCard, HomeHeader, Section } from '@components/Home';
 import NoEventsDisplay from '@components/Home/NoEventsDisplay';
@@ -37,7 +36,6 @@ const ArticleCard = styled(Link)(({ theme }) => ({
 }));
 
 function HomePage() {
-  const colorMode = useContext(ColorModeContext);
   const { data: events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
 
@@ -152,7 +150,7 @@ function HomePage() {
         {/* Articles Section */}
         <Section title='Articles' moreLink='/articles'>
           <HorizontalScroll whileTap={{ cursor: 'grabbing' }}>
-            {isEventsLoading
+            {isArticlesLoading
               ? renderEventCardShimmers(3)
               : (articles || []).map((article) => (
                 <ArticleCard

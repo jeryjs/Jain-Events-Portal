@@ -5,7 +5,7 @@ import {
   Paper
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 // Components
@@ -17,7 +17,6 @@ import ArticleHero from '@components/Article/ArticleHero';
 import RecentArticles from '@components/Articles/RecentArticles';
 import PageTransition from '@components/shared/PageTransition';
 import { useArticles } from '@hooks/useApi';
-import { ColorModeContext } from '../App';
 import { generateLoremMarkdown } from '@utils/loremMarkdownGenerator';
 import ArticleSkeleton from '@components/Article/ArticleSkeleton';
 
@@ -25,7 +24,6 @@ const ArticlePage: React.FC = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const navigate = useNavigate();
   const theme = useTheme();
-  const colorMode = useContext(ColorModeContext);
   const isDarkMode = theme.palette.mode === 'dark';
   const editor = useCreateBlockNote({});
   
@@ -96,7 +94,6 @@ const ArticlePage: React.FC = () => {
         <ArticleHero
           article={article}
           onBack={handleBack}
-          onToggleTheme={colorMode.toggleColorMode}
           isDarkMode={isDarkMode}
         />
 

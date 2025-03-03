@@ -1,11 +1,8 @@
-import React from 'react';
-import { Box, Typography, IconButton, Tab, Tabs, Button } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import { useContext } from 'react';
-import { ColorModeContext } from '../../App';
 import { EventType } from '@common/constants';
+import ThemeSwitcher from '@components/shared/ThemeSwitcher';
+import { Box, Button, Tab, Tabs, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const AppHeader = styled(Box)(({ theme }) => `
@@ -23,7 +20,7 @@ const TabsContainer = styled(Box)(({ theme }) => `
 const StyledTab = styled(Tab)(({ theme }) => `
   min-width: auto; padding: 4px 24px; border-radius: 24px; margin: 0 4px; font-weight: 500;
   &:hover { color: ${theme.palette.text.secondary}; opacity: 1; background-color: ${theme.palette.action.hover}; }
-  &.Mui-selected { color: ${theme.palette.background.paper}; background-color: ${theme.palette.text.primary}; }
+  &.Mui-selected { color: ${theme.palette.background.default}; background-color: ${theme.palette.text.primary}; font-weight: bold; }
   &.Mui-focusVisible { background-color: ${theme.palette.action.focus}; }
 `);
 
@@ -50,7 +47,6 @@ interface HomeHeaderProps {
 }
 
 const HomeHeader: React.FC<HomeHeaderProps> = ({ tabValue, onTabChange }) => {
-  const colorMode = useContext(ColorModeContext);
   return (
     <>
       <AppHeader>
@@ -67,9 +63,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ tabValue, onTabChange }) => {
             >
               Timeline
             </Button>
-            <IconButton onClick={colorMode.toggleColorMode}>
-              {colorMode.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
+            <ThemeSwitcher />
           </Box>
         </HeaderWrapper>
       </AppHeader>

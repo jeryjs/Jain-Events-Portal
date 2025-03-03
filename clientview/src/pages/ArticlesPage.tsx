@@ -8,10 +8,10 @@ import { Box, Container, Skeleton, Typography } from '@mui/material';
 import Grid2 from '@mui/material/Grid2';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ColorModeContext } from '../App';
+import { useColorMode } from '@utils/ColorMode';
 
 const ArticlesPage: React.FC = () => {
-  const colorMode = useContext(ColorModeContext);
+  const colorMode = useColorMode();
   const navigate = useNavigate();
   const { data, isLoading } = useArticles();
   const [searchTerm, setSearchTerm] = useState('');
@@ -74,7 +74,6 @@ const ArticlesPage: React.FC = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         onBack={() => navigate(-1)}
-        toggleColorMode={colorMode.toggleColorMode}
         isDarkMode={colorMode.mode === 'dark'}
       />
       <Container maxWidth="xl" sx={{ pb: 8 }}>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, createContext } from 'react';
+import React, { useMemo } from 'react';
 import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -9,45 +9,23 @@ import ArticlesPage from './pages/ArticlesPage';
 import ArticlePage from './pages/ArticlePage';
 import TimelinePage from './pages/TimelinePage';
 import queryClient from './utils/QueryClient';
-
-interface ColorMode {
-  mode: 'light' | 'dark';
-  toggleColorMode: () => void;
-}
-
-export const ColorModeContext = createContext<ColorMode>({
-  mode: 'light', // Default value
-  toggleColorMode: () => {},
-});
+import { ColorModeContext, useColorMode } from './utils/ColorMode';
 
 function App() {
-  const [mode, setMode] = useState<'light' | 'dark'>(localStorage.getItem('theme') === 'dark' ? 'dark' : 'light');
-  const colorMode = useMemo(
-    () => ({
-      mode: mode,
-      toggleColorMode: () => {
-        setMode((prev) => {
-          const newMode = prev === 'light' ? 'dark' : 'light';
-          localStorage.setItem('theme', newMode);
-          return newMode;
-        });
-      },
-    }),
-    [mode],
-  );
+  const colorMode = useColorMode();
 
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode: mode, // Set the mode here
+          mode: colorMode.mode,
           primary: {
-            main: mode === 'light' ? '#000' : '#fff', // Adjust primary color based on mode
+            main: colorMode.mode === 'light' ? '#000' : '#fff',
           },
         },
         typography: { fontFamily: '"Inter","Roboto","Helvetica","Arial",sans-serif' },
       }),
-    [mode],
+    [colorMode.mode],
   );
 
   return (

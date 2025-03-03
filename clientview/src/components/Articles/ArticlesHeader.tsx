@@ -1,6 +1,5 @@
+import ThemeSwitcher from '@components/shared/ThemeSwitcher';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, IconButton, InputBase, Typography } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
@@ -11,7 +10,6 @@ interface ArticlesHeaderProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
   onBack: () => void;
-  toggleColorMode: () => void;
   isDarkMode: boolean;
 }
 
@@ -86,8 +84,6 @@ const ArticlesHeader: React.FC<ArticlesHeaderProps> = ({
   searchTerm,
   onSearchChange,
   onBack,
-  toggleColorMode,
-  isDarkMode
 }) => {
   return (
     <HeroSection>
@@ -111,9 +107,7 @@ const ArticlesHeader: React.FC<ArticlesHeaderProps> = ({
         >
           <ArrowBackIcon />
         </IconButton>
-        <IconButton onClick={toggleColorMode} sx={{ color: 'white' }}>
-          {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
-        </IconButton>
+        <ThemeSwitcher />
       </Box>
       <HeroContent>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
