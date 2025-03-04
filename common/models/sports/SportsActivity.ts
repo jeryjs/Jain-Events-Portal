@@ -102,7 +102,8 @@ class SportsActivity<T extends Sport> extends Activity {
 		}
 
 		const participants = data.participants.map((p: any) => SportsPlayer.parse(p));
-		return new SportsActivity<typeof gameType>(data.id, data.name, data.eventType, data.teams, participants, data.game as typeof gameType);
+		const game = Object.assign(gameType, data.game);
+		return new SportsActivity<typeof gameType>(data.id, data.name, data.eventType, data.teams, participants, game);
 	}
 
 	getPlayer(playerId: string): SportsPlayer {
