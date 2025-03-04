@@ -1,20 +1,12 @@
 // Export base models
-export { default as Activity } from './Activity';
-export { default as Event } from './Event';
-export { default as Participant } from './Participant';
-export { default as Article } from './Article';
+export { default as Activity } from "./Activity";
+export { default as Event } from "./Event";
+export { default as Participant } from "./Participant";
+export { default as Article } from "./Article";
 
 // Export sports models
-export { default as SportsActivity } from './sports/SportsActivity';
-export { 
-    default as SportsPlayer,
-    type Volleyball,
-    type Football,
-    type Cricket,
-    type Basketball,
-    type Throwball,
-    type Sport
-} from './sports/SportsParticipant';
+export { default as SportsActivity, Cricket, Football, Basketball, OtherSport } from "./sports/SportsActivity";
+export { default as SportsPlayer } from "./sports/SportsPlayer";
 
 // Export culturals models
-export { default as CulturalActivity } from './culturals/CulturalActivity';
+export { default as CulturalActivity } from "./culturals/CulturalActivity";

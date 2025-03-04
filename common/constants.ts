@@ -2,7 +2,7 @@ export enum EventType {
 	GENERAL = 0,
 
 	SPORTS = 1000,
-	VOLLEYBALL = 1001,
+	BASKETBALL = 1001,
 	FOOTBALL = 1002,
 	CRICKET = 1003,
 
