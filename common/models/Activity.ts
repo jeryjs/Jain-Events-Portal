@@ -7,6 +7,7 @@ export default class Activity {
     constructor(
         public id: string,
         public name: string,
+        public time: Date,
         public participants: Participant[],
         public eventType: EventType
     ) {}
@@ -21,7 +22,7 @@ export default class Activity {
             default:
                 // Default Activity parsing logic
                 const participants = data.participants.map((p: any) => Participant.parse(p));
-                return new Activity(data.activityId, data.name, participants, data.eventType);
+                return new Activity(data.id, data.name, data.time, participants, data.eventType);
         }
     }
 }

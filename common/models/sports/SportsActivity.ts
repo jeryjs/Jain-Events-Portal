@@ -84,12 +84,13 @@ class SportsActivity<T extends Sport> extends Activity {
 	constructor(
 		id: string,
 		name: string,
+		time: Date,
 		eventType: EventType,
 		public teams: { id: string; name: string }[],
 		public participants: SportsPlayer[],
 		public game: T
 	) {
-		super(id, name, participants, eventType);
+		super(id, name, time, participants, eventType);
 	}
 
 	static parse(data: any): SportsActivity<Sport> {
@@ -103,7 +104,7 @@ class SportsActivity<T extends Sport> extends Activity {
 
 		const participants = data.participants.map((p: any) => SportsPlayer.parse(p));
 		const game = Object.assign(gameType, data.game);
-		return new SportsActivity<typeof gameType>(data.id, data.name, data.eventType, data.teams, participants, game);
+		return new SportsActivity<gameType>(data.id, data.name, data.time, data.eventType, data.teams, participants, game);
 	}
 
 	getPlayer(playerId: string): SportsPlayer {

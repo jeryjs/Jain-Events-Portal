@@ -4,17 +4,18 @@ import Participant from '../Participant';
 
 class CulturalActivity extends Activity {
   constructor(
-    activityId: string, 
+    id: string, 
     name: string, 
+    time: Date,
     participants: Participant[], 
     public performanceDetails: string
   ) {
-    super(activityId, name, participants, EventType.CULTURAL);
+    super(id, name, time, participants, EventType.CULTURAL);
   }
 
   static parse(data: any): CulturalActivity {
     const participants = data.participants.map((p: any) => Participant.parse(p));
-    return new CulturalActivity(data.activityId, data.name, participants, data.performanceDetails);
+    return new CulturalActivity(data.id, data.name, data.time, participants, data.performanceDetails);
   }
 }
 
