@@ -1,0 +1,196 @@
+[
+{
+    "id": "basketball",
+    "name": "Inter-College Basketball Tournament",
+    "eventType": 1001,
+    "teams": [
+        { "id": "lions", "name": "Lions" },
+        { "id": "tigers", "name": "Tigers" }
+    ],
+    "participants": [
+        { "usn": "USN1", "name": "LeBron James", "gender": "male", "teamId": "lions" },
+        { "usn": "USN2", "name": "Michael Jordan", "gender": "male", "teamId": "lions" },
+        { "usn": "USN3", "name": "Stephen Curry", "gender": "male", "teamId": "lions" },
+        { "usn": "USN4", "name": "Kevin Durant", "gender": "male", "teamId": "lions" },
+        { "usn": "USN5", "name": "Kobe Bryant", "gender": "male", "teamId": "lions" },
+        { "usn": "USN6", "name": "Dwayne Wade", "gender": "male", "teamId": "tigers" },
+        { "usn": "USN7", "name": "Shaquille O'Neal", "gender": "male", "teamId": "tigers" },
+        { "usn": "USN8", "name": "Larry Bird", "gender": "male", "teamId": "tigers" },
+        { "usn": "USN9", "name": "Magic Johnson", "gender": "male", "teamId": "tigers" },
+        { "usn": "USN10", "name": "Hakeem Olajuwon", "gender": "male", "teamId": "tigers" }
+    ],
+    "game": {
+        "stats": [
+            {
+                "teamId": "lions",
+                "points": [
+                    { "playerId": "USN1", "points": 28 },
+                    { "playerId": "USN2", "points": 32 },
+                    { "playerId": "USN3", "points": 25 },
+                    { "playerId": "USN4", "points": 22 },
+                    { "playerId": "USN5", "points": 18 }
+                ]
+            },
+            {
+                "teamId": "tigers",
+                "points": [
+                    { "playerId": "USN6", "points": 26 },
+                    { "playerId": "USN7", "points": 24 },
+                    { "playerId": "USN8", "points": 20 },
+                    { "playerId": "USN9", "points": 15 },
+                    { "playerId": "USN10", "points": 12 }
+                ]
+            }
+        ]
+    }
+},
+{
+    "id": "football",
+    "name": "Annual Football Championship",
+    "eventType": 1002,
+    "teams": [
+        { "id": "eagles", "name": "Eagles" },
+        { "id": "falcons", "name": "Falcons" }
+    ],
+    "participants": [
+        { "usn": "USN11", "name": "Cristiano Ronaldo", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN12", "name": "Lionel Messi", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN13", "name": "Neymar Jr", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN14", "name": "Kylian Mbappé", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN15", "name": "Robert Lewandowski", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN16", "name": "Kevin De Bruyne", "gender": "male", "teamId": "falcons" },
+        { "usn": "USN17", "name": "Virgil van Dijk", "gender": "male", "teamId": "falcons" },
+        { "usn": "USN18", "name": "Sergio Ramos", "gender": "male", "teamId": "falcons" },
+        { "usn": "USN19", "name": "Manuel Neuer", "gender": "male", "teamId": "falcons" },
+        { "usn": "USN20", "name": "Mohamed Salah", "gender": "male", "teamId": "falcons" }
+    ],
+    "game": {
+        "stats": [
+            {
+                "teamId": "eagles",
+                "goals": [{ "playerId": "USN11" }, { "playerId": "USN12" }, { "playerId": "USN13" }],
+                "assists": [{ "playerId": "USN14" }, { "playerId": "USN11" }],
+                "redCards": [],
+                "yellowCards": [{ "playerId": "USN15" }],
+                "positions": []
+            },
+            {
+                "teamId": "falcons",
+                "goals": [{ "playerId": "USN20" }],
+                "assists": [{ "playerId": "USN16" }],
+                "redCards": [{ "playerId": "USN18" }],
+                "yellowCards": [{ "playerId": "USN17" }],
+                "positions": []
+            }
+        ]
+    }
+},
+{
+    "id": "cricket",
+    "name": "Cricket Premier League",
+    "eventType": 1003,
+    "teams": [
+        { "id": "gladiators", "name": "Gladiators" },
+        { "id": "warriors", "name": "Warriors" }
+    ],
+    "participants": [
+        { "usn": "USN21", "name": "Virat Kohli", "gender": "male", "teamId": "gladiators" },
+        { "usn": "USN22", "name": "Rohit Sharma", "gender": "male", "teamId": "gladiators" },
+        { "usn": "USN23", "name": "Jasprit Bumrah", "gender": "male", "teamId": "gladiators" },
+        { "usn": "USN24", "name": "MS Dhoni", "gender": "male", "teamId": "gladiators" },
+        { "usn": "USN25", "name": "Sachin Tendulkar", "gender": "male", "teamId": "gladiators" },
+        { "usn": "USN26", "name": "Kane Williamson", "gender": "male", "teamId": "warriors" },
+        { "usn": "USN27", "name": "David Warner", "gender": "male", "teamId": "warriors" },
+        { "usn": "USN28", "name": "Mitchell Starc", "gender": "male", "teamId": "warriors" },
+        { "usn": "USN29", "name": "Steve Smith", "gender": "male", "teamId": "warriors" },
+        { "usn": "USN30", "name": "Chris Gayle", "gender": "male", "teamId": "warriors" }
+    ],
+    "game": {
+        "innings": [
+            {
+                "bowlingTeam": "gladiators",
+                "battingTeam": "warriors",
+                "overs": [
+                    {
+                        "bowlerId": "USN23",
+                        "balls": [
+                            { "batsmanId": "USN26", "runs": 0, "extraRuns": 0, "type": "dot" },
+                            { "batsmanId": "USN26", "runs": 4, "extraRuns": 0, "type": "normal" },
+                            { "batsmanId": "USN26", "runs": 6, "extraRuns": 0, "type": "normal" },
+                            { "batsmanId": "USN26", "runs": 1, "extraRuns": 0, "type": "normal" },
+                            { "batsmanId": "USN27", "runs": 2, "extraRuns": 0, "type": "normal" },
+                            { "batsmanId": "USN27", "runs": 0, "extraRuns": 0, "type": "out" }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+},
+  {
+    "id": "4",
+    "name": "College Singing Competition",
+    "eventType": 2002,
+    "participants": [
+      { "usn": "USN11", "name": "Ivy", "gender": "female" },
+      { "usn": "USN12", "name": "Jack", "gender": "male" }
+    ],
+    "performanceDetails": "Solo performances"
+  },
+  {
+    "id": "5",
+    "name": "Dance Mania",
+    "eventType": 2001,
+    "participants": [
+      { "usn": "USN13", "name": "Kelly", "gender": "female" },
+      { "usn": "USN14", "name": "Liam", "gender": "male" }
+    ],
+    "performanceDetails": "Group dance"
+  },
+  {
+    "id": "6",
+    "name": "DJ Night",
+    "eventType": 2003,
+    "participants": [
+      { "usn": "USN15", "name": "Mia", "gender": "female" },
+      { "usn": "USN16", "name": "Noah", "gender": "male" }
+    ],
+    "performanceDetails": "Open DJ session"
+  },
+  {
+    "id": "7",
+    "name": "Coding Competition",
+    "eventType": 3001,
+    "participants": [
+      { "usn": "USN17", "name": "Olivia", "gender": "female" },
+      { "usn": "USN18", "name": "Owen", "gender": "male" }
+    ]
+  },
+  {
+    "id": "8",
+    "name": "Hackathon 24 Hours",
+    "eventType": 3002,
+    "participants": [
+      { "usn": "USN19", "name": "Penny", "gender": "female" },
+      { "usn": "USN20", "name": "Quinn", "gender": "male" }
+    ]
+  },
+  {
+    "id": "9",
+    "name": "General Knowledge Quiz",
+    "eventType": 3003,
+    "participants": [
+      { "usn": "USN21", "name": "Rachel", "gender": "female" },
+      { "usn": "USN22", "name": "Sam", "gender": "male" }
+    ]
+  },
+  {
+    "id": "10",
+    "name": "Web Development Workshop",
+    "eventType": 3004,
+    "participants": [
+      { "usn": "USN23", "name": "Tina", "gender": "female" },
+      { "usn": "USN24", "name": "Uma", "gender": "female" }
+    ]
+  }
+]

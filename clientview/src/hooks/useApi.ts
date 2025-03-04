@@ -81,9 +81,37 @@ const _fetchActivities = async (eventId: string): Promise<Activity[]> => {
 };
 
 export const useActivities = (eventId: string) => {
+	return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
+
 	return useQuery({
 		queryKey: ["activities", eventId],
 		queryFn: () => _fetchActivities(eventId),
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: false,
+	});
+};
+
+export const useActivity = (eventId: string, activityId: string) => {
+	const activitiesQuery = useActivities(eventId);
+
+	return useQuery({
+		queryKey: ["activity", eventId, activityId],
+		queryFn: async () => activitiesQuery.data?.find((a) => a.id === activityId),
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		enabled: !activitiesQuery.isLoading,
+	});
+};
+
+
+const useDummyActivities = (eventId: string, count = 30) => {
+	return useQuery({
+		queryKey: ["dummy_activities", eventId, count],
+		queryFn: async () => {
+			return fetch("/dummy_activities.json")
+				.then((res) => res.json())
+				.then((data) => parseActivities(data).slice(0, count)) // Limit to the first `count` activities
+				.then((it) => new Promise<typeof it>((resolve) => setTimeout(() => resolve(it), 1000))); // Simulate network delay
+		},
 		staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchOnWindowFocus: false,
 	});
