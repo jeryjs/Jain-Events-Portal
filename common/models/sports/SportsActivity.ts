@@ -16,7 +16,7 @@ export class Cricket {
 				type: "W" | "NB" | "WD" | "B" | "LB";
 			}[];
 		}[];
-	}[];
+	}[] = [];
 
 	get totalOvers() {
 		return this.innings.reduce((total, i) => total + i.overs.length, 0);
@@ -49,7 +49,7 @@ export class Football {
 		redCards: { playerId: string }[];
 		yellowCards: { playerId: string }[];
 		positions: { playerId: string; position: "Player" | "Benched" | "Goalkeeper" | "Defender" | "Midfielder" | "Forward"; }[];
-	}[];
+	}[] = [];
 
 	getTotalGoals(teamId?: string) {
 		if (teamId) {
@@ -63,7 +63,7 @@ export class Basketball {
 	stats: {
 		teamId: string;
 		points: { playerId: string; points: number }[];
-	}[];
+	}[] = [];
 
 	getTotalPoints(teamId?: string) {
 		if (teamId) {
@@ -75,7 +75,7 @@ export class Basketball {
 
 // Generic sports specific stats
 export class OtherSport {
-	points: { teamId: string; points: number }[];
+	points: { teamId: string; points: number }[] = [];
 }
 
 type Sport = Cricket | Football | Basketball | OtherSport;
@@ -104,11 +104,11 @@ class SportsActivity<T extends Sport> extends Activity {
 
 		const participants = data.participants.map((p: any) => SportsPlayer.parse(p));
 		const game = Object.assign(gameType, data.game);
-		return new SportsActivity<gameType>(data.id, data.name, data.time, data.eventType, data.teams, participants, game);
+		return new SportsActivity<typeof gameType>(data.id, data.name, data.time, data.eventType, data.teams, participants, game);
 	}
 
-	getPlayer(playerId: string): SportsPlayer {
-		return this.participants.find((p) => p.usn === playerId);
+	getPlayer(playerId: string): SportsPlayer | null {
+		return this.participants.find((p) => p.usn === playerId) || null;
 	}
 
 	getTeamPlayers(teamId: string): SportsPlayer[] {
