@@ -1,7 +1,8 @@
 [
 {
     "id": "basketball",
-    "name": "Inter-College Basketball Tournament",
+    "name": "Basketball Finals - Lions vs Tigers",
+    "startTime": "2025-03-06T14:00:00Z",
     "eventType": 1001,
     "teams": [
         { "id": "lions", "name": "Lions" },
@@ -46,7 +47,8 @@
 },
 {
     "id": "football",
-    "name": "Annual Football Championship",
+    "name": "Football Semi Finals - Eagles vs Falcons",
+    "startTime": "2025-03-05T14:00:00Z",
     "eventType": 1002,
     "teams": [
         { "id": "eagles", "name": "Eagles" },
@@ -84,49 +86,225 @@
             }
         ]
     }
-},
-{
+  },
+  {
     "id": "cricket",
-    "name": "Cricket Premier League",
+    "name": "Cricket Match - Titans vs Vikings",
+    "startTime": "2025-03-07T10:00:00Z",
     "eventType": 1003,
     "teams": [
-        { "id": "gladiators", "name": "Gladiators" },
-        { "id": "warriors", "name": "Warriors" }
+      { "id": "titans", "name": "Titans" },
+      { "id": "vikings", "name": "Vikings" }
     ],
     "participants": [
-        { "usn": "USN21", "name": "Virat Kohli", "gender": "male", "teamId": "gladiators" },
-        { "usn": "USN22", "name": "Rohit Sharma", "gender": "male", "teamId": "gladiators" },
-        { "usn": "USN23", "name": "Jasprit Bumrah", "gender": "male", "teamId": "gladiators" },
-        { "usn": "USN24", "name": "MS Dhoni", "gender": "male", "teamId": "gladiators" },
-        { "usn": "USN25", "name": "Sachin Tendulkar", "gender": "male", "teamId": "gladiators" },
-        { "usn": "USN26", "name": "Kane Williamson", "gender": "male", "teamId": "warriors" },
-        { "usn": "USN27", "name": "David Warner", "gender": "male", "teamId": "warriors" },
-        { "usn": "USN28", "name": "Mitchell Starc", "gender": "male", "teamId": "warriors" },
-        { "usn": "USN29", "name": "Steve Smith", "gender": "male", "teamId": "warriors" },
-        { "usn": "USN30", "name": "Chris Gayle", "gender": "male", "teamId": "warriors" }
+      { "usn": "USN31", "name": "Aaron Finch", "gender": "male", "teamId": "titans" },
+      { "usn": "USN32", "name": "Shaun Marsh", "gender": "male", "teamId": "titans" },
+      { "usn": "USN33", "name": "Pat Cummins", "gender": "male", "teamId": "titans" },
+      { "usn": "USN34", "name": "Tim Paine", "gender": "male", "teamId": "titans" },
+      { "usn": "USN35", "name": "Usman Khawaja", "gender": "male", "teamId": "titans" },
+      { "usn": "USN36", "name": "Nathan Lyon", "gender": "male", "teamId": "titans" },
+      { "usn": "USN37", "name": "Josh Hazlewood", "gender": "male", "teamId": "titans" },
+      { "usn": "USN38", "name": "Marnus Labuschagne", "gender": "male", "teamId": "titans" },
+      { "usn": "USN39", "name": "Steve Smith", "gender": "male", "teamId": "titans" },
+      { "usn": "USN40", "name": "David Warner", "gender": "male", "teamId": "titans" },
+      { "usn": "USN41", "name": "Mitchell Starc", "gender": "male", "teamId": "titans" },
+      { "usn": "USN42", "name": "Kane Williamson", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN43", "name": "Martin Guptill", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN44", "name": "Trent Boult", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN45", "name": "Tom Latham", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN46", "name": "Ross Taylor", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN47", "name": "Colin Munro", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN48", "name": "Lockie Ferguson", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN49", "name": "Mitchell Santner", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN50", "name": "Tim Southee", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN51", "name": "Henry Nicholls", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN52", "name": "Matt Henry", "gender": "male", "teamId": "vikings" }
     ],
     "game": {
-        "innings": [
-            {
-                "bowlingTeam": "gladiators",
-                "battingTeam": "warriors",
-                "overs": [
-                    {
-                        "bowlerId": "USN23",
-                        "balls": [
-                            { "batsmanId": "USN26", "runs": 0, "extraRuns": 0, "type": "dot" },
-                            { "batsmanId": "USN26", "runs": 4, "extraRuns": 0, "type": "normal" },
-                            { "batsmanId": "USN26", "runs": 6, "extraRuns": 0, "type": "normal" },
-                            { "batsmanId": "USN26", "runs": 1, "extraRuns": 0, "type": "normal" },
-                            { "batsmanId": "USN27", "runs": 2, "extraRuns": 0, "type": "normal" },
-                            { "batsmanId": "USN27", "runs": 0, "extraRuns": 0, "type": "out" }
-                        ]
-                    }
-                ]
-            }
+      "innings": [
+      {
+      "bowlingTeam": "titans",
+      "battingTeam": "vikings",
+      "overs": [
+        {
+        "bowlerId": "USN33",
+        "balls": [
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 0, "extraRuns": 1, "type": "WD" },
+          { "batsmanId": "USN42", "runs": 2, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN43", "runs": 0, "extraRuns": 0, "type": "W" },
+          { "batsmanId": "USN45", "runs": 4, "extraRuns": 0, "type": "4" },
+          { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" }
         ]
+        },
+        {
+        "bowlerId": "USN37",
+        "balls": [
+          { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 0, "extraRuns": 0, "type": "D" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 2, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 0, "extraRuns": 1, "type": "NB" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+          { "batsmanId": "USN45", "runs": 0, "extraRuns": 0, "type": "W" }
+        ]
+        },
+        {
+        "bowlerId": "USN33",
+        "balls": [
+          { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 0, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" }
+          ]
+        },
+        {
+        "bowlerId": "USN37",
+        "balls": [
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 0, "extraRuns": 0, "type": "W" }
+          ]
+        },
+        {
+        "bowlerId": "USN41",
+        "balls": [
+          { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN47", "runs": 98, "extraRuns": 0, "type": "0" }
+        ]
+        },
+      {
+      "bowlerId": "USN33",
+      "balls": [
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 2, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN37",
+      "balls": [
+        { "batsmanId": "USN46", "runs": 4, "extraRuns": 0, "type": "4" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 0, "extraRuns": 0, "type": "W" }
+      ]
+        },
+        {
+      "bowlerId": "USN33",
+      "balls": [
+        { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 0, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 0, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN37",
+      "balls": [
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        }
+      ]
+        },
+        {
+      "bowlingTeam": "vikings",
+      "battingTeam": "titans",
+      "overs": [
+        {
+      "bowlerId": "USN44",
+      "balls": [
+        { "batsmanId": "USN31", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 3, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 0, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN48",
+      "balls": [
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 4, "extraRuns": 0, "type": "4" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN44",
+      "balls": [
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 0, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN48",
+      "balls": [
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN44",
+      "balls": [
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 0, "extraRuns": 1, "type": "WD" },
+        { "batsmanId": "USN39", "runs": 0, "extraRuns": 0, "type": "W" }
+      ]
+        },
+        {
+      "bowlerId": "USN48",
+      "balls": [
+        { "batsmanId": "USN39", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        }
+      ]
+      }
+      ]
     }
-},
+  },
   {
     "id": "4",
     "name": "College Singing Competition",

@@ -92,6 +92,8 @@ export const useActivities = (eventId: string) => {
 };
 
 export const useActivity = (eventId: string, activityId: string) => {
+	return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
+
 	const activitiesQuery = useActivities(eventId);
 
 	return useQuery({
@@ -116,6 +118,20 @@ const useDummyActivities = (eventId: string, count = 30) => {
 		refetchOnWindowFocus: false,
 	});
 };
+
+const useDummyActivity = (eventId: string, activityId: string) => {
+	return useQuery({
+		queryKey: ["dummy_activity", eventId, activityId],
+		queryFn: async () => {
+			return fetch("/dummy_activities.json")
+				.then((res) => res.json())
+				.then((data) => parseActivities(data).find((a) => a.id === activityId))
+				.then((it) => new Promise<typeof it>((resolve) => setTimeout(() => resolve(it), 1000))); // Simulate network delay
+		},
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: true,
+	});
+}
 
 
 /*

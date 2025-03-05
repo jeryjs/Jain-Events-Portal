@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { EventType } from '@common/constants';
 import Activity from '@common/models/Activity';
 import { Link } from 'react-router-dom';
+import { getBaseEventType } from '@common/utils';
 
 const StyledCard = styled(Card)(({ theme }) => `
   margin: ${theme.spacing(1)};
@@ -27,13 +28,7 @@ interface ActivityCardProps {
 
 // Helper function to get activity type text
 const getActivityType = (type: EventType): string => {
-  const activityTypes = {
-    [EventType.TECH]: 'Technical',
-    [EventType.CULTURAL]: 'Cultural',
-    [EventType.SPORTS]: 'Sports',
-    [EventType.GENERAL]: 'General'
-  };
-  return activityTypes[type] || 'General';
+  return EventType[type].toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
 };
 
 // Helper function to get chip color based on activity type
@@ -44,7 +39,7 @@ const getChipColor = (type: EventType): string => {
     [EventType.SPORTS]: '#1976d2',    // Blue
     [EventType.GENERAL]: '#9c27b0'    // Purple
   };
-  return typeColors[type] || typeColors[EventType.GENERAL];
+  return typeColors[getBaseEventType(type)] || typeColors[EventType.GENERAL];
 };
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 0 }) => {
