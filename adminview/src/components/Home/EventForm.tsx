@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 
 import { EventType } from '@common/constants';
 import { Event } from '@common/models';
+import { ActivityButton } from './ActivityButton';
 
 const EventTypeInput = styled(Box)`
   position: absolute; bottom: 0; left: 0;
@@ -454,6 +455,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
               )}
             </Button>
           </Box>
+
+          {event && <ActivityButton eventId={event.id} />}
         </Box>
       </Paper>
     </Suspense>

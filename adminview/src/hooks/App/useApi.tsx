@@ -86,29 +86,29 @@ export const EventsApi = {
 export const ActivitiesApi = {
   // Get all activities for an event
   getByEventId: (eventId: string) => 
-    apiFetch<Activity[]>(`/events/${eventId}/activities`),
+    apiFetch<Activity[]>(`/activities/${eventId}`),
     
   // Get specific activity by ID
   getById: (eventId: string, activityId: string) => 
-    apiFetch<Activity>(`/events/${eventId}/activities/${activityId}`),
+    apiFetch<Activity>(`/activities/${eventId}/${activityId}`),
     
   // Create a new activity for an event
   create: (eventId: string, activityData: Omit<Activity, 'id'>) => 
-    apiFetch<Activity>(`/events/${eventId}/activities`, {
+    apiFetch<Activity>(`/activities/${eventId}`, {
       method: 'POST',
       body: JSON.stringify(activityData),
     }),
     
   // Update an existing activity
   update: (eventId: string, activityId: string, activityData: Partial<Activity>) => 
-    apiFetch<Activity>(`/events/${eventId}/activities/${activityId}`, {
+    apiFetch<Activity>(`/activities/${eventId}/${activityId}`, {
       method: 'PATCH',
       body: JSON.stringify(activityData),
     }),
     
   // Delete an activity
   delete: (eventId: string, activityId: string) => 
-    apiFetch<void>(`/events/${eventId}/activities/${activityId}`, {
+    apiFetch<void>(`/activities/${eventId}/${activityId}`, {
       method: 'DELETE',
     }),
 };

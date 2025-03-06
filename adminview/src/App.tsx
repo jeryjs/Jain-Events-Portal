@@ -3,16 +3,17 @@ import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import HomePage from './pages/HomePage';
+import ActivitiesPage from './pages/ActivitiesPage';
 import ArticlesPage from './pages/ArticlesPage';
 
 // Create a theme with primary and secondary colors
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#000', // Dark blue
+      main: '#000',
     },
     secondary: {
-      main: '#2e7d32', // Dark green
+      main: '#2e7d32',
     },
     background: {
       default: '#f5f7fa',
@@ -66,6 +67,9 @@ const App = () => {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/:eventId" element={<HomePage />} />
+              <Route path="/events" element={<HomePage />} />
+              <Route path="/events/:eventId/activities" element={<ActivitiesPage />} />
+              <Route path="/events/:eventId/activities/:activityId" element={<ActivitiesPage />} />
               <Route path="/articles" element={<ArticlesPage />} />
               <Route path="/articles/:articleId" element={<ArticlesPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
