@@ -436,6 +436,7 @@ const InningsDetails = ({ innings, inningsIndex, teams, players, game, updateGam
           innings={innings}
           game={game}
           selectedBatsman={selectedBatsman}
+          setSelectedBatsman={setSelectedBatsman}
           updateGameData={updateGameData}
         />
       </Grid>
@@ -524,7 +525,7 @@ const BatsmenPanel = ({ teamName, teamId, teamPlayers, inningsIndex, game, selec
 };
 
 // Bowlers Panel Component
-const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, game, selectedBatsman, updateGameData }) => {
+const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, game, selectedBatsman, setSelectedBatsman, updateGameData }) => {
   const [popoverAnchorEl, setPopoverAnchorEl] = useState<HTMLElement | null>(null);
   const [currentBowler, setCurrentBowler] = useState<string | null>(null);
   const [currentOverIndex, setCurrentOverIndex] = useState<number | null>(null);
@@ -548,6 +549,7 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
 
     const over = innings.overs[overIndex];
 
+    setSelectedBatsman(ball.batsmanId);
     setCurrentBowler(over.bowlerId);
     setCurrentOverIndex(overIndex);
     setCurrentBallIndex(ballIndex);
