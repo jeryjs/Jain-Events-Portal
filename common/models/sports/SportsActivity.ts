@@ -93,12 +93,20 @@ export class Cricket {
 		return scoreByOver;
 	}
 
-	getWicketCount(teamId: string): number {
-		const innings = this.innings.find((i) => i.battingTeam === teamId);
-		if (!innings) return 0;
+	getWicketCount(teamId?: string): number {
+		if (teamId) {
+			const innings = this.innings.find((i) => i.battingTeam === teamId);
+			if (!innings) return 0;
 
-		return innings.overs.reduce((wickets, over) => {
-			return wickets + over.balls.filter((ball) => ball.type === "W").length;
+			return innings.overs.reduce((wickets, over) => {
+				return wickets + over.balls.filter((ball) => ball.type === "W").length;
+			}, 0);
+		}
+
+		return this.innings.reduce((totalWickets, inning) => {
+			return totalWickets + inning.overs.reduce((wickets, over) => {
+				return wickets + over.balls.filter((ball) => ball.type === "W").length;
+			}, 0);
 		}, 0);
 	}
 }
@@ -298,7 +306,7 @@ class SportsActivity<T extends Sport> extends Activity {
 		if (this.game instanceof Cricket) return `${this.game.getWicketCount(teamId)}`;
 		// if (this.game instanceof Football) return `${this.game.getYellowCardCount(teamId)} Yellow Cards`;
 		// if (this.game instanceof Basketball) return `${this.game.getFoulCount(teamId)} Fouls`;
-		return null;
+		return '';
 	}
 
 	// Get match result - winner, draw or ongoing
