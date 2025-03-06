@@ -6,7 +6,7 @@ export class Cricket {
 	tossWinner: {
 		teamId: string;
 		choice: "bat" | "bowl";
-	};
+	} = {} as any;
 	innings: {
 		bowlingTeam: string;
 		battingTeam: string;

@@ -1,6 +1,8 @@
 import db from '@config/firebase';
 import { v4 as uuidv4 } from 'uuid';
-import { cache, TTL } from '@config/cache';
+import { cache, TTL, updateCache } from '@config/cache';
+import { Activity } from '@common/models';
+import { parseActivities } from '@common/utils';
 
 // Collection references
 const eventsCollection = db.collection('events');
@@ -15,15 +17,11 @@ export const getActivities = async (eventId: string) => {
 
     if (cachedActivities) {
         console.log(`📦 Serving cached activities for event ${eventId}`);
-        return cachedActivities;
+        return cachedActivities as Activity[];
     }
 
     const snapshot = await activitiesCollection(eventId).get();
-    const activities = snapshot.docs.map(doc => ({
-        id: doc.id,
-        eventId,
-        ...doc.data()
-    }));
+    const activities = parseActivities(snapshot.docs.map(doc => doc.data()));
 
     cache.set(cacheKey, activities, TTL.ACTIVITIES);
 
@@ -39,19 +37,14 @@ export const getActivityById = async (eventId: string, activityId: string) => {
 
     if (cachedActivity) {
         console.log(`📦 Serving cached activity ${activityId}`);
-        return cachedActivity;
+        return cachedActivity as Activity;
     }
 
     const doc = await activitiesCollection(eventId).doc(activityId).get();
     
     if (!doc.exists) return null;
 
-    const activityData = {
-        id: doc.id,
-        eventId,
-        ...doc.data()
-    };
-
+    const activityData = Activity.parse(doc.data());
     cache.set(cacheKey, activityData, TTL.ACTIVITIES);
     
     return activityData;
@@ -72,12 +65,9 @@ export const createActivity = async (eventId: string, activityData: any) => {
     
     const { id, eventId: _, ...dataToStore } = activityData;
     
-    if (dataToStore.date) {
-        dataToStore.date = dataToStore.date instanceof Date ? 
-            dataToStore.date : new Date(dataToStore.date);
-    }
-    
     await activityDoc.set(dataToStore);
+
+    updateActivitiesCache(eventId, activityId, dataToStore);
     
     return {
         id: activityId,
@@ -97,19 +87,13 @@ export const updateActivity = async (eventId: string, activityId: string, activi
     
     const { id, eventId: _, ...dataToUpdate } = activityData;
     
-    if (dataToUpdate.date) {
-        dataToUpdate.date = dataToUpdate.date instanceof Date ? 
-            dataToUpdate.date : new Date(dataToUpdate.date);
-    }
-    
     await activityDoc.update(dataToUpdate);
     
     const updatedDoc = await activityDoc.get();
-    return {
-        id: activityId,
-        eventId,
-        ...updatedDoc.data()
-    };
+    
+    updateActivitiesCache(eventId, activityId, updatedDoc.data());
+
+    return updatedDoc.data();
 };
 
 /**
@@ -124,3 +108,20 @@ export const deleteActivity = async (eventId: string, activityId: string) => {
     await activityDoc.delete();
     return true;
 };
+
+
+// cache utility function
+const updateActivitiesCache = (eventId: string, activityId: string, data: any) => {
+    const cacheKey = `activities-${eventId}`;
+    const cachedActivities = (cache.get(cacheKey) || []) as Activity[];
+
+    const updatedActivities = cachedActivities.map(activity => {
+        if (activity.id === activityId) {
+            return { ...activity, ...data };
+        }
+        return activity;
+    });
+
+    cache.set(`${cacheKey}-${activityId}`, data, TTL.ACTIVITIES);
+    cache.set(cacheKey, updatedActivities, TTL.ACTIVITIES);
+}
