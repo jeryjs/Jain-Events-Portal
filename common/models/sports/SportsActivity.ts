@@ -3,6 +3,10 @@ import Activity from "../Activity";
 import SportsPlayer from "./SportsPlayer";
 
 export class Cricket {
+	tossWinner: {
+		teamId: string;
+		choice: "bat" | "bowl";
+	};
 	innings: {
 		bowlingTeam: string;
 		battingTeam: string;
