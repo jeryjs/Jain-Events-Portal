@@ -89,7 +89,7 @@ export const SportsView = ({ activity }: { activity: SportsActivity<Sport> }) =>
     return (
         <Box sx={{ mb: 4 }}>
             {/* Sport Header */}
-            <Paper
+            {/* <Paper
                 elevation={0}
                 sx={{
                     p: 3,
@@ -128,7 +128,7 @@ export const SportsView = ({ activity }: { activity: SportsActivity<Sport> }) =>
                         />
                     </Grid>
                 </Grid>
-            </Paper>
+            </Paper> */}
 
             {/* Teams Section with VS Display */}
             <TeamComparisonCard activity={activity} />
@@ -235,7 +235,7 @@ const TeamComparisonCard = ({ activity }: { activity: SportsActivity<Sport> }) =
                             secondaryStat={secondaryStat2}
                             isWinner={winnerId === team2.id}
                             align={isMobile ? 'center' : 'right'}
-                            color="secondary"
+                            color="primary"
                         />
                     </Grid>
                 </Grid>
@@ -289,7 +289,7 @@ const TeamDisplay = ({ team, activity, score, secondaryStat, isWinner, align, co
                     <Avatar
                         key={player.usn || idx}
                         alt={player.name}
-                        src={`https://i.pravatar.cc/150?u=${player.usn || idx}`}
+                        src={`https://eu.ui-avatars.com/api/?name=${player.name || idx}&size=50`}
                         sx={{
                             width: 32,
                             height: 32,

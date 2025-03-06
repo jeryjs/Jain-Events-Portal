@@ -74,21 +74,8 @@ function ActivityPage() {
   return (
     <PageTransition>
       <Container maxWidth="lg" sx={{ py: 4, color: 'text.primary' }}>
-        {/* Activity Header with Back Button */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <IconButton
-            onClick={handleBack}
-            sx={{ mr: 2, bgcolor: 'background.paper', boxShadow: 1 }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h4" component="h1" fontWeight="bold">
-            {activity.name}
-          </Typography>
-        </Box>
-
         {/* Activity Hero Section */}
-        <ActivityHero activity={activity} baseType={baseType} />
+        <ActivityHero activity={activity} baseType={baseType} handleBack={handleBack} />
 
         {/* Activity Content Based on Type */}
         {baseType === EventType.SPORTS && (
@@ -113,7 +100,7 @@ function ActivityPage() {
 }
 
 // Activity Header Component
-const ActivityHero = ({ activity, baseType }) => {
+const ActivityHero = ({ activity, baseType, handleBack }) => {
   // Get appropriate background color based on activity type
   const getBgColor = (type) => {
     switch (type) {
@@ -133,50 +120,82 @@ const ActivityHero = ({ activity, baseType }) => {
   };
 
   return (
-    <HeroContainer>
+    <HeroContainer
+      sx={{
+      bgcolor: (theme) => theme.palette.background.default,
+      // color: (theme) => theme.palette.primary.contrastText,
+      boxShadow: (theme) => `0 10px 30px ${alpha(theme.palette.primary.dark, 0.3)}`,
+      }}
+    >
+      {/* Activity Header with Back Button */}
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, color: 'inherit' }}>
+      <IconButton
+        onClick={handleBack}
+        sx={{
+        mr: 2,
+        bgcolor: (theme) => alpha(theme.palette.background.paper, 0.2),
+        boxShadow: 1,
+        color: 'inherit',
+        '&:hover': {
+          bgcolor: (theme) => alpha(theme.palette.background.paper, 0.3),
+        },
+        }}
+      >
+        <ArrowBackIcon />
+      </IconButton>
+      <Typography variant="h5" component="h1" fontWeight="bold" color="inherit">
+        {activity.name}
+      </Typography>
+      </Box>
+
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <Box>
-          <HeaderChip
-            label={getActivityTypeLabel(activity.eventType)}
-            sx={{ bgcolor: getBgColor(baseType) }}
-          />
-          <Box sx={{ mt: 2 }}>
-            <InfoIconWrapper>
-              <CalendarTodayIcon />
-              <Typography variant="body1">
-                {activity.startTime.toLocaleDateString('en-US', {
-                  weekday: 'short',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: true,
-                })}
-              </Typography>
-            </InfoIconWrapper>
-            <InfoIconWrapper>
-              <PeopleIcon />
-              {activity.participants?.length > 0 && (
-                <Box>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>{activity.participants?.length || 0} Participants</Typography>
-                  <AvatarGroup max={5}>
-                    {activity.participants.map((participant, i) => (
-                      <ParticipantAvatar
-                        key={participant.usn || i}
-                        alt={participant.name}
-                        // src={`https://i.pravatar.cc/150?u=${participant.usn || i}`}
-                        // src={`https://robohash.org/${participant.usn || i}?set=set3&size=150`}
-                        src={`https://eu.ui-avatars.com/api/?name=${participant.name || i}&size=50`}
-                        // src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${participant.usn || i}`}
-                        // src={`https://www.gravatar.com/avatar/${window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(participant.usn || i + "@jainuniversity.ac.in"))}?s=150&d=identicon`}
-                      />
-                    ))}
-                  </AvatarGroup>
-                </Box>
-              )}
-            </InfoIconWrapper>
+      <Box>
+        <HeaderChip
+        label={getActivityTypeLabel(activity.eventType)}
+        sx={{
+          bgcolor: (theme) => theme.palette.background.paper,
+          color: getBgColor(baseType),
+          fontWeight: 'bold',
+        }}
+        />
+        <Box sx={{ mt: 2, color: 'inherit' }}>
+        <InfoIconWrapper sx={{ color: 'inherit' }}>
+          <CalendarTodayIcon sx={{ color: 'inherit' }} />
+          <Typography variant="body2" color="inherit">
+          {activity.startTime.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          })}
+          </Typography>
+        </InfoIconWrapper>
+        <InfoIconWrapper sx={{ color: 'inherit' }}>
+          <PeopleIcon sx={{ color: 'inherit' }} />
+          {activity.participants?.length > 0 && (
+          <Box>
+            <Typography variant="subtitle2" sx={{ mb: 0.5 }} color="inherit">
+            {activity.participants?.length || 0} Participants
+            </Typography>
+            <AvatarGroup max={5}>
+            {activity.participants.map((participant, i) => (
+              <ParticipantAvatar
+              key={participant.usn || i}
+              alt={participant.name}
+              src={`https://eu.ui-avatars.com/api/?name=${participant.name || i}&size=50`}
+              sx={{
+                borderColor: getBgColor(baseType),
+              }}
+              />
+            ))}
+            </AvatarGroup>
           </Box>
+          )}
+        </InfoIconWrapper>
         </Box>
+      </Box>
       </Box>
     </HeroContainer>
   );

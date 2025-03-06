@@ -41,7 +41,7 @@ export const CulturalsView = ({ activity }) => {
                 <Avatar 
                   sx={{ width: 80, height: 80, mb: 2 }}
                   alt={participant.name}
-                  src={`https://i.pravatar.cc/150?u=${participant.usn || idx}`}
+                  src={`https://eu.ui-avatars.com/api/?name=${participant.name}&size=50`}
                 />
                 <Typography variant="h6" align="center">{participant.name}</Typography>
                 <Chip 

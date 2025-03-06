@@ -60,8 +60,8 @@ const PlayersTab = ({ activity }) => {
                   width: 24,
                   height: 24,
                   borderRadius: '50%',
-                  bgcolor: idx === 0 ? theme.palette.primary.main : theme.palette.secondary.main,
-                  color: '#fff',
+                  bgcolor: theme.palette.primary.dark,
+                  color: theme.palette.primary.contrastText,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -87,14 +87,14 @@ const PlayersTab = ({ activity }) => {
                     width: 32,
                     height: 32,
                     borderRadius: '50%',
-                    bgcolor: selectedTeamIndex === 0 ? theme.palette.primary.main : theme.palette.secondary.main,
+                    bgcolor: theme.palette.primary.dark,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     mr: 1
                   }}
                 >
-                  <Typography variant="body2" sx={{ color: '#fff', fontWeight: 'bold' }}>
+                  <Typography variant="body2" sx={{ color: theme.palette.primary.contrastText, fontWeight: 'bold' }}>
                     {selectedTeam.name.charAt(0)}
                   </Typography>
                 </Box>
@@ -118,7 +118,7 @@ const PlayersTab = ({ activity }) => {
                   >
                     <ListItemAvatar>
                       <Avatar 
-                        src={`https://i.pravatar.cc/150?u=${player.usn || idx}`}
+                        src={`https://eu.ui-avatars.com/api/?name=${player.name || idx}&size=50`}
                         alt={player.name}
                         sx={{
                           width: 48,

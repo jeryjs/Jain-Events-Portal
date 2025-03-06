@@ -46,37 +46,28 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
               </Typography>
 
               {activity.teams.map(team => {
-                const totalPoints = game.getTotalPoints(team.id);
+                const totalPoints = game.getTotalPoints();
+                const teamPoints = game.getTotalPoints(team.id);
                 return (
-                  <Box
-                    key={team.id}
-                    sx={{
-                      mb: 2,
-                      p: 2,
-                      borderRadius: 1,
-                      bgcolor: theme.palette.grey[50]
-                    }}
-                  >
+                  <Box key={team.id} sx={{ mb: 2, p: 2, borderRadius: 1 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                       <Typography variant="body1" fontWeight="medium">
                         {team.name}
                       </Typography>
                       <Typography variant="h6" fontWeight="bold">
-                        {totalPoints} pts
+                        {teamPoints} pts
                       </Typography>
                     </Box>
 
                     <LinearProgress
                       variant="determinate"
-                      value={totalPoints > 0 ? 100 : 0}
+                      value={totalPoints > 0 ? (teamPoints / totalPoints) * 100 : 0}
                       sx={{
                         height: 8,
                         borderRadius: 1,
-                        bgcolor: theme.palette.grey[200],
+                        bgcolor: theme.palette.divider,
                         '& .MuiLinearProgress-bar': {
-                          bgcolor: team.id === activity.teams[0].id
-                            ? theme.palette.primary.main
-                            : theme.palette.secondary.main
+                          bgcolor: theme.palette.primary.main
                         }
                       }}
                     />
@@ -112,7 +103,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Avatar
-                        src={`https://i.pravatar.cc/150?u=${scorer.playerId}`}
+                        src={`https://eu.ui-avatars.com/api/?name=${player.name || idx}&size=50`}
                         alt={player.name}
                         sx={{ width: 32, height: 32, mr: 1 }}
                       />
@@ -140,7 +131,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Team Contribution
+                Points Contribution
               </Typography>
 
               {activity.teams.map(team => {
@@ -171,7 +162,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                           <LinearProgress
                             variant="determinate"
                             value={contribution.percentage}
-                            color={team.id === activity.teams[0].id ? "primary" : "secondary"}
+                            color="primary"
                             sx={{ height: 6, borderRadius: 1 }}
                           />
                         </Box>

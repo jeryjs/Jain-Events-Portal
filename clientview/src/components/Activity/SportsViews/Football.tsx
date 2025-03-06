@@ -41,7 +41,6 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                         sx={{
                           p: 2,
                           borderRadius: 1,
-                          bgcolor: theme.palette.grey[50],
                         }}
                       >
                         <Typography variant="body1" fontWeight="medium" gutterBottom>
@@ -125,7 +124,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Avatar
-                        src={`https://i.pravatar.cc/150?u=${scorer.playerId}`}
+                        src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
                         alt={player.name}
                         sx={{ width: 32, height: 32, mr: 1 }}
                       />
@@ -176,7 +175,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Avatar
-                        src={`https://i.pravatar.cc/150?u=${assist.playerId}`}
+                        src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
                         alt={player.name}
                         sx={{ width: 32, height: 32, mr: 1 }}
                       />
@@ -296,7 +295,7 @@ const PlayersTab = ({ activity }) => {
   );
 };
 
-// Scoreboard component (formerly Statistics)
+// Scoreboard component
 const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, game: Football }) => {
   return (
     <Grid container spacing={3}>

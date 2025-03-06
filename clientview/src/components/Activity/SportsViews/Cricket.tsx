@@ -2,7 +2,7 @@ import { Cricket, SportsActivity } from "@common/models";
 import { Sport } from "@common/models/sports/SportsActivity";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SportsCricketIcon from '@mui/icons-material/SportsCricket';
-import LooksTwoIcon from '@mui/icons-material/LooksTwo';
+import LooksFourIcon from '@mui/icons-material/Looks4Outlined';
 import Filter6Icon from '@mui/icons-material/Filter6';
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import {
@@ -103,7 +103,6 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                       mb: 2,
                       p: 1,
                       borderRadius: 1,
-                      bgcolor: theme.palette.grey[50]
                     }}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -146,7 +145,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Avatar
-                        src={`https://i.pravatar.cc/150?u=${scorer.player}`}
+                        src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
                         alt={player.name}
                         sx={{ width: 32, height: 32, mr: 1 }}
                       />
@@ -188,7 +187,6 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                       mb: 2,
                       p: 1,
                       borderRadius: 1,
-                      bgcolor: theme.palette.grey[50]
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -219,7 +217,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
 
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <LooksTwoIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
+                  <LooksFourIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
                   <Typography variant="subtitle1" fontWeight="medium">
                     Top 4s
                   </Typography>
@@ -241,7 +239,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Avatar
-                          src={`https://i.pravatar.cc/150?u=${playerId}`}
+                          src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
                           alt={player.name}
                           sx={{ width: 24, height: 24, mr: 1 }}
                         />
@@ -259,7 +257,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
 
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Filter6Icon sx={{ mr: 1, color: theme.palette.secondary.main }} />
+                  <Filter6Icon sx={{ mr: 1, color: theme.palette.primary.main }} />
                   <Typography variant="subtitle1" fontWeight="medium">
                     Top 6s
                   </Typography>
@@ -281,7 +279,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Avatar
-                          src={`https://i.pravatar.cc/150?u=${playerId}`}
+                          src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
                           alt={player.name}
                           sx={{ width: 24, height: 24, mr: 1 }}
                         />
@@ -346,7 +344,7 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                     sx={{
-                      bgcolor: theme.palette.grey[50],
+                      bgcolor: theme.palette.divider,
                       borderRadius: 1,
                       '&.Mui-expanded': {
                         borderBottomLeftRadius: 0,

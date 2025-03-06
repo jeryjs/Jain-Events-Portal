@@ -72,7 +72,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                           <Avatar
                             key={player.usn || idx}
                             alt={player.name}
-                            src={`https://i.pravatar.cc/150?u=${player.usn || idx}`}
+                            src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
                             sx={{ width: 40, height: 40 }}
                           />
                         ))}
