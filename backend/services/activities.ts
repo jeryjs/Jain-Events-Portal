@@ -1,6 +1,6 @@
 import db from '@config/firebase';
 import { v4 as uuidv4 } from 'uuid';
-import { cache, TTL, updateCache } from '@config/cache';
+import { cache, TTL } from '@config/cache';
 import { Activity } from '@common/models';
 import { parseActivities } from '@common/utils';
 
