@@ -67,7 +67,9 @@ export const createActivity = async (eventId: string, activityData: any) => {
     
     await activityDoc.set(dataToStore);
 
-    updateActivitiesCache(eventId, activityId, dataToStore);
+    // updateActivitiesCache(eventId, activityId, dataToStore);
+    cache.set(`activities-${eventId}-${activityId}`, dataToStore, TTL.ACTIVITIES);
+    cache.del(`activities-${eventId}`);
     
     return {
         id: activityId,
@@ -91,7 +93,9 @@ export const updateActivity = async (eventId: string, activityId: string, activi
     
     const updatedDoc = await activityDoc.get();
     
-    updateActivitiesCache(eventId, activityId, updatedDoc.data());
+    // updateActivitiesCache(eventId, activityId, updatedDoc.data());
+    cache.set(`activities-${eventId}-${activityId}`, updatedDoc.data(), TTL.ACTIVITIES);
+    cache.del(`activities-${eventId}`);
 
     return updatedDoc.data();
 };

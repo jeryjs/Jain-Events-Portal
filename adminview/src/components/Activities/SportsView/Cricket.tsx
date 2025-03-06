@@ -46,7 +46,7 @@ const BALL_TYPES = [
   { value: "NB", label: "No Ball", extraRuns: 1, color: "#ff9800" },
   { value: "B", label: "Bye", extraRuns: 0, color: "#4caf50" },
   { value: "LB", label: "Leg Bye", extraRuns: 0, color: "#4caf50" },
-  { value: "D", label: "Dot", extraRuns: 0, color: "#e0e0e0" }
+  // { value: "D", label: "Dot", extraRuns: 0, color: "#e0e0e0" }
 ];
 
 // Types for props
