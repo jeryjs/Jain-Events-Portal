@@ -15,8 +15,7 @@ if (process.env.VERCEL == "1" || __filename.endsWith(".js")) {
 import "dotenv/config";
 import express, { Request, Response } from "express";
 import cors from "cors";
-// import morgan from 'morgan';
-// import helmet from 'helmet';
+import helmet from 'helmet';
 
 import eventRoutes from "@routes/eventRoutes";
 import activityRoutes from "@routes/activityRoutes";
@@ -25,9 +24,12 @@ import authRoutes from "@routes/authRoutes";
 
 const app = express();
 
-app.use(cors<Request>());
-// app.use(helmet());
-// app.use(morgan('dev'));
+// Middlewares to use only in production
+if (process.env.NODE_ENV !== 'development') {
+    app.use(cors<Request>());
+    app.use(helmet());
+}
+
 app.use(express.json());
 
 app.get("/api", (req: Request, res: Response) => {

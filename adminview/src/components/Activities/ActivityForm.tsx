@@ -1,28 +1,30 @@
-import { useState, useEffect } from 'react';
-import { Box, TextField, FormControl, InputLabel, Select, MenuItem, Button, Paper, Typography, CircularProgress } from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { Box, Button, CircularProgress, FormControl, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
+import { renderTimeViewClock } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Activity, CulturalActivity, SportsActivity } from '@common/models';
-import { EventType } from '@common/constants';
 import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 
-// Views for different activity types
-import { SportsView } from './SportsView';
-import { GeneralView } from './GeneralView';
-import { CulturalsView } from './CulturalsView';
+import { EventType } from '@common/constants';
+import { Activity, CulturalActivity, SportsActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getBaseEventType } from '@common/utils';
-import { renderTimeViewClock } from '@mui/x-date-pickers';
+
+import { CulturalsView } from './CulturalsView';
+import { GeneralView } from './GeneralView';
+import { SportsView } from './SportsView';
 
 interface ActivityFormProps {
     eventId?: string;
     activity: Activity | null;
     isCreating: boolean;
     onSave: (formData: Activity) => Promise<void>;
+    onDelete?: (activityId: string) => Promise<void>;
 }
 
-export const ActivityForm = ({ eventId, activity, isCreating, onSave }: ActivityFormProps) => {
+export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }: ActivityFormProps) => {
     const [formData, setFormData] = useState<Partial<Activity>>({
         id: '',
         name: '',
@@ -91,6 +93,22 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave }: Activity
             console.error('Error saving activity:', error);
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    // Handle delete button click
+    const handleDelete = async () => {
+        if (!activity?.id || !onDelete) return;
+        
+        if (window.confirm('Are you sure you want to delete this activity? This action cannot be undone.')) {
+            setIsSubmitting(true);
+            try {
+                await onDelete(activity.id);
+            } catch (error) {
+                console.error('Error deleting activity:', error);
+            } finally {
+                setIsSubmitting(false);
+            }
         }
     };
 
@@ -166,7 +184,26 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave }: Activity
                 </Box>
 
                 {/* Form Actions */}
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                    {!isCreating && onDelete && (
+                        <Button
+                            variant="outlined"
+                            color="error"
+                            onClick={handleDelete}
+                            disabled={isSubmitting}
+                            startIcon={<DeleteOutlineIcon />}
+                            sx={{ 
+                                borderColor: 'rgba(211, 47, 47, 0.5)', 
+                                color: 'error.main',
+                                '&:hover': {
+                                    backgroundColor: 'rgba(211, 47, 47, 0.04)',
+                                    borderColor: 'error.main'
+                                }
+                            }}
+                        >
+                            Delete
+                        </Button>
+                    )}
                     <Button
                         variant="contained"
                         color="primary"

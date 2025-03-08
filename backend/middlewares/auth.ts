@@ -25,13 +25,14 @@ const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunc
   const token = authHeader.split(' ')[1];
   
   try {
-    // Verify token and attach user data to request
+    // Verify token and extract user data from token
     const decoded = verifyToken(token);
     if (!decoded) {
       res.status(401).json({ message: 'Invalid token' });
       return;
     }
     
+    // Attach user data to request
     req.user = decoded as UserData;
     next();
   } catch (error) {
@@ -52,41 +53,101 @@ const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunc
 /**
  * @description Middleware to authorize user with admin role.
  */
-const adminMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    res.status(401).json({ message: 'Authentication required' });
-    return;
-  }
-  
-  if (req.user.role < Role.ADMIN) {
-    res.status(403).json({ 
-      message: 'Access denied',
-      details: 'This action requires administrator privileges'
+const adminMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // Check for token in Authorization header
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ 
+      message: 'Authentication required', 
+      details: 'Valid Bearer token is required in Authorization header'
     });
     return;
   }
+
+  const token = authHeader.split(' ')[1];
   
-  next();
+  try {
+    // Verify token and extract user data from token
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      res.status(401).json({ message: 'Invalid token' });
+      return;
+    }
+    
+    const user = decoded as UserData;
+
+    if (user.role < Role.ADMIN) {
+      res.status(403).json({ 
+        message: 'Access denied',
+        details: 'This action requires administrator privileges'
+      });
+      return;
+    }
+    
+    next();
+  } catch (error) {
+    // Handle specific token errors
+    if (error instanceof Error) {
+      const message = error.message.includes('expired') 
+        ? 'Token has expired' 
+        : 'Invalid token';
+      
+      res.status(401).json({ message, details: error.message });
+      return;
+    }
+    
+    res.status(401).json({ message: 'Authentication failed' });
+  }
 };
 
 /**
  * @description Middleware to authorize user with manager or higher role.
  */
-const managerMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    res.status(401).json({ message: 'Authentication required' });
-    return;
-  }
-  
-  if (req.user.role < Role.MANAGER) {
-    res.status(403).json({ 
-      message: 'Access denied',
-      details: 'This action requires manager privileges'
+const managerMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // Check for token in Authorization header
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ 
+      message: 'Authentication required', 
+      details: 'Valid Bearer token is required in Authorization header'
     });
     return;
   }
+
+  const token = authHeader.split(' ')[1];
   
-  next();
+  try {
+    // Verify token and extract user data from token
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      res.status(401).json({ message: 'Invalid token' });
+      return;
+    }
+
+    const user = decoded as UserData;
+    
+    if (user.role < Role.MANAGER) {
+      res.status(403).json({ 
+        message: 'Access denied',
+        details: 'This action requires manager privileges'
+      });
+      return;
+    }
+    
+    next();
+  } catch (error) {
+    // Handle specific token errors
+    if (error instanceof Error) {
+      const message = error.message.includes('expired') 
+        ? 'Token has expired' 
+        : 'Invalid token';
+      
+      res.status(401).json({ message, details: error.message });
+      return;
+    }
+    
+    res.status(401).json({ message: 'Authentication failed' });
+  }
 };
 
 /**

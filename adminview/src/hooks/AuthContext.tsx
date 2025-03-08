@@ -20,8 +20,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Check for existing token and user data on initial load
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('admin_token');
-      const userData = localStorage.getItem('admin_user');
+      const token = localStorage.getItem('auth_token');
+      const userData = localStorage.getItem('auth_user');
       
       if (token && userData) {
         try {
@@ -61,8 +61,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { token, userData } = await response.json();
       
       // Store token and user data
-      localStorage.setItem('admin_token', token);
-      localStorage.setItem('admin_user', JSON.stringify(userData));
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_user', JSON.stringify(userData));
       
       setUser(userData);
     } catch (error) {
@@ -74,8 +74,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     // Remove token and user data
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_user');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
     
     setUser(null);
   };

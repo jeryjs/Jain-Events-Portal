@@ -105,11 +105,12 @@ export const updateActivity = async (eventId: string, activityId: string, activi
  */
 export const deleteActivity = async (eventId: string, activityId: string) => {
     const activityDoc = activitiesCollection(eventId).doc(activityId);
-    const doc = await activityDoc.get();
     
-    if (!doc.exists) return false;
-    
-    await activityDoc.delete();
+    await activityDoc.delete();    
+
+    cache.del(`activities-${eventId}-${activityId}`); 
+    cache.del(`activities-${eventId}`);
+
     return true;
 };
 

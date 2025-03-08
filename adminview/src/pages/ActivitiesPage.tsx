@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Box, Typography, Container, Paper, Grid, Card, IconButton, Breadcrumbs, CircularProgress, Alert, Snackbar } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useEventActivities, useCreateActivity, useUpdateActivity } from '@hooks/App';
+import { useEventActivities, useCreateActivity, useUpdateActivity, useDeleteActivity } from '@hooks/App';
 import { ActivitiesList } from '@components/Activities/ActivitiesList';
 import { Activity } from '@common/models';
 import { ActivityForm } from '@components/Activities';
@@ -20,6 +20,7 @@ const ActivitiesPage = () => {
     // Mutations
     const createMutation = useCreateActivity(eventId);
     const updateMutation = useUpdateActivity(eventId);
+    const deleteMutation = useDeleteActivity(eventId);
     
     // Set isCreating based on URL and find selected activity from activities array
     useEffect(() => {
@@ -66,6 +67,30 @@ const ActivitiesPage = () => {
             }
         } catch (err) {
             setError(`Failed to ${isCreating ? 'create' : 'update'} activity: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        }
+    };
+
+    // Handle delete activity
+    const handleDeleteActivity = async (activityId: string) => {
+        try {
+            setError(null);
+            await deleteMutation.mutateAsync(activityId);
+            // Navigate back to the activities list after deletion
+            setSelectedActivity(null);
+            navigate(`/events/${eventId}/activities`);
+        } catch (err) {
+            console.error('Delete activity error:', err);
+            let errorMessage = 'Failed to delete activity';
+            
+            if (err instanceof Error) {
+                if (err.message.includes('401') || err.message.includes('authorized')) {
+                    errorMessage = `Not authorized to delete this activity. Please check your permissions or log in again.`;
+                } else {
+                    errorMessage = `Failed to delete activity: ${err.message}`;
+                }
+            }
+            
+            setError(errorMessage);
         }
     };
     
@@ -178,6 +203,7 @@ const ActivitiesPage = () => {
                                 activity={isCreating ? null : selectedActivity}
                                 isCreating={isCreating}
                                 onSave={handleSaveActivity}
+                                onDelete={handleDeleteActivity}
                             />
                         </Box>
                     )}

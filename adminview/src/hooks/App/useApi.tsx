@@ -4,67 +4,64 @@ import config from '#config';
 
 const API_BASE_URL = config.API_BASE_URL;
 
-// Interface for API error response
-interface ApiError {
-  status: number;
-  message: string;
-  details?: any;
-}
-
 /**
- * Custom fetch wrapper that handles common API patterns
+ * Base fetch function for API calls with authentication
  */
-async function apiFetch<T>(
-  endpoint: string, 
-  options: RequestInit = {}
-): Promise<T> {
-  const url = `${API_BASE_URL}${endpoint}`;
-  
-  // Get auth token from localStorage
-  const token = localStorage.getItem('admin_token');
-  
-  // Set default headers
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-    ...options.headers,
-  };
-  
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
-  
-  // Handle auth errors specifically
-  if (response.status === 401 || response.status === 403) {
-    // Clear invalid tokens
-    if (response.status === 401) {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
-    }
+async function apiFetch<T>(url: string, options: RequestInit = {}) {
+  try {
+    // Get authentication token from storage or context
+    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
     
-    const error: ApiError = {
-      status: response.status,
-      message: response.status === 401 ? 'Authentication required' : 'Access denied',
+    // Ensure headers object exists
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+      ...options.headers,
     };
+    
+    // Create fetch options, but ensure we don't use include for credentials
+    // which would cause CORS errors with wildcard origins
+    const fetchOptions: RequestInit = {
+      ...options,
+      headers,
+      // Use 'same-origin' instead of 'include' for credentials
+      credentials: 'same-origin',
+    };
+
+    const response = await fetch(`${API_BASE_URL}${url}`, fetchOptions);
+
+    if (!response.ok) {
+      // Handle authentication errors specifically
+      if (response.status === 401) {
+        // Optional: Trigger auth refresh or redirect to login
+        console.error('Authentication error: Not authorized to perform this action');
+        throw new Error('You are not authorized to perform this action. Please log in again.');
+      }
+      
+      const errorText = await response.text();
+      let errorMessage;
+      
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.message || errorData.error || `Error ${response.status}: ${response.statusText}`;
+      } catch {
+        errorMessage = `Error ${response.status}: ${response.statusText}`;
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    // For DELETE requests, responses might be empty
+    if (response.status === 204 || response.headers.get('Content-Length') === '0') {
+      return { success: true };
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API fetch error:', error);
     throw error;
   }
-  
-  // Handle JSON parsing
-  const data = await response.json();
-  
-  // Handle error responses
-  if (!response.ok) {
-    const error: ApiError = {
-      status: response.status,
-      message: data.message || 'An unknown error occurred',
-      details: data.details,
-    };
-    throw error;
-  }
-  
-  return data;
-}
+};
 
 /**
  * Events API endpoints
@@ -126,10 +123,11 @@ export const ActivitiesApi = {
     }),
     
   // Delete an activity
-  delete: (eventId: string, activityId: string) => 
-    apiFetch<void>(`/activities/${eventId}/${activityId}`, {
+  delete: async (eventId: string, activityId: string) => {
+    return apiFetch(`/activities/${eventId}/${activityId}`, {
       method: 'DELETE',
-    }),
+    });
+  },
 };
 
 // Article API endpoints
