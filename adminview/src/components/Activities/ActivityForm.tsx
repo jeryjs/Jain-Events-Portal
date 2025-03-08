@@ -1,5 +1,5 @@
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Box, Button, CircularProgress, FormControl, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, FormControl, Grid, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
 import { renderTimeViewClock } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -30,6 +30,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
         name: '',
         eventType: EventType.GENERAL,
         startTime: new Date(),
+        endTime: undefined,  // Add endTime field with default undefined
         participants: [],
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,6 +47,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                 name: '',
                 eventType: EventType.GENERAL,
                 startTime: new Date(),
+                endTime: undefined,
                 participants: [],
             });
         }
@@ -164,18 +166,41 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                         {errors.eventType && <Typography color="error">{errors.eventType}</Typography>}
                     </FormControl>
 
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DateTimePicker
-                            label="Start Time"
-                            value={dayjs(formData.startTime)}
-                            onChange={(newValue) => handleChange('startTime', newValue?.toDate() || new Date())}
-                            viewRenderers={{
-                                hours: renderTimeViewClock,
-                                minutes: renderTimeViewClock,
-                            }}
-                            sx={{ mt: 2, width: '100%' }}
-                        />
-                    </LocalizationProvider>
+                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                        <Grid item xs={12} md={6}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DateTimePicker
+                                    label="Start Time"
+                                    value={dayjs(formData.startTime)}
+                                    onChange={(newValue) => handleChange('startTime', newValue?.toDate() || new Date())}
+                                    viewRenderers={{
+                                        hours: renderTimeViewClock,
+                                        minutes: renderTimeViewClock,
+                                    }}
+                                    sx={{ width: '100%' }}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DateTimePicker
+                                    label="End Time"
+                                    value={formData.endTime ? dayjs(formData.endTime) : null}
+                                    onChange={(newValue) => handleChange('endTime', newValue?.toDate())}
+                                    viewRenderers={{
+                                        hours: renderTimeViewClock,
+                                        minutes: renderTimeViewClock,
+                                    }}
+                                    slotProps={{
+                                        textField: {
+                                            helperText: "Fill after activity has ended (if applicable)",
+                                        },
+                                    }}
+                                    sx={{ width: '100%' }}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+                    </Grid>
                 </Box>
 
                 {/* Activity Type Specific View */}

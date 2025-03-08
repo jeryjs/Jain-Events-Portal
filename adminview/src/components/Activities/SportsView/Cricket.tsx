@@ -39,8 +39,8 @@ import { Cricket, Sport } from '@common/models/sports/SportsActivity';
 // Ball type options for cricket
 const BALL_TYPES = [
   { value: "0", label: "Normal", extraRuns: 0, color: "#e0e0e0" },
-  { value: "4", label: "Four", extraRuns: 4, color: "#2196f3" },
-  { value: "6", label: "Six", extraRuns: 6, color: "#9c27b0" },
+  { value: "4", label: "Four", runs: 4, extraRuns: 0, color: "#2196f3" },
+  { value: "6", label: "Six", runs: 6, extraRuns: 0, color: "#9c27b0" },
   { value: "W", label: "Wicket", extraRuns: 0, color: "#f44336" },
   { value: "WD", label: "Wide", extraRuns: 1, color: "#ff9800" },
   { value: "NB", label: "No Ball", extraRuns: 1, color: "#ff9800" },
@@ -576,6 +576,7 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
     setBallDetails({
       ...ballDetails,
       type,
+      runs: ballType?.runs || ballDetails.runs,
       extraRuns: ballType?.extraRuns || 0
     });
   }, [ballDetails]);

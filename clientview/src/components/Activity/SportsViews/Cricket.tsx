@@ -78,227 +78,507 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
 
   const { topFours, topSixes } = calculateBoundaries();
 
+  // Get current match status
+  const getMatchStatus = () => {
+    const now = new Date();
+    const isMatchEnded = activity.endTime && new Date(activity.endTime) < now;
+
+    if (isMatchEnded) {
+      // Match has ended
+      const winner = determineWinner();
+      return {
+        isComplete: true,
+        winner
+      };
+    } else if (!game.innings || game.innings.length === 0) {
+      return "Match not started";
+    } else {
+      const currentInnings = game.innings[game.innings.length - 1];
+      const battingTeam = activity.teams.find(t => t.id === currentInnings.battingTeam);
+      const bowlingTeam = activity.teams.find(t => t.id === currentInnings.bowlingTeam);
+
+      const totalOvers = currentInnings.overs.length;
+      const ballsInLastOver = currentInnings.overs.length > 0
+        ? currentInnings.overs[currentInnings.overs.length - 1].balls.length
+        : 0;
+
+      const oversPlayed = totalOvers + (ballsInLastOver / 6);
+
+      return {
+        currentInnings: game.innings.length,
+        battingTeam,
+        bowlingTeam,
+        oversPlayed: oversPlayed.toFixed(1),
+        isComplete: false
+      };
+    }
+  };
+
+  // Determine the winner of the match
+  const determineWinner = () => {
+    if (!game.innings || game.innings.length === 0) return null;
+
+    // Get scores for each team
+    const scores = activity.teams.map(team => ({
+      team,
+      runs: game.getTotalRuns(team.id),
+      wickets: game.getWicketCount(team.id)
+    })).sort((a, b) => b.runs - a.runs); // Sort by runs (highest first)
+
+    // If tie, return both teams
+    if (scores.length >= 2 && scores[0].runs === scores[1].runs) {
+      return { isTie: true, teams: [scores[0].team, scores[1].team] };
+    }
+
+    // Return winner
+    return { isTie: false, team: scores[0].team, margin: `${scores[0].runs - scores[1].runs} runs` };
+  };
+
+  const matchStatus = getMatchStatus();
+
   return (
     <Box>
       <Grid container spacing={3}>
-        {/* Match Summary Section */}
+        {/* Match Status Section - Replaced and Enhanced */}
         <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Match Summary
+          <Card sx={{
+            overflow: 'hidden',
+            borderRadius: 2,
+            boxShadow: theme.shadows[3],
+            backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url(https://img.freepik.com/free-vector/cricket-stadium-background_1017-8014.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            position: 'relative'
+          }}>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                bgcolor: typeof matchStatus === 'string' 
+                  ? 'info.main' 
+                  : matchStatus.isComplete ? 'error.main' : 'success.main',
+                color: 'white',
+                px: 2,
+                py: 0.5,
+                borderBottomRightRadius: 8
+              }}
+            >
+              {typeof matchStatus === 'string' 
+                ? 'UPCOMING' 
+                : matchStatus.isComplete 
+                  ? 'COMPLETED' 
+                  : `INNINGS ${matchStatus.currentInnings}`}
+            </Box>
+
+            <CardContent sx={{ pt: 5 }}>
+              <Typography variant="h5" gutterBottom fontWeight="bold" color="primary.main">
+                Match Status
               </Typography>
 
-              {activity.teams.map(team => {
-                const teamScore = game.getTotalRuns(team.id);
-                const wickets = game.getWicketCount(team.id);
+              {typeof matchStatus === 'string' ? (
+                <Box sx={{ textAlign: 'center', py: 2 }}>
+                  <Typography variant="h6">{matchStatus}</Typography>
+                  <Typography variant="body2" color="text.secondary">The match will start at {new Date(activity.startTime).toLocaleString()}</Typography>
+                </Box>
+              ) : matchStatus.isComplete ? (
+                <Box>
+                  {/* Match Result Display */}
+                  <Box sx={{ 
+                    textAlign: 'center', 
+                    py: 2,
+                    mb: 3,
+                    bgcolor: 'rgba(0,0,0,0.03)',
+                    borderRadius: 2,
+                    border: '1px solid',
+                    borderColor: 'divider'
+                  }}>
+                    <Typography variant="h6" color="error.main" gutterBottom fontWeight="bold">
+                      MATCH COMPLETED
+                    </Typography>
+                    
+                    {matchStatus.winner && (
+                      matchStatus.winner.isTie ? (
+                        <Typography variant="body1" fontWeight="medium">
+                          Match Tied
+                        </Typography>
+                      ) : (
+                        <>
+                          <Typography variant="body1" fontWeight="medium">
+                            {matchStatus.winner.team.name} won by {matchStatus.winner.margin}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                            {activity.endTime && `Finished: ${new Date(activity.endTime).toLocaleString()}`}
+                          </Typography>
+                        </>
+                      )
+                    )}
+                  </Box>
+                  
+                  {/* Team Scores - Similar to the in-progress match but with different styling for the winner */}
+                  {activity.teams.map(team => {
+                    const teamScore = game.getTotalRuns(team.id);
+                    const wickets = game.getWicketCount(team.id);
+                    const overs = game.getTeamOvers(team.id);
+                    const runRate = overs > 0 ? (teamScore / overs).toFixed(2) : '-';
+                    const isWinner = matchStatus.winner && !matchStatus.winner.isTie && matchStatus.winner.team.id === team.id;
 
-                return (
-                  <Box
-                    key={team.id}
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      mb: 2,
-                      p: 1,
+                    return (
+                      <Box
+                        key={team.id}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          mb: 2,
+                          p: 2,
+                          borderRadius: 2,
+                          bgcolor: isWinner ? 'rgba(76, 175, 80, 0.08)' : 'background.paper',
+                          border: `1px solid ${isWinner ? theme.palette.success.light : theme.palette.divider}`,
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {isWinner && (
+                          <Box 
+                            sx={{ 
+                              position: 'absolute',
+                              right: 0,
+                              top: 0,
+                              bgcolor: 'success.main',
+                              color: 'white',
+                              fontSize: '0.7rem',
+                              px: 1,
+                              py: 0.25,
+                              borderBottomLeftRadius: 8
+                            }}
+                          >
+                            WINNER
+                          </Box>
+                        )}
+                        
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Avatar sx={{ 
+                            bgcolor: isWinner ? theme.palette.success.main : theme.palette.primary.main,
+                            color: 'white',
+                            width: 40,
+                            height: 40,
+                            mr: 2,
+                            fontWeight: 'bold'
+                          }}>
+                            {team.name.charAt(0)}
+                          </Avatar>
+                          <Box>
+                            <Typography variant="h6" fontWeight="bold">
+                              {team.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              RR: {runRate}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        
+                        <Box sx={{ textAlign: 'right' }}>
+                          <Typography variant="h5" fontWeight="bold" sx={{ lineHeight: 1.2 }}>
+                            {teamScore}/{wickets}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {overs} overs
+                          </Typography>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              ) : (
+                <>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                    <Typography variant="subtitle1" fontWeight="medium">
+                      Current Innings: {matchStatus.currentInnings}
+                    </Typography>
+                    <Typography variant="subtitle1">
+                      Overs: {matchStatus.oversPlayed}
+                    </Typography>
+                  </Box>
+
+                  {activity.teams.map(team => {
+                    const teamScore = game.getTotalRuns(team.id);
+                    const wickets = game.getWicketCount(team.id);
+                    const overs = game.getTeamOvers(team.id);
+                    const runRate = overs > 0 ? (teamScore / overs).toFixed(2) : '-';
+                    const isBatting = matchStatus.battingTeam?.id === team.id;
+
+                    return (
+                      <Box
+                        key={team.id}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          mb: 2,
+                          p: 2,
+                          borderRadius: 2,
+                          bgcolor: isBatting ? 'rgba(76, 175, 80, 0.12)' : 'background.paper',
+                          border: `1px solid ${isBatting ? theme.palette.success.light : theme.palette.divider}`,
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {isBatting && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              right: 0,
+                              top: 0,
+                              bgcolor: 'success.main',
+                              color: 'white',
+                              fontSize: '0.7rem',
+                              px: 1,
+                              py: 0.25,
+                              borderBottomLeftRadius: 8
+                            }}
+                          >
+                            BATTING
+                          </Box>
+                        )}
+
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Avatar sx={{
+                            bgcolor: theme.palette.primary.main,
+                            color: 'white',
+                            width: 40,
+                            height: 40,
+                            mr: 2,
+                            fontWeight: 'bold'
+                          }}>
+                            {team.name.charAt(0)}
+                          </Avatar>
+                          <Box>
+                            <Typography variant="h6" fontWeight="bold">
+                              {team.name}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              RR: {runRate}
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        <Box sx={{ textAlign: 'right' }}>
+                          <Typography variant="h5" fontWeight="bold" sx={{ lineHeight: 1.2 }}>
+                            {teamScore}/{wickets}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {overs > 0 ? `${overs} overs` : 'Yet to bat'}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+
+                  {game.tossWinner && (
+                    <Box sx={{
+                      mt: 2,
+                      p: 1.5,
                       borderRadius: 1,
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Typography variant="body1" fontWeight="medium">
-                        {team.name}
+                      bgcolor: 'rgba(0, 0, 0, 0.03)',
+                      border: '1px dashed',
+                      borderColor: 'divider',
+                      fontSize: '0.9rem'
+                    }}>
+                      <Typography variant="body2">
+                        <strong>{activity.teams.find(t => t.id === game.tossWinner.teamId)?.name}</strong> won the toss and elected to <strong>{game.tossWinner.choice}</strong> first
                       </Typography>
                     </Box>
-                    <Typography variant="body1" fontWeight="bold">
-                      {teamScore}/{wickets}
-                    </Typography>
-                  </Box>
-                );
-              })}
+                  )}
+                </>
+              )}
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Top Batsmen */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Top Scorers
-              </Typography>
+        {typeof matchStatus !== "string" && <>
+          {/* Top Batsmen */}
+          < Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Top Scorers
+                </Typography>
 
-              {game.getTopScorers(5).map((scorer, idx) => {
-                const player = activity.getPlayer(scorer.player);
-                if (!player) return null;
+                {game.getTopScorers(5).map((scorer, idx) => {
+                  const player = activity.getPlayer(scorer.player);
+                  if (!player) return null;
 
-                return (
-                  <Box
-                    key={scorer.player}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 1,
-                      py: 0.5
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Avatar
-                        src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
-                        alt={player.name}
-                        sx={{ width: 32, height: 32, mr: 1 }}
-                      />
-                      <Box>
-                        <Typography variant="body2" fontWeight="bold">
-                          {player.name}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {activity.teams.find(t => t.id === player.teamId)?.name || ''}
-                        </Typography>
+                  return (
+                    <Box
+                      key={scorer.player}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 1,
+                        py: 0.5
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Avatar
+                          src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
+                          alt={player.name}
+                          sx={{ width: 32, height: 32, mr: 1 }}
+                        />
+                        <Box>
+                          <Typography variant="body2" fontWeight="bold">
+                            {player.name}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {activity.teams.find(t => t.id === player.teamId)?.name || ''}
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
-                    <Typography variant="body2" fontWeight="medium">
-                      {scorer.runs} runs
-                    </Typography>
-                  </Box>
-                );
-              })}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Innings Details */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Innings Details
-              </Typography>
-
-              {game.innings.map((inning, idx) => {
-                const battingTeam = activity.teams.find(t => t.id === inning.battingTeam);
-                const bowlingTeam = activity.teams.find(t => t.id === inning.bowlingTeam);
-
-                return (
-                  <Box
-                    key={idx}
-                    sx={{
-                      mb: 2,
-                      p: 1,
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                       <Typography variant="body2" fontWeight="medium">
-                        {battingTeam?.name || ''} batting
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {inning.overs.length} overs
+                        {scorer.runs} runs
                       </Typography>
                     </Box>
-                    <Typography variant="h6" fontWeight="bold">
-                      {game.getTotalRuns(inning.battingTeam)} runs
+                  );
+                })}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Top Boundaries Hitters */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Top Boundary Hitters
+                </Typography>
+
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <LooksFourIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
+                    <Typography variant="subtitle1" fontWeight="medium">
+                      Top 4s
                     </Typography>
                   </Box>
-                );
-              })}
-            </CardContent>
-          </Card>
-        </Grid>
+                  {topFours.map(({ playerId, count }) => {
+                    const player = activity.getPlayer(playerId);
+                    if (!player) return null;
 
-        {/* Top Boundaries Hitters */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Top Boundary Hitters
-              </Typography>
-
-              <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <LooksFourIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-                  <Typography variant="subtitle1" fontWeight="medium">
-                    Top 4s
-                  </Typography>
+                    return (
+                      <Box
+                        key={playerId}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          ml: 4,
+                          mb: 1
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Avatar
+                            src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
+                            alt={player.name}
+                            sx={{ width: 24, height: 24, mr: 1 }}
+                          />
+                          <Typography variant="body2">
+                            {player.name}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" fontWeight="bold">
+                          {count} × 4s
+                        </Typography>
+                      </Box>
+                    );
+                  })}
                 </Box>
-                {topFours.map(({ playerId, count }) => {
-                  const player = activity.getPlayer(playerId);
-                  if (!player) return null;
+
+                <Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <Filter6Icon sx={{ mr: 1, color: theme.palette.primary.main }} />
+                    <Typography variant="subtitle1" fontWeight="medium">
+                      Top 6s
+                    </Typography>
+                  </Box>
+                  {topSixes.map(({ playerId, count }) => {
+                    const player = activity.getPlayer(playerId);
+                    if (!player) return null;
+
+                    return (
+                      <Box
+                        key={playerId}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          ml: 4,
+                          mb: 1
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Avatar
+                            src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
+                            alt={player.name}
+                            sx={{ width: 24, height: 24, mr: 1 }}
+                          />
+                          <Typography variant="body2">
+                            {player.name}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" fontWeight="bold">
+                          {count} × 6s
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+          
+
+          {/* Innings Details */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Innings Details
+                </Typography>
+
+                {game.innings.map((inning, idx) => {
+                  const battingTeam = activity.getTeam(inning.battingTeam);
+                  const bowlingTeam = activity.getTeam(inning.bowlingTeam);
 
                   return (
                     <Box
-                      key={playerId}
+                      key={idx}
                       sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        ml: 4,
-                        mb: 1
+                        mb: 2,
+                        p: 1,
+                        borderRadius: 1,
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Avatar
-                          src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
-                          alt={player.name}
-                          sx={{ width: 24, height: 24, mr: 1 }}
-                        />
-                        <Typography variant="body2">
-                          {player.name}
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="body2" fontWeight="medium">
+                          {battingTeam?.name || ''} batting
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {inning.overs.length} overs
                         </Typography>
                       </Box>
-                      <Typography variant="body2" fontWeight="bold">
-                        {count} × 4s
+                      <Typography variant="h6" fontWeight="bold">
+                        {game.getTotalRuns(inning.battingTeam)} runs
                       </Typography>
                     </Box>
                   );
                 })}
-              </Box>
+              </CardContent>
+            </Card>
+          </Grid>
 
-              <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Filter6Icon sx={{ mr: 1, color: theme.palette.primary.main }} />
-                  <Typography variant="subtitle1" fontWeight="medium">
-                    Top 6s
-                  </Typography>
-                </Box>
-                {topSixes.map(({ playerId, count }) => {
-                  const player = activity.getPlayer(playerId);
-                  if (!player) return null;
-
-                  return (
-                    <Box
-                      key={playerId}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        ml: 4,
-                        mb: 1
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Avatar
-                          src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
-                          alt={player.name}
-                          sx={{ width: 24, height: 24, mr: 1 }}
-                        />
-                        <Typography variant="body2">
-                          {player.name}
-                        </Typography>
-                      </Box>
-                      <Typography variant="body2" fontWeight="bold">
-                        {count} × 6s
-                      </Typography>
-                    </Box>
-                  );
-                })}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        </>}
       </Grid>
-    </Box>
+    </Box >
   );
 };
 
@@ -323,16 +603,10 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
             </Typography>
 
             {game.innings.map((inning, inningIdx) => {
-              const battingTeam = activity.teams.find(t => t.id === inning.battingTeam);
-              const bowlingTeam = activity.teams.find(t => t.id === inning.bowlingTeam);
-              const inningScore = inning.overs.reduce(
-                (total, over) => total + over.balls.reduce((sum, ball) => sum + ball.runs + ball.extraRuns, 0),
-                0
-              );
-              const wickets = inning.overs.reduce(
-                (total, over) => total + over.balls.filter(ball => ball.type === "W").length,
-                0
-              );
+              const battingTeam = activity.getTeam(inning.battingTeam);
+              const bowlingTeam = activity.getTeam(inning.bowlingTeam);
+              const inningScore = game.getInningsRuns(inningIdx);
+              const wickets = game.getWicketsByInning(inningIdx);
 
               return (
                 <Accordion
@@ -473,36 +747,48 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                               // Collect bowling stats for this innings
                               const bowlerStats = {};
                               inning.overs.forEach(over => {
-                                // Count overs bowled
+                                // Get the bowler ID for this over
                                 const bowlerId = over.bowlerId;
+                                
                                 if (!bowlerStats[bowlerId]) {
                                   bowlerStats[bowlerId] = {
-                                    overs: 0,
+                                    balls: 0,
                                     runs: 0,
-                                    wickets: 0,
-                                    balls: 0
+                                    wickets: 0
                                   };
                                 }
-                                bowlerStats[bowlerId].overs++;
-
-                                // Calculate runs and wickets
+                                
+                                // Count balls bowled and other stats for this bowler
                                 over.balls.forEach(ball => {
+                                  // Only count legitimate deliveries for the over count
+                                  bowlerStats[bowlerId].balls++;
                                   bowlerStats[bowlerId].runs += ball.runs + ball.extraRuns;
                                   if (ball.type === "W") bowlerStats[bowlerId].wickets++;
-                                  bowlerStats[bowlerId].balls++;
                                 });
                               });
 
-                              return Object.entries(bowlerStats).map(([bowlerId, stats]: [any, any]) => {
+                              return Object.entries(bowlerStats).map(([bowlerId, stats]: [string, any]) => {
                                 const player = activity.participants.find(p => p.usn === bowlerId);
                                 if (!player) return null;
 
-                                const economy = (stats.runs / (stats.balls / 6)).toFixed(1);
+                                // Calculate complete overs and remaining balls
+                                const completeOvers = Math.floor(stats.balls / 6);
+                                const remainingBalls = stats.balls % 6;
+                                
+                                // Format as "overs.balls" (e.g., "4.3" means 4 overs and 3 balls)
+                                const oversDisplay = remainingBalls > 0 
+                                  ? `${completeOvers}.${remainingBalls}` 
+                                  : completeOvers.toString();
+                                
+                                // Calculate economy rate (runs per over)
+                                const economy = (stats.balls > 0) 
+                                  ? (stats.runs / (stats.balls / 6)).toFixed(2) 
+                                  : '0.00';
 
                                 return (
                                   <TableRow key={bowlerId}>
                                     <TableCell>{player.name}</TableCell>
-                                    <TableCell align="right">{stats.overs}</TableCell>
+                                    <TableCell align="right">{oversDisplay}</TableCell>
                                     <TableCell align="right">{stats.runs}</TableCell>
                                     <TableCell align="right" sx={{
                                       fontWeight: stats.wickets >= 3 ? 'bold' : 'regular',

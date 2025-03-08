@@ -134,7 +134,10 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
               The match hasnt started yet!
             </Typography>
           )
-          : renderSportSpecificForm()
+          : <>
+            { (formData.endTime < new Date()) && <Typography color="success" sx={{ mb: 2 }}>The match has ended!</Typography> }
+            { renderSportSpecificForm() }
+          </>
         }
       </Box>
     </Box>
