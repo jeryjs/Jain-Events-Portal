@@ -1,12 +1,13 @@
 // filepath: y:\All-Projects\Jain-Events-Portal\backend\routes\eventRoutes.ts
-import { Router, Request, Response } from 'express';
-import { 
-    getEvents, 
-    getEventById, 
-    createEvent, 
-    updateEvent, 
+import { Request, Response, Router } from 'express';
+import { adminMiddleware } from '@middlewares/auth';
+import {
+    createEvent,
     deleteEvent,
-} from "../services/events";
+    getEventById,
+    getEvents,
+    updateEvent,
+} from "@services/events";
 
 const router = Router();
 
@@ -41,7 +42,7 @@ router.get('/events/:eventId', async (req: Request, res: Response) => {
 });
 
 // Create new event
-router.post('/events', async (req: Request, res: Response) => {
+router.post('/events', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const newEvent = await createEvent(req.body);
         res.status(201).json(newEvent);
@@ -52,7 +53,7 @@ router.post('/events', async (req: Request, res: Response) => {
 });
 
 // Update event
-router.patch('/events/:eventId', async (req: Request, res: Response) => {
+router.patch('/events/:eventId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const updatedEvent = await updateEvent(req.params.eventId, req.body);
         res.json(updatedEvent);
@@ -63,7 +64,7 @@ router.patch('/events/:eventId', async (req: Request, res: Response) => {
 });
 
 // Delete event
-router.delete('/events/:eventId', async (req: Request, res: Response) => {
+router.delete('/events/:eventId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const result = await deleteEvent(req.params.eventId);
         if (result) {

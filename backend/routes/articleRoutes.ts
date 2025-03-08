@@ -6,6 +6,7 @@ import {
     updateArticle, 
     deleteArticle,
 } from "@services/articles";
+import { adminMiddleware } from '@middlewares/auth';
 
 const router = Router();
 
@@ -40,7 +41,7 @@ router.get('/articles/:articleId', async (req: Request, res: Response) => {
 });
 
 // Create new article
-router.post('/articles', async (req: Request, res: Response) => {
+router.post('/articles', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const newArticle = await createArticle(req.body);
         res.status(201).json(newArticle);
@@ -51,7 +52,7 @@ router.post('/articles', async (req: Request, res: Response) => {
 });
 
 // Update article
-router.patch('/articles/:articleId', async (req: Request, res: Response) => {
+router.patch('/articles/:articleId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const updatedArticle = await updateArticle(req.params.articleId, req.body);
         res.json(updatedArticle);
@@ -62,7 +63,7 @@ router.patch('/articles/:articleId', async (req: Request, res: Response) => {
 });
 
 // Delete article
-router.delete('/articles/:articleId', async (req: Request, res: Response) => {
+router.delete('/articles/:articleId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const result = await deleteArticle(req.params.articleId);
         if (result) {

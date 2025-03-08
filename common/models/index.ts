@@ -1,4 +1,5 @@
 // Export base models
+export { default as UserData } from "./UserData";
 export { default as Activity } from "./Activity";
 export { default as Event } from "./Event";
 export { default as Participant } from "./Participant";

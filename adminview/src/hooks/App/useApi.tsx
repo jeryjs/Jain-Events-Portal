@@ -20,9 +20,13 @@ async function apiFetch<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   
+  // Get auth token from localStorage
+  const token = localStorage.getItem('admin_token');
+  
   // Set default headers
   const headers = {
     'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...options.headers,
   };
   
@@ -30,6 +34,21 @@ async function apiFetch<T>(
     ...options,
     headers,
   });
+  
+  // Handle auth errors specifically
+  if (response.status === 401 || response.status === 403) {
+    // Clear invalid tokens
+    if (response.status === 401) {
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
+    }
+    
+    const error: ApiError = {
+      status: response.status,
+      message: response.status === 401 ? 'Authentication required' : 'Access denied',
+    };
+    throw error;
+  }
   
   // Handle JSON parsing
   const data = await response.json();
@@ -115,55 +134,58 @@ export const ActivitiesApi = {
 
 // Article API endpoints
 export const ArticlesApi = {
-  getAll: async (): Promise<Article[]> => {
-    const response = await fetch(`${config.API_BASE_URL}/articles`);
-    if (!response.ok) throw new Error('Failed to fetch articles');
-    const data = await response.json();
-    return data.map((item: any) => Article.parse(item));
-  },
+  getAll: () => apiFetch<Article[]>('/articles')
+    .then(data => data.map((item: any) => Article.parse(item))),
   
-  getById: async (id: string): Promise<Article> => {
-    const response = await fetch(`${config.API_BASE_URL}/articles/${id}`);
-    if (!response.ok) throw new Error(`Failed to fetch article ${id}`);
-    const data = await response.json();
-    return Article.parse(data);
-  },
+  getById: (id: string) => 
+    apiFetch<Article>(`/articles/${id}`)
+      .then(data => Article.parse(data)),
   
-  create: async (article: Article): Promise<Article> => {
-    const response = await fetch(`${config.API_BASE_URL}/articles`, {
+  create: (article: Article) => 
+    apiFetch<Article>('/articles', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(article.toJSON()),
-    });
-    if (!response.ok) throw new Error('Failed to create article');
-    const data = await response.json();
-    return Article.parse(data);
-  },
+    }).then(data => Article.parse(data)),
   
-  update: async (id: string, article: Article): Promise<Article> => {
-    const response = await fetch(`${config.API_BASE_URL}/articles/${id}`, {
+  update: (id: string, article: Article) => 
+    apiFetch<Article>(`/articles/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(article.toJSON()),
-    });
-    if (!response.ok) throw new Error(`Failed to update article ${id}`);
-    const data = await response.json();
-    return Article.parse(data);
-  },
+    }).then(data => Article.parse(data)),
   
-  delete: async (id: string): Promise<boolean> => {
-    const response = await fetch(`${config.API_BASE_URL}/articles/${id}`, {
+  delete: (id: string) => 
+    apiFetch<boolean>(`/articles/${id}`, {
       method: 'DELETE',
-    });
-    if (!response.ok) throw new Error(`Failed to delete article ${id}`);
-    return true;
-  },
+    }),
 };
 
+// Auth API endpoints
+export const AuthApi = {
+  login: async (username: string, password: string) => {
+    const response = await fetch(`${API_BASE_URL}/auth/admin/authenticate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || 'Authentication failed');
+    }
+    
+    return response.json();
+  }
+};
 
 // Export all API endpoints
 export default {
   events: EventsApi,
   activities: ActivitiesApi,
   articles: ArticlesApi,
+  auth: AuthApi,
 };
