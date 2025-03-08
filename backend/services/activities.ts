@@ -63,19 +63,13 @@ export const createActivity = async (eventId: string, activityData: any) => {
     const activityId = activityData.id || uuidv4();
     const activityDoc = activitiesCollection(eventId).doc(activityId);
     
-    const { id, eventId: _, ...dataToStore } = activityData;
-    
-    await activityDoc.set(dataToStore);
+    await activityDoc.set(activityData);
 
     // updateActivitiesCache(eventId, activityId, dataToStore);
-    cache.set(`activities-${eventId}-${activityId}`, dataToStore, TTL.ACTIVITIES);
+    cache.set(`activities-${eventId}-${activityId}`, activityData, TTL.ACTIVITIES);
     cache.del(`activities-${eventId}`);
     
-    return {
-        id: activityId,
-        eventId,
-        ...dataToStore
-    };
+    return activityData;
 };
 
 /**
@@ -87,17 +81,13 @@ export const updateActivity = async (eventId: string, activityId: string, activi
     
     if (!doc.exists) return null;
     
-    const { id, eventId: _, ...dataToUpdate } = activityData;
-    
-    await activityDoc.update(dataToUpdate);
-    
-    const updatedDoc = await activityDoc.get();
+    await activityDoc.update(activityData);
     
     // updateActivitiesCache(eventId, activityId, updatedDoc.data());
-    cache.set(`activities-${eventId}-${activityId}`, updatedDoc.data(), TTL.ACTIVITIES);
+    cache.set(`activities-${eventId}-${activityId}`, activityData, TTL.ACTIVITIES);
     cache.del(`activities-${eventId}`);
 
-    return updatedDoc.data();
+    return activityData;
 };
 
 /**

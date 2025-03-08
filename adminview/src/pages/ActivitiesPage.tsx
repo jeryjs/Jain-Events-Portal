@@ -32,7 +32,7 @@ const ActivitiesPage = () => {
             setSelectedActivity(activity || null);
             
             // If activity ID is in URL but not found in data, show error
-            if (!activity) {
+            if (!activity && !isCreating) {
                 setError(`Activity with ID "${activityId}" not found`);
             } else {
                 setError(null);

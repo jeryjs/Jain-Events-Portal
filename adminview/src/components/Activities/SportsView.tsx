@@ -46,7 +46,7 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
 
   // Update form data with parsed activity
   const handleChange = (field: keyof SportsActivity<Sport>, value: any) => {
-    setFormData(SportsActivity.parse({...formData, [field]: value}));
+    setFormData(SportsActivity.parse({ ...formData, [field]: value }));
   };
 
   // Render sport-specific form based on selected sport type
@@ -128,7 +128,14 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
       {/* Sport-specific form */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6" gutterBottom>Manage Match</Typography>
-        {renderSportSpecificForm()}
+        {formData.startTime > new Date() ?
+          (
+            <Typography color="error" sx={{ mb: 2 }}>
+              The match hasnt started yet!
+            </Typography>
+          )
+          : renderSportSpecificForm()
+        }
       </Box>
     </Box>
   );

@@ -89,7 +89,7 @@ export const CricketForm = ({ formData, setFormData }: CricketFormProps) => {
 
     // Default toss winner to first team
     const defaultTossWinner = {
-      teamId: teams[0].id,
+      teamId: '',
       choice: "bat" as const
     };
 
@@ -127,7 +127,7 @@ export const CricketForm = ({ formData, setFormData }: CricketFormProps) => {
 // Toss Section Component
 const TossSection = ({ teams, game, updateGameData }) => {
   // Get toss winner and choice
-  const tossWinner = game.tossWinner || { teamId: teams[0]?.id || '', choice: 'bat' as const };
+  const tossWinner = game.tossWinner;
 
   // Handle toss winner change
   const handleTossWinnerChange = (teamId: string) => {
@@ -160,10 +160,11 @@ const TossSection = ({ teams, game, updateGameData }) => {
           <FormControl fullWidth size="small">
             <InputLabel>Toss Winner</InputLabel>
             <Select
-              value={tossWinner.teamId || teams[0]?.id}
+              value={tossWinner.teamId}
               onChange={(e) => handleTossWinnerChange(e.target.value)}
               label="Toss Winner"
             >
+              <MenuItem></MenuItem> {/* Empty option */}
               {teams.map(team => (
                 <MenuItem key={team.id} value={team.id}>{team.name}</MenuItem>
               ))}
@@ -187,9 +188,10 @@ const TossSection = ({ teams, game, updateGameData }) => {
               chose to:
             </Typography>
             <ToggleButtonGroup
-              value={tossWinner.choice || 'bat'}
+              value={!tossWinner.teamId ? '' : tossWinner.choice}
               exclusive
               onChange={(e, value) => value && handleTossChoiceChange(value)}
+              disabled={!tossWinner.teamId}
               size="large"
               sx={{
                 '& .MuiToggleButton-root': {
