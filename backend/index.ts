@@ -15,16 +15,21 @@ if (process.env.VERCEL == "1" || __filename.endsWith(".js")) {
 import "dotenv/config";
 import express, { Request, Response } from "express";
 import cors from "cors";
+import helmet from 'helmet';
 
 import eventRoutes from "@routes/eventRoutes";
 import activityRoutes from "@routes/activityRoutes";
 import articleRoutes from "@routes/articleRoutes";
-import userRoutes from "@routes/userRoutes";
-import adminRoutes from "@routes/adminRoutes";
+import authRoutes from "@routes/authRoutes";
 
 const app = express();
 
-app.use(cors<Request>());
+// Middlewares to use only in production
+if (process.env.NODE_ENV !== 'development') {
+    app.use(cors<Request>());
+    app.use(helmet());
+}
+
 app.use(express.json());
 
 app.get("/api", (req: Request, res: Response) => {
@@ -34,8 +39,7 @@ app.get("/api", (req: Request, res: Response) => {
 app.use("/api", eventRoutes);
 app.use("/api", activityRoutes);
 app.use("/api", articleRoutes);
-app.use("/api/user", userRoutes);
-app.use("/api/admin", adminRoutes);
+app.use("/api/auth", authRoutes);
 
 const PORT = (process.env.PORT || 3000) as number;
 app.listen(PORT, "0.0.0.0", () => {

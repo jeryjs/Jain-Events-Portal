@@ -3,6 +3,10 @@ import Activity from "../Activity";
 import SportsPlayer from "./SportsPlayer";
 
 export class Cricket {
+	tossWinner: {
+		teamId: string;
+		choice: "bat" | "bowl";
+	} = {} as any;
 	innings: {
 		bowlingTeam: string;
 		battingTeam: string;
@@ -45,9 +49,16 @@ export class Cricket {
 
 	getTotalRuns(teamId?: string): number {
 		if (teamId) {
-			return this.innings.find((i) => i.battingTeam === teamId)?.overs.reduce((total, o) => total + o.balls.reduce((total, b) => total + b.runs, 0), 0) || 0;
+			return this.innings.find((i) => i.battingTeam === teamId)?.overs.reduce((total, o) => total + o.balls.reduce((total, b) => total + b.runs + b.extraRuns, 0), 0) || 0;
 		}
-		return this.innings.reduce((total, i) => total + i.overs.reduce((total, o) => total + o.balls.reduce((total, b) => total + b.runs, 0), 0), 0);
+		return this.innings.reduce((total, i) => total + i.overs.reduce((total, o) => total + o.balls.reduce((total, b) => total + b.runs + b.extraRuns, 0), 0), 0);
+	}
+
+	getInningsRuns(inningIdx: number, teamId?: string): number {
+		if (teamId) {
+			return this.innings[inningIdx].overs.reduce((total, o) => total + o.balls.reduce((total, b) => total + (b.batsmanId === teamId ? b.runs + b.extraRuns : 0), 0), 0);
+		}
+		return this.innings[inningIdx].overs.reduce((total, o) => total + o.balls.reduce((total, b) => total + b.runs + b.extraRuns, 0), 0);
 	}
 
 	getTopScorers(limit: number = 5): { player: string; runs: number }[] {
@@ -107,6 +118,21 @@ export class Cricket {
 			return totalWickets + inning.overs.reduce((wickets, over) => {
 				return wickets + over.balls.filter((ball) => ball.type === "W").length;
 			}, 0);
+		}, 0);
+	}
+
+	getWicketsByInning(inningIdx: number, teamId?: string): number {
+		if (teamId) {
+			const innings = this.innings[inningIdx];
+			if (!innings || innings.battingTeam !== teamId) return 0;
+
+			return innings.overs.reduce((wickets, over) => {
+				return wickets + over.balls.filter((ball) => ball.type === "W").length;
+			}, 0);
+		}
+
+		return this.innings[inningIdx].overs.reduce((totalWickets, over) => {
+			return totalWickets + over.balls.filter((ball) => ball.type === "W").length;
 		}, 0);
 	}
 }
@@ -282,6 +308,10 @@ class SportsActivity<T extends Sport> extends Activity {
 		const result = this.getMatchResult();
 		if (result.isDraw || result.isOngoing || !result.winner) return null;
 		return this.teams.find((t) => t.id === result.winner) || null;
+	}
+
+	getTeam(teamId: string) {
+		return this.teams.find((t) => t.id === teamId) || null;
 	}
 
 	getPlayer(playerId: string): SportsPlayer | null {

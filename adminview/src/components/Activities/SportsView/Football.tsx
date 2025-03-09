@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Paper, Typography, Button, Tabs, Tab, FormControl, InputLabel, Select, MenuItem, Card, CardContent, Grid, Chip } from '@mui/material';
+import { Box, Paper, Typography, Button, Tabs, Tab, FormControl, InputLabel, Select, MenuItem, Card, CardContent, Grid, Chip, Chip } from '@mui/material';
 import { TeamsForm } from './TeamsForm';
 import { ParticipantsForm } from '../ParticipantsForm';
 import { SportsActivity } from '@common/models';
@@ -47,11 +47,31 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
         <Tab label="Match Details" />
       </Tabs>
 
-      <Box sx={{ mt: 2 }}>
-        {activeTab === 0 && <TeamsForm teams={teams} setTeams={handleTeamsChange} />}
-        {activeTab === 1 && <ParticipantsForm participants={participants} setParticipants={handleParticipantsChange} teams={teams} />}
-        {activeTab === 2 && <FootballMatchDetails formData={formData} setFormData={setFormData} teams={teams} participants={participants} stats={stats} setStats={setStats} />}
-      </Box>
+      {/* <Box sx={{ mt: 2 }}>
+        {activeTab === 0 && (
+          <TeamsForm
+            teams={teams}
+            setTeams={handleTeamsChange}
+          />
+        )}
+        {activeTab === 1 && (
+          <ParticipantsForm
+            participants={participants}
+            setParticipants={handleParticipantsChange}
+            teams={teams}
+          />
+        )}
+        {activeTab === 2 && (
+          <FootballMatchDetails
+            formData={formData}
+            setFormData={setFormData}
+            teams={teams}
+            participants={participants}
+            stats={stats}
+            setStats={setStats}
+          />
+        )}
+      </Box> */}
     </Paper>
   );
 };
