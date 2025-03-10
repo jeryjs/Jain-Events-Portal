@@ -115,8 +115,6 @@ export class Football {
 	stats: {
 		teamId: string;
 		goals: { playerId: string }[];
-		penaltyGoals: { playerId: string }[];
-		ownGoals: { playerId: string }[];
 		assists: { playerId: string }[];
 		redCards: { playerId: string }[];
 		yellowCards: { playerId: string }[];
