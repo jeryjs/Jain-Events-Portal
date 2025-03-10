@@ -145,7 +145,6 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
             overflow: 'hidden',
             borderRadius: 2,
             boxShadow: theme.shadows[3],
-            backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.95), rgba(255,255,255,0.95)), url(https://img.freepik.com/free-vector/cricket-stadium-background_1017-8014.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             position: 'relative'
