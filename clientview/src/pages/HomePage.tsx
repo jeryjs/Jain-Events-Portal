@@ -5,7 +5,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { HomeHeader, EventCard } from '../components/Home';
 import PageTransition from '../components/shared/PageTransition';
 import { useEvents } from '../hooks/useApi';
-import ColorModeContext from '../App';
+import { ColorModeContext } from '../App';
 import { styled } from '@mui/material/styles';
 import PhotoGallery from '@components/shared/PhotoGallery';
 
