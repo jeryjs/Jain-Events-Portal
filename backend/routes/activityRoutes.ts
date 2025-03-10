@@ -5,7 +5,8 @@ import {
     createActivity, 
     updateActivity, 
     deleteActivity,
-} from '../services/activities';
+} from '@services/activities';
+import { adminMiddleware, managerMiddleware } from '@middlewares/auth';
 
 const router = express.Router();
 
@@ -40,7 +41,7 @@ router.get('/activities/:eventId/:activityId', async (req: Request, res: Respons
 });
 
 // Create new activity
-router.post('/activities/:eventId', async (req: Request, res: Response) => {
+router.post('/activities/:eventId', managerMiddleware, async (req: Request, res: Response) => {
     try {
         const newActivity = await createActivity(req.params.eventId, req.body);
         res.status(201).json(newActivity);
@@ -51,7 +52,7 @@ router.post('/activities/:eventId', async (req: Request, res: Response) => {
 });
 
 // Update activity
-router.patch('/activities/:eventId/:activityId', async (req: Request, res: Response) => {
+router.patch('/activities/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
     try {
         const updatedActivity = await updateActivity(
             req.params.eventId, 
@@ -70,7 +71,7 @@ router.patch('/activities/:eventId/:activityId', async (req: Request, res: Respo
 });
 
 // Delete activity
-router.delete('/activities/:eventId/:activityId', async (req: Request, res: Response) => {
+router.delete('/activities/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
     try {
         const result = await deleteActivity(req.params.eventId, req.params.activityId);
         if (result) {

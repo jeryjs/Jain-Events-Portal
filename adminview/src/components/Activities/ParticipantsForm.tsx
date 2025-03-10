@@ -1,23 +1,27 @@
-import { useState } from 'react';
-import { Box, Paper, Typography, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Alert, InputLabel, Select, MenuItem, FormControl } from '@mui/material';
+import { Participant, SportsPlayer } from '@common/models';
 import AddIcon from '@mui/icons-material/Add';
+import CodeIcon from '@mui/icons-material/Code';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Participant } from '@common/models';
-import SportsPlayer from '@common/models/sports/SportsPlayer';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, Paper, Select, TextField, Tooltip, Typography } from '@mui/material';
+import { useState, useEffect, useRef } from 'react';
+
+type ParticipantType = SportsPlayer | Participant;
 
 interface ParticipantsFormProps {
-    participants: (Participant | SportsPlayer)[];
-    setParticipants: (participants: (Participant | SportsPlayer)[]) => void;
+    participants: ParticipantType[];
+    setParticipants: (participants: ParticipantType[]) => void;
     teams?: any[];
 }
 
-const initialFormState = {
+const initialFormState: Partial<ParticipantType> = {
     name: '',
     usn: '',
     branch: '',
     phone: '',
     email: '',
+    teamId: '',
 };
 
 export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: ParticipantsFormProps) => {
@@ -25,14 +29,101 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [formValues, setFormValues] = useState(initialFormState);
     const [error, setError] = useState('');
-    const [teamId, setTeamId] = useState('');
+    const [isJsonMode, setIsJsonMode] = useState(false);
+    const [jsonValue, setJsonValue] = useState('');
+    const [jsonError, setJsonError] = useState('');
+    
+    // Debounce timer for JSON updates
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Update JSON when participants change (only when in JSON mode)
+    useEffect(() => {
+        if (isJsonMode) {
+            try {
+                setJsonValue(JSON.stringify(participants, null, 2));
+                setJsonError('');
+            } catch (err) {
+                console.error('Error stringifying participants:', err);
+            }
+        }
+    }, [participants, isJsonMode]);
+
+    // Handle JSON mode toggle
+    const handleToggleJsonMode = () => {
+        if (!isJsonMode) {
+            // Switching to JSON mode - update the JSON value
+            try {
+                setJsonValue(JSON.stringify(participants, null, 2));
+                setJsonError('');
+            } catch (err) {
+                console.error('Error stringifying participants:', err);
+                setJsonError('Error converting participants to JSON');
+            }
+        }
+        setIsJsonMode(!isJsonMode);
+    };
+
+    // Handle JSON text changes with auto-update functionality
+    const handleJsonChange = (value: string) => {
+        setJsonValue(value);
+        
+        // Clear previous timer
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+        }
+        
+        // Set a small delay to avoid excessive updates during typing
+        timerRef.current = setTimeout(() => {
+            try {
+                // Validate JSON syntax
+                const parsed = JSON.parse(value);
+                
+                // Validate it's an array
+                if (!Array.isArray(parsed)) {
+                    setJsonError('JSON must be an array of participants');
+                    return;
+                }
+                
+                // Check each item for required fields
+                for (let i = 0; i < parsed.length; i++) {
+                    const item = parsed[i];
+                    if (!item.name) {
+                        setJsonError(`Participant at index ${i} is missing required field: name`);
+                        return;
+                    }
+                    if (teams.length > 0 && !item.teamId) {
+                        setJsonError(`Participant at index ${i} is missing required field: teamId`);
+                        return;
+                    }
+                }
+                
+                // If we got here, the JSON is valid - apply it immediately
+                setJsonError('');
+                
+                // Convert each item to the appropriate type
+                const typedParticipants = parsed.map((p: any) => {
+                    if (teams.length > 0) {
+                        return SportsPlayer.parse(p);
+                    } else {
+                        return Participant.parse(p);
+                    }
+                });
+                
+                // Update participants
+                setParticipants(typedParticipants);
+                
+            } catch (err) {
+                // Just show the error but don't update participants
+                setJsonError('Invalid JSON format');
+            }
+        }, 300);
+    };
 
     const handleOpen = () => {
         setFormValues(initialFormState);
         setEditIndex(null);
         setError('');
         setOpen(true);
-        setTeamId('');
     };
 
     const handleClose = () => {
@@ -41,19 +132,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
 
     const handleEdit = (index: number) => {
         setEditIndex(index);
-        const editingParticipant = participants[index];
-        setFormValues({
-            name: editingParticipant.name || '',
-            usn: editingParticipant.usn || '',
-            branch: editingParticipant.branch || '',
-            phone: editingParticipant.phone || '',
-            email: editingParticipant.email || '',
-        });
-        if (teams.length > 0 && editingParticipant instanceof SportsPlayer) {
-            setTeamId(editingParticipant.teamId);
-        } else {
-            setTeamId('');
-        }
+        setFormValues(participants[index]);
         setOpen(true);
     };
 
@@ -64,40 +143,46 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
     };
 
     const handleChange = (field: string, value: any) => {
-        setFormValues(prev => ({ ...prev, [field]: value }));
+        if (teams.length>0) {
+            setFormValues(prev => SportsPlayer.parse({ ...prev, [field]: value }));
+        } else {
+            setFormValues(prev => Participant.parse({ ...prev, [field]: value }));
+        }
     };
 
     const validateForm = (): boolean => {
+        let isValid = true;
         if (!formValues.name?.trim()) {
             setError('Name is required.');
-            return false;
-        }
-        if (teams.length > 0 && !teamId) {
+            isValid = false;
+        } else if (teams.length>0 && !formValues.teamId) {
             setError('Team is required.');
-            return false;
+            isValid = false;
+        } else {
+            setError('');
         }
-        setError('');
-        return true;
+        return isValid;
     };
 
     const handleSave = () => {
         if (!validateForm()) return;
 
-        let newParticipant;
+        let newParticipant: Participant | SportsPlayer;
 
-        if (teams.length > 0) {
-            newParticipant = SportsPlayer.parse({ ...formValues, teamId });
+        if (teams.length>0) {
+            newParticipant = SportsPlayer.parse({ ...formValues, teamId: formValues.teamId });
         } else {
             newParticipant = Participant.parse(formValues);
         }
 
+        const updatedParticipants = [...participants];
         if (editIndex !== null) {
-            const newParticipants = [...participants];
-            newParticipants[editIndex] = newParticipant;
-            setParticipants(newParticipants);
+            updatedParticipants[editIndex] = newParticipant;
         } else {
-            setParticipants([...participants, newParticipant]);
+            updatedParticipants.push(newParticipant);
         }
+
+        setParticipants(updatedParticipants);
         handleClose();
     };
 
@@ -105,33 +190,98 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
         <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="h6">Participants</Typography>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpen} size="small">
-                    Add Participant
-                </Button>
+                <Box display="flex" alignItems="center">
+                    <Tooltip title={isJsonMode ? "Switch to Form View" : "Switch to JSON View"}>
+                        <IconButton 
+                            onClick={handleToggleJsonMode}
+                            color={isJsonMode ? "primary" : "default"}
+                            sx={{ mr: 1 }}
+                            size="small"
+                        >
+                            {isJsonMode ? <ViewListIcon /> : <CodeIcon />}
+                        </IconButton>
+                    </Tooltip>
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpen} size="small">
+                        Add Participant
+                    </Button>
+                </Box>
             </Box>
-            <List>
-                {participants.map((p, index) => (
-                    <ListItem
-                        key={p.usn || index}
-                        divider
-                        secondaryAction={
-                            <Box>
-                                <IconButton edge="end" onClick={() => handleEdit(index)} size="small">
-                                    <EditIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton edge="end" onClick={() => handleDeleteParticipant(index)} size="small">
-                                    <DeleteIcon fontSize="small" />
-                                </IconButton>
-                            </Box>
-                        }
-                    >
-                        <ListItemText
-                            primary={p.name}
-                            secondary={p.detailsString}
-                        />
-                    </ListItem>
-                ))}
-            </List>
+
+            {isJsonMode ? (
+                // JSON Editor View
+                <Box>
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={10}
+                        value={jsonValue}
+                        onChange={(e) => handleJsonChange(e.target.value)}
+                        error={!!jsonError}
+                        helperText={jsonError}
+                        placeholder="Enter participants as JSON array"
+                        sx={{
+                            fontFamily: 'monospace',
+                            '& .MuiInputBase-root': { 
+                                fontFamily: 'monospace',
+                                fontSize: '0.875rem'
+                            }
+                        }}
+                    />
+                    <Box mt={1} px={1}>
+                        <Typography variant="caption" color="text.secondary">
+                            {jsonError ? 'Fix the JSON error above to apply changes' : 'Changes are applied automatically when JSON is valid'}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                            {teams.length > 0 
+                                ? 'Required format: [{ "name": "Name", "teamId": "team-id" }, ...]'
+                                : 'Required format: [{ "name": "Name", ... }, ...]'}
+                        </Typography>
+                    </Box>
+                </Box>
+            ) : (
+                // UI View
+                <>
+                    {participants.length === 0 && (
+                        <Box py={2} textAlign="center">
+                            <Typography color="text.secondary">No participants added yet</Typography>
+                        </Box>
+                    )}
+
+                    {participants.length > 0 && (
+                        <List>
+                            {participants.map((p, index) => (
+                                <ListItem
+                                    key={p.usn || index}
+                                    divider
+                                    secondaryAction={
+                                        <Box>
+                                            <IconButton edge="end" onClick={() => handleEdit(index)} size="small">
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton edge="end" onClick={() => handleDeleteParticipant(index)} size="small">
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Box>
+                                    }
+                                >
+                                    <ListItemText
+                                        primary={p.name}
+                                        secondary={
+                                            <>
+                                                {p.usn && `USN: ${p.usn}`}
+                                                {p.branch && ` • ${p.branch}`}
+                                                {'teamId' in p && teams.find(t => t.id === p.teamId)?.name &&
+                                                    ` • Team: ${teams.find(t => t.id === p.teamId)?.name}`}
+                                            </>
+                                        }
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    )}
+                </>
+            )}
+
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>{editIndex !== null ? 'Edit Participant' : 'Add Participant'}</DialogTitle>
                 <DialogContent>
@@ -148,7 +298,6 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                                 onChange={(e) => handleChange('name', e.target.value)}
                                 fullWidth
                                 required
-                                error={!!error}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -157,7 +306,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                                 value={formValues.usn || ''}
                                 onChange={(e) => handleChange('usn', e.target.value)}
                                 fullWidth
-                                required
+                                helperText="Leave blank to auto-generate"
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -166,7 +315,6 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                                 value={formValues.branch || ''}
                                 onChange={(e) => handleChange('branch', e.target.value)}
                                 fullWidth
-                                required
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -188,18 +336,17 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                                 placeholder="Email address"
                             />
                         </Grid>
-                        {teams.length > 0 && (
+                        {teams.length>0 && (
                             <Grid item xs={12}>
                                 <FormControl fullWidth>
                                     <InputLabel id="team-select-label">Team</InputLabel>
                                     <Select
                                         labelId="team-select-label"
                                         id="team-select"
-                                        value={teamId}
+                                        value={formValues.teamId || ''}
                                         label="Team"
-                                        onChange={(e) => setTeamId(e.target.value)}
+                                        onChange={(e) => handleChange('teamId', e.target.value)}
                                         required
-                                        error={!!error && !teamId}
                                     >
                                         {teams.map((team) => (
                                             <MenuItem key={team.id} value={team.id}>{team.name}</MenuItem>
@@ -212,7 +359,11 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleSave} variant="contained" disabled={!formValues.name?.trim() || (teams.length > 0 && !teamId)}>
+                    <Button
+                        onClick={handleSave}
+                        variant="contained"
+                        disabled={!formValues.name?.trim() || (teams.length>0 && !formValues.teamId)}
+                    >
                         Save
                     </Button>
                 </DialogActions>

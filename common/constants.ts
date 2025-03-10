@@ -25,10 +25,10 @@ export enum ArticleStatus {
 }
 
 export enum Role {
-	ADMIN = "admin",
-	USER = "user",
-	GUEST = "guest",
-	MANAGER = "manager",
+	GUEST = 0, // Lowest privileges
+	USER = 1,
+	MANAGER = 2,
+	ADMIN = 3, // Highest privileges
 }
 
 export enum Gender {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Paper, Typography, Button, Tabs, Tab, FormControl, InputLabel, Select, MenuItem, Card, CardContent, Grid } from '@mui/material';
+import { Box, Paper, Typography, Button, Tabs, Tab, FormControl, InputLabel, Select, MenuItem, Card, CardContent, Grid, Chip } from '@mui/material';
 import { TeamsForm } from './TeamsForm';
 import { ParticipantsForm } from '../ParticipantsForm';
 import { EventType } from '@common/constants';
@@ -36,7 +36,7 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
         <Tab label="Match Details" />
       </Tabs>
 
-      <Box sx={{ mt: 2 }}>
+      {/* <Box sx={{ mt: 2 }}>
         {activeTab === 0 && (
           <TeamsForm
             teams={teams}
@@ -60,7 +60,7 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
             setStats={setStats}
           />
         )}
-      </Box>
+      </Box> */}
     </Paper>
   );
 };

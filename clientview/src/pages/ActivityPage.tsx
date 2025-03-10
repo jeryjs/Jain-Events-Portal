@@ -60,7 +60,7 @@ function ActivityPage() {
     return <ActivitySkeleton />;
   }
 
-  if (!activity) {
+  if (!activity && !isLoading) {
     return <ActivityNotFound eventId={eventId || ''} />;
   }
 
