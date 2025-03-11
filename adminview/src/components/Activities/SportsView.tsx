@@ -4,7 +4,7 @@ import { TeamsForm } from './SportsView/TeamsForm';
 import { ParticipantsForm } from './ParticipantsForm';
 import { CricketForm } from './SportsView/Cricket';
 import { GenericSport } from './SportsView/GenericSport';
-import { SportsActivity } from '@common/models';
+import { SportsActivity, SportsPlayer } from '@common/models';
 import { Basketball, Cricket, Football, OtherSport, Sport, Athletics } from '@common/models/sports/SportsActivity';
 import { EventType } from '@common/constants';
 import { BasketballForm } from './SportsView/Basketball';
@@ -119,7 +119,7 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
         >
           <DialogContent title="Manage Participants" onClose={() => setOpenParticipantsDialog(false)}>
             <ParticipantsForm
-              participants={formData.participants || []}
+              participants={(formData.participants || []) as SportsPlayer[]}
               setParticipants={useCallback((newParticipants) => handleChange("participants", newParticipants), [handleChange])}
               teams={teams}
             />

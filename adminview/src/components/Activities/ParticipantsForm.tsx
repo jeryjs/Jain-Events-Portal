@@ -22,6 +22,7 @@ const initialFormState: Partial<ParticipantType> = {
     phone: '',
     email: '',
     teamId: '',
+    position: 'playing'
 };
 
 export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: ParticipantsFormProps) => {
@@ -32,7 +33,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
     const [isJsonMode, setIsJsonMode] = useState(false);
     const [jsonValue, setJsonValue] = useState('');
     const [jsonError, setJsonError] = useState('');
-    
+
     // Debounce timer for JSON updates
     const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -66,24 +67,24 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
     // Handle JSON text changes with auto-update functionality
     const handleJsonChange = (value: string) => {
         setJsonValue(value);
-        
+
         // Clear previous timer
         if (timerRef.current) {
             clearTimeout(timerRef.current);
         }
-        
+
         // Set a small delay to avoid excessive updates during typing
         timerRef.current = setTimeout(() => {
             try {
                 // Validate JSON syntax
                 const parsed = JSON.parse(value);
-                
+
                 // Validate it's an array
                 if (!Array.isArray(parsed)) {
                     setJsonError('JSON must be an array of participants');
                     return;
                 }
-                
+
                 // Check each item for required fields
                 for (let i = 0; i < parsed.length; i++) {
                     const item = parsed[i];
@@ -96,10 +97,10 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                         return;
                     }
                 }
-                
+
                 // If we got here, the JSON is valid - apply it immediately
                 setJsonError('');
-                
+
                 // Convert each item to the appropriate type
                 const typedParticipants = parsed.map((p: any) => {
                     if (teams.length > 0) {
@@ -108,10 +109,10 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                         return Participant.parse(p);
                     }
                 });
-                
+
                 // Update participants
                 setParticipants(typedParticipants);
-                
+
             } catch (err) {
                 // Just show the error but don't update participants
                 setJsonError('Invalid JSON format');
@@ -143,7 +144,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
     };
 
     const handleChange = (field: string, value: any) => {
-        if (teams.length>0) {
+        if (teams.length > 0) {
             setFormValues(prev => SportsPlayer.parse({ ...prev, [field]: value }));
         } else {
             setFormValues(prev => Participant.parse({ ...prev, [field]: value }));
@@ -155,7 +156,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
         if (!formValues.name?.trim()) {
             setError('Name is required.');
             isValid = false;
-        } else if (teams.length>0 && !formValues.teamId) {
+        } else if (teams.length > 0 && !formValues.teamId) {
             setError('Team is required.');
             isValid = false;
         } else {
@@ -169,7 +170,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
 
         let newParticipant: Participant | SportsPlayer;
 
-        if (teams.length>0) {
+        if (teams.length > 0) {
             newParticipant = SportsPlayer.parse({ ...formValues, teamId: formValues.teamId });
         } else {
             newParticipant = Participant.parse(formValues);
@@ -192,7 +193,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                 <Typography variant="h6">Participants</Typography>
                 <Box display="flex" alignItems="center">
                     <Tooltip title={isJsonMode ? "Switch to Form View" : "Switch to JSON View"}>
-                        <IconButton 
+                        <IconButton
                             onClick={handleToggleJsonMode}
                             color={isJsonMode ? "primary" : "default"}
                             sx={{ mr: 1 }}
@@ -221,7 +222,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                         placeholder="Enter participants as JSON array"
                         sx={{
                             fontFamily: 'monospace',
-                            '& .MuiInputBase-root': { 
+                            '& .MuiInputBase-root': {
                                 fontFamily: 'monospace',
                                 fontSize: '0.875rem'
                             }
@@ -232,7 +233,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                             {jsonError ? 'Fix the JSON error above to apply changes' : 'Changes are applied automatically when JSON is valid'}
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                            {teams.length > 0 
+                            {teams.length > 0
                                 ? 'Required format: [{ "name": "Name", "teamId": "team-id" }, ...]'
                                 : 'Required format: [{ "name": "Name", ... }, ...]'}
                         </Typography>
@@ -329,44 +330,38 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                                 placeholder="Email address"
                             />
                         </Grid>
-                        {teams.length>0 && (
-                            <>
-                                <Grid item xs={12} sm={6}>
-                                    <FormControl fullWidth>
-                                        <InputLabel id="team-select-label">Team</InputLabel>
-                                        <Select
-                                            labelId="team-select-label"
-                                            id="team-select"
-                                            value={formValues.teamId || ''}
-                                            label="Team"
-                                            onChange={(e) => handleChange('teamId', e.target.value)}
-                                            required
-                                        >
-                                            {teams.map((team) => (
-                                                <MenuItem key={team.id} value={team.id}>{team.name}</MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    {formValues instanceof SportsPlayer && (
-                                        <ToggleButtonGroup
-                                            value={formValues.position || 'playing'}
-                                            exclusive
-                                            onChange={(e, value) => handleChange('position', value)}
-                                            aria-label="position"
-                                            fullWidth
-                                        >
-                                            <ToggleButton value="playing" aria-label="playing">
-                                                Playing
-                                            </ToggleButton>
-                                            <ToggleButton value="substitute" aria-label="substitute">
-                                                Substitute
-                                            </ToggleButton>
-                                        </ToggleButtonGroup>
-                                    )}
-                                </Grid>
-                            </>
+                        {teams.length > 0 && (
+                            <Grid item display="flex" alignItems="center" gap={2} sx={{ width: '100%' }}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="team-select-label">Team</InputLabel>
+                                    <Select
+                                        labelId="team-select-label"
+                                        id="team-select"
+                                        value={formValues.teamId || ''}
+                                        label="Team"
+                                        onChange={(e) => handleChange('teamId', e.target.value)}
+                                        required
+                                    >
+                                        {teams.map((team) => (
+                                            <MenuItem key={team.id} value={team.id}>
+                                                {team.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                {formValues.position && (
+                                    <ToggleButtonGroup
+                                        value={formValues.position || 'playing'}
+                                        exclusive
+                                        onChange={(e, value) => handleChange('position', value)}
+                                        aria-label="position"
+                                        color="info"
+                                    >
+                                        <ToggleButton value="playing" aria-label="playing">Playing</ToggleButton>
+                                        <ToggleButton value="substitute" aria-label="substitute">Substitute</ToggleButton>
+                                    </ToggleButtonGroup>
+                                )}
+                            </Grid>
                         )}
                     </Grid>
                 </DialogContent>
@@ -375,7 +370,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                     <Button
                         onClick={handleSave}
                         variant="contained"
-                        disabled={!formValues.name?.trim() || (teams.length>0 && !formValues.teamId)}
+                        disabled={!formValues.name?.trim() || (teams.length > 0 && !formValues.teamId)}
                     >
                         Save
                     </Button>
