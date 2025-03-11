@@ -4,7 +4,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, Paper, Select, TextField, Tooltip, Typography } from '@mui/material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, Paper, Select, TextField, Tooltip, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { useState, useEffect, useRef } from 'react';
 
 type ParticipantType = SportsPlayer | Participant;
@@ -266,14 +266,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                                 >
                                     <ListItemText
                                         primary={p.name}
-                                        secondary={
-                                            <>
-                                                {p.usn && `USN: ${p.usn}`}
-                                                {p.branch && ` • ${p.branch}`}
-                                                {'teamId' in p && teams.find(t => t.id === p.teamId)?.name &&
-                                                    ` • Team: ${teams.find(t => t.id === p.teamId)?.name}`}
-                                            </>
-                                        }
+                                        secondary={p.detailsString}
                                     />
                                 </ListItem>
                             ))}
@@ -337,23 +330,43 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                             />
                         </Grid>
                         {teams.length>0 && (
-                            <Grid item xs={12}>
-                                <FormControl fullWidth>
-                                    <InputLabel id="team-select-label">Team</InputLabel>
-                                    <Select
-                                        labelId="team-select-label"
-                                        id="team-select"
-                                        value={formValues.teamId || ''}
-                                        label="Team"
-                                        onChange={(e) => handleChange('teamId', e.target.value)}
-                                        required
-                                    >
-                                        {teams.map((team) => (
-                                            <MenuItem key={team.id} value={team.id}>{team.name}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                            </Grid>
+                            <>
+                                <Grid item xs={12} sm={6}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="team-select-label">Team</InputLabel>
+                                        <Select
+                                            labelId="team-select-label"
+                                            id="team-select"
+                                            value={formValues.teamId || ''}
+                                            label="Team"
+                                            onChange={(e) => handleChange('teamId', e.target.value)}
+                                            required
+                                        >
+                                            {teams.map((team) => (
+                                                <MenuItem key={team.id} value={team.id}>{team.name}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    {formValues instanceof SportsPlayer && (
+                                        <ToggleButtonGroup
+                                            value={formValues.position || 'playing'}
+                                            exclusive
+                                            onChange={(e, value) => handleChange('position', value)}
+                                            aria-label="position"
+                                            fullWidth
+                                        >
+                                            <ToggleButton value="playing" aria-label="playing">
+                                                Playing
+                                            </ToggleButton>
+                                            <ToggleButton value="substitute" aria-label="substitute">
+                                                Substitute
+                                            </ToggleButton>
+                                        </ToggleButtonGroup>
+                                    )}
+                                </Grid>
+                            </>
                         )}
                     </Grid>
                 </DialogContent>

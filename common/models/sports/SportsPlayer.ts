@@ -11,7 +11,7 @@ export default class SportsPlayer extends Participant {
     branch: string,
     event: EventType,
     public teamId: string,
-    public position: "playing" | "substitute",
+    public position: "playing" | "substitute" = "playing",
     public stats: {}
   ) {
     super(usn, name, gender, email, phone, branch, event);
@@ -23,6 +23,6 @@ export default class SportsPlayer extends Participant {
   }
 
   get detailsString() {
-    return `USN: ${this.usn} • Phone: ${this.phone} • Email: ${this.email} • Team: ${this.teamId} • Position: ${this.position}`;
+    return `USN: ${this.usn} • Team: ${this.teamId} • Position: ${this.position}`;
   }
 }
