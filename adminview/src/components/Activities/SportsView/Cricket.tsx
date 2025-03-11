@@ -489,11 +489,14 @@ const BatsmenPanel = ({ teamName, teamId, teamPlayers, inningsIndex, game, selec
                     mb: 0.5,
                     transition: 'all 0.2s',
                     '&.Mui-selected': {
-                      backgroundColor: 'secondary.light',
+                      backgroundColor: '#e3f2fd', // Light blue for selected state
                       boxShadow: isSelected ? '0 0 0 1px #2196f3' : 'none',
                       '&:hover': {
-                        backgroundColor: 'primary.light',
+                        backgroundColor: '#cfe8fc', // Slightly darker blue on hover when selected
                       }
+                    },
+                    '&:hover': {
+                      backgroundColor: '#e0e0e0' // Slightly darker gray on hover when not selected
                     }
                   }}
                 >
@@ -683,13 +686,7 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
               const bowlerBalls = overIndex !== -1 && innings.overs ? innings.overs[overIndex]?.balls || [] : [];
 
               return (
-                <ListItem
-                  key={bowler.usn}
-                  sx={{
-                    borderBottom: '1px solid rgba(0,0,0,0.08)',
-                    py: 1
-                  }}
-                >
+                <ListItem key={bowler.usn} sx={{ borderBottom: '1px solid rgba(0,0,0,0.08)', py: 1 }}>
                   <ListItemText primary={bowler.name} />
                   <Stack direction="row" spacing={0.5} sx={{
                     minHeight: 40,
