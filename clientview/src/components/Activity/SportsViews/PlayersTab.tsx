@@ -28,6 +28,15 @@ const PlayersTab = ({ activity }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [selectedTeamIndex, setSelectedTeamIndex] = useState(0);
   
+  // Convert string to PascalCase with spaces preserved
+  const toPascalCase = (name) => {
+    if (!name) return "";
+    const words = name.split(/\s+/);
+    return words.map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(" "); // Join with spaces between words
+  };
+
   const handleTeamChange = (_, newValue) => {
     setSelectedTeamIndex(newValue);
   };
@@ -148,7 +157,7 @@ const PlayersTab = ({ activity }) => {
                         primary={
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Typography variant="body1" fontWeight="medium">
-                              {player.name}
+                              {toPascalCase(player.name)}
                             </Typography>
                             {player.gender === Gender.FEMALE && (
                               <WomanIcon 
@@ -235,7 +244,7 @@ const PlayersTab = ({ activity }) => {
                           primary={
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                               <Typography variant="body1" color="text.secondary">
-                                {player.name}
+                                {toPascalCase(player.name)}
                               </Typography>
                               {player.gender === Gender.FEMALE && (
                                 <WomanIcon 
