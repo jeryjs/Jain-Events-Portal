@@ -161,14 +161,14 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
         }}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{backgroundColor: alpha(color, 0.1), "& .MuiAccordionSummary-content": { alignItems: "center" }}}>
-          <Chip label={activityType} size="small" sx={{ backgroundColor: alpha(color, 0.3), color: "white", fontWeight: "medium", mr: 2}} />
+          <Chip label={activityType} size="small" sx={{ backgroundColor: alpha(color, 0.3), fontWeight: "medium", mr: 2}} />
           
           <Typography variant="subtitle1" sx={{ fontWeight: "medium" }}>
             {activities.length}{" "} {getBaseEventType(eventType) === EventType.SPORTS? "Matches": activities.length === 1 ? "Activity" : "Activities"}
           </Typography>
           
           {fixtures[eventType] && ( <IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
-            <Typography variant="caption" sx={{ color: "#fff" }}>Fixtures</Typography>
+            <Typography variant="caption">Fixtures</Typography>
           </IconButton>)}
         </AccordionSummary>
         <AccordionDetails sx={{ p: 1 }}>
