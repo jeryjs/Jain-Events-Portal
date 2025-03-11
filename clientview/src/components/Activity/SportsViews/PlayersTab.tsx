@@ -20,6 +20,8 @@ import { Gender } from "@common/constants";
 import PersonIcon from "@mui/icons-material/Person";
 import WomanIcon from "@mui/icons-material/Woman";
 import TagIcon from "@mui/icons-material/Tag";
+import SportsIcon from "@mui/icons-material/Sports";
+import SubdirectoryArrowRightIcon from "@mui/icons-material/SubdirectoryArrowRight";
 
 const PlayersTab = ({ activity }) => {
   const theme = useTheme();
@@ -39,7 +41,11 @@ const PlayersTab = ({ activity }) => {
   }
 
   const selectedTeam = activity.teams[selectedTeamIndex];
-  const teamPlayers = activity.getTeamPlayers(selectedTeam.id);
+  const allTeamPlayers = activity.getTeamPlayers(selectedTeam.id);
+  
+  // Separate players into playing and substitutes
+  const playingPlayers = allTeamPlayers.filter(player => player.isPlaying);
+  const substitutePlayers = allTeamPlayers.filter(player => !player.isPlaying);
   
   return (
     <Box>
@@ -103,79 +109,176 @@ const PlayersTab = ({ activity }) => {
               
               <Divider sx={{ my: 2 }} />
               
-              <List sx={{ pt: 0 }}>
-                {teamPlayers.map((player, idx) => (
-                  <ListItem 
-                    key={player.usn || idx}
-                    sx={{ 
-                      py: 1.5,
-                      borderRadius: 1,
-                      mb: 1,
-                      '&:hover': {
-                        bgcolor: theme.palette.action.hover
-                      }
-                    }}
-                  >
-                    <ListItemAvatar>
-                      <Avatar 
-                        src={`https://eu.ui-avatars.com/api/?name=${player.name || idx}&size=50`}
-                        alt={player.name}
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          border: `2px solid ${theme.palette.primary.main}`
-                        }}
+              {/* Playing Players Section */}
+              <Box sx={{ mb: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <SportsIcon fontSize="small" sx={{ mr: 1, color: theme.palette.success.main }} />
+                  <Typography variant="subtitle1" fontWeight="medium" color="success.main">
+                    Playing Squad ({playingPlayers.length})
+                  </Typography>
+                </Box>
+                
+                <List sx={{ pt: 0 }}>
+                  {playingPlayers.map((player, idx) => (
+                    <ListItem 
+                      key={player.usn || idx}
+                      sx={{ 
+                        py: 1.5,
+                        borderRadius: 1,
+                        mb: 1,
+                        bgcolor: theme.palette.success.light + '10',
+                        '&:hover': {
+                          bgcolor: theme.palette.action.hover
+                        }
+                      }}
+                    >
+                      <ListItemAvatar>
+                        <Avatar 
+                          src={`https://eu.ui-avatars.com/api/?name=${player.name || idx}&size=50`}
+                          alt={player.name}
+                          sx={{
+                            width: 48,
+                            height: 48,
+                            border: `2px solid ${theme.palette.success.main}`
+                          }}
+                        />
+                      </ListItemAvatar>
+                      
+                      <ListItemText 
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography variant="body1" fontWeight="medium">
+                              {player.name}
+                            </Typography>
+                            {player.gender === Gender.FEMALE && (
+                              <WomanIcon 
+                                fontSize="small" 
+                                sx={{ ml: 1, color: theme.palette.error.light }}
+                              />
+                            )}
+                            {player.gender === Gender.MALE && (
+                              <PersonIcon 
+                                fontSize="small" 
+                                sx={{ ml: 1, color: theme.palette.info.light }}
+                              />
+                            )}
+                          </Box>
+                        }
+                        secondary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                            <TagIcon sx={{ fontSize: 16, mr: 0.5, color: theme.palette.text.secondary }} />
+                            <Typography variant="caption" color="text.secondary">
+                              {player.usn}
+                            </Typography>
+                          </Box>
+                        }
                       />
-                    </ListItemAvatar>
-                    
-                    <ListItemText 
-                      primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Typography variant="body1" fontWeight="medium">
-                            {player.name}
-                          </Typography>
-                          {player.gender === Gender.FEMALE && (
-                            <WomanIcon 
-                              fontSize="small" 
-                              sx={{ ml: 1, color: theme.palette.error.light }}
-                            />
-                          )}
-                          {player.gender === Gender.MALE && (
-                            <PersonIcon 
-                              fontSize="small" 
-                              sx={{ ml: 1, color: theme.palette.info.light }}
-                            />
-                          )}
+                      
+                      {player.stats?.position && (
+                        <Box 
+                          sx={{ 
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 1,
+                            bgcolor: theme.palette.success.main + '20',
+                            color: theme.palette.success.dark,
+                            fontSize: '0.75rem',
+                            fontWeight: 500
+                          }}
+                        >
+                          {player.stats.position}
                         </Box>
-                      }
-                      secondary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                          <TagIcon sx={{ fontSize: 16, mr: 0.5, color: theme.palette.text.secondary }} />
-                          <Typography variant="caption" color="text.secondary">
-                            {player.usn}
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                    
-                    {player.stats?.position && (
-                      <Box 
+                      )}
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+              
+              {/* Substitutes Section */}
+              {substitutePlayers.length > 0 && (
+                <Box sx={{ mt: 4 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <SubdirectoryArrowRightIcon fontSize="small" sx={{ mr: 1, color: theme.palette.grey[600] }} />
+                    <Typography variant="subtitle1" fontWeight="medium" color="text.secondary">
+                      Substitutes ({substitutePlayers.length})
+                    </Typography>
+                  </Box>
+                  
+                  <List sx={{ pt: 0 }}>
+                    {substitutePlayers.map((player, idx) => (
+                      <ListItem 
+                        key={player.usn || idx}
                         sx={{ 
-                          px: 1,
-                          py: 0.5,
+                          py: 1.5,
                           borderRadius: 1,
+                          mb: 1,
                           bgcolor: theme.palette.grey[100],
-                          color: theme.palette.text.secondary,
-                          fontSize: '0.75rem',
-                          fontWeight: 500
+                          '&:hover': {
+                            bgcolor: theme.palette.action.hover
+                          }
                         }}
                       >
-                        {player.stats.position}
-                      </Box>
-                    )}
-                  </ListItem>
-                ))}
-              </List>
+                        <ListItemAvatar>
+                          <Avatar 
+                            src={`https://eu.ui-avatars.com/api/?name=${player.name || idx}&size=50`}
+                            alt={player.name}
+                            sx={{
+                              width: 48,
+                              height: 48,
+                              border: `2px solid ${theme.palette.grey[400]}`,
+                              opacity: 0.8
+                            }}
+                          />
+                        </ListItemAvatar>
+                        
+                        <ListItemText 
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <Typography variant="body1" color="text.secondary">
+                                {player.name}
+                              </Typography>
+                              {player.gender === Gender.FEMALE && (
+                                <WomanIcon 
+                                  fontSize="small" 
+                                  sx={{ ml: 1, color: theme.palette.error.light }}
+                                />
+                              )}
+                              {player.gender === Gender.MALE && (
+                                <PersonIcon 
+                                  fontSize="small" 
+                                  sx={{ ml: 1, color: theme.palette.info.light }}
+                                />
+                              )}
+                            </Box>
+                          }
+                          secondary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
+                              <TagIcon sx={{ fontSize: 16, mr: 0.5, color: theme.palette.text.secondary }} />
+                              <Typography variant="caption" color="text.secondary">
+                                {player.usn}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                        
+                        <Box 
+                          sx={{ 
+                            px: 1,
+                            py: 0.5,
+                            borderRadius: 1,
+                            bgcolor: theme.palette.grey[200],
+                            color: theme.palette.text.secondary,
+                            fontSize: '0.75rem',
+                            fontWeight: 500
+                          }}
+                        >
+                          Substitute
+                        </Box>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Grid>

@@ -181,8 +181,9 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                   </TableRow>
                 </TableHead>
                 <TableBody>
+                  {/* Playing Players */}
                   {activity.participants
-                  .filter(player => player.teamId === team.id)
+                  .filter(player => player.teamId === team.id && player.isPlaying)
                   .map(player => {
                     const playerPoints = game.stats
                     ?.find(s => s.teamId === team.id)
@@ -209,6 +210,53 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                     <TableCell align="center">{playerWithPoints.twoPoints || '-'}</TableCell>
                     <TableCell align="center">{playerWithPoints.threePoints || '-'}</TableCell>
                     <TableCell align="right" sx={{ fontWeight: 'medium' }}>{playerWithPoints.totalPoints}</TableCell>
+                    </TableRow>
+                  ))}
+                  
+                  {/* Substitutes Section */}
+                  {activity.participants
+                  .filter(player => player.teamId === team.id && !player.isPlaying)
+                  .length > 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5} sx={{ bgcolor: 'grey.100', py: 1 }}>
+                        <Typography variant="subtitle2" fontWeight="medium">
+                          Substitutes
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  
+                  {/* Substitutes Players */}
+                  {activity.participants
+                  .filter(player => player.teamId === team.id && !player.isPlaying)
+                  .map(player => {
+                    const playerPoints = game.stats
+                    ?.find(s => s.teamId === team.id)
+                    ?.points.filter(p => p.playerId === player.usn) || [];
+
+                    const onePoints = playerPoints.filter(p => p.points === 1).length;
+                    const twoPoints = playerPoints.filter(p => p.points === 2).length;
+                    const threePoints = playerPoints.filter(p => p.points === 3).length;
+                    const totalPoints = playerPoints.reduce((sum, p) => sum + p.points, 0);
+
+                    return {
+                    ...player,
+                    onePoints,
+                    twoPoints,
+                    threePoints,
+                    totalPoints
+                    };
+                  })
+                  .sort((a, b) => b.totalPoints - a.totalPoints)
+                  .map((playerWithPoints: any) => (
+                    <TableRow key={playerWithPoints.usn} sx={{ bgcolor: 'grey.50' }}>
+                    <TableCell>
+                      <Typography color="text.secondary">{playerWithPoints.name}</Typography>
+                    </TableCell>
+                    <TableCell align="center">{playerWithPoints.onePoints || '-'}</TableCell>
+                    <TableCell align="center">{playerWithPoints.twoPoints || '-'}</TableCell>
+                    <TableCell align="center">{playerWithPoints.threePoints || '-'}</TableCell>
+                    <TableCell align="right">{playerWithPoints.totalPoints}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

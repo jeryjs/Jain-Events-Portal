@@ -628,8 +628,9 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                             </TableRow>
                           </TableHead>
                           <TableBody>
+                            {/* Playing Batters */}
                             {activity.participants
-                              .filter(p => p.teamId === inning.battingTeam)
+                              .filter(p => p.teamId === inning.battingTeam && p.isPlaying)
                               .map((player) => {
                                 // Calculate player stats for this specific innings
                                 let runs = 0;
@@ -679,11 +680,89 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                 );
                               })
                               .filter(Boolean)}
+                              
+                            {/* Substitutes Section Header */}
+                            {activity.participants
+                              .filter(p => p.teamId === inning.battingTeam && !p.isPlaying)
+                              .some(player => {
+                                // Check if this substitute batted
+                                let ballsFaced = 0;
+                                inning.overs.forEach(over => {
+                                  over.balls.forEach(ball => {
+                                    if (ball.batsmanId === player.usn && ball.type !== 'WD' && ball.type !== 'NB') {
+                                      ballsFaced++;
+                                    }
+                                  });
+                                });
+                                return ballsFaced > 0;
+                              }) && (
+                                <TableRow>
+                                  <TableCell colSpan={6} sx={{ bgcolor: 'grey.100', py: 1 }}>
+                                    <Typography variant="subtitle2" fontWeight="medium">
+                                      Substitutes
+                                    </Typography>
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            }
+                            
+                            {/* Substitute Batters */}
+                            {activity.participants
+                              .filter(p => p.teamId === inning.battingTeam && !p.isPlaying)
+                              .map((player) => {
+                                // Calculate player stats for this specific innings
+                                let runs = 0;
+                                let ballsFaced = 0;
+                                let fours = 0;
+                                let sixes = 0;
+
+                                inning.overs.forEach(over => {
+                                  over.balls.forEach(ball => {
+                                    if (ball.batsmanId === player.usn && ball.type !== 'WD' && ball.type !== 'NB') {
+                                      runs += ball.runs;
+                                      ballsFaced++;
+                                      if (ball.runs === 4) fours++;
+                                      if (ball.runs === 6) sixes++;
+                                    }
+                                  });
+                                });
+
+                                if (ballsFaced === 0) return null; // Skip players who didn't bat
+
+                                const strikeRate = ((runs / ballsFaced) * 100).toFixed(1);
+                                const showHalfCenturyBadge = runs >= 50;
+
+                                return (
+                                  <TableRow key={player.usn} sx={{ bgcolor: 'grey.50' }}>
+                                    <TableCell>
+                                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Typography color="text.secondary">{player.name}</Typography>
+                                        {showHalfCenturyBadge && (
+                                          <Chip
+                                            size="small"
+                                            icon={<EmojiEventsIcon />}
+                                            label={runs >= 100 ? "100+" : "50+"}
+                                            color={runs >= 100 ? "success" : "primary"}
+                                            variant="outlined"
+                                            sx={{ ml: 1, height: 20, opacity: 0.8, '& .MuiChip-icon': { fontSize: 14 } }}
+                                          />
+                                        )}
+                                      </Box>
+                                    </TableCell>
+                                    <TableCell align="right">{runs}</TableCell>
+                                    <TableCell align="right">{ballsFaced}</TableCell>
+                                    <TableCell align="right">{fours}</TableCell>
+                                    <TableCell align="right">{sixes}</TableCell>
+                                    <TableCell align="right">{strikeRate}</TableCell>
+                                  </TableRow>
+                                );
+                              })
+                              .filter(Boolean)}
                           </TableBody>
                         </Table>
                       </TableContainer>
 
-                      {/* Bowling Section */}
+                      {/* Bowling Section - Now update this section to separate playing and substitute bowlers */}
                       <Typography variant="subtitle1" gutterBottom fontWeight="medium" sx={{
                         display: 'flex',
                         alignItems: 'center',
@@ -717,7 +796,8 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                   bowlerStats[bowlerId] = {
                                     balls: 0,
                                     runs: 0,
-                                    wickets: 0
+                                    wickets: 0,
+                                    playerId: bowlerId
                                   };
                                 }
 
@@ -731,39 +811,118 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                 });
                               });
 
-                              return Object.entries(bowlerStats).map(([bowlerId, stats]: [string, any]) => {
-                                const player = activity.participants.find(p => p.usn === bowlerId);
-                                if (!player) return null;
+                              // First render playing bowlers
+                              const playingBowlers = Object.values(bowlerStats)
+                                .filter((stats: any) => {
+                                  const player = activity.participants.find(p => p.usn === stats.playerId);
+                                  return player && player.isPlaying;
+                                })
+                                .map((stats: any) => {
+                                  const player = activity.participants.find(p => p.usn === stats.playerId);
+                                  if (!player) return null;
 
-                                // Calculate complete overs and remaining balls
-                                const completeOvers = Math.floor(stats.balls / 6);
-                                const remainingBalls = stats.balls % 6;
+                                  // Calculate complete overs and remaining balls
+                                  const completeOvers = Math.floor(stats.balls / 6);
+                                  const remainingBalls = stats.balls % 6;
 
-                                // Format as "overs.balls" (e.g., "4.3" means 4 overs and 3 balls)
-                                const oversDisplay = remainingBalls > 0
-                                  ? `${completeOvers}.${remainingBalls}`
-                                  : completeOvers.toString();
+                                  // Format as "overs.balls" (e.g., "4.3" means 4 overs and 3 balls)
+                                  const oversDisplay = remainingBalls > 0
+                                    ? `${completeOvers}.${remainingBalls}`
+                                    : completeOvers.toString();
 
-                                // Calculate economy rate (runs per over)
-                                const economy = (stats.balls > 0)
-                                  ? (stats.runs / (stats.balls / 6)).toFixed(2)
-                                  : '0.00';
+                                  // Calculate economy rate (runs per over)
+                                  const economy = (stats.balls > 0)
+                                    ? (stats.runs / (stats.balls / 6)).toFixed(2)
+                                    : '0.00';
 
+                                  return (
+                                    <TableRow key={stats.playerId}>
+                                      <TableCell>{player.name}</TableCell>
+                                      <TableCell align="right">{oversDisplay}</TableCell>
+                                      <TableCell align="right">{stats.runs}</TableCell>
+                                      <TableCell align="right" sx={{
+                                        fontWeight: stats.wickets >= 3 ? 'bold' : 'regular',
+                                        color: stats.wickets >= 5 ? theme.palette.success.main : 'inherit'
+                                      }}>
+                                        {stats.wickets}
+                                      </TableCell>
+                                      <TableCell align="right">{economy}</TableCell>
+                                    </TableRow>
+                                  );
+                                }).filter(Boolean);
+                                
+                              // Check if there are any substitute bowlers
+                              const substituteStats = Object.values(bowlerStats)
+                                .filter((stats: any) => {
+                                  const player = activity.participants.find(p => p.usn === stats.playerId);
+                                  return player && !player.isPlaying;
+                                });
+                                
+                              // Return playing bowlers first
+                              if (playingBowlers.length === 0 && substituteStats.length === 0) {
                                 return (
-                                  <TableRow key={bowlerId}>
-                                    <TableCell>{player.name}</TableCell>
-                                    <TableCell align="right">{oversDisplay}</TableCell>
-                                    <TableCell align="right">{stats.runs}</TableCell>
-                                    <TableCell align="right" sx={{
-                                      fontWeight: stats.wickets >= 3 ? 'bold' : 'regular',
-                                      color: stats.wickets >= 5 ? theme.palette.success.main : 'inherit'
-                                    }}>
-                                      {stats.wickets}
+                                  <TableRow>
+                                    <TableCell colSpan={5} align="center">
+                                      <Typography color="text.secondary" sx={{ py: 1 }}>
+                                        No bowling data available
+                                      </Typography>
                                     </TableCell>
-                                    <TableCell align="right">{economy}</TableCell>
                                   </TableRow>
                                 );
-                              }).filter(Boolean);
+                              }
+                              
+                              return (
+                                <>
+                                  {playingBowlers}
+                                  
+                                  {/* Substitute Bowlers Header */}
+                                  {substituteStats.length > 0 && (
+                                    <TableRow>
+                                      <TableCell colSpan={5} sx={{ bgcolor: 'grey.100', py: 1 }}>
+                                        <Typography variant="subtitle2" fontWeight="medium">
+                                          Substitute Bowlers
+                                        </Typography>
+                                      </TableCell>
+                                    </TableRow>
+                                  )}
+                                  
+                                  {/* Substitute Bowlers */}
+                                  {substituteStats.map((stats: any) => {
+                                    const player = activity.participants.find(p => p.usn === stats.playerId);
+                                    if (!player) return null;
+
+                                    // Calculate complete overs and remaining balls
+                                    const completeOvers = Math.floor(stats.balls / 6);
+                                    const remainingBalls = stats.balls % 6;
+
+                                    // Format as "overs.balls" (e.g., "4.3" means 4 overs and 3 balls)
+                                    const oversDisplay = remainingBalls > 0
+                                      ? `${completeOvers}.${remainingBalls}`
+                                      : completeOvers.toString();
+
+                                    // Calculate economy rate (runs per over)
+                                    const economy = (stats.balls > 0)
+                                      ? (stats.runs / (stats.balls / 6)).toFixed(2)
+                                      : '0.00';
+
+                                    return (
+                                      <TableRow key={stats.playerId} sx={{ bgcolor: 'grey.50' }}>
+                                        <TableCell>
+                                          <Typography color="text.secondary">{player.name}</Typography>
+                                        </TableCell>
+                                        <TableCell align="right">{oversDisplay}</TableCell>
+                                        <TableCell align="right">{stats.runs}</TableCell>
+                                        <TableCell align="right" sx={{
+                                          color: stats.wickets >= 5 ? theme.palette.success.main : 'inherit'
+                                        }}>
+                                          {stats.wickets}
+                                        </TableCell>
+                                        <TableCell align="right">{economy}</TableCell>
+                                      </TableRow>
+                                    );
+                                  })}
+                                </>
+                              );
                             })()}
                           </TableBody>
                         </Table>

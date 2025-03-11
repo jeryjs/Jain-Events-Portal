@@ -22,6 +22,10 @@ export default class SportsPlayer extends Participant {
     return new SportsPlayer(s.usn, s.name, s.gender, s.email, s.phone, s.branch, s.event, data.teamId, data.position, data.stats);
   }
 
+  get isPlaying() {
+    return this.position != "substitute";
+  }
+  
   get detailsString() {
     return `USN: ${this.usn} • Team: ${this.teamId} • Position: ${this.position}`;
   }

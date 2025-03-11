@@ -198,7 +198,9 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                         </TableRow>
                       </TableHead>
                       <TableBody>
+                        {/* Playing Players */}
                         {activity.participants
+                          .filter(player => player.isPlaying)
                           .map(player => {
                             // Count goals
                             const goals = game.stats?.reduce((total, teamStat) => {
@@ -281,6 +283,119 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                             );
                           }).filter(Boolean)}
 
+                        {/* Substitutes heading if there are any with statistics */}
+                        {activity.participants
+                          .filter(player => !player.isPlaying)
+                          .some(player => {
+                            const goals = game.stats?.reduce((total, teamStat) => {
+                              return total + (teamStat.goals?.filter(g => g.playerId === player.usn)?.length || 0);
+                            }, 0) || 0;
+                            const assists = game.stats?.reduce((total, teamStat) => {
+                              return total + (teamStat.assists?.filter(a => a.playerId === player.usn)?.length || 0);
+                            }, 0) || 0;
+                            const redCards = game.stats?.reduce((total, teamStat) => {
+                              return total + (teamStat.redCards?.filter(c => c.playerId === player.usn)?.length || 0);
+                            }, 0) || 0;
+                            const yellowCards = game.stats?.reduce((total, teamStat) => {
+                              return total + (teamStat.yellowCards?.filter(c => c.playerId === player.usn)?.length || 0);
+                            }, 0) || 0;
+                            
+                            return goals > 0 || assists > 0 || redCards > 0 || yellowCards > 0;
+                          }) && (
+                          <TableRow>
+                            <TableCell colSpan={7} sx={{ bgcolor: 'grey.100', py: 1 }}>
+                              <Typography variant="subtitle2" fontWeight="medium">
+                                Substitutes
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        )}
+
+                        {/* Substitutes with statistics */}
+                        {activity.participants
+                          .filter(player => !player.isPlaying)
+                          .map(player => {
+                            // Count goals
+                            const goals = game.stats?.reduce((total, teamStat) => {
+                              return total + (teamStat.goals?.filter(g => g.playerId === player.usn)?.length || 0);
+                            }, 0) || 0;
+
+                            // Count assists
+                            const assists = game.stats?.reduce((total, teamStat) => {
+                              return total + (teamStat.assists?.filter(a => a.playerId === player.usn)?.length || 0);
+                            }, 0) || 0;
+
+                            // Count red cards
+                            const redCards = game.stats?.reduce((total, teamStat) => {
+                              return total + (teamStat.redCards?.filter(c => c.playerId === player.usn)?.length || 0);
+                            }, 0) || 0;
+
+                            // Count yellow cards
+                            const yellowCards = game.stats?.reduce((total, teamStat) => {
+                              return total + (teamStat.yellowCards?.filter(c => c.playerId === player.usn)?.length || 0);
+                            }, 0) || 0;
+
+                            return {
+                              player,
+                              goals,
+                              assists,
+                              redCards,
+                              yellowCards,
+                              goalPlusAssist: goals + assists
+                            };
+                          })
+                          .sort((a, b) => b.goalPlusAssist - a.goalPlusAssist)
+                          .map(({ player, goals, assists, redCards, yellowCards, goalPlusAssist }) => {
+                            const team = activity.teams.find(t => t.id === player.teamId);
+
+                            // Skip players with no statistics
+                            if (goals === 0 && assists === 0 && redCards === 0 && yellowCards === 0) return null;
+
+                            return (
+                              <TableRow key={player.usn} sx={{ bgcolor: 'grey.50' }}>
+                                <TableCell>
+                                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Avatar sx={{ width: 24, height: 24, mr: 1, opacity: 0.8 }}>
+                                      {player.name.charAt(0)}
+                                    </Avatar>
+                                    <Typography variant="body2" color="text.secondary">
+                                      {player.name}
+                                    </Typography>
+                                  </Box>
+                                </TableCell>
+                                <TableCell>{team?.name}</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: goals > 0 ? 'bold' : 'normal' }}>
+                                  {goals}
+                                </TableCell>
+                                <TableCell align="center" sx={{ fontWeight: assists > 0 ? 'bold' : 'normal' }}>
+                                  {assists}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {yellowCards > 0 && (
+                                    <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                                      <Box sx={{ width: 12, height: 16, bgcolor: '#ffeb3b', mr: 1 }} />
+                                      {yellowCards}
+                                    </Box>
+                                  )}
+                                </TableCell>
+                                <TableCell align="center">
+                                  {redCards > 0 && (
+                                    <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                                      <Box sx={{ width: 12, height: 16, bgcolor: '#f44336', mr: 1 }} />
+                                      {redCards}
+                                    </Box>
+                                  )}
+                                </TableCell>
+                                <TableCell align="center" sx={{
+                                  fontWeight: 'bold',
+                                  color: goalPlusAssist > 0 ? theme.palette.primary.main : 'inherit'
+                                }}>
+                                  {goalPlusAssist}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          }).filter(Boolean)}
+                          
                         {(!game.stats || game.stats.every(s => !s.goals?.length && !s.assists?.length && !s.yellowCards?.length && !s.redCards?.length)) && (
                           <TableRow>
                             <TableCell colSpan={7} sx={{ textAlign: 'center' }}>

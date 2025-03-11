@@ -67,21 +67,86 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                         </Typography>
                       </Box>
 
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {activity.getTeamPlayers(team.id).slice(0, 5).map((player, idx) => (
-                          <Avatar
-                            key={player.usn || idx}
-                            alt={player.name}
-                            src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
-                            sx={{ width: 40, height: 40 }}
+                      {/* Playing Players */}
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="body2" color="success.main" sx={{ mb: 1, fontWeight: 'medium', display: 'flex', alignItems: 'center' }}>
+                          <Box
+                            component="span"
+                            sx={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: '50%',
+                              bgcolor: 'success.main',
+                              display: 'inline-block',
+                              mr: 1
+                            }}
                           />
-                        ))}
-                        {activity.getTeamPlayers(team.id).length > 5 && (
-                          <Avatar sx={{ width: 40, height: 40, bgcolor: theme.palette.grey[300] }}>
-                            +{activity.getTeamPlayers(team.id).length - 5}
-                          </Avatar>
-                        )}
+                          Playing
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                          {activity.getTeamPlayers(team.id)
+                            .filter(player => player.isPlaying)
+                            .slice(0, 5).map((player, idx) => (
+                              <Avatar
+                                key={player.usn || idx}
+                                alt={player.name}
+                                src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
+                                sx={{ 
+                                  width: 40, 
+                                  height: 40, 
+                                  border: `2px solid ${theme.palette.success.main}`
+                                }}
+                              />
+                            ))}
+                          {activity.getTeamPlayers(team.id).filter(p => p.isPlaying).length > 5 && (
+                            <Avatar sx={{ width: 40, height: 40, bgcolor: theme.palette.success.light, color: theme.palette.success.contrastText }}>
+                              +{activity.getTeamPlayers(team.id).filter(p => p.isPlaying).length - 5}
+                            </Avatar>
+                          )}
+                        </Box>
                       </Box>
+                      
+                      {/* Substitutes */}
+                      {activity.getTeamPlayers(team.id).filter(p => !p.isPlaying).length > 0 && (
+                        <Box>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 'medium', display: 'flex', alignItems: 'center' }}>
+                            <Box
+                              component="span"
+                              sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                bgcolor: 'grey.500',
+                                display: 'inline-block',
+                                mr: 1
+                              }}
+                            />
+                            Substitutes
+                          </Typography>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            {activity.getTeamPlayers(team.id)
+                              .filter(player => !player.isPlaying)
+                              .slice(0, 3).map((player, idx) => (
+                                <Avatar
+                                  key={player.usn || idx}
+                                  alt={player.name}
+                                  src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
+                                  sx={{ 
+                                    width: 36, 
+                                    height: 36, 
+                                    opacity: 0.7,
+                                    border: `2px solid ${theme.palette.grey[400]}`
+                                  }}
+                                />
+                              ))}
+                            {activity.getTeamPlayers(team.id).filter(p => !p.isPlaying).length > 3 && (
+                              <Avatar sx={{ width: 36, height: 36, bgcolor: theme.palette.grey[300] }}>
+                                +{activity.getTeamPlayers(team.id).filter(p => !p.isPlaying).length - 3}
+                              </Avatar>
+                            )}
+                          </Box>
+                        </Box>
+                      )}
                     </Box>
                   </Grid>
                 ))}
@@ -164,17 +229,31 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                   <TableRow>
                     <TableCell>Team</TableCell>
                     <TableCell align="right">Total Players</TableCell>
+                    <TableCell align="right">Playing</TableCell>
+                    <TableCell align="right">Substitutes</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {activity.teams.map(team => (
-                    <TableRow key={team.id}>
-                      <TableCell>{team.name}</TableCell>
-                      <TableCell align="right">
-                        {activity.getTeamPlayers(team.id).length}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {activity.teams.map(team => {
+                    const allPlayers = activity.getTeamPlayers(team.id);
+                    const playingPlayers = allPlayers.filter(p => p.isPlaying);
+                    const substitutePlayers = allPlayers.filter(p => !p.isPlaying);
+                    
+                    return (
+                      <TableRow key={team.id}>
+                        <TableCell>{team.name}</TableCell>
+                        <TableCell align="right">
+                          {allPlayers.length}
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: 'success.main', fontWeight: 'medium' }}>
+                          {playingPlayers.length}
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: 'text.secondary' }}>
+                          {substitutePlayers.length}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>
