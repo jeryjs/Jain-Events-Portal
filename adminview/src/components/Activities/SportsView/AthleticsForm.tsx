@@ -56,13 +56,9 @@ export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => 
 
         // Update heats in game data
         updateGameData({ heats: newHeats });
-
-        console.log("initialised: "+ JSON.stringify(formData.game));
     }, [formData.teams]);
     
     const updateGameData = (gameData: Partial<Athletics>) => {
-        console.log(gameData);
-        
         setFormData({ ...formData, game: { ...formData.game, ...gameData } } as SportsActivity<Athletics>)
     }
 
