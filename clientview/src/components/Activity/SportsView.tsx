@@ -28,7 +28,7 @@ export const SportsView = ({ activity }: { activity: SportsActivity<Sport> }) =>
         switch (activity.eventType) {
             case EventType.CRICKET: return <CricketView activity={activity} />;
             case EventType.BASKETBALL: return <BasketballView activity={activity} />;
-            case EventType.FOOTBALL: return <FootballView activity={activity} tabValue={1} />;
+            case EventType.FOOTBALL: return <FootballView activity={activity} />;
             default: return <GenericView activity={activity} tabValue={1} />;
         }
     };
