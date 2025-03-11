@@ -426,8 +426,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
           {/* Google Drive Link Section */}
           <Box sx={{ mb: 4 }}>
             <TextField
-              label="Google Drive Link"
-              placeholder="Enter Google Drive link here..."
+              label="imgur link"
+              placeholder="Enter imgur link link here..."
               fullWidth
               margin="normal"
               value={formData.galleryLink}
