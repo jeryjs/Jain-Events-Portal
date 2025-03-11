@@ -39,17 +39,17 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
     // Initialize form with activity data if editing
     useEffect(() => {
         if (activity) {
-            setFormData(activity);
+            setFormData(Activity.parse(activity));
         } else {
             // Reset form if creating new activity
-            setFormData({
+            setFormData(Activity.parse({
                 id: '',
                 name: '',
                 eventType: EventType.GENERAL,
                 startTime: new Date(),
                 endTime: undefined,
                 participants: [],
-            });
+            }));
         }
     }, [activity]);
 
