@@ -3,16 +3,21 @@ import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import HomePage from './pages/HomePage';
+import EventsPage from './pages/EventsPage';
+import ActivitiesPage from './pages/ActivitiesPage';
 import ArticlesPage from './pages/ArticlesPage';
+import { AuthProvider } from './hooks/AuthContext';
+import { ProtectedLayout } from './components/Auth';
+import { Role } from '@common/constants';
 
 // Create a theme with primary and secondary colors
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#000', // Dark blue
+      main: '#000',
     },
     secondary: {
-      main: '#2e7d32', // Dark green
+      main: '#2e7d32',
     },
     background: {
       default: '#f5f7fa',
@@ -61,17 +66,35 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter basename="/admin">
-          <Suspense fallback={<div>Loading admin view...</div>}>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/:eventId" element={<HomePage />} />
-              <Route path="/articles" element={<ArticlesPage />} />
-              <Route path="/articles/:articleId" element={<ArticlesPage />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter basename="/admin">
+            <Suspense fallback={<div>Loading admin view...</div>}>
+              <Routes>
+                {/* Public route - Login */}
+                <Route path="/" element={<HomePage />} />
+
+                {/* Protected routes - Accessible only by Admins and Managers */}
+                <Route element={<ProtectedLayout minAccessRole={Role.MANAGER} />}>
+                  {/* Events routes */}
+                  <Route path="events" element={<EventsPage />} />
+                  <Route path="events/:eventId" element={<EventsPage />} />
+                  
+                  {/* Activities routes */}
+                  <Route path="events/:eventId/activities" element={<ActivitiesPage />} />
+                  <Route path="events/:eventId/activities/create" element={<ActivitiesPage />} />
+                  <Route path="events/:eventId/activities/:activityId" element={<ActivitiesPage />} />
+
+                  {/* Articles routes */}
+                  <Route path="articles" element={<ArticlesPage />} />
+                  <Route path="articles/:articleId" element={<ArticlesPage />} />
+                </Route>
+
+                {/* Redirect all other paths to home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

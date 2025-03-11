@@ -1,16 +1,21 @@
 import { Suspense, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper } from '@mui/material';
+import { Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper, 
+  Accordion, AccordionSummary, AccordionDetails, alpha, 
+  Dialog} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { motion } from 'framer-motion';
 import { useActivities, useEvent } from '../hooks/useApi';
 import ActivityCard from '@components/Event/ActivityCard';
 import PhotoGallery from '../components/shared/PhotoGallery';
 import PageTransition from '../components/shared/PageTransition';
 import { EventType } from '@common/constants';
+import { getBaseEventType } from '@common/utils';
+import { generateColorFromString } from '@utils/utils';
 
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
@@ -80,10 +85,115 @@ const getDefaultImage = (src): string => {
   return src || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg';
 };
 
+// Helper function to generate a unique color based on the event type
+const generateColor = (type: EventType): string => {
+  // Use a simple hash function to generate a unique hue for each event type
+  const hue = (type * 137.5) % 360; // 137.5 is a good golden angle approximation
+  return `hsl(${hue}, 60%, 50%)`; // Return an HSL color string
+};
+
+// Helper function to get event type information
+const getEventTypeInfo = (type: EventType) => {
+  return {
+    text: EventType[type],
+    color: generateColorFromString(EventType[type]),
+  };
+};
+
+// Activity Accordion Component
+interface ActivityAccordionProps {
+  eventType: EventType;
+  activities: any[];
+  eventId: string;
+}
+
+const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activities, eventId }) => {
+  const [expanded, setExpanded] = useState(activities.length <= 3);
+  const [fixtureDialog, setFixtureDialog] = useState<string | Record<string, string> | null>(null);
+  const { text: activityType, color } = getEventTypeInfo(eventType);
+
+  /// Hardcoding the fixture data for the sportastica-2025 event temporarily
+  const fixtures = eventId === "sportastica-2025" && {
+    [EventType.VOLLEYBALL]: "https://i.imgur.com/C67OIyz.png",
+    [EventType.FOOTBALL]: "https://i.imgur.com/82B4SjE.png",
+    [EventType.BASKETBALL]: { Boys: "https://i.imgur.com/OcsfJnF.png", Girls: "https://i.imgur.com/CVqnbyt.png" },
+    [EventType.CRICKET]: "https://i.imgur.com/EsfSrzV.png",
+    [EventType.THROWBALL]: "https://i.imgur.com/EsfSrzV.png"
+  } || {};
+
+  const handleFixtureClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const fixture = fixtures[eventType];
+    fixture && setFixtureDialog(fixture);
+  };
+
+  const renderFixtureDialogContent = () =>
+    !fixtureDialog ? null : typeof fixtureDialog === "string" ? (
+      <motion.img
+        src={fixtureDialog}
+        alt={`Fixture for ${activityType}`}
+        style={{ width: "100%" }}
+      />
+    ) : (
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {Object.entries(fixtureDialog).map(([key, url]) => (
+          <Box key={key} sx={{ textAlign: "center" }}>
+            <Typography variant="subtitle2">{key}</Typography>
+            <motion.img
+              src={url}
+              alt={`Fixture ${key} for ${activityType}`}
+              style={{ width: "100%" }}
+            />
+          </Box>
+        ))}
+      </Box>
+    );
+
+  return (
+    <>
+      <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}
+        sx={{
+          mb: 2,
+          borderRadius: 2,
+          overflow: "hidden",
+          "&:before": { display: "none" },
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        }}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{backgroundColor: alpha(color, 0.1), "& .MuiAccordionSummary-content": { alignItems: "center" }}}>
+          <Chip label={activityType} size="small" sx={{ backgroundColor: alpha(color, 0.3), fontWeight: "medium", mr: 2}} />
+          
+          <Typography variant="subtitle1" sx={{ fontWeight: "medium" }}>
+            {activities.length}{" "} {getBaseEventType(eventType) === EventType.SPORTS? "Matches": activities.length === 1 ? "Activity" : "Activities"}
+          </Typography>
+          
+          {fixtures[eventType] && ( <IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
+            <Typography variant="caption">Fixtures</Typography>
+          </IconButton>)}
+        </AccordionSummary>
+        <AccordionDetails sx={{ p: 1 }}>
+          {activities.map((activity, index) => (
+            <ActivityCard
+              key={activity.id}
+              activity={activity}
+              eventId={eventId}
+              delay={index}
+            />
+          ))}
+        </AccordionDetails>
+      </Accordion>
+      <Dialog open={Boolean(fixtureDialog)} onClose={() => setFixtureDialog(null)} maxWidth="xl" fullWidth>
+        {renderFixtureDialogContent()}
+      </Dialog>
+    </>
+  );
+};
+
 // Activity list component with React.Suspense
 const ActivitiesSection = ({ eventId }: { eventId: string }) => {
   const { data: activities, isLoading } = useActivities(eventId);
   const len = activities && Array.isArray(activities) ? activities.length : 0;
+  
   if (isLoading) {
     return (
       <Box>
@@ -95,6 +205,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
       </Box>
     );
   }
+  
   if (!activities || len === 0) {
     return (
       <Paper sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
@@ -102,11 +213,31 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
       </Paper>
     );
   }
+  
+  // Group activities by event type
+  const groupedActivities = activities.reduce((acc, activity) => {
+    const activityType = activity.eventType;
+    if (!acc[activityType]) {
+      acc[activityType] = [];
+    }
+    acc[activityType].push(activity);
+    return acc;
+  }, {} as Record<number, any[]>);
+
+  // Sort the groups by event type (so they appear in a consistent order)
   return (
     <Box>
-      {activities.map((activity, index) => (
-        <ActivityCard key={activity.id} activity={activity} eventId={eventId} delay={index} />
-      ))}
+      {Object.entries(groupedActivities)
+        .sort(([typeA], [typeB]) => Number(typeA) - Number(typeB))
+        .map(([type, acts]) => (
+          <ActivityAccordion 
+            key={type} 
+            eventType={Number(type) as EventType} 
+            activities={acts} 
+            eventId={eventId}
+          />
+        ))
+      }
     </Box>
   );
 };
@@ -230,9 +361,9 @@ function EventPage() {
             <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
               {event.venue}
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
+            {/* <Typography variant="subtitle1" color="text.secondary">
               Tap for directions
-            </Typography>
+            </Typography> */}
           </Box>
         </InfoIconWrapper>
 
@@ -290,9 +421,9 @@ function EventPage() {
           )}
         </ContentSection>
         <ActivitySectionContainer>
-          <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
-            Activities
-          </Typography>
+            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
+            {getBaseEventType(event.type) === EventType.SPORTS ? 'Matches' : 'Activities'}
+            </Typography>
           <Suspense fallback={
             <Box>
               {Array(3).fill(0).map((_, index) => (

@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 
 import { EventType } from '@common/constants';
 import { Event } from '@common/models';
+import { ActivityButton } from './ActivityButton';
 
 const EventTypeInput = styled(Box)`
   position: absolute; bottom: 0; left: 0;
@@ -36,7 +37,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
   // Default States for form fields
   const [formData, setFormData] = useState<Partial<Event>>({
     ...Event.parse({}).toJSON(),
-    timings: [new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000)]
+    timings: [new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000)],
+    galleryLink: '' // Add googleDriveLink to formData
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isImageEditOpen, setIsImageEditOpen] = useState(false);
@@ -421,6 +423,19 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
             />
           </Box>
 
+          {/* Google Drive Link Section */}
+          <Box sx={{ mb: 4 }}>
+            <TextField
+              label="imgur link"
+              placeholder="Enter imgur link link here..."
+              fullWidth
+              margin="normal"
+              value={formData.galleryLink}
+              onChange={(e) => editFormData('googleDriveLink', e.target.value)}
+              sx={{ mb: 4 }}
+            />
+          </Box>
+
           {/* Save Button */}
           <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
             <Button
@@ -454,6 +469,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
               )}
             </Button>
           </Box>
+
+          {event && <ActivityButton eventId={event.id} />}
         </Box>
       </Paper>
     </Suspense>

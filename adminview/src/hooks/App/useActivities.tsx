@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ActivitiesApi } from './useApi';
+import { Activity } from '@common/models';
 
 /**
  * Hook to fetch all activities for an event
@@ -36,7 +37,7 @@ export function useCreateActivity(eventId?: string) {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (activityData: any) => {
+    mutationFn: (activityData: Activity) => {
       return ActivitiesApi.create(eventId!, activityData);
     },
     onSuccess: () => {
@@ -52,12 +53,12 @@ export function useUpdateActivity(eventId?: string) {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ activityId, ...data }: { activityId: string, [key: string]: any }) => {
-      return ActivitiesApi.update(eventId!, activityId, data);
+    mutationFn: (activity: Activity) => {
+      return ActivitiesApi.update(eventId!, activity.id, activity);
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (_, activity) => {
       queryClient.invalidateQueries({ queryKey: ['activities', 'event', eventId] });
-      queryClient.invalidateQueries({ queryKey: ['activity', eventId, variables.activityId] });
+      queryClient.invalidateQueries({ queryKey: ['activity', eventId, activity.id] });
     },
   });
 }

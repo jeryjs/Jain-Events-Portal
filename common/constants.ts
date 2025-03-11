@@ -2,9 +2,12 @@ export enum EventType {
 	GENERAL = 0,
 
 	SPORTS = 1000,
-	VOLLEYBALL = 1001,
+	BASKETBALL = 1001,
 	FOOTBALL = 1002,
 	CRICKET = 1003,
+	VOLLEYBALL = 1004,
+	THROWBALL = 1005,
+	ATHLETICS = 1006,
 
 	CULTURAL = 2000,
 	DANCE = 2001,
@@ -25,10 +28,10 @@ export enum ArticleStatus {
 }
 
 export enum Role {
-	ADMIN = "admin",
-	USER = "user",
-	GUEST = "guest",
-	MANAGER = "manager",
+	GUEST = 0, // Lowest privileges
+	USER = 1,
+	MANAGER = 2,
+	ADMIN = 3, // Highest privileges
 }
 
 export enum Gender {

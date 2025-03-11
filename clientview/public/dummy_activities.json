@@ -1,0 +1,374 @@
+[
+{
+    "id": "basketball",
+    "name": "Basketball Finals - Lions vs Tigers",
+    "startTime": "2025-03-06T14:00:00Z",
+    "eventType": 1001,
+    "teams": [
+        { "id": "lions", "name": "Lions" },
+        { "id": "tigers", "name": "Tigers" }
+    ],
+    "participants": [
+        { "usn": "USN1", "name": "LeBron James", "gender": "male", "teamId": "lions" },
+        { "usn": "USN2", "name": "Michael Jordan", "gender": "male", "teamId": "lions" },
+        { "usn": "USN3", "name": "Stephen Curry", "gender": "male", "teamId": "lions" },
+        { "usn": "USN4", "name": "Kevin Durant", "gender": "male", "teamId": "lions" },
+        { "usn": "USN5", "name": "Kobe Bryant", "gender": "male", "teamId": "lions" },
+        { "usn": "USN6", "name": "Dwayne Wade", "gender": "male", "teamId": "tigers" },
+        { "usn": "USN7", "name": "Shaquille O'Neal", "gender": "male", "teamId": "tigers" },
+        { "usn": "USN8", "name": "Larry Bird", "gender": "male", "teamId": "tigers" },
+        { "usn": "USN9", "name": "Magic Johnson", "gender": "male", "teamId": "tigers" },
+        { "usn": "USN10", "name": "Hakeem Olajuwon", "gender": "male", "teamId": "tigers" }
+    ],
+    "game": {
+        "stats": [
+            {
+                "teamId": "lions",
+                "points": [
+                    { "playerId": "USN1", "points": 28 },
+                    { "playerId": "USN2", "points": 32 },
+                    { "playerId": "USN3", "points": 25 },
+                    { "playerId": "USN4", "points": 22 },
+                    { "playerId": "USN5", "points": 18 }
+                ]
+            },
+            {
+                "teamId": "tigers",
+                "points": [
+                    { "playerId": "USN6", "points": 26 },
+                    { "playerId": "USN7", "points": 24 },
+                    { "playerId": "USN8", "points": 20 },
+                    { "playerId": "USN9", "points": 15 },
+                    { "playerId": "USN10", "points": 12 }
+                ]
+            }
+        ]
+    }
+},
+{
+    "id": "football",
+    "name": "Football Semi Finals - Eagles vs Falcons",
+    "startTime": "2025-03-05T14:00:00Z",
+    "eventType": 1002,
+    "teams": [
+        { "id": "eagles", "name": "Eagles" },
+        { "id": "falcons", "name": "Falcons" }
+    ],
+    "participants": [
+        { "usn": "USN11", "name": "Cristiano Ronaldo", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN12", "name": "Lionel Messi", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN13", "name": "Neymar Jr", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN14", "name": "Kylian Mbappé", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN15", "name": "Robert Lewandowski", "gender": "male", "teamId": "eagles" },
+        { "usn": "USN16", "name": "Kevin De Bruyne", "gender": "male", "teamId": "falcons" },
+        { "usn": "USN17", "name": "Virgil van Dijk", "gender": "male", "teamId": "falcons" },
+        { "usn": "USN18", "name": "Sergio Ramos", "gender": "male", "teamId": "falcons" },
+        { "usn": "USN19", "name": "Manuel Neuer", "gender": "male", "teamId": "falcons" },
+        { "usn": "USN20", "name": "Mohamed Salah", "gender": "male", "teamId": "falcons" }
+    ],
+    "game": {
+        "stats": [
+            {
+                "teamId": "eagles",
+                "goals": [{ "playerId": "USN11" }, { "playerId": "USN12" }, { "playerId": "USN13" }],
+                "assists": [{ "playerId": "USN14" }, { "playerId": "USN11" }],
+                "redCards": [],
+                "yellowCards": [{ "playerId": "USN15" }],
+                "positions": []
+            },
+            {
+                "teamId": "falcons",
+                "goals": [{ "playerId": "USN20" }],
+                "assists": [{ "playerId": "USN16" }],
+                "redCards": [{ "playerId": "USN18" }],
+                "yellowCards": [{ "playerId": "USN17" }],
+                "positions": []
+            }
+        ]
+    }
+  },
+  {
+    "id": "cricket",
+    "name": "Cricket Match - Titans vs Vikings",
+    "startTime": "2025-03-07T10:00:00Z",
+    "eventType": 1003,
+    "teams": [
+      { "id": "titans", "name": "Titans" },
+      { "id": "vikings", "name": "Vikings" }
+    ],
+    "participants": [
+      { "usn": "USN31", "name": "Aaron Finch", "gender": "male", "teamId": "titans" },
+      { "usn": "USN32", "name": "Shaun Marsh", "gender": "male", "teamId": "titans" },
+      { "usn": "USN33", "name": "Pat Cummins", "gender": "male", "teamId": "titans" },
+      { "usn": "USN34", "name": "Tim Paine", "gender": "male", "teamId": "titans" },
+      { "usn": "USN35", "name": "Usman Khawaja", "gender": "male", "teamId": "titans" },
+      { "usn": "USN36", "name": "Nathan Lyon", "gender": "male", "teamId": "titans" },
+      { "usn": "USN37", "name": "Josh Hazlewood", "gender": "male", "teamId": "titans" },
+      { "usn": "USN38", "name": "Marnus Labuschagne", "gender": "male", "teamId": "titans" },
+      { "usn": "USN39", "name": "Steve Smith", "gender": "male", "teamId": "titans" },
+      { "usn": "USN40", "name": "David Warner", "gender": "male", "teamId": "titans" },
+      { "usn": "USN41", "name": "Mitchell Starc", "gender": "male", "teamId": "titans" },
+      { "usn": "USN42", "name": "Kane Williamson", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN43", "name": "Martin Guptill", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN44", "name": "Trent Boult", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN45", "name": "Tom Latham", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN46", "name": "Ross Taylor", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN47", "name": "Colin Munro", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN48", "name": "Lockie Ferguson", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN49", "name": "Mitchell Santner", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN50", "name": "Tim Southee", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN51", "name": "Henry Nicholls", "gender": "male", "teamId": "vikings" },
+      { "usn": "USN52", "name": "Matt Henry", "gender": "male", "teamId": "vikings" }
+    ],
+    "game": {
+      "innings": [
+      {
+      "bowlingTeam": "titans",
+      "battingTeam": "vikings",
+      "overs": [
+        {
+        "bowlerId": "USN33",
+        "balls": [
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 0, "extraRuns": 1, "type": "WD" },
+          { "batsmanId": "USN42", "runs": 2, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN43", "runs": 0, "extraRuns": 0, "type": "W" },
+          { "batsmanId": "USN45", "runs": 4, "extraRuns": 0, "type": "4" },
+          { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" }
+        ]
+        },
+        {
+        "bowlerId": "USN37",
+        "balls": [
+          { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 0, "extraRuns": 0, "type": "D" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 2, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 0, "extraRuns": 1, "type": "NB" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+          { "batsmanId": "USN45", "runs": 0, "extraRuns": 0, "type": "W" }
+        ]
+        },
+        {
+        "bowlerId": "USN33",
+        "balls": [
+          { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 0, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" }
+          ]
+        },
+        {
+        "bowlerId": "USN37",
+        "balls": [
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+          { "batsmanId": "USN42", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN45", "runs": 0, "extraRuns": 0, "type": "W" }
+          ]
+        },
+        {
+        "bowlerId": "USN41",
+        "balls": [
+          { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+          { "batsmanId": "USN47", "runs": 98, "extraRuns": 0, "type": "0" }
+        ]
+        },
+      {
+      "bowlerId": "USN33",
+      "balls": [
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 6, "extraRuns": 0, "type": "6" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 2, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN37",
+      "balls": [
+        { "batsmanId": "USN46", "runs": 4, "extraRuns": 0, "type": "4" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 0, "extraRuns": 0, "type": "W" }
+      ]
+        },
+        {
+      "bowlerId": "USN33",
+      "balls": [
+        { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 0, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN45", "runs": 0, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN37",
+      "balls": [
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN46", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN47", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        }
+      ]
+        },
+        {
+      "bowlingTeam": "vikings",
+      "battingTeam": "titans",
+      "overs": [
+        {
+      "bowlerId": "USN44",
+      "balls": [
+        { "batsmanId": "USN31", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 3, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 0, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN48",
+      "balls": [
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 4, "extraRuns": 0, "type": "4" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN44",
+      "balls": [
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 0, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN32", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN48",
+      "balls": [
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN31", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        },
+        {
+      "bowlerId": "USN44",
+      "balls": [
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 0, "extraRuns": 1, "type": "WD" },
+        { "batsmanId": "USN39", "runs": 0, "extraRuns": 0, "type": "W" }
+      ]
+        },
+        {
+      "bowlerId": "USN48",
+      "balls": [
+        { "batsmanId": "USN39", "runs": 2, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN39", "runs": 1, "extraRuns": 0, "type": "0" },
+        { "batsmanId": "USN35", "runs": 1, "extraRuns": 0, "type": "0" }
+      ]
+        }
+      ]
+      }
+      ]
+    }
+  },
+  {
+    "id": "4",
+    "name": "College Singing Competition",
+    "eventType": 2002,
+    "participants": [
+      { "usn": "USN11", "name": "Ivy", "gender": "female" },
+      { "usn": "USN12", "name": "Jack", "gender": "male" }
+    ],
+    "performanceDetails": "Solo performances"
+  },
+  {
+    "id": "5",
+    "name": "Dance Mania",
+    "eventType": 2001,
+    "participants": [
+      { "usn": "USN13", "name": "Kelly", "gender": "female" },
+      { "usn": "USN14", "name": "Liam", "gender": "male" }
+    ],
+    "performanceDetails": "Group dance"
+  },
+  {
+    "id": "6",
+    "name": "DJ Night",
+    "eventType": 2003,
+    "participants": [
+      { "usn": "USN15", "name": "Mia", "gender": "female" },
+      { "usn": "USN16", "name": "Noah", "gender": "male" }
+    ],
+    "performanceDetails": "Open DJ session"
+  },
+  {
+    "id": "7",
+    "name": "Coding Competition",
+    "eventType": 3001,
+    "participants": [
+      { "usn": "USN17", "name": "Olivia", "gender": "female" },
+      { "usn": "USN18", "name": "Owen", "gender": "male" }
+    ]
+  },
+  {
+    "id": "8",
+    "name": "Hackathon 24 Hours",
+    "eventType": 3002,
+    "participants": [
+      { "usn": "USN19", "name": "Penny", "gender": "female" },
+      { "usn": "USN20", "name": "Quinn", "gender": "male" }
+    ]
+  },
+  {
+    "id": "9",
+    "name": "General Knowledge Quiz",
+    "eventType": 3003,
+    "participants": [
+      { "usn": "USN21", "name": "Rachel", "gender": "female" },
+      { "usn": "USN22", "name": "Sam", "gender": "male" }
+    ]
+  },
+  {
+    "id": "10",
+    "name": "Web Development Workshop",
+    "eventType": 3004,
+    "participants": [
+      { "usn": "USN23", "name": "Tina", "gender": "female" },
+      { "usn": "USN24", "name": "Uma", "gender": "female" }
+    ]
+  }
+]

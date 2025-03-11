@@ -7,9 +7,17 @@ export default class Activity {
     constructor(
         public id: string,
         public name: string,
+        public startTime: Date,
+        public endTime: Date,   // can be null until the activity ends
         public participants: Participant[],
         public eventType: EventType
-    ) {}
+    ) {
+        if(!this.startTime) this.startTime = new Date();  // TODO: Remove this line once testing is done.
+
+        // Convert Timestamp-like objects (from firestore) to Date
+        if (!(this.startTime instanceof Date)) this.startTime = new Date(this.startTime);
+        if (this.endTime && !(this.endTime instanceof Date)) this.endTime = new Date(this.endTime);
+    }
     
     static parse(data: any): Activity {
         // Determine the type of activity based on eventType
@@ -21,7 +29,11 @@ export default class Activity {
             default:
                 // Default Activity parsing logic
                 const participants = data.participants.map((p: any) => Participant.parse(p));
-                return new Activity(data.activityId, data.name, participants, data.eventType);
+                return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.eventType);
         }
+    }
+
+    get isOngoing(): boolean {
+        return this.endTime ? this.endTime > new Date() : false;
     }
 }
