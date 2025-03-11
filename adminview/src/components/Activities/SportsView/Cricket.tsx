@@ -537,7 +537,14 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
   const [currentBallIndex, setCurrentBallIndex] = useState<number | null>(null);
   const [ballDetails, setBallDetails] = useState({ runs: 0, type: "0", extraRuns: 0 });
 
-  // Handle ball popover open for new ball
+  // Disable add if the selected batsman has already lost his wicket
+  const isBatsmanOut = useMemo(() => {
+    if (!selectedBatsman) return false;
+    return (innings.overs || []).some(over =>
+      over.balls.some(ball => ball.type === 'W' && ball.batsmanId === selectedBatsman)
+    );
+  }, [innings.overs, selectedBatsman]);
+
   const handleBallPopoverOpen = useCallback((event: React.MouseEvent<HTMLElement>, bowlerId: string) => {
     if (!selectedBatsman) return;
 
@@ -548,14 +555,10 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
     setPopoverAnchorEl(event.currentTarget);
   }, [selectedBatsman]);
 
-  // Handle opening the ball dialog/popover for editing an existing ball
   const handleEditBall = useCallback((event: React.MouseEvent<HTMLElement>, overIndex: number, ballIndex: number, ball: Ball) => {
     event.stopPropagation();
-
-    const over = innings.overs[overIndex];
-
     setSelectedBatsman(ball.batsmanId);
-    setCurrentBowler(over.bowlerId);
+    setCurrentBowler(innings.overs[overIndex].bowlerId);
     setCurrentOverIndex(overIndex);
     setCurrentBallIndex(ballIndex);
 
@@ -566,7 +569,7 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
     });
 
     setPopoverAnchorEl(event.currentTarget);
-  }, [innings]);
+  }, [innings.overs, setSelectedBatsman]);
 
   // Handle ball popover close
   const handlePopoverClose = useCallback(() => {
@@ -604,7 +607,23 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
       inning.overs = [];
     }
 
-    // Editing existing ball
+    // Look for an incomplete over for the current bowler.
+    let overIndex = -1;
+    const bowlerOvers = inning.overs.filter(o => o.bowlerId === currentBowler);
+    if (bowlerOvers.length > 0) {
+      const lastBowlerOver = bowlerOvers[bowlerOvers.length - 1];
+      const fairCount = lastBowlerOver.balls.filter(ball => ball.type !== 'WD' && ball.type !== 'NB').length;
+      if (fairCount < 6) {
+        overIndex = inning.overs.lastIndexOf(lastBowlerOver);
+      }
+    }
+    if (overIndex === -1) {
+      // No incomplete over found; create a new one.
+      inning.overs.push({ bowlerId: currentBowler, balls: [] });
+      overIndex = inning.overs.length - 1;
+    }
+
+    // For editing an existing ball.
     if (currentOverIndex !== null && currentBallIndex !== null) {
       if (!inning.overs[currentOverIndex] || !inning.overs[currentOverIndex].balls[currentBallIndex]) {
         handlePopoverClose();
@@ -617,17 +636,8 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
         extraRuns: ballDetails.extraRuns,
         type: ballDetails.type
       };
-    }
-    // Adding new ball
-    else {
-      // Find or create over for the current bowler
-      let overIndex = inning.overs.findIndex(o => o.bowlerId === currentBowler);
-      if (overIndex === -1) {
-        inning.overs.push({ bowlerId: currentBowler, balls: [] });
-        overIndex = inning.overs.length - 1;
-      }
-
-      // Add ball to over
+    } else {
+      // Add a new ball.
       inning.overs[overIndex].balls.push({
         batsmanId: selectedBatsman,
         runs: ballDetails.runs,
@@ -666,87 +676,112 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
     handlePopoverClose();
   }, [inningsIndex, currentOverIndex, currentBallIndex, game.innings, updateGameData, handlePopoverClose]);
 
-  // Calculate popover open state
-  const isPopoverOpen = Boolean(popoverAnchorEl);
+  // Get the last over in the innings for global check.
+  const globalLastOver = (innings.overs && innings.overs.length > 0) ? innings.overs[innings.overs.length - 1] : null;
 
   return (
-    <Card variant="outlined" sx={{
-      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-      height: '100%'
-    }}>
+    <Card variant="outlined" sx={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)', height: '100%' }}>
       <CardContent>
-        <Typography variant="h6" gutterBottom>
-          {teamName} Bowlers
-        </Typography>
+        <Typography variant="h6" gutterBottom>{teamName} Bowlers</Typography>
         <List dense sx={{ maxHeight: 300, overflow: 'auto' }}>
           {teamPlayers.length > 0 ? (
             teamPlayers.map(bowler => {
-              // Find over index for this bowler
-              const overIndex = innings.overs?.findIndex(o => o.bowlerId === bowler.usn);
-              const bowlerBalls = overIndex !== -1 && innings.overs ? innings.overs[overIndex]?.balls || [] : [];
-
+              // Group all overs for this bowler.
+              const bowlerOvers = innings.overs ? innings.overs.filter(o => o.bowlerId === bowler.usn) : [];
+              // Determine disable state:
+              let disableAddBall = !selectedBatsman || isBatsmanOut;
+              if (globalLastOver && globalLastOver.bowlerId === bowler.usn) {
+                const fairCount = globalLastOver.balls.filter(ball => ball.type !== 'WD' && ball.type !== 'NB').length;
+                if (fairCount >= 6) {
+                  disableAddBall = true;
+                }
+              }
               return (
                 <ListItem key={bowler.usn} sx={{ borderBottom: '1px solid rgba(0,0,0,0.08)', py: 1 }}>
                   <ListItemText primary={bowler.name} />
-                  <Stack direction="row" spacing={0.5} sx={{
-                    minHeight: 40,
-                    alignItems: 'center',
-                    flexWrap: 'wrap'
-                  }}>
-                    {/* Show existing balls */}
-                    {bowlerBalls.map((ball: Ball, ballIndex: number) => {
-                      const ballType = BALL_TYPES.find(b => b.value === ball.type);
-                      const totalRuns = (ball.runs || 0) + (ball.extraRuns || 0);
-                      // Check if this ball was hit by the selected batsman
-                      const isSelectedBatsmanBall = selectedBatsman && ball.batsmanId === selectedBatsman;
-
-                      return (
-                        <Tooltip
-                          key={ballIndex}
-                          title={`${ballType?.label || 'Ball'} - ${totalRuns} runs`}
+                  <Stack direction="column" spacing={1} sx={{ minHeight: 40 }}>
+                    {bowlerOvers.length > 0 ? (
+                      bowlerOvers.map((over, idx) => (
+                        <Stack
+                          key={idx}
+                          direction="row"
+                          spacing={0.5}
+                          alignItems="center"
+                          sx={{ width: '100%' }}
                         >
-                          <Avatar
-                            onClick={(e) => handleEditBall(e, overIndex || 0, ballIndex, ball)}
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              fontSize: '0.8rem',
-                              bgcolor: ballType?.color || '#e0e0e0',
-                              color: ['W', '6', '4'].includes(ball.type) ? 'white' : 'black',
-                              boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
-                              cursor: 'pointer',
-                              border: isSelectedBatsmanBall ? '2px solid #1976d2' : 'none',
-                              '&:hover': {
-                                transform: 'scale(1.1)',
-                                boxShadow: '0 3px 6px rgba(0,0,0,0.2)',
-                              },
-                              m: 0.2,
-                              transition: 'all 0.2s'
-                            }}
-                          >
-                            {ball.type === 'W' ? 'W' : totalRuns}
-                          </Avatar>
-                        </Tooltip>
-                      );
-                    })}
-
-                    {/* Add ball button */}
-                    <IconButton
-                      size="small"
-                      color="primary"
-                      onClick={(e) => handleBallPopoverOpen(e, bowler.usn)}
-                      disabled={!selectedBatsman}
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        bgcolor: 'rgba(0,0,0,0.04)',
-                        '&:hover': {
-                          bgcolor: 'rgba(0,0,0,0.08)'
-                        }
-                      }}
-                    >
-                      <AddIcon fontSize="small" />
-                    </IconButton>
+                          {over.balls.map((ball, ballIndex) => {
+                            const ballType = BALL_TYPES.find(b => b.value === ball.type);
+                            const totalRuns = (ball.runs || 0) + (ball.extraRuns || 0);
+                            const isSelectedBatsmanBall = selectedBatsman && ball.batsmanId === selectedBatsman;
+                            return (
+                              <Tooltip key={ballIndex} title={`${ballType?.label || 'Ball'} - ${totalRuns} runs`}>
+                                <Avatar
+                                  onClick={(e) => {
+                                    // Find the global over index
+                                    const globalOverIndex = innings.overs.findIndex(o => o === over);
+                                    handleEditBall(e, globalOverIndex, ballIndex, ball);
+                                  }}
+                                  sx={{
+                                    width: 32,
+                                    height: 32,
+                                    fontSize: '0.8rem',
+                                    bgcolor: ballType?.color || '#e0e0e0',
+                                    color: ['W', '6', '4'].includes(ball.type) ? 'white' : 'black',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                                    cursor: 'pointer',
+                                    border: isSelectedBatsmanBall ? '2px solid #1976d2' : 'none',
+                                    '&:hover': {
+                                      transform: 'scale(1.1)',
+                                      boxShadow: '0 3px 6px rgba(0,0,0,0.2)',
+                                    },
+                                    m: 0.2,
+                                    transition: 'all 0.2s'
+                                  }}
+                                >
+                                  {ball.type === 'W' ? 'W' : totalRuns}
+                                </Avatar>
+                              </Tooltip>
+                            );
+                          })}
+                          {idx === bowlerOvers.length - 1 && (
+                            <>
+                              <Box sx={{ flexGrow: 1 }} />
+                              <IconButton
+                                size="small"
+                                color="primary"
+                                onClick={(e) => handleBallPopoverOpen(e, bowler.usn)}
+                                disabled={disableAddBall}
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  bgcolor: 'rgba(0,0,0,0.04)',
+                                  '&:hover': { bgcolor: 'rgba(0,0,0,0.08)' }
+                                }}
+                              >
+                                <AddIcon fontSize="small" />
+                              </IconButton>
+                            </>
+                          )}
+                        </Stack>
+                      ))
+                    ) : (
+                      <Stack direction="row" justifyContent="flex-end">
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={(e) => handleBallPopoverOpen(e, bowler.usn)}
+                          disabled={disableAddBall}
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            bgcolor: 'rgba(0,0,0,0.04)',
+                            '&:hover': { bgcolor: 'rgba(0,0,0,0.08)' }
+                          }}
+                        >
+                          <AddIcon fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                    )}
                   </Stack>
                 </ListItem>
               );
@@ -756,10 +791,8 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
           )}
         </List>
       </CardContent>
-
-      {/* Ball Editor Popover */}
       <BallEditorPopover
-        isOpen={isPopoverOpen}
+        isOpen={Boolean(popoverAnchorEl)}
         anchorEl={popoverAnchorEl}
         ballDetails={ballDetails}
         setBallDetails={setBallDetails}
