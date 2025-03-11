@@ -5,8 +5,8 @@ export function parseEvents(data: any[]): Event[] {
     return data
         .map(Event.parse)
         .sort((a, b) => 
-            new Date(b.time?.start || Date.now()).getTime() -
-            new Date(a.time?.start || Date.now()).getTime()
+            new Date(a.time?.start || Date.now()).getTime() -
+            new Date(b.time?.start || Date.now()).getTime()
         );
 }
 
@@ -14,8 +14,8 @@ export function parseActivities(data: any[]): Activity[] {
     return data
         .map(Activity.parse)
         .sort((a, b) =>
-            new Date(b.startTime || Date.now()).getTime() -
-            new Date(a.startTime || Date.now()).getTime()
+            new Date(a.startTime || Date.now()).getTime() -
+            new Date(b.startTime || Date.now()).getTime()
         );
 }
 
@@ -23,8 +23,8 @@ export function parseArticles(data: any[]): Article[] {
     return data
         .map(Article.parse)
         .sort((a, b) =>
-            new Date(b.publishedAt || Date.now()).getTime() -
-            new Date(a.publishedAt || Date.now()).getTime()
+            new Date(a.publishedAt || Date.now()).getTime() -
+            new Date(b.publishedAt || Date.now()).getTime()
         );
 }
 
