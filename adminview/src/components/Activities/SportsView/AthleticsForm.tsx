@@ -39,53 +39,53 @@ export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => 
 
     const [activeTab, setActiveTab] = useState(0);
     const [topPlayersCount, setTopPlayersCount] = useState(5);
-    
+
     // Use a ref to track initialization status
     const initializedRef = useRef(false);
 
     // Update game data in the parent form
     const updateGameData = useCallback((updatedGame: Partial<Athletics>) => {
-        setFormData(prevData => ({
-            ...prevData,
-            game: {
-                ...prevData.game,
-                ...updatedGame
-            }
-        } as SportsActivity<Sport>));
+        setFormData(({ ...formData, game: { ...game, ...updatedGame } } as SportsActivity<Sport>));
     }, [setFormData]);
 
     // Initialize heats only once when component mounts or when teams/players change significantly
     useEffect(() => {
         // Skip if already initialized or if no teams
         if (initializedRef.current || teams.length === 0) return;
-        
+
         // Check if initialization is needed
         const needsInit = !game.heats || game.heats.length === 0;
-        const needsUpdate = game.heats && game.heats.length > 0 && 
-            (game.heats.length !== teams.length || 
-             teams.some(team => !game.heats.find(h => h.heatId === team.id)));
-        
+        const needsUpdate = game.heats && game.heats.length > 0 &&
+            (game.heats.length !== teams.length ||
+                teams.some(team => !game.heats.find(h => h.heatId === team.id)));
+
         if (needsInit || needsUpdate) {
             console.log("Initializing athletics heats");
             const initialHeats = teams.map(team => {
                 // Find existing heat for this team
                 const existingHeat = game.heats?.find(h => h.heatId === team.id);
-                
+
                 // Get athletes for this team
                 const teamPlayers = players.filter(p => p.teamId === team.id);
-                
-                return {
-                    heatId: team.id,
-                    });
 
                 return {
                     heatId: team.id,
-                    athletes: updatedAthletes
+                    athletes: teamPlayers.map(player => {
+                        // Preserve existing athlete data if available
+                        const existingAthlete = existingHeat?.athletes?.find(a => a.playerId === player.usn);
+                        return existingAthlete || {
+                            playerId: player.usn,
+                            time: 0,
+                            rank: 0
+                        };
+                    })
                 };
             });
-            updateGameData({ heats: updatedHeats });
+
+            updateGameData({ heats: initialHeats });
+            initializedRef.current = true;
         }
-    }, [teams, players, game, updateGameData]);
+    }, [teams, players, game.heats, updateGameData]);
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setActiveTab(newValue);
@@ -113,7 +113,7 @@ export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => 
                             key={team.id}
                             team={team}
                             game={game}
-                            players={players}
+                            players={players.filter(p => p.teamId === team.id)} // Pre-filter players for each team
                             updateGameData={updateGameData}
                         />
                     ))}
@@ -126,17 +126,28 @@ export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => 
                     players={players}
                     topPlayersCount={topPlayersCount}
                     setTopPlayersCount={setTopPlayersCount}
-                    updateGameData={updateGameData}
                 />
             )}
         </Paper>
     );
 };
 
-// Heat Manager Component
-const HeatManager = ({ team, game, players, updateGameData }) => {
+// Heat Manager Component Props
+interface HeatManagerProps {
+    team: { id: string; name: string };
+    game: Athletics;
+    players: any[]; // Replace 'any' with the actual type of players
+    updateGameData: (updatedGame: Partial<Athletics>) => void;
+}
+
+// Heat Manager Component - Memoized to prevent unnecessary re-renders
+const HeatManager = React.memo<HeatManagerProps>(({ team, game, players, updateGameData }) => {
     const theme = useTheme();
-    const heat = useMemo(() => game.heats?.find(h => h.heatId === team.id) || { heatId: team.id, athletes: [] }, [game.heats, team.id]);
+    const heat = useMemo(() =>
+        game.heats?.find(h => h.heatId === team.id) ||
+        { heatId: team.id, athletes: [] },
+        [game.heats, team.id]);
+
     const [expanded, setExpanded] = useState(false);
 
     const handleChange = () => {
@@ -151,34 +162,74 @@ const HeatManager = ({ team, game, players, updateGameData }) => {
         if (heatIndex === -1) return;
 
         const athleteIndex = updatedHeats[heatIndex].athletes.findIndex(a => a.playerId === playerId);
-
         if (athleteIndex === -1) return;
 
-        updatedHeats[heatIndex].athletes[athleteIndex].time = time;
+        // Create a new array with the updated athlete
+        const updatedAthletes = [...updatedHeats[heatIndex].athletes];
+        updatedAthletes[athleteIndex] = {
+            ...updatedAthletes[athleteIndex],
+            time
+        };
 
         // Auto-assign ranks based on time
-        const sortedAthletes = [...updatedHeats[heatIndex].athletes].sort((a, b) => (a.time || Infinity) - (b.time || Infinity));
+        const sortedAthletes = [...updatedAthletes]
+            .filter(a => a.time > 0)
+            .sort((a, b) => (a.time || Infinity) - (b.time || Infinity));
+
         sortedAthletes.forEach((athlete, index) => {
-            athlete.rank = (athlete.time && athlete.time > 0) ? index + 1 : 0;
+            const athleteIdx = updatedAthletes.findIndex(a => a.playerId === athlete.playerId);
+            if (athleteIdx !== -1) {
+                updatedAthletes[athleteIdx] = {
+                    ...updatedAthletes[athleteIdx],
+                    rank: index + 1
+                };
+            }
         });
 
+        // Athletes with time=0 get rank=0
+        updatedAthletes.forEach((athlete, idx) => {
+            if (athlete.time === 0) {
+                updatedAthletes[idx] = {
+                    ...athlete,
+                    rank: 0
+                };
+            }
+        });
+
+        updatedHeats[heatIndex] = {
+            ...updatedHeats[heatIndex],
+            athletes: updatedAthletes
+        };
+
         updateGameData({ heats: updatedHeats });
-    }, [game, team.id, updateGameData]);
+    }, [team.id, updateGameData]);
 
     //Update athlete rank
     const updateAthleteRank = useCallback((playerId: string, rank: number) => {
-        const updatedHeats = [...(game.heats || [])];
-        const heatIndex = updatedHeats.findIndex(h => h.heatId === team.id);
+        {
+            const updatedHeats = [...(game.heats || [])];
+            const heatIndex = updatedHeats.findIndex(h => h.heatId === team.id);
 
-        if (heatIndex === -1) return;
-
-        const athleteIndex = updatedHeats[heatIndex].athletes.findIndex(a => a.playerId === playerId);
-
-        if (athleteIndex === -1) return;
-
-        updatedHeats[heatIndex].athletes[athleteIndex].rank = rank;
-        updateGameData({ heats: updatedHeats });
-    }, [game, team.id, updateGameData]);
+            if (heatIndex === -1) return;
+            
+            const athleteIndex = updatedHeats[heatIndex].athletes.findIndex(a => a.playerId === playerId);
+            if (athleteIndex === -1) return;
+            
+            // Create a new array with the updated athlete
+            const updatedAthletes = [...updatedHeats[heatIndex].athletes];
+            updatedAthletes[athleteIndex] = {
+                ...updatedAthletes[athleteIndex],
+                rank
+            };
+            
+            updatedHeats[heatIndex] = {
+                ...updatedHeats[heatIndex],
+                athletes: updatedAthletes
+            };
+            
+            updateGameData({ heats: updatedHeats });
+        }
+    }, [team.id, updateGameData]);
 
     return (
         <Accordion expanded={expanded} onChange={handleChange}>
@@ -187,59 +238,135 @@ const HeatManager = ({ team, game, players, updateGameData }) => {
             </AccordionSummary>
             <AccordionDetails>
                 <List dense>
-                    {heat.athletes.map((athlete: any) => {
-                        const player = players.find((p: any) => p.usn === athlete.playerId);
+                    {players.map((player) => {
+                        const athlete = heat.athletes?.find(a => a.playerId === player.usn) || { playerId: player.usn, time: 0, rank: 0 };
+
                         return (
-                            <ListItem key={athlete.playerId}>
-                                <ListItemText primary={player?.name || 'Unknown'} />
-                                <TextField
-                                    label="Time"
-                                    type="number"
-                                    size="small"
-                                    value={athlete.time || 0}
-                                    onChange={(e) => updateAthleteTime(athlete.playerId, Number(e.target.value))}
-                                />
-                                <TextField
-                                    label="Rank"
-                                    type="number"
-                                    size="small"
-                                    value={athlete.rank || 0}
-                                    onChange={(e) => updateAthleteRank(athlete.playerId, Number(e.target.value))}
-                                />
-                            </ListItem>
+                            <AthleteListItem
+                                key={player.usn}
+                                player={player}
+                                athlete={athlete}
+                                updateAthleteTime={updateAthleteTime}
+                                updateAthleteRank={updateAthleteRank}
+                            />
                         );
                     })}
+                    {players.length === 0 && (
+                        <Typography variant="body2" color="textSecondary" align="center" sx={{ py: 2 }}>
+                            No athletes in this heat
+                        </Typography>
+                    )}
                 </List>
             </AccordionDetails>
         </Accordion>
     );
-};
+}, (prevProps: HeatManagerProps, nextProps: HeatManagerProps) => {
+    // Custom comparison function to avoid unnecessary re-renders
+    return (
+        prevProps.team.id === nextProps.team.id &&
+        prevProps.game.heats === nextProps.game.heats &&
+        prevProps.players.length === nextProps.players.length
+    );
+});
 
-// Export Tab Component
-const ExportTab = ({ game, players, topPlayersCount, setTopPlayersCount, updateGameData }) => {
+// Athlete List Item Component Props
+interface AthleteListItemProps {
+    player: any; // Replace 'any' with the actual type of player
+    athlete: { playerId: string; time: number; rank: number };
+    updateAthleteTime: (playerId: string, time: number) => void;
+    updateAthleteRank: (playerId: string, rank: number) => void;
+}
+
+// Athlete List Item Component - Memoized to prevent unnecessary re-renders
+const AthleteListItem = React.memo<AthleteListItemProps>(({ player, athlete, updateAthleteTime, updateAthleteRank }) => {
+    const handleTimeChange = useCallback((e: any) => {
+        const value = Number(e.target.value);
+        updateAthleteTime(player.usn, value);
+    }, [player.usn, updateAthleteTime]);
+
+    const handleRankChange = useCallback((e: any) => {
+        const value = Number(e.target.value);
+        updateAthleteRank(player.usn, value);
+    }, [player.usn, updateAthleteRank]);
+
+    return (
+        <ListItem>
+            <ListItemText primary={player.name} />
+            <TextField
+                label="Time"
+                type="number"
+                size="small"
+                value={athlete.time || 0}
+                onChange={handleTimeChange}
+                sx={{ width: 100, mr: 2 }}
+                inputProps={{ min: 0, step: 0.01 }}
+            />
+            <TextField
+                label="Rank"
+                type="number"
+                size="small"
+                value={athlete.rank || 0}
+                onChange={handleRankChange}
+                sx={{ width: 80 }}
+                inputProps={{ min: 0, step: 1 }}
+            />
+        </ListItem>
+    );
+}, (prevProps: AthleteListItemProps, nextProps: AthleteListItemProps) => {
+    // Custom comparison function to avoid unnecessary re-renders
+    return (
+        prevProps.player.usn === nextProps.player.usn &&
+        prevProps.athlete.time === nextProps.athlete.time &&
+        prevProps.athlete.rank === nextProps.athlete.rank
+    );
+});
+
+// Export Tab Component Props
+interface ExportTabProps {
+    game: Athletics;
+    players: any[]; // Replace 'any' with the actual type of players
+    topPlayersCount: number;
+    setTopPlayersCount: React.Dispatch<React.SetStateAction<number>>;
+}
+
+// Export Tab Component - Memoized
+const ExportTab = React.memo<ExportTabProps>(({ game, players, topPlayersCount, setTopPlayersCount }) => {
     const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
-    // Generate JSON for top players
-    const generateTopPlayersJson = useCallback(() => {
-        const allAthletes = game.heats.flatMap(heat => heat.athletes);
-        const topPlayers = allAthletes.slice(0, topPlayersCount).map(athlete => {
+    // Generate JSON for top players - memoized calculation
+    const topPlayersJson = useMemo(() => {
+        const allAthletes = game.heats?.flatMap(heat =>
+            heat.athletes
+                .filter(athlete => athlete.time !== undefined && athlete.time > 0)
+                .map(athlete => ({
+                    ...athlete,
+                    heatId: heat.heatId
+                }))
+        ) || [];
+
+        const sortedAthletes = [...allAthletes]
+            .sort((a, b) => (a.time || Infinity) - (b.time || Infinity))
+            .slice(0, topPlayersCount);
+
+        const topPlayers = sortedAthletes.map(athlete => {
             const player = players.find(p => p.usn === athlete.playerId);
             return {
                 name: player?.name || 'Unknown',
                 usn: athlete.playerId,
-                teamId: player?.teamId || ''
+                teamId: player?.teamId || '',
+                time: athlete.time,
+                rank: athlete.rank
             };
         });
 
         return JSON.stringify(topPlayers, null, 2);
-    }, [game, players, topPlayersCount]);
+    }, [game.heats, players, topPlayersCount]);
 
     // Handle copy to clipboard
-    const handleCopyToClipboard = () => {
-        const json = generateTopPlayersJson();
-        navigator.clipboard.writeText(json);
+    const handleCopyToClipboard = useCallback(() => {
+        navigator.clipboard.writeText(topPlayersJson);
         setExportDialogOpen(false);
-    };
+    }, [topPlayersJson]);
 
     return (
         <Box mt={3} display="flex" flexDirection="column" alignItems="center">
@@ -269,9 +396,9 @@ const ExportTab = ({ game, players, topPlayersCount, setTopPlayersCount, updateG
                     <TextField
                         multiline
                         rows={5}
-                        value={generateTopPlayersJson()}
+                        value={topPlayersJson}
                         fullWidth
-                        InputProps={{ readOnly: true }}
+                        slotProps={{ input: { readOnly: true } }}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -281,6 +408,9 @@ const ExportTab = ({ game, players, topPlayersCount, setTopPlayersCount, updateG
             </Dialog>
         </Box>
     );
-};
+});
+
+// Add React import at the top for memo
+import React from 'react';
 
 export default AthleticsForm;

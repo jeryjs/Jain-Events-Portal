@@ -256,7 +256,7 @@ export class Basketball {
 export class Athletics {
 	heats: {
 		heatId: string;	// this is the teamId
-		athletes: { playerId: string; rank?: number; time?: number }[];	// sometimes time is not provided
+		athletes: { playerId: string; rank: number; time: number }[];	// sometimes time is not provided
 	}[] = [];
 
 	getWinner(heatIndex: number): string {
