@@ -1,7 +1,8 @@
 import { Suspense, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper, 
-  Accordion, AccordionSummary, AccordionDetails, alpha } from '@mui/material';
+  Accordion, AccordionSummary, AccordionDetails, alpha, 
+  Dialog} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -108,54 +109,83 @@ interface ActivityAccordionProps {
 
 const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activities, eventId }) => {
   const [expanded, setExpanded] = useState(activities.length <= 3);
-  const { text, color } = getEventTypeInfo(eventType);
-  
+  const [fixtureDialog, setFixtureDialog] = useState<string | Record<string, string> | null>(null);
+  const { text: activityType, color } = getEventTypeInfo(eventType);
+
+  /// Hardcoding the fixture data for the sportastica-2025 event temporarily
+  const fixtures = eventId === "sportastica-2025" && {
+    [EventType.VOLLEYBALL]: "https://i.imgur.com/C67OIyz.png",
+    [EventType.FOOTBALL]: "https://i.imgur.com/82B4SjE.png",
+    [EventType.BASKETBALL]: { Boys: "https://i.imgur.com/OcsfJnF.png", Girls: "https://i.imgur.com/CVqnbyt.png" },
+    [EventType.CRICKET]: "https://i.imgur.com/EsfSrzV.png",
+    [EventType.THROWBALL]: "https://i.imgur.com/EsfSrzV.png"
+  } || {};
+
+  const handleFixtureClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const fixture = fixtures[eventType];
+    fixture && setFixtureDialog(fixture);
+  };
+
+  const renderFixtureDialogContent = () =>
+    !fixtureDialog ? null : typeof fixtureDialog === "string" ? (
+      <motion.img
+        src={fixtureDialog}
+        alt={`Fixture for ${activityType}`}
+        style={{ width: "100%" }}
+      />
+    ) : (
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {Object.entries(fixtureDialog).map(([key, url]) => (
+          <Box key={key} sx={{ textAlign: "center" }}>
+            <Typography variant="subtitle2">{key}</Typography>
+            <motion.img
+              src={url}
+              alt={`Fixture ${key} for ${activityType}`}
+              style={{ width: "100%" }}
+            />
+          </Box>
+        ))}
+      </Box>
+    );
+
   return (
-    <Accordion 
-      expanded={expanded} 
-      onChange={() => setExpanded(!expanded)}
-      sx={{ 
-        mb: 2, 
-        borderRadius: 2,
-        overflow: 'hidden',
-        '&:before': { display: 'none' },
-        boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-      }}
-    >
-      <AccordionSummary 
-        expandIcon={<ExpandMoreIcon />}
-        sx={{ 
-          backgroundColor: alpha(color, 0.1),
-          '& .MuiAccordionSummary-content': {
-            alignItems: 'center'
-          }
+    <>
+      <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}
+        sx={{
+          mb: 2,
+          borderRadius: 2,
+          overflow: "hidden",
+          "&:before": { display: "none" },
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
         }}
       >
-        <Chip 
-          label={text}
-          size="small"
-          sx={{ 
-            backgroundColor: color,
-            color: 'white',
-            fontWeight: 'medium',
-            mr: 2
-          }}
-        />
-        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
-          {activities.length} {getBaseEventType(eventType) === EventType.SPORTS ? 'Matches' : activities.length === 1 ? 'Activity' : 'Activities'}
-        </Typography>
-      </AccordionSummary>
-      <AccordionDetails sx={{ p: 1 }}>
-        {activities.map((activity, index) => (
-          <ActivityCard 
-            key={activity.id} 
-            activity={activity} 
-            eventId={eventId} 
-            delay={index} 
-          />
-        ))}
-      </AccordionDetails>
-    </Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{backgroundColor: alpha(color, 0.1), "& .MuiAccordionSummary-content": { alignItems: "center" }}}>
+          <Chip label={activityType} size="small" sx={{ backgroundColor: alpha(color, 0.3), color: "white", fontWeight: "medium", mr: 2}} />
+          
+          <Typography variant="subtitle1" sx={{ fontWeight: "medium" }}>
+            {activities.length}{" "} {getBaseEventType(eventType) === EventType.SPORTS? "Matches": activities.length === 1 ? "Activity" : "Activities"}
+          </Typography>
+          
+          {fixtures[eventType] && ( <IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
+            <Typography variant="caption" sx={{ color: "#fff" }}>Fixtures</Typography>
+          </IconButton>)}
+        </AccordionSummary>
+        <AccordionDetails sx={{ p: 1 }}>
+          {activities.map((activity, index) => (
+            <ActivityCard
+              key={activity.id}
+              activity={activity}
+              eventId={eventId}
+              delay={index}
+            />
+          ))}
+        </AccordionDetails>
+      </Accordion>
+      <Dialog open={Boolean(fixtureDialog)} onClose={() => setFixtureDialog(null)} maxWidth="xl" fullWidth>
+        {renderFixtureDialogContent()}
+      </Dialog>
+    </>
   );
 };
 
