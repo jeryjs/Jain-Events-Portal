@@ -1,6 +1,6 @@
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Box, Button, CircularProgress, FormControl, Grid, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
-import { renderTimeViewClock } from '@mui/x-date-pickers';
+import { Box, Button, CircularProgress, FormControl, Grid, IconButton, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
+import { ClearIcon, renderTimeViewClock } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -167,7 +167,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                     </FormControl>
 
                     <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={6} display="flex" alignItems="center">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
                                     label="Start Time"
@@ -180,8 +180,9 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                                     sx={{ width: '100%' }}
                                 />
                             </LocalizationProvider>
+                            <IconButton onClick={() => handleChange('startTime', null)}><ClearIcon /></IconButton>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={6} display="flex" alignItems="center">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
                                     label="End Time"
@@ -199,6 +200,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                                     sx={{ width: '100%' }}
                                 />
                             </LocalizationProvider>
+                            <IconButton onClick={() => handleChange('endTime', null)}><ClearIcon /></IconButton>
                         </Grid>
                     </Grid>
                 </Box>
