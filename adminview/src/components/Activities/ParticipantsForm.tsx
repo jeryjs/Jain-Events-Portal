@@ -267,7 +267,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                                 >
                                     <ListItemText
                                         primary={p.name}
-                                        secondary={p.detailsString}
+                                        secondary={p.detailsString??`USN: ${p.usn ?? 'N/A'} • Branch: ${p.branch ?? 'N/A'}`}
                                     />
                                 </ListItem>
                             ))}
