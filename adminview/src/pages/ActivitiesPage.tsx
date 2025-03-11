@@ -96,9 +96,23 @@ const ActivitiesPage = () => {
     
     // Error handling
     const hasError = activitiesError || error;
+    if (hasError) {
+        return (
+            <Container maxWidth={false} sx={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Paper sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography variant="h5" gutterBottom>
+                        {activitiesError ? 'Failed to load activities' : 'An error occurred'}
+                    </Typography>
+                    <Typography color="textSecondary">
+                        {activitiesError ? activitiesError.message : error}
+                    </Typography>
+                </Paper>
+            </Container>
+        );
+    }
     
     return (
-        <Container maxWidth={false} sx={{ height: '100vh', py: 3 }}>
+        <Container maxWidth={false} sx={{ height: '80vh' }}>
             {/* Header */}
             <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, p: 2 }}>
                 <Box>
@@ -134,9 +148,9 @@ const ActivitiesPage = () => {
             </Snackbar>
 
             {/* Main content */}
-            <Grid container spacing={3} sx={{ height: 'calc(100% - 80px)' }}>
+            <Grid container spacing={3}>
                 {/* Left pane - Activities list */}
-                <Grid item xs={12} md={3}>
+                <Grid item xs={12} md={3} sx={{ height: '100vh' }}>
                     <ActivitiesList
                         eventId={eventId || ''}
                         selectedActivityId={activityId}
@@ -146,7 +160,7 @@ const ActivitiesPage = () => {
                 </Grid>
 
                 {/* Right pane - Activity form */}
-                <Grid item xs={12} md={9} sx={{ height: '100%' }}>
+                <Grid item xs={12} md={9} >
                     {isActivitiesLoading ? (
                         <Paper 
                             sx={{ 
@@ -197,7 +211,6 @@ const ActivitiesPage = () => {
                             </Typography>
                         </Paper>
                     ) : (
-                        <Box sx={{ height: '100%', overflow: 'auto' }}>
                             <ActivityForm
                                 eventId={eventId}
                                 activity={isCreating ? null : selectedActivity}
@@ -205,7 +218,6 @@ const ActivitiesPage = () => {
                                 onSave={handleSaveActivity}
                                 onDelete={handleDeleteActivity}
                             />
-                        </Box>
                     )}
                 </Grid>
             </Grid>

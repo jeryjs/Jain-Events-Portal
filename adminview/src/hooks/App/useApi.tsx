@@ -53,10 +53,10 @@ async function apiFetch<T>(url: string, options: RequestInit = {}) {
 
     // For DELETE requests, responses might be empty
     if (response.status === 204 || response.headers.get('Content-Length') === '0') {
-      return { success: true };
+      return { success: true } as T;
     }
 
-    return await response.json();
+    return await response.json() as T;
   } catch (error) {
     console.error('API fetch error:', error);
     throw error;
