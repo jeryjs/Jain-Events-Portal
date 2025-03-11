@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-Welcome to the Jain Events Portal project! This document outlines how to contribute in a manner that keeps the codebase clean, efficient and consistent.
+Welcome to the Jain FET Hub project! This document outlines how to contribute in a manner that keeps the codebase clean, efficient and consistent.
 
 ## Project Setup
 - Follow the instructions on this GitHub repo to get the project running: [Build Instructions](/README.md#build)

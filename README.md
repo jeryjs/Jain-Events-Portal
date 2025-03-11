@@ -1,4 +1,4 @@
-# JAIN Events Portal
+# Jain FET Hub
 > https://jain-events-portal.vercel.app/
 
 
