@@ -13,7 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const activities_1 = require("../services/activities");
+const activities_1 = require("@services/activities");
+const auth_1 = require("@middlewares/auth");
 const router = express_1.default.Router();
 /**
  * Activity Routes
@@ -46,7 +47,7 @@ router.get('/activities/:eventId/:activityId', (req, res) => __awaiter(void 0, v
     }
 }));
 // Create new activity
-router.post('/activities/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/activities/:eventId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newActivity = yield (0, activities_1.createActivity)(req.params.eventId, req.body);
         res.status(201).json(newActivity);
@@ -57,7 +58,7 @@ router.post('/activities/:eventId', (req, res) => __awaiter(void 0, void 0, void
     }
 }));
 // Update activity
-router.patch('/activities/:eventId/:activityId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updatedActivity = yield (0, activities_1.updateActivity)(req.params.eventId, req.params.activityId, req.body);
         if (updatedActivity) {
@@ -73,7 +74,7 @@ router.patch('/activities/:eventId/:activityId', (req, res) => __awaiter(void 0,
     }
 }));
 // Delete activity
-router.delete('/activities/:eventId/:activityId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, activities_1.deleteActivity)(req.params.eventId, req.params.activityId);
         if (result) {

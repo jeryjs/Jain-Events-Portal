@@ -6,16 +6,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyToken = exports.generateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable not set.');
+}
 /**
  * Generates a JSON Web Token (JWT) for user authentication
- * @param {UserData} userData - The user data object containing the username
+ * @param {string} username - The username of the user
  * @param {string} role - The role of the user
  * @returns {string} A signed JWT containing the user information
  */
-const generateToken = (userData, role) => {
+const generateToken = (userData) => {
     return jsonwebtoken_1.default.sign({
         username: userData.username,
-        role,
+        role: userData.role,
     }, JWT_SECRET, { expiresIn: '24h' });
 };
 exports.generateToken = generateToken;

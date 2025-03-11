@@ -11,7 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 // filepath: y:\All-Projects\Jain-Events-Portal\backend\routes\eventRoutes.ts
 const express_1 = require("express");
-const events_1 = require("../services/events");
+const auth_1 = require("@middlewares/auth");
+const events_1 = require("@services/events");
 const router = (0, express_1.Router)();
 /**
  * Event Routes
@@ -44,7 +45,7 @@ router.get('/events/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 }));
 // Create new event
-router.post('/events', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/events', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newEvent = yield (0, events_1.createEvent)(req.body);
         res.status(201).json(newEvent);
@@ -55,7 +56,7 @@ router.post('/events', (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 }));
 // Update event
-router.patch('/events/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/events/:eventId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updatedEvent = yield (0, events_1.updateEvent)(req.params.eventId, req.body);
         res.json(updatedEvent);
@@ -66,7 +67,7 @@ router.patch('/events/:eventId', (req, res) => __awaiter(void 0, void 0, void 0,
     }
 }));
 // Delete event
-router.delete('/events/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/events/:eventId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, events_1.deleteEvent)(req.params.eventId);
         if (result) {

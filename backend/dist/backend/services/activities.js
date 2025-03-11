@@ -8,17 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -27,6 +16,8 @@ exports.deleteActivity = exports.updateActivity = exports.createActivity = expor
 const firebase_1 = __importDefault(require("@config/firebase"));
 const uuid_1 = require("uuid");
 const cache_1 = require("@config/cache");
+const models_1 = require("@common/models");
+const utils_1 = require("@common/utils");
 // Collection references
 const eventsCollection = firebase_1.default.collection('events');
 const activitiesCollection = (eventId) => eventsCollection.doc(eventId).collection('activities');
@@ -41,7 +32,7 @@ const getActivities = (eventId) => __awaiter(void 0, void 0, void 0, function* (
         return cachedActivities;
     }
     const snapshot = yield activitiesCollection(eventId).get();
-    const activities = snapshot.docs.map(doc => (Object.assign({ id: doc.id, eventId }, doc.data())));
+    const activities = (0, utils_1.parseActivities)(snapshot.docs.map(doc => doc.data()));
     cache_1.cache.set(cacheKey, activities, cache_1.TTL.ACTIVITIES);
     return activities;
 });
@@ -59,7 +50,7 @@ const getActivityById = (eventId, activityId) => __awaiter(void 0, void 0, void 
     const doc = yield activitiesCollection(eventId).doc(activityId).get();
     if (!doc.exists)
         return null;
-    const activityData = Object.assign({ id: doc.id, eventId }, doc.data());
+    const activityData = models_1.Activity.parse(doc.data());
     cache_1.cache.set(cacheKey, activityData, cache_1.TTL.ACTIVITIES);
     return activityData;
 });
@@ -74,13 +65,11 @@ const createActivity = (eventId, activityData) => __awaiter(void 0, void 0, void
     }
     const activityId = activityData.id || (0, uuid_1.v4)();
     const activityDoc = activitiesCollection(eventId).doc(activityId);
-    const { id, eventId: _ } = activityData, dataToStore = __rest(activityData, ["id", "eventId"]);
-    if (dataToStore.date) {
-        dataToStore.date = dataToStore.date instanceof Date ?
-            dataToStore.date : new Date(dataToStore.date);
-    }
-    yield activityDoc.set(dataToStore);
-    return Object.assign({ id: activityId, eventId }, dataToStore);
+    yield activityDoc.set(activityData);
+    // updateActivitiesCache(eventId, activityId, dataToStore);
+    cache_1.cache.set(`activities-${eventId}-${activityId}`, activityData, cache_1.TTL.ACTIVITIES);
+    cache_1.cache.del(`activities-${eventId}`);
+    return activityData;
 });
 exports.createActivity = createActivity;
 /**
@@ -91,14 +80,11 @@ const updateActivity = (eventId, activityId, activityData) => __awaiter(void 0, 
     const doc = yield activityDoc.get();
     if (!doc.exists)
         return null;
-    const { id, eventId: _ } = activityData, dataToUpdate = __rest(activityData, ["id", "eventId"]);
-    if (dataToUpdate.date) {
-        dataToUpdate.date = dataToUpdate.date instanceof Date ?
-            dataToUpdate.date : new Date(dataToUpdate.date);
-    }
-    yield activityDoc.update(dataToUpdate);
-    const updatedDoc = yield activityDoc.get();
-    return Object.assign({ id: activityId, eventId }, updatedDoc.data());
+    yield activityDoc.update(activityData);
+    // updateActivitiesCache(eventId, activityId, updatedDoc.data());
+    cache_1.cache.set(`activities-${eventId}-${activityId}`, activityData, cache_1.TTL.ACTIVITIES);
+    cache_1.cache.del(`activities-${eventId}`);
+    return activityData;
 });
 exports.updateActivity = updateActivity;
 /**
@@ -106,10 +92,22 @@ exports.updateActivity = updateActivity;
  */
 const deleteActivity = (eventId, activityId) => __awaiter(void 0, void 0, void 0, function* () {
     const activityDoc = activitiesCollection(eventId).doc(activityId);
-    const doc = yield activityDoc.get();
-    if (!doc.exists)
-        return false;
     yield activityDoc.delete();
+    cache_1.cache.del(`activities-${eventId}-${activityId}`);
+    cache_1.cache.del(`activities-${eventId}`);
     return true;
 });
 exports.deleteActivity = deleteActivity;
+// cache utility function
+const updateActivitiesCache = (eventId, activityId, data) => {
+    const cacheKey = `activities-${eventId}`;
+    const cachedActivities = (cache_1.cache.get(cacheKey) || []);
+    const updatedActivities = cachedActivities.map(activity => {
+        if (activity.id === activityId) {
+            return Object.assign(Object.assign({}, activity), data);
+        }
+        return activity;
+    });
+    cache_1.cache.set(`${cacheKey}-${activityId}`, data, cache_1.TTL.ACTIVITIES);
+    cache_1.cache.set(cacheKey, updatedActivities, cache_1.TTL.ACTIVITIES);
+};
