@@ -45,6 +45,7 @@ const TeamBox = styled(Box)(({ theme }) => `
 const TeamScore = styled(Box)<{ winner?: boolean }>(({ theme, winner }) => `
   display: flex;
   flex-direction: column;
+  width: min-content;
   align-items: center;
   padding: ${theme.spacing(0.5, 2)};
   ${winner ? `
@@ -59,7 +60,7 @@ const TeamName = styled(Typography)(({ theme }) => `
   font-weight: 500;
   font-size: 0.85rem;
   color: ${theme.palette.text.secondary};
-  max-width: 80px;
+  max-width: 30vw;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
@@ -486,7 +487,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                   {sportIcon}
                 </Avatar>
                 <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '1.1rem' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: { xs: '0.9rem', md: '1.1rem' } }}>
                     {activity.name}
                   </Typography>
                 </Box>
@@ -494,41 +495,35 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
 
               <Divider sx={{ my: 1.5 }} />
 
-              <TeamBox>
-                <TeamScore winner={status === 'completed' && isTeamsConfirmed && matchResult.winner === team1?.id}>
+                <TeamBox>
+                <Box sx={{ flex: 1, maxWidth: 'calc(50% - 20px)', textAlign: 'center' }}>
+                  <TeamScore winner={status === 'completed' && isTeamsConfirmed && matchResult.winner === team1?.id}>
                   <TeamName>{team1?.name || 'TBD'}</TeamName>
                   {status !== 'upcoming' && isTeamsConfirmed && (
                     <>
-                      <TeamScoreValue winner={matchResult.winner === team1?.id}>
-                        {sportActivity.getTotalScore(team1.id)}
-                      </TeamScoreValue>
-                      {sportActivity.getSecondaryStat(team1.id) && (
-                        <ScoreSecondary>
-                          {sportActivity.getSecondaryStat(team1.id)}
-                        </ScoreSecondary>
-                      )}
+                      <TeamScoreValue winner={matchResult.winner === team1?.id}> {sportActivity.getTotalScore(team1.id)}</TeamScoreValue>
+                      {sportActivity.getSecondaryStat(team1.id) && (<ScoreSecondary> {sportActivity.getSecondaryStat(team1.id)}</ScoreSecondary>)}
                     </>
                   )}
-                </TeamScore>
+                  </TeamScore>
+                </Box>
 
-                <VsText>VS</VsText>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 1 }}>
+                  <VsText>VS</VsText>
+                </Box>
 
-                <TeamScore winner={status === 'completed' && isTeamsConfirmed && matchResult.winner === team2?.id}>
+                <Box sx={{ flex: 1, maxWidth: 'calc(50% - 20px)', textAlign: 'center', justifyItems: 'flex-end' }}>
+                  <TeamScore winner={status === 'completed' && isTeamsConfirmed && matchResult.winner === team2?.id}>
                   <TeamName>{team2?.name || 'TBD'}</TeamName>
                   {status !== 'upcoming' && isTeamsConfirmed && (
                     <>
-                      <TeamScoreValue winner={matchResult.winner === team2?.id}>
-                        {sportActivity.getTotalScore(team2.id)}
-                      </TeamScoreValue>
-                      {sportActivity.getSecondaryStat(team2.id) && (
-                        <ScoreSecondary>
-                          {sportActivity.getSecondaryStat(team2.id)}
-                        </ScoreSecondary>
-                      )}
+                      <TeamScoreValue winner={matchResult.winner === team2?.id}>{sportActivity.getTotalScore(team2.id)}</TeamScoreValue>
+                      {sportActivity.getSecondaryStat(team2.id) && ( <ScoreSecondary>{sportActivity.getSecondaryStat(team2.id)}</ScoreSecondary> )}
                     </>
                   )}
-                </TeamScore>
-              </TeamBox>
+                  </TeamScore>
+                </Box>
+                </TeamBox>
 
               {!isTeamsConfirmed && (
                 <Box sx={{ mt: 2, textAlign: 'center' }}>
