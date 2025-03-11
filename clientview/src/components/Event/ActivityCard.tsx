@@ -1,6 +1,6 @@
 import { EventType } from '@common/constants';
 import Activity from '@common/models/Activity';
-import SportsActivity, { Sport } from '@common/models/sports/SportsActivity';
+import SportsActivity, { Sport, Athletics } from '@common/models/sports/SportsActivity';
 import { getBaseEventType } from '@common/utils';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -9,11 +9,13 @@ import SportsBasketballIcon from '@mui/icons-material/SportsBasketball';
 import SportsCricketIcon from '@mui/icons-material/SportsCricket';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { Avatar, Badge, Box, Card, CardContent, Chip, Divider, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { generateColorFromString } from '@utils/utils';
 import { motion } from 'framer-motion';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
 const StyledCard = styled(Card)(({ theme }) => `
@@ -145,6 +147,7 @@ const getSportIcon = (type: EventType) => {
     case EventType.FOOTBALL: return <SportsSoccerIcon />;
     case EventType.CRICKET: return <SportsCricketIcon />;
     case EventType.BASKETBALL: return <SportsBasketballIcon />;
+    case EventType.ATHLETICS: return <DirectionsRunIcon />;
     default: return <SportsEsportsIcon />;
   }
 };
@@ -207,6 +210,260 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
     const team1 = sportActivity.teams?.[0];
     const team2 = sportActivity.teams?.[1];
     const isTeamsConfirmed = !!team1 && !!team2;
+
+    // Render athletics-specific card UI
+    if (activity.eventType === EventType.ATHLETICS) {
+      const athleticsGame = sportActivity.game as Athletics;
+      
+      // Get top 3 athletes across all heats based on time
+      const topAthletes = useMemo(() => {
+        const allAthletes = athleticsGame.heats?.flatMap(heat => 
+          heat.athletes
+            .filter(a => a.time && a.time > 0)
+            .map(athlete => ({
+              ...athlete,
+              heatId: heat.heatId,
+              teamName: sportActivity.teams?.find(t => t.id === heat.heatId)?.name || '',
+              athleteName: sportActivity.participants?.find(p => p.usn === athlete.playerId)?.name || 'Unknown'
+            }))
+        ) || [];
+        
+        return allAthletes.sort((a, b) => a.time - b.time).slice(0, 3);
+      }, [athleticsGame.heats, sportActivity.teams, sportActivity.participants]);
+      
+      return (
+        <MotionBox
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Link to={`/${eventId}/${activity.id}`} style={{ textDecoration: 'none' }}>
+            <StyledCard elevation={4}>
+              <MatchStatus status={status}>
+                {getStatusIcon(status)}
+                <Typography>{status}</Typography>
+              </MatchStatus>
+
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Avatar
+                    sx={{
+                      bgcolor: `${chipColor}22`,
+                      color: chipColor,
+                      width: 36,
+                      height: 36,
+                      mr: 1.5
+                    }}
+                  >
+                    <DirectionsRunIcon />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '1.1rem' }}>
+                      {activity.name}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Divider sx={{ my: 1.5 }} />
+
+                {status === 'upcoming' ? (
+                  <Box sx={{ mt: 1.5 }}>
+                    <Typography variant="body2" color="text.secondary" align="center">
+                      {new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} • {new Date(activity.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </Typography>
+                  </Box>
+                ) : (
+                  <>
+                    {/* Event Stats Line */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                      <Chip 
+                        icon={<DirectionsRunIcon sx={{ fontSize: '0.85rem !important' }} />} 
+                        label={`${athleticsGame.heats?.length || 0} Heats`}
+                        size="small"
+                        sx={{ 
+                          bgcolor: 'background.paper',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          '& .MuiChip-label': { px: 1, py: 0.5 },
+                          '& .MuiChip-icon': { ml: 0.5 }
+                        }}
+                      />
+                      <Chip 
+                        icon={<Badge sx={{ 
+                          '& .MuiBadge-badge': { 
+                            position: 'static',
+                            transform: 'none',
+                            fontSize: '0.7rem',
+                            height: '16px',
+                            minWidth: '16px',
+                            padding: 0
+                          }
+                        }} 
+                        badgeContent={sportActivity.participants?.length || 0} color="primary"
+                        />} 
+                        label="Athletes"
+                        size="small"
+                        sx={{ 
+                          bgcolor: 'background.paper',
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          '& .MuiChip-label': { pl: 1, pr: 1.5, py: 0.5 },
+                        }}
+                      />
+                    </Box>
+
+                    {/* Top Performers Section */}
+                    <Typography 
+                      variant="subtitle2" 
+                      sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        mb: 1,
+                        color: 'primary.main',
+                        fontWeight: 600
+                      }}
+                    >
+                      <EmojiEventsIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+                      Leaderboard
+                    </Typography>
+                    
+                    {topAthletes.length > 0 ? (
+                      <Box sx={{ 
+                        borderRadius: 1,
+                        overflow: 'hidden',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                      }}>
+                        {topAthletes.map((athlete, idx) => {
+                          const medalColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+                          
+                          return (
+                            <Box 
+                              key={athlete.playerId}
+                              sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center',
+                                justifyContent: 'space-between', 
+                                p: 1,
+                                bgcolor: idx % 2 === 0 ? 'rgba(0, 0, 0, 0.02)' : 'transparent',
+                                borderBottom: idx < topAthletes.length - 1 ? '1px solid' : 'none',
+                                borderColor: 'divider',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                '&:after': idx < 3 ? {
+                                  content: '""',
+                                  position: 'absolute',
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: '4px',
+                                  backgroundColor: medalColors[idx]
+                                } : {}
+                              }}
+                            >
+                              <Box sx={{ display: 'flex', alignItems: 'center', maxWidth: '70%' }}>
+                                <Typography 
+                                  variant="caption" 
+                                  sx={{ 
+                                    color: 'text.secondary',
+                                    fontWeight: 'bold',
+                                    minWidth: '16px'
+                                  }}
+                                >
+                                  {idx + 1}
+                                </Typography>
+                                <Avatar 
+                                  sx={{ 
+                                    width: 24, 
+                                    height: 24, 
+                                    fontSize: '0.8rem',
+                                    bgcolor: idx < 3 ? `${medalColors[idx]}33` : 'grey.300',
+                                    color: idx < 3 ? medalColors[idx] : 'text.secondary',
+                                    mr: 1,
+                                    ml: 0.5
+                                  }}
+                                >
+                                  {athlete.athleteName.charAt(0)}
+                                </Avatar>
+                                <Typography 
+                                  variant="body2" 
+                                  sx={{ 
+                                    fontWeight: idx === 0 ? 600 : 400,
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                  }}
+                                >
+                                  {athlete.athleteName}
+                                  <Typography 
+                                    component="span" 
+                                    variant="caption" 
+                                    color="text.secondary"
+                                    sx={{ ml: 0.5 }}
+                                  >
+                                    ({athlete.teamName})
+                                  </Typography>
+                                </Typography>
+                              </Box>
+                              <Typography 
+                                variant="body2" 
+                                fontWeight={idx === 0 ? 600 : 400} 
+                                sx={{ 
+                                  color: idx < 3 ? 
+                                    idx === 0 ? 'primary.main' : 
+                                    idx === 1 ? 'secondary.main' : 
+                                    'warning.main' : 'text.primary',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {athlete.time?.toFixed(2)}s
+                              </Typography>
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    ) : (
+                      <Box sx={{ 
+                        textAlign: 'center', 
+                        py: 2, 
+                        bgcolor: 'background.paper',
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                        borderRadius: 1
+                      }}>
+                        <Typography color="text.secondary" variant="body2">
+                          {status === 'ongoing' ? 'Event in progress - No results yet' : 'No results recorded'}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {/* Status Footer */}
+                    <Box 
+                      sx={{ 
+                        mt: 2,
+                        p: 1,
+                        borderRadius: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: status === 'ongoing' ? 'error.main' : 'success.main',
+                        color: 'white'
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ fontWeight: 600, letterSpacing: 1 }}>
+                        {status === 'ongoing' ? 'EVENT IN PROGRESS' : 'EVENT COMPLETED'}
+                      </Typography>
+                    </Box>
+                  </>
+                )}
+              </CardContent>
+            </StyledCard>
+          </Link>
+        </MotionBox>
+      );
+    }
 
     return (
       <MotionBox
