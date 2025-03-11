@@ -10,6 +10,7 @@ export default class Event {
 		timings: any[] | Date[],
 		public description: string,
 		public venue: string,
+		public galleryLink: string,
 		public banner: { url?: string; customCss?: string }
 	) {
 		// Convert Timestamp-like objects (from firestore) to Date
@@ -33,6 +34,7 @@ export default class Event {
 			data.timings || [],
 			data.description || '',
 			data.venue || '',
+			data.galleryLink || '',
 			data.banner || {}
 		);
 	}
@@ -49,6 +51,7 @@ export default class Event {
 			timings: this.timings.map((t) => t.toISOString()),
 			description: this.description,
 			venue: this.venue,
+			galleryLink: this.galleryLink,
 			banner: this.banner,
 		};
 	}

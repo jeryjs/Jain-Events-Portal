@@ -37,7 +37,8 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
   // Default States for form fields
   const [formData, setFormData] = useState<Partial<Event>>({
     ...Event.parse({}).toJSON(),
-    timings: [new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000)]
+    timings: [new Date(), new Date(Date.now() + 2 * 60 * 60 * 1000)],
+    galleryLink: '' // Add googleDriveLink to formData
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isImageEditOpen, setIsImageEditOpen] = useState(false);
@@ -419,6 +420,19 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
               error={!!formErrors.description}
               helperText={formErrors.description}
               required
+            />
+          </Box>
+
+          {/* Google Drive Link Section */}
+          <Box sx={{ mb: 4 }}>
+            <TextField
+              label="Google Drive Link"
+              placeholder="Enter Google Drive link here..."
+              fullWidth
+              margin="normal"
+              value={formData.galleryLink}
+              onChange={(e) => editFormData('googleDriveLink', e.target.value)}
+              sx={{ mb: 4 }}
             />
           </Box>
 
