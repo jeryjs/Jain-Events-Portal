@@ -293,6 +293,20 @@ export class OtherSport {
 		const winningPoints = Math.max(...teamPoints.map((t) => t.points));
 		return teamPoints.find((t) => t.points === winningPoints)?.team || null;
 	}
+
+	getTotalPoints(teamId?: string) {
+		if (teamId) {
+			return this.points.find((t) => t.teamId === teamId)?.points || 0;
+		}
+		return this.points.reduce((total, t) => total + t.points, 0);
+	}
+
+	getTopScorers(limit: number = 5): { teamId: string; points: number }[] {
+		return this.points
+			.map((t) => ({ teamId: t.teamId, points: t.points }))
+			.sort((a, b) => b.points - a.points)
+			.slice(0, limit);
+	}
 }
 
 export type Sport = Cricket | Football | Basketball | Athletics | OtherSport;
