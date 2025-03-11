@@ -1,4 +1,4 @@
-import { SportsActivity } from '@common/models';
+import { SportsActivity, SportsPlayer } from '@common/models';
 import { Athletics, Sport } from '@common/models/sports/SportsActivity';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -34,59 +34,37 @@ interface AthleticsFormProps {
 
 export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => {
     const theme = useTheme();
-    const game = useMemo(() => (formData.game as Athletics || new Athletics()), [formData.game]);
-    const teams = useMemo(() => formData.teams || [], [formData.teams]);
-    const players = useMemo(() => formData.participants || [], [formData.participants]);
 
     const [activeTab, setActiveTab] = useState(0);
     const [topPlayersCount, setTopPlayersCount] = useState(5);
 
-    // Use a ref to track initialization status
-    const initializedRef = useRef(false);
-
-    // Update game data in the parent form
-    const updateGameData = useCallback((updatedGame: Partial<Athletics>) => {
-        setFormData(({ ...formData, game: { ...game, ...updatedGame } } as SportsActivity<Sport>));
-    }, [setFormData]);
-
-    // Initialize heats only once when component mounts or when teams/players change significantly
+    // Initialize Heats
     useEffect(() => {
-        // Skip if already initialized or if no teams
-        if (initializedRef.current || teams.length === 0) return;
+        const game = formData.game as Athletics;
+        const teamIds = new Set(formData.teams?.map(team => team.id));
+        const currentHeats = game?.heats || [];
 
-        // Check if initialization is needed
-        const needsInit = !game.heats || game.heats.length === 0;
-        const needsUpdate = game.heats && game.heats.length > 0 &&
-            (game.heats.length !== teams.length ||
-                teams.some(team => !game.heats.find(h => h.heatId === team.id)));
+        // Remove heats with heatId not in teamIds
+        let newHeats = currentHeats.filter(heat => teamIds.has(heat.heatId));
 
-        if (needsInit || needsUpdate) {
-            console.log("Initializing athletics heats");
-            const initialHeats = teams.map(team => {
-                // Find existing heat for this team
-                const existingHeat = game.heats?.find(h => h.heatId === team.id);
+        // Add heats for teams missing in newHeats
+        formData.teams?.forEach(team => {
+            if (!newHeats.find(heat => heat.heatId === team.id)) {
+                newHeats.push({ heatId: team.id, athletes: [] });
+            }
+        });
 
-                // Get athletes for this team
-                const teamPlayers = players.filter(p => p.teamId === team.id);
+        // Update heats in game data
+        updateGameData({ heats: newHeats });
 
-                return {
-                    heatId: team.id,
-                    athletes: teamPlayers.map(player => {
-                        // Preserve existing athlete data if available
-                        const existingAthlete = existingHeat?.athletes?.find(a => a.playerId === player.usn);
-                        return existingAthlete || {
-                            playerId: player.usn,
-                            time: 0,
-                            rank: 0
-                        };
-                    })
-                };
-            });
-
-            updateGameData({ heats: initialHeats });
-            initializedRef.current = true;
-        }
-    }, [teams, players, game.heats, updateGameData]);
+        console.log("initialised: "+ JSON.stringify(formData.game));
+    }, [formData.teams]);
+    
+    const updateGameData = (gameData: Partial<Athletics>) => {
+        console.log(gameData);
+        
+        setFormData({ ...formData, game: { ...formData.game, ...gameData } } as SportsActivity<Athletics>)
+    }
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setActiveTab(newValue);
@@ -109,12 +87,12 @@ export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => 
 
             {activeTab === 0 && (
                 <Box mt={3}>
-                    {teams.map((team) => (
+                    {formData.teams?.map((team) => (
                         <HeatManager
                             key={team.id}
                             team={team}
-                            game={game}
-                            players={players.filter(p => p.teamId === team.id)} // Pre-filter players for each team
+                            game={formData.game as Athletics}
+                            players={formData.participants.filter(p => p.teamId == team.id)}
                             updateGameData={updateGameData}
                         />
                     ))}
@@ -123,8 +101,8 @@ export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => 
 
             {activeTab === 1 && (
                 <ExportTab
-                    game={game}
-                    players={players}
+                    game={formData.game as Athletics}
+                    players={formData.participants}
                     topPlayersCount={topPlayersCount}
                     setTopPlayersCount={setTopPlayersCount}
                 />
@@ -135,125 +113,82 @@ export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => 
 
 // Heat Manager Component Props
 interface HeatManagerProps {
-    team: { id: string; name: string };
+    team: Record<string, any>;
     game: Athletics;
-    players: any[]; // Replace 'any' with the actual type of players
+    players: SportsPlayer[];
     updateGameData: (updatedGame: Partial<Athletics>) => void;
 }
 
-// Heat Manager Component - Memoized to prevent unnecessary re-renders
+// Heat Manager Accordion - Memoized to prevent unnecessary re-renders
 const HeatManager = React.memo<HeatManagerProps>(({ team, game, players, updateGameData }) => {
-    const theme = useTheme();
-    const heat = useMemo(() =>
-        game.heats?.find(h => h.heatId === team.id) ||
-        { heatId: team.id, athletes: [] },
-        [game.heats, team.id]);
-
     const [expanded, setExpanded] = useState(false);
+    let heat = game.heats?.find(h => h.heatId === team.id);
+    if (!heat) {
+        heat = { heatId: team.id, athletes: [] };
+        updateGameData({ heats: [...(game.heats || []), heat] });
+    }
 
-    const handleChange = () => {
-        setExpanded(!expanded);
+    // Merged update function for both athlete time and rank
+    const updateAthlete = (playerId: string, updates: { time?: number; rank?: number }) => {
+        const heatIndex = game.heats?.findIndex(h => h.heatId === heat.heatId);
+
+        const updatedHeat = { ...heat };
+        const idx = updatedHeat.athletes.findIndex(a => a.playerId === playerId);
+        const newAthlete =
+            idx === -1
+                ? { playerId, time: updates.time ?? 0, rank: updates.rank ?? 0 }
+                : { ...updatedHeat.athletes[idx], ...updates };
+
+        if (idx === -1) {
+            updatedHeat.athletes.push(newAthlete);
+        } else {
+            updatedHeat.athletes[idx] = newAthlete;
+        }
+
+        // If the updated athlete's time is not 0, auto update all ranks
+        if (newAthlete.time !== 0) {
+            const athletesWithTime = updatedHeat.athletes.filter(a => a.time !== 0);
+            athletesWithTime.sort((a, b) => a.time - b.time);
+            athletesWithTime.forEach((athlete, index) => {
+                const i = updatedHeat.athletes.findIndex(a => a.playerId === athlete.playerId);
+                updatedHeat.athletes[i] = { ...updatedHeat.athletes[i], rank: index + 1 };
+            });
+        }
+        
+        updateGameData({ heats: game.heats?.map((h, i) => i === heatIndex ? updatedHeat : h) });
     };
 
-    //Update athlete time
-    const updateAthleteTime = useCallback((playerId: string, time: number) => {
-        const updatedHeats = [...(game.heats || [])];
-        const heatIndex = updatedHeats.findIndex(h => h.heatId === team.id);
-
-        if (heatIndex === -1) return;
-
-        const athleteIndex = updatedHeats[heatIndex].athletes.findIndex(a => a.playerId === playerId);
-        if (athleteIndex === -1) return;
-
-        // Create a new array with the updated athlete
-        const updatedAthletes = [...updatedHeats[heatIndex].athletes];
-        updatedAthletes[athleteIndex] = {
-            ...updatedAthletes[athleteIndex],
-            time
-        };
-
-        // Auto-assign ranks based on time
-        const sortedAthletes = [...updatedAthletes]
-            .filter(a => a.time > 0)
-            .sort((a, b) => (a.time || Infinity) - (b.time || Infinity));
-
-        sortedAthletes.forEach((athlete, index) => {
-            const athleteIdx = updatedAthletes.findIndex(a => a.playerId === athlete.playerId);
-            if (athleteIdx !== -1) {
-                updatedAthletes[athleteIdx] = {
-                    ...updatedAthletes[athleteIdx],
-                    rank: index + 1
-                };
-            }
-        });
-
-        // Athletes with time=0 get rank=0
-        updatedAthletes.forEach((athlete, idx) => {
-            if (athlete.time === 0) {
-                updatedAthletes[idx] = {
-                    ...athlete,
-                    rank: 0
-                };
-            }
-        });
-
-        updatedHeats[heatIndex] = {
-            ...updatedHeats[heatIndex],
-            athletes: updatedAthletes
-        };
-
-        updateGameData({ heats: updatedHeats });
-    }, [team.id, updateGameData]);
-
-    //Update athlete rank
-    const updateAthleteRank = useCallback((playerId: string, rank: number) => {
-        {
-            const updatedHeats = [...(game.heats || [])];
-            const heatIndex = updatedHeats.findIndex(h => h.heatId === team.id);
-
-            if (heatIndex === -1) return;
-            
-            const athleteIndex = updatedHeats[heatIndex].athletes.findIndex(a => a.playerId === playerId);
-            if (athleteIndex === -1) return;
-            
-            // Create a new array with the updated athlete
-            const updatedAthletes = [...updatedHeats[heatIndex].athletes];
-            updatedAthletes[athleteIndex] = {
-                ...updatedAthletes[athleteIndex],
-                rank
-            };
-            
-            updatedHeats[heatIndex] = {
-                ...updatedHeats[heatIndex],
-                athletes: updatedAthletes
-            };
-            
-            updateGameData({ heats: updatedHeats });
-        }
-    }, [team.id, updateGameData]);
-
     return (
-        <Accordion expanded={expanded} onChange={handleChange}>
+        <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle1" fontWeight="bold">{team.name} Heat</Typography>
+                <Typography variant="subtitle1" fontWeight="bold">
+                    {team.name}
+                </Typography>
             </AccordionSummary>
             <AccordionDetails>
                 <List dense>
                     {players.map((player) => {
-                        const athlete = heat.athletes?.find(a => a.playerId === player.usn) || { playerId: player.usn, time: 0, rank: 0 };
+                        const athlete =
+                            heat.athletes?.find(a => a.playerId === player.usn) ||
+                            { playerId: player.usn, time: 0, rank: 0 };
 
                         return (
                             <AthleteListItem
                                 key={player.usn}
                                 player={player}
                                 athlete={athlete}
-                                updateAthleteTime={updateAthleteTime}
-                                updateAthleteRank={updateAthleteRank}
+                                updateAthleteTime={(playerId, time) => updateAthlete(playerId, { time })}
+                                updateAthleteRank={(playerId, rank) => updateAthlete(playerId, { rank })}
                             />
                         );
                     })}
                     {players.length === 0 && (
-                        <Typography variant="body2" color="textSecondary" align="center" sx={{ py: 2 }}>
+                        <Typography
+                            variant="body2"
+                            color="textSecondary"
+                            align="center"
+                            sx={{ py: 2 }}
+                        >
                             No athletes in this heat
                         </Typography>
                     )}
@@ -300,7 +235,7 @@ const AthleteListItem = React.memo<AthleteListItemProps>(({ player, athlete, upd
                 value={athlete.time || 0}
                 onChange={handleTimeChange}
                 sx={{ width: 100, mr: 2 }}
-                inputProps={{ min: 0, step: 0.01 }}
+                inputProps={{ min: 0, step: 0.1 }}
             />
             <TextField
                 label="Rank"
