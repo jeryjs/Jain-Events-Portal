@@ -11,7 +11,7 @@ export default class SportsPlayer extends Participant {
     branch: string,
     event: EventType,
     public teamId: string,
-    public position: string,
+    public position: "playing" | "substitute",
     public stats: {}
   ) {
     super(usn, name, gender, email, phone, branch, event);

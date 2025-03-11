@@ -12,7 +12,7 @@ interface GenericSportFormProps {
 }
 
 export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) => {
-  const game = formData.game as OtherSport;
+  const game = (formData.game || {}) as OtherSport;
   const teams = formData.teams || [];
 
   const [notification, setNotification] = useState<string | null>(null);
