@@ -148,23 +148,23 @@ export class Football {
 	}[] = [];
 
 	get winner() {
-		const teamGoals = this.stats.map((t) => ({ team: t.teamId, goals: t.goals.length }));
+		const teamGoals = this.stats.map((t) => ({ team: t.teamId, goals: t.goals?.length }));
 		const winningGoals = Math.max(...teamGoals.map((t) => t.goals));
 		return teamGoals.find((t) => t.goals === winningGoals)?.team || null;
 	}
 
 	getTotalGoals(teamId?: string) {
 		if (teamId) {
-			return this.stats.find((t) => t.teamId === teamId)?.goals.length || 0;
+			return this.stats.find((t) => t.teamId === teamId)?.goals?.length || 0;
 		}
-		return this.stats.reduce((total, t) => total + t.goals.length, 0);
+		return this.stats.reduce((total, t) => total + t.goals?.length, 0);
 	}
 
 	getTopScorers(limit: number = 5): { playerId: string; goals: number }[] {
 		const scorers: Record<string, number> = {};
 
 		this.stats.forEach((teamStat) => {
-			teamStat.goals.forEach((goal) => {
+			teamStat.goals?.forEach((goal) => {
 				scorers[goal.playerId] = (scorers[goal.playerId] || 0) + 1;
 			});
 		});
@@ -179,7 +179,7 @@ export class Football {
 		const assisters: Record<string, number> = {};
 
 		this.stats.forEach((teamStat) => {
-			teamStat.assists.forEach((assist) => {
+			teamStat.assists?.forEach((assist) => {
 				assisters[assist.playerId] = (assisters[assist.playerId] || 0) + 1;
 			});
 		});
@@ -195,8 +195,8 @@ export class Football {
 		if (!teamStat) return { red: 0, yellow: 0 };
 
 		return {
-			red: teamStat.redCards.length,
-			yellow: teamStat.yellowCards.length,
+			red: teamStat.redCards?.length,
+			yellow: teamStat.yellowCards?.length,
 		};
 	}
 }
@@ -253,6 +253,37 @@ export class Basketball {
 	}
 }
 
+export class Athletics {
+	heats: {
+		heatId: string;	// this is the teamId
+		athletes: { playerId: string; rank?: number; time?: number }[];	// sometimes time is not provided
+	}[] = [];
+
+	getWinner(heatIndex: number): string {
+		if (heatIndex >= 0 && heatIndex < this.heats.length) {
+			const winner = this.heats[heatIndex].athletes.find(athlete => athlete.rank === 1);
+			return winner?.playerId || '';
+		}
+		return '';
+	}
+
+	getAthletesInHeat(heatIndex: number): { playerId: string; rank?: number; time?: number }[] {
+		if (heatIndex >= 0 && heatIndex < this.heats.length) {
+			return this.heats[heatIndex].athletes;
+		}
+		return [];
+	}
+
+	getAverageTime(heatIndex: number): number {
+		if (heatIndex >= 0 && heatIndex < this.heats.length) {
+			const athletes = this.heats[heatIndex].athletes;
+			const totalTime = athletes.reduce((sum, athlete) => sum + (athlete.time ?? 0), 0);
+			return athletes.length > 0 ? totalTime / athletes.length : 0;
+		}
+		return 0;
+	}
+}
+
 // Generic sports specific stats
 export class OtherSport {
 	points: { teamId: string; points: number }[] = [];
@@ -264,7 +295,7 @@ export class OtherSport {
 	}
 }
 
-export type Sport = Cricket | Football | Basketball | OtherSport;
+export type Sport = Cricket | Football | Basketball | Athletics | OtherSport;
 
 class SportsActivity<T extends Sport> extends Activity {
 	constructor(
@@ -283,17 +314,11 @@ class SportsActivity<T extends Sport> extends Activity {
 	static parse(data: any): SportsActivity<Sport> {
 		let gameType: Sport;
 		switch (data.eventType as EventType) {
-			case EventType.CRICKET:
-				gameType = new Cricket();
-				break;
-			case EventType.FOOTBALL:
-				gameType = new Football();
-				break;
-			case EventType.BASKETBALL:
-				gameType = new Basketball();
-				break;
-			default:
-				gameType = new OtherSport();
+			case EventType.CRICKET: gameType = new Cricket(); break;
+			case EventType.FOOTBALL: gameType = new Football(); break;
+			case EventType.BASKETBALL: gameType = new Basketball(); break;
+			case EventType.ATHLETICS: gameType = new Athletics(); break;
+			default: gameType = new OtherSport(); 
 		}
 
 		const participants = data.participants.map((p: any) => SportsPlayer.parse(p));

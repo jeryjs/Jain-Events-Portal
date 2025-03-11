@@ -19,3 +19,14 @@ export const getBaseEventType = (it: number): EventType => {
     if (it >= EventType.SPORTS) return EventType.SPORTS;
     return EventType.GENERAL;
 };
+
+export const getActivityTypes = (type: EventType): EventType[] => {
+    const nextBaseType = type + 1000;
+    const types: EventType[] = [];
+    for (let i = type + 1; i < nextBaseType; i++) {
+        if (EventType[i]) {
+            types.push(i);
+        }
+    }
+    return types;
+}

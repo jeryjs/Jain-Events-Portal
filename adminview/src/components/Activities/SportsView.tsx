@@ -5,8 +5,11 @@ import { ParticipantsForm } from './ParticipantsForm';
 import { CricketForm } from './SportsView/Cricket';
 import { GenericSport } from './SportsView/GenericSport';
 import { SportsActivity } from '@common/models';
-import { Cricket, OtherSport, Sport } from '@common/models/sports/SportsActivity';
+import { Basketball, Cricket, Football, OtherSport, Sport, Athletics } from '@common/models/sports/SportsActivity';
 import { EventType } from '@common/constants';
+import { BasketballForm } from './SportsView/Basketball';
+import { FootballForm } from './SportsView/Football';
+import { AthleticsForm } from './SportsView/AthleticsForm';
 
 // Define types properly
 interface SportsViewProps {
@@ -52,12 +55,11 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
   // Render sport-specific form based on selected sport type
   const renderSportSpecificForm = useCallback(() => {
     switch (formData.eventType) {
-      case EventType.CRICKET:
-        return <CricketForm formData={formData as SportsActivity<Cricket>} setFormData={setFormData} />;
-      case EventType.FOOTBALL:
-        return <GenericSport formData={formData as SportsActivity<OtherSport>} setFormData={setFormData} />;
-      default:
-        return <GenericSport formData={formData} setFormData={setFormData} />;
+      case EventType.CRICKET: return <CricketForm formData={formData as SportsActivity<Cricket>} setFormData={setFormData} />;
+      case EventType.BASKETBALL: return <BasketballForm formData={formData as SportsActivity<Basketball>} setFormData={setFormData} />;
+      case EventType.FOOTBALL: return <FootballForm formData={formData as SportsActivity<Football>} setFormData={setFormData} />;
+      case EventType.ATHLETICS: return <AthleticsForm formData={formData as SportsActivity<Athletics>} setFormData={setFormData} />;
+      default: return <GenericSport formData={formData} setFormData={setFormData} />;
     }
   }, [formData, setFormData]);
 

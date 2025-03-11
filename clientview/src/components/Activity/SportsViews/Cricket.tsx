@@ -1,3 +1,4 @@
+import { Suspense, useState } from 'react';
 import { Cricket, SportsActivity } from "@common/models";
 import { Sport } from "@common/models/sports/SportsActivity";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -5,6 +6,9 @@ import SportsCricketIcon from '@mui/icons-material/SportsCricket';
 import LooksFourIcon from '@mui/icons-material/Looks4Outlined';
 import Filter6Icon from '@mui/icons-material/Filter6';
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import GroupIcon from '@mui/icons-material/Group';
+import ScoreboardIcon from '@mui/icons-material/Scoreboard';
 import {
   Accordion,
   AccordionDetails,
@@ -15,6 +19,9 @@ import {
   CardContent,
   Chip,
   Grid,
+  Paper,
+  Tab,
+  Tabs,
   Table,
   TableBody,
   TableCell,
@@ -22,21 +29,43 @@ import {
   TableHead,
   TableRow,
   Typography,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
-import { useState } from "react";
 import PlayersTab from "./PlayersTab";
 
-// Main view component that switches between tabs
-export default function CricketView({ activity, tabValue }) {
+// Main view component with its own tabs
+export default function CricketView({ activity }) {
+  const [tabValue, setTabValue] = useState(0);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const cricket = activity.game as Cricket;
 
+  const handleTabChange = (_, newValue) => {
+    setTabValue(newValue);
+  };
+
   return (
-    <>
-      {tabValue === 0 && <OverviewTab activity={activity} game={cricket} />}
-      {tabValue === 1 && <PlayersTab activity={activity} />}
-      {tabValue === 2 && <ScoreboardTab activity={activity} game={cricket} />}
-    </>
+    <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
+      <Tabs
+        value={tabValue}
+        onChange={handleTabChange}
+        variant={isMobile ? "fullWidth" : "standard"}
+        sx={{ borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tab icon={<AssessmentIcon />} label="Overview" iconPosition="start" />
+        <Tab icon={<GroupIcon />} label="Players" iconPosition="start" />
+        <Tab icon={<ScoreboardIcon />} label="Scoreboard" iconPosition="start" />
+      </Tabs>
+
+      <Box>
+        <Suspense fallback={<Typography>Loading...</Typography>}>
+          {tabValue === 0 && <OverviewTab activity={activity} game={cricket} />}
+          {tabValue === 1 && <PlayersTab activity={activity} />}
+          {tabValue === 2 && <ScoreboardTab activity={activity} game={cricket} />}
+        </Suspense>
+      </Box>
+    </Paper>
   );
 };
 
@@ -90,7 +119,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
         isComplete: true,
         winner
       };
-    } else if (!game.innings || game.innings.length === 0) {
+    } else if (!activity.startTime || activity.startTime > now) {
       return "Match not started";
     } else {
       const currentInnings = game.innings[game.innings.length - 1];
@@ -154,8 +183,8 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                 position: 'absolute',
                 top: 0,
                 left: 0,
-                bgcolor: typeof matchStatus === 'string' 
-                  ? 'info.main' 
+                bgcolor: typeof matchStatus === 'string'
+                  ? 'info.main'
                   : matchStatus.isComplete ? 'error.main' : 'success.main',
                 color: 'white',
                 px: 2,
@@ -163,10 +192,10 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                 borderBottomRightRadius: 8
               }}
             >
-              {typeof matchStatus === 'string' 
-                ? 'UPCOMING' 
-                : matchStatus.isComplete 
-                  ? 'COMPLETED' 
+              {typeof matchStatus === 'string'
+                ? 'UPCOMING'
+                : matchStatus.isComplete
+                  ? 'COMPLETED'
                   : `INNINGS ${matchStatus.currentInnings}`}
             </Box>
 
@@ -183,8 +212,8 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
               ) : matchStatus.isComplete ? (
                 <Box>
                   {/* Match Result Display */}
-                  <Box sx={{ 
-                    textAlign: 'center', 
+                  <Box sx={{
+                    textAlign: 'center',
                     py: 2,
                     mb: 3,
                     bgcolor: 'rgba(0,0,0,0.03)',
@@ -195,7 +224,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                     <Typography variant="h6" color="error.main" gutterBottom fontWeight="bold">
                       MATCH COMPLETED
                     </Typography>
-                    
+
                     {matchStatus.winner && (
                       matchStatus.winner.isTie ? (
                         <Typography variant="body1" fontWeight="medium">
@@ -213,81 +242,6 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                       )
                     )}
                   </Box>
-                  
-                  {/* Team Scores - Similar to the in-progress match but with different styling for the winner */}
-                  {activity.teams.map(team => {
-                    const teamScore = game.getTotalRuns(team.id);
-                    const wickets = game.getWicketCount(team.id);
-                    const overs = game.getTeamOvers(team.id);
-                    const runRate = overs > 0 ? (teamScore / overs).toFixed(2) : '-';
-                    const isWinner = matchStatus.winner && !matchStatus.winner.isTie && matchStatus.winner.team.id === team.id;
-
-                    return (
-                      <Box
-                        key={team.id}
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          mb: 2,
-                          p: 2,
-                          borderRadius: 2,
-                          bgcolor: isWinner ? 'rgba(76, 175, 80, 0.08)' : 'background.paper',
-                          border: `1px solid ${isWinner ? theme.palette.success.light : theme.palette.divider}`,
-                          position: 'relative',
-                          overflow: 'hidden'
-                        }}
-                      >
-                        {isWinner && (
-                          <Box 
-                            sx={{ 
-                              position: 'absolute',
-                              right: 0,
-                              top: 0,
-                              bgcolor: 'success.main',
-                              color: 'white',
-                              fontSize: '0.7rem',
-                              px: 1,
-                              py: 0.25,
-                              borderBottomLeftRadius: 8
-                            }}
-                          >
-                            WINNER
-                          </Box>
-                        )}
-                        
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Avatar sx={{ 
-                            bgcolor: isWinner ? theme.palette.success.main : theme.palette.primary.main,
-                            color: 'white',
-                            width: 40,
-                            height: 40,
-                            mr: 2,
-                            fontWeight: 'bold'
-                          }}>
-                            {team.name.charAt(0)}
-                          </Avatar>
-                          <Box>
-                            <Typography variant="h6" fontWeight="bold">
-                              {team.name}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              RR: {runRate}
-                            </Typography>
-                          </Box>
-                        </Box>
-                        
-                        <Box sx={{ textAlign: 'right' }}>
-                          <Typography variant="h5" fontWeight="bold" sx={{ lineHeight: 1.2 }}>
-                            {teamScore}/{wickets}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {overs} overs
-                          </Typography>
-                        </Box>
-                      </Box>
-                    );
-                  })}
                 </Box>
               ) : (
                 <>
@@ -315,7 +269,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                           justifyContent: 'space-between',
                           alignItems: 'center',
                           mb: 2,
-                          p: 2,
+                          // p: 2,
                           borderRadius: 2,
                           bgcolor: isBatting ? 'rgba(76, 175, 80, 0.12)' : 'background.paper',
                           border: `1px solid ${isBatting ? theme.palette.success.light : theme.palette.divider}`,
@@ -396,50 +350,60 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
         </Grid>
 
         {typeof matchStatus !== "string" && <>
-          {/* Top Batsmen */}
-          < Grid item xs={12} md={6}>
+          {/* Top Batsmen - Updated to match Basketball style */}
+          <Grid item xs={12} md={6}>
             <Card>
               <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Top Scorers
+                <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
+                  <EmojiEventsIcon sx={{ mr: 1 }} /> Top Scorers
                 </Typography>
 
-                {game.getTopScorers(5).map((scorer, idx) => {
-                  const player = activity.getPlayer(scorer.player);
-                  if (!player) return null;
+                <TableContainer>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Player</TableCell>
+                        <TableCell>Team</TableCell>
+                        <TableCell align="right">Runs</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {game.getTopScorers(5).filter(scorer => scorer.runs > 0).map((scorer, idx) => {
+                        const player = activity.getPlayer(scorer.player);
+                        if (!player) return null;
+                        const team = activity.teams.find(t => t.id === player.teamId);
 
-                  return (
-                    <Box
-                      key={scorer.player}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        mb: 1,
-                        py: 0.5
-                      }}
-                    >
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Avatar
-                          src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
-                          alt={player.name}
-                          sx={{ width: 32, height: 32, mr: 1 }}
-                        />
-                        <Box>
-                          <Typography variant="body2" fontWeight="bold">
-                            {player.name}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {activity.teams.find(t => t.id === player.teamId)?.name || ''}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Typography variant="body2" fontWeight="medium">
-                        {scorer.runs} runs
-                      </Typography>
-                    </Box>
-                  );
-                })}
+                        return (
+                          <TableRow
+                            key={scorer.player}
+                            sx={{
+                              bgcolor: idx < 3 ? `rgba(255,215,0,${0.1 - idx * 0.03})` : 'inherit',
+                            }}
+                          >
+                            <TableCell>
+                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Avatar
+                                  sx={{ width: 24, height: 24, mr: 1 }}
+                                  src={`https://eu.ui-avatars.com/api/?name=${player.name}&size=50`}
+                                >
+                                  {player.name.charAt(0)}
+                                </Avatar>
+                                <Typography variant="body2" fontWeight={idx === 0 ? 'bold' : 'normal'}>
+                                  {player.name}
+                                  {idx === 0 && ' 👑'}
+                                </Typography>
+                              </Box>
+                            </TableCell>
+                            <TableCell>{team?.name}</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: "medium" }}>
+                              {scorer.runs}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </CardContent>
             </Card>
           </Grid>
@@ -534,7 +498,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
               </CardContent>
             </Card>
           </Grid>
-          
+
 
           {/* Innings Details */}
           <Grid item xs={12} md={6}>
@@ -675,7 +639,7 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
 
                                 inning.overs.forEach(over => {
                                   over.balls.forEach(ball => {
-                                    if (ball.batsmanId === player.usn) {
+                                    if (ball.batsmanId === player.usn && ball.type !== 'WD' && ball.type !== 'NB') {
                                       runs += ball.runs;
                                       ballsFaced++;
                                       if (ball.runs === 4) fours++;
@@ -748,7 +712,7 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                               inning.overs.forEach(over => {
                                 // Get the bowler ID for this over
                                 const bowlerId = over.bowlerId;
-                                
+
                                 if (!bowlerStats[bowlerId]) {
                                   bowlerStats[bowlerId] = {
                                     balls: 0,
@@ -756,11 +720,12 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                     wickets: 0
                                   };
                                 }
-                                
+
                                 // Count balls bowled and other stats for this bowler
                                 over.balls.forEach(ball => {
-                                  // Only count legitimate deliveries for the over count
-                                  bowlerStats[bowlerId].balls++;
+                                  if (ball.type !== 'NB' && ball.type !== 'WD') {
+                                    bowlerStats[bowlerId].balls++;
+                                  }
                                   bowlerStats[bowlerId].runs += ball.runs + ball.extraRuns;
                                   if (ball.type === "W") bowlerStats[bowlerId].wickets++;
                                 });
@@ -773,15 +738,15 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                 // Calculate complete overs and remaining balls
                                 const completeOvers = Math.floor(stats.balls / 6);
                                 const remainingBalls = stats.balls % 6;
-                                
+
                                 // Format as "overs.balls" (e.g., "4.3" means 4 overs and 3 balls)
-                                const oversDisplay = remainingBalls > 0 
-                                  ? `${completeOvers}.${remainingBalls}` 
+                                const oversDisplay = remainingBalls > 0
+                                  ? `${completeOvers}.${remainingBalls}`
                                   : completeOvers.toString();
-                                
+
                                 // Calculate economy rate (runs per over)
-                                const economy = (stats.balls > 0) 
-                                  ? (stats.runs / (stats.balls / 6)).toFixed(2) 
+                                const economy = (stats.balls > 0)
+                                  ? (stats.runs / (stats.balls / 6)).toFixed(2)
                                   : '0.00';
 
                                 return (

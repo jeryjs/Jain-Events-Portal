@@ -46,7 +46,7 @@ const PlayersTab = ({ activity }) => {
       <Tabs
         value={selectedTeamIndex}
         onChange={handleTeamChange}
-        variant={isMobile ? "scrollable" : "fullWidth"}
+        variant={isMobile && activity.teams.length > 3 ? "scrollable" : "fullWidth"}
         scrollButtons="auto"
         sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
       >
@@ -123,9 +123,7 @@ const PlayersTab = ({ activity }) => {
                         sx={{
                           width: 48,
                           height: 48,
-                          border: `2px solid ${selectedTeamIndex === 0 
-                            ? theme.palette.primary.main 
-                            : theme.palette.secondary.main}`
+                          border: `2px solid ${theme.palette.primary.main}`
                         }}
                       />
                     </ListItemAvatar>

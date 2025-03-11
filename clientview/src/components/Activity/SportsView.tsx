@@ -1,156 +1,47 @@
 import { EventType } from "@common/constants";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import {
     Avatar,
     Box,
     Card,
-    CardContent,
-    Chip,
     Divider,
     Grid,
-    Paper,
-    Tab,
-    Tabs,
     Typography,
     useMediaQuery,
     useTheme
 } from "@mui/material";
-import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
-import SportsCricketIcon from '@mui/icons-material/SportsCricket';
-import SportsBasketballIcon from '@mui/icons-material/SportsBasketball';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import { useState } from "react";
 
 // Sport-specific views
+import { SportsActivity } from "@common/models";
+import { Cricket, Sport } from "@common/models/sports/SportsActivity";
 import BasketballView from "./SportsViews/Basketball";
 import CricketView from "./SportsViews/Cricket";
 import FootballView from "./SportsViews/Football";
 import GenericView from "./SportsViews/GenericSport";
-import { SportsActivity } from "@common/models";
-import { Cricket, Sport } from "@common/models/sports/SportsActivity";
 
 // Sports Activity View
 export const SportsView = ({ activity }: { activity: SportsActivity<Sport> }) => {
-    const [tabValue, setTabValue] = useState(0);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const handleTabChange = (_, newValue) => {
-        setTabValue(newValue);
-    };
-
-    // Get appropriate icon for the sport type
-    const getSportIcon = () => {
+    const renderSportsContent = () => {
         switch (activity.eventType) {
-            case EventType.FOOTBALL: return <SportsSoccerIcon fontSize="large" />;
-            case EventType.CRICKET: return <SportsCricketIcon fontSize="large" />;
-            case EventType.BASKETBALL: return <SportsBasketballIcon fontSize="large" />;
-            default: return null;
+            case EventType.CRICKET: return <CricketView activity={activity} />;
+            case EventType.BASKETBALL: return <BasketballView activity={activity} />;
+            case EventType.FOOTBALL: return <FootballView activity={activity} tabValue={1} />;
+            default: return <GenericView activity={activity} tabValue={1} />;
         }
     };
-
-    // Get sport name
-    const getSportName = () => {
-        switch (activity.eventType) {
-            case EventType.FOOTBALL: return "Football";
-            case EventType.CRICKET: return "Cricket";
-            case EventType.BASKETBALL: return "Basketball";
-            default: return "Sports";
-        }
-    };
-
-    // Get match status
-    const getMatchStatus = () => {
-        const result = activity.getMatchResult();
-
-        if (result.isOngoing) {
-            return { label: "In Progress", color: "primary" };
-        } else if (result.isDraw) {
-            return { label: "Match Drawn", color: "warning" };
-        } else {
-            const winningTeam = activity.winningTeam;
-            return {
-                label: winningTeam ? `${winningTeam.name} Won` : "Match Ended",
-                color: "success"
-            };
-        }
-    };
-
-    const renderSportsContent = (tabValue) => {
-        switch (activity.eventType) {
-            case EventType.CRICKET: return <CricketView activity={activity} tabValue={tabValue} />;
-            case EventType.BASKETBALL: return <BasketballView activity={activity} tabValue={tabValue} />;
-            case EventType.FOOTBALL: return <FootballView activity={activity} tabValue={tabValue} />;
-            default: return <GenericView activity={activity} tabValue={tabValue} />;
-        }
-    };
-
-    const matchStatus = getMatchStatus();
 
     return (
         <Box sx={{ mb: 4 }}>
-            {/* Sport Header */}
-            {/* <Paper
-                elevation={0}
-                sx={{
-                    p: 3,
-                    mb: 4,
-                    borderRadius: 2,
-                    background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
-                    color: "white",
-                }}
-            >
-                <Grid container spacing={2} alignItems="center">
-                    <Grid item>
-                        <Box
-                            sx={{
-                                bgcolor: "rgba(255,255,255,0.2)",
-                                borderRadius: "50%",
-                                p: 1,
-                                display: "flex",
-                            }}
-                        >
-                            {getSportIcon()}
-                        </Box>
-                    </Grid>
-                    <Grid item xs>
-                        <Typography variant="h5" fontWeight="bold">
-                            {activity.name}
-                        </Typography>
-                        <Typography variant="subtitle2">
-                            {getSportName()} Match
-                        </Typography>
-                    </Grid>
-                    <Grid item>
-                        <Chip
-                            label={matchStatus.label}
-                            //   color={matchStatus.color} 
-                            sx={{ fontWeight: "bold" }}
-                        />
-                    </Grid>
-                </Grid>
-            </Paper> */}
-
             {/* Teams Section with VS Display */}
             <TeamComparisonCard activity={activity} />
 
-            {/* Navigation Tabs */}
-            <Paper sx={{ borderRadius: 2, overflow: 'hidden', mt: 4 }}>
-                <Tabs
-                    value={tabValue}
-                    onChange={handleTabChange}
-                    variant={isMobile ? "fullWidth" : "standard"}
-                    sx={{ borderBottom: 1, borderColor: 'divider' }}
-                >
-                    <Tab label="Overview" />
-                    <Tab label="Players" />
-                    <Tab label="Scoreboard" /> {/* Changed from "Statistics" */}
-                </Tabs>
-
-                {/* Tab Content */}
-                <Box>
-                    {renderSportsContent(tabValue)}
-                </Box>
-            </Paper>
+            {/* Sport-specific content with tabs handled internally */}
+            <Box sx={{ mt: 4 }}>
+                {renderSportsContent()}
+            </Box>
         </Box>
     );
 };
@@ -267,12 +158,12 @@ const TeamDisplay = ({ team, activity, score, secondaryStat, isWinner, align, co
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center' }}>
-                <Typography variant="h3" sx={{ fontWeight: 'bold', color: theme.palette[color].main, opacity: isWinner ? 1 : 0.7}}>
+                <Typography variant="h3" sx={{ fontWeight: 'bold', color: theme.palette[color].main, opacity: isWinner ? 1 : 0.7 }}>
                     {score}
                 </Typography>
-                <Typography variant="h6" sx={{ color: theme.palette.text.secondary, ml: 1, mb: 1 }}>
+                {secondaryStat && <Typography variant="h6" sx={{ color: theme.palette.text.secondary, ml: 1, mb: 1 }}>
                     / {secondaryStat}
-                </Typography>
+                </Typography>}
             </Box>
             {(activity.game instanceof Cricket) && (
                 <Typography variant="body2" color="text.secondary">

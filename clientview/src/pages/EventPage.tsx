@@ -1,16 +1,20 @@
 import { Suspense, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper } from '@mui/material';
+import { Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper, 
+  Accordion, AccordionSummary, AccordionDetails, alpha } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { motion } from 'framer-motion';
 import { useActivities, useEvent } from '../hooks/useApi';
 import ActivityCard from '@components/Event/ActivityCard';
 import PhotoGallery from '../components/shared/PhotoGallery';
 import PageTransition from '../components/shared/PageTransition';
 import { EventType } from '@common/constants';
+import { getBaseEventType } from '@common/utils';
+import { generateColorFromString } from '@utils/utils';
 
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
@@ -80,10 +84,86 @@ const getDefaultImage = (src): string => {
   return src || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg';
 };
 
+// Helper function to generate a unique color based on the event type
+const generateColor = (type: EventType): string => {
+  // Use a simple hash function to generate a unique hue for each event type
+  const hue = (type * 137.5) % 360; // 137.5 is a good golden angle approximation
+  return `hsl(${hue}, 60%, 50%)`; // Return an HSL color string
+};
+
+// Helper function to get event type information
+const getEventTypeInfo = (type: EventType) => {
+  return {
+    text: EventType[type],
+    color: generateColorFromString(EventType[type]),
+  };
+};
+
+// Activity Accordion Component
+interface ActivityAccordionProps {
+  eventType: EventType;
+  activities: any[];
+  eventId: string;
+}
+
+const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activities, eventId }) => {
+  const [expanded, setExpanded] = useState(activities.length <= 3);
+  const { text, color } = getEventTypeInfo(eventType);
+  
+  return (
+    <Accordion 
+      expanded={expanded} 
+      onChange={() => setExpanded(!expanded)}
+      sx={{ 
+        mb: 2, 
+        borderRadius: 2,
+        overflow: 'hidden',
+        '&:before': { display: 'none' },
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+      }}
+    >
+      <AccordionSummary 
+        expandIcon={<ExpandMoreIcon />}
+        sx={{ 
+          backgroundColor: alpha(color, 0.1),
+          '& .MuiAccordionSummary-content': {
+            alignItems: 'center'
+          }
+        }}
+      >
+        <Chip 
+          label={text}
+          size="small"
+          sx={{ 
+            backgroundColor: color,
+            color: 'white',
+            fontWeight: 'medium',
+            mr: 2
+          }}
+        />
+        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+          {activities.length} {getBaseEventType(eventType) === EventType.SPORTS ? 'Matches' : activities.length === 1 ? 'Activity' : 'Activities'}
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ p: 1 }}>
+        {activities.map((activity, index) => (
+          <ActivityCard 
+            key={activity.id} 
+            activity={activity} 
+            eventId={eventId} 
+            delay={index} 
+          />
+        ))}
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
 // Activity list component with React.Suspense
 const ActivitiesSection = ({ eventId }: { eventId: string }) => {
   const { data: activities, isLoading } = useActivities(eventId);
   const len = activities && Array.isArray(activities) ? activities.length : 0;
+  
   if (isLoading) {
     return (
       <Box>
@@ -95,6 +175,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
       </Box>
     );
   }
+  
   if (!activities || len === 0) {
     return (
       <Paper sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
@@ -102,11 +183,31 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
       </Paper>
     );
   }
+  
+  // Group activities by event type
+  const groupedActivities = activities.reduce((acc, activity) => {
+    const activityType = activity.eventType;
+    if (!acc[activityType]) {
+      acc[activityType] = [];
+    }
+    acc[activityType].push(activity);
+    return acc;
+  }, {} as Record<number, any[]>);
+
+  // Sort the groups by event type (so they appear in a consistent order)
   return (
     <Box>
-      {activities.map((activity, index) => (
-        <ActivityCard key={activity.id} activity={activity} eventId={eventId} delay={index} />
-      ))}
+      {Object.entries(groupedActivities)
+        .sort(([typeA], [typeB]) => Number(typeA) - Number(typeB))
+        .map(([type, acts]) => (
+          <ActivityAccordion 
+            key={type} 
+            eventType={Number(type) as EventType} 
+            activities={acts} 
+            eventId={eventId}
+          />
+        ))
+      }
     </Box>
   );
 };
@@ -230,9 +331,9 @@ function EventPage() {
             <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
               {event.venue}
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
+            {/* <Typography variant="subtitle1" color="text.secondary">
               Tap for directions
-            </Typography>
+            </Typography> */}
           </Box>
         </InfoIconWrapper>
 
@@ -290,9 +391,9 @@ function EventPage() {
           )}
         </ContentSection>
         <ActivitySectionContainer>
-          <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
-            Activities
-          </Typography>
+            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
+            {getBaseEventType(event.type) === EventType.SPORTS ? 'Matches' : 'Activities'}
+            </Typography>
           <Suspense fallback={
             <Box>
               {Array(3).fill(0).map((_, index) => (
