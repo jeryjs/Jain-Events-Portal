@@ -24,6 +24,7 @@ import {
     Typography,
     useTheme
 } from '@mui/material';
+import React from 'react';
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
 interface AthleticsFormProps {
@@ -409,8 +410,5 @@ const ExportTab = React.memo<ExportTabProps>(({ game, players, topPlayersCount, 
         </Box>
     );
 });
-
-// Add React import at the top for memo
-import React from 'react';
 
 export default AthleticsForm;
