@@ -380,7 +380,7 @@ class SportsActivity<T extends Sport> extends Activity {
 
 	// Get match result - winner, draw or ongoing
 	getMatchResult(): { winner?: string; isDraw: boolean; isOngoing: boolean } {
-		if (this.teams.length !== 2) return { isDraw: false, isOngoing: true };
+		if (this.teams?.length !== 2) return { isDraw: false, isOngoing: true };
 
 		let team1Id = this.teams[0].id;
 		let team2Id = this.teams[1].id;
