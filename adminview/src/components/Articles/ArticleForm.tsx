@@ -379,7 +379,12 @@ export const ArticleForm = ({ article, isCreating, onSave, onDelete }: ArticleFo
           >
             <IconButton
               sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
-              onClick={() => setIsMarkdownMode(!isMarkdownMode)}
+              onClick={() => {
+                setIsMarkdownMode(!isMarkdownMode)
+                editor.tryParseMarkdownToBlocks(formData.content).then((it) => {
+                  editor.replaceBlocks(editor.document, it);
+                });
+              }}
             >
               {isMarkdownMode ? <EditIcon /> : <MarkdownIcon />}
             </IconButton>
