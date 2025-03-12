@@ -12,9 +12,11 @@ import {
   Grid2 as Grid,
   Divider,
   FormHelperText,
-  CircularProgress
+  CircularProgress,
+  IconButton
 } from '@mui/material';
-
+import MarkdownIcon from '@mui/icons-material/CodeTwoTone';
+import EditIcon from '@mui/icons-material/Edit';
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
@@ -44,6 +46,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
   const editor = useCreateBlockNote({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [isMarkdownMode, setIsMarkdownMode] = useState(false);
 
   // Reset form when article changes
   useEffect(() => {
@@ -236,13 +239,38 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
                 border: 'none',
                 borderRadius: 0,
                 height: '100%'
-              }
+              },
+              position: 'relative'
             }}
           >
-            <BlockNoteView
-              editor={editor}
-              theme='light'
-              onChange={() => editor.blocksToMarkdownLossy().then((it) => handleChange('content', it))} />
+            <IconButton
+              sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+              onClick={() => {
+                setIsMarkdownMode(!isMarkdownMode)
+                editor.tryParseMarkdownToBlocks(formData.content).then((it) => {
+                  editor.replaceBlocks(editor.document, it);
+                });
+              }}
+            >
+              {isMarkdownMode ? <EditIcon /> : <MarkdownIcon />}
+            </IconButton>
+            {isMarkdownMode ? (
+              <TextField
+                fullWidth
+                multiline
+                minRows={18}
+                value={formData.content || ''}
+                onChange={(e) => handleChange('content', e.target.value)}
+                variant="outlined"
+                error={!!errors.content}
+                helperText={errors.content}
+              />
+            ) : (
+              <BlockNoteView
+                editor={editor}
+                theme='light'
+                onChange={() => editor.blocksToMarkdownLossy().then((it) => handleChange('content', it))} />
+            )}
           </Paper>
           <FormHelperText sx={{ m: 2 }}>
             Format your article using the rich text editor above. Use headings, lists, and formatting tools to make your content engaging.
