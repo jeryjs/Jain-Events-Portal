@@ -5,9 +5,10 @@ import { useEventActivities } from '@hooks/App';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AddIcon from '@mui/icons-material/Add';
 import PeopleIcon from '@mui/icons-material/People';
-import { Box, Button, Chip, Divider, LinearProgress, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Chip, Divider, LinearProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
 import dayjs from 'dayjs';
+import { useState } from 'react';
 import { generateColorFromString } from '../../utils/utils';
 
 interface ActivitiesListProps {
@@ -189,9 +190,12 @@ const ActivityItem = ({
 
 export const ActivitiesList = ({ eventId, selectedActivityId, onSelectActivity, onCreateActivity }: ActivitiesListProps) => {
   const { activities, isLoading } = useEventActivities(eventId);
+  const [filter, setFilter] = useState<EventType>(undefined);
+  const filteredActivities = filter === undefined
+    ? activities
+    : activities.filter(activity => activity.eventType === filter);
 
-  // Group activities by date for the timeline
-  const groupedActivities = activities.reduce((acc: Record<string, Activity[]>, activity) => {
+  const groupedActivities = filteredActivities.reduce((acc: Record<string, Activity[]>, activity) => {
     const dateKey = dayjs(activity.startTime).format('YYYY-MM-DD');
     if (!acc[dateKey]) {
       acc[dateKey] = [];
@@ -236,6 +240,29 @@ export const ActivitiesList = ({ eventId, selectedActivityId, onSelectActivity, 
       </Box>
 
       <Box sx={{ flexGrow: 1, overflow: 'auto', p: 2, position: 'relative' }}>
+        {/* Activity Filter UI */}
+        <Box
+          sx={{
+            mb: 2,
+            overflow: 'scroll',
+            '&::-webkit-scrollbar': { display: 'none' },
+            scrollbarWidth: 'none'
+          }}
+        >
+          <ToggleButtonGroup
+            size="small"
+            color="primary"
+            value={filter}
+            exclusive
+            onChange={(e, newFilter) => { if (newFilter !== null) setFilter(newFilter); }}
+          >
+            <ToggleButton value={undefined}>All</ToggleButton>
+            {Array.from(new Set(activities.map(activity => activity.eventType))).map(eventType => (
+              <ToggleButton key={eventType} value={eventType}>{EventType[eventType]}</ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        </Box>
+
         {isLoading ? (
           <Box sx={{ p: 3, textAlign: 'center' }}>
             <LinearProgress sx={{ mb: 2 }} />
@@ -243,7 +270,7 @@ export const ActivitiesList = ({ eventId, selectedActivityId, onSelectActivity, 
               Loading activities...
             </Typography>
           </Box>
-        ) : activities.length === 0 ? (
+        ) : filteredActivities.length === 0 ? (
           <Box sx={{ p: 3, textAlign: 'center' }}>
             <Typography variant="subtitle1" color="text.secondary" fontWeight="medium">
               No activities found
