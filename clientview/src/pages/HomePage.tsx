@@ -153,7 +153,7 @@ function HomePage() {
       { items: upcomingEvents, view: <EventSection.upcoming />, key: 'upcoming' },
       { items: pastEvents, view: <EventSection.past />, key: 'past' },
     ].sort((a, b) => (a.items.length === 0 ? 1 : 0) - (b.items.length === 0 ? 1 : 0));
-  }, [events]);
+  }, [events, catTabId]);
 
 
   return (
