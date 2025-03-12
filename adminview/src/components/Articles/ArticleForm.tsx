@@ -24,7 +24,9 @@ import {
 
 import { EventType } from '@common/constants';
 import { Article } from '@common/models';
+import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/mantine/style.css";
 import { useCreateBlockNote } from "@blocknote/react";
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CloseIcon from '@mui/icons-material/Close';
