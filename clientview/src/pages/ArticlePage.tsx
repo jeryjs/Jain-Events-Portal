@@ -42,9 +42,9 @@ const ArticlePage: React.FC = () => {
       
       // Check if article exists before accessing content
       if (article && article.content) {
-        const loremIpsum = generateLoremMarkdown(5);
-        const dummyContent = article.content + "\n\n" + loremIpsum;
-        editor.tryParseMarkdownToBlocks(dummyContent)
+        // const loremIpsum = generateLoremMarkdown(5);
+        // const dummyContent = article.content + "\n\n" + loremIpsum;
+        editor.tryParseMarkdownToBlocks(article.content)
           .then((blocks) => {
             editor.replaceBlocks(editor.document, blocks);
           }).catch(err => {
