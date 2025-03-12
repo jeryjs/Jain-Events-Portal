@@ -1,40 +1,44 @@
-import "@blocknote/core/fonts/inter.css";
+import { useState, useEffect } from 'react';
+import { 
+  Box, 
+  TextField, 
+  Button, 
+  Paper, 
+  Typography, 
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Grid2 as Grid,
+  Divider,
+  FormHelperText,
+  CircularProgress,
+  IconButton,
+  Fade,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
+} from '@mui/material';
+
+import { EventType } from '@common/constants';
+import { Article } from '@common/models';
 import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
 import { useCreateBlockNote } from "@blocknote/react";
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CloseIcon from '@mui/icons-material/Close';
 import MarkdownIcon from '@mui/icons-material/CodeTwoTone';
 import EditIcon from '@mui/icons-material/Edit';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Divider,
-  Fade,
-  FormControl,
-  FormHelperText,
-  Grid2 as Grid,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  TextField,
-  Typography
-} from '@mui/material';
-import { useEffect, useState } from 'react';
-
-import { EventType } from '@common/constants';
-import { Article } from '@common/models';
 
 interface ArticleFormProps {
   article?: Article;
   isCreating: boolean;
   onSave: (article: Article) => Promise<void>;
+  onDelete?: (articleId: string) => Promise<void>;
 }
 
-export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) => {
+export const ArticleForm = ({ article, isCreating, onSave, onDelete }: ArticleFormProps) => {
   const [formData, setFormData] = useState<Partial<Article>>(
     article || {
       title: '',
@@ -51,6 +55,8 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
   const [saving, setSaving] = useState(false);
   const [isMarkdownMode, setIsMarkdownMode] = useState(false);
   const [isImageEditOpen, setIsImageEditOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [openConfirmation, setOpenConfirmation] = useState(false);
 
   // Reset form when article changes
   useEffect(() => {
@@ -163,9 +169,8 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
                 src={formData.image.url}
                 alt={formData.title}
                 sx={{ width: '100%', height: '100%' }}
-                style={
-                  formData.image.customCss
-                    ? Object.fromEntries(
+                style={formData.image.customCss
+                  ? Object.fromEntries(
                       formData.image.customCss.split(';')
                         .filter(prop => prop.trim())
                         .map(prop => {
@@ -173,7 +178,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
                           return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
                         })
                     )
-                    : {}
+                  : {}
                 }
               />
             ) : (
@@ -403,6 +408,52 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
       </Grid>
       
       <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+        {onDelete && article && (
+          <>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setOpenConfirmation(true)}
+              disabled={saving || isDeleting}
+            >
+              Delete Article
+            </Button>
+            <Dialog
+              open={openConfirmation}
+              onClose={() => setOpenConfirmation(false)}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                {"Confirm Delete"}
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Are you sure you want to delete this article?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpenConfirmation(false)}>Cancel</Button>
+                <Button
+                  onClick={async () => {
+                    setOpenConfirmation(false);
+                    setIsDeleting(true);
+                    try {
+                      await onDelete(article.id);
+                    } finally {
+                      setIsDeleting(false);
+                    }
+                  }}
+                  color="error"
+                  disabled={isDeleting}
+                  startIcon={isDeleting && <CircularProgress size={20} color="inherit" />}
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </>
+        )}
         <Button
           type="submit"
           variant="contained"

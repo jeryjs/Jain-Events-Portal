@@ -29,7 +29,7 @@ export const ArticlesList = memo(({
       height: '100%', 
       display: 'flex', 
       flexDirection: 'column',
-      width: collapsed ? 'auto' : 300,
+      width: collapsed ? 'auto' : '100%',
       transition: 'width 0.3s ease'
     }}>
       <Box sx={{ 
