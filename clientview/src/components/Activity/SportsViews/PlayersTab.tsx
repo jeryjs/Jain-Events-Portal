@@ -22,8 +22,10 @@ import WomanIcon from "@mui/icons-material/Woman";
 import TagIcon from "@mui/icons-material/Tag";
 import SportsIcon from "@mui/icons-material/Sports";
 import SubdirectoryArrowRightIcon from "@mui/icons-material/SubdirectoryArrowRight";
+import { SportsActivity } from "@common/models";
 
 const PlayersTab = ({ activity }) => {
+  if (!(activity instanceof SportsActivity)) return null;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [selectedTeamIndex, setSelectedTeamIndex] = useState(0);
@@ -127,10 +129,10 @@ const PlayersTab = ({ activity }) => {
                   </Typography>
                 </Box>
                 
-                <List sx={{ pt: 0 }}>
+                <List sx={{ pt: 0 }} key={`playing-${selectedTeam.id}`}>
                   {playingPlayers.map((player, idx) => (
                     <ListItem 
-                      key={player.usn || idx}
+                      key={`${selectedTeam.id}-playing-${player.usn || idx}`}
                       sx={{ 
                         py: 1.5,
                         borderRadius: 1,
@@ -183,7 +185,7 @@ const PlayersTab = ({ activity }) => {
                         }
                       />
                       
-                      {player.stats?.position && (
+                      {player.position && (
                         <Box 
                           sx={{ 
                             px: 1,
@@ -195,7 +197,7 @@ const PlayersTab = ({ activity }) => {
                             fontWeight: 500
                           }}
                         >
-                          {player.stats.position}
+                          {player.position}
                         </Box>
                       )}
                     </ListItem>
@@ -213,10 +215,10 @@ const PlayersTab = ({ activity }) => {
                     </Typography>
                   </Box>
                   
-                  <List sx={{ pt: 0 }}>
+                  <List sx={{ pt: 0 }} key={`subs-${selectedTeam.id}`}>
                     {substitutePlayers.map((player, idx) => (
                       <ListItem 
-                        key={player.usn || idx}
+                        key={`${selectedTeam.id}-sub-${player.usn || idx}`}
                         sx={{ 
                           py: 1.5,
                           borderRadius: 1,
