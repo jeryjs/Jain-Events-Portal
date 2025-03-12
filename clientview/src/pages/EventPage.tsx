@@ -118,7 +118,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
     [EventType.FOOTBALL]: "https://i.imgur.com/82B4SjE.png",
     [EventType.BASKETBALL]: { Boys: "https://i.imgur.com/OcsfJnF.png", Girls: "https://i.imgur.com/CVqnbyt.png" },
     [EventType.CRICKET]: "https://i.imgur.com/EsfSrzV.png",
-    [EventType.THROWBALL]: "https://i.imgur.com/EsfSrzV.png"
+    [EventType.THROWBALL]: "https://i.imgur.com/huZyVGE.png"
   } || {};
 
   const handleFixtureClick = (e: React.MouseEvent) => {
