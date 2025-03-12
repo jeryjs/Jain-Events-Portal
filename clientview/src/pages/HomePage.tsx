@@ -1,7 +1,7 @@
 import { Box, Container, Skeleton, Typography, CardMedia, CardContent } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { EventCard, HomeHeader, Section } from '@components/Home';
 import NoEventsDisplay from '@components/Home/NoEventsDisplay';
@@ -10,6 +10,7 @@ import PhotoGallery from '@components/shared/PhotoGallery';
 import { useArticles, useEvents } from '@hooks/useApi';
 import { EventType } from '@common/constants';
 import { Link } from 'react-router-dom';
+import React from 'react';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -36,6 +37,9 @@ const ArticleCard = styled(Link)(({ theme }) => ({
 }));
 
 function HomePage() {
+  const mounted = useRef(false);
+  useEffect(() => { if (mounted.current) return; else mounted.current = true; }, []);
+
   const { data: events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
 
@@ -88,59 +92,81 @@ function HomePage() {
     return category ? String(category.label).toLowerCase() + ' events' : 'events';
   };
 
+  const EventSection = {
+    ongoing: () => (
+      <Section title='Happening Now' key='ongoing' moreLink={getTimelineLink(ongoingEvents)}>
+        <HorizontalScroll whileTap={{ cursor: 'grabbing' }}>
+          {isEventsLoading
+            ? renderEventCardShimmers(8)
+            : ongoingEvents.map((event, idx) => <EventCard key={event.id} event={event} delay={idx} />)}
+        </HorizontalScroll>
+        {!isEventsLoading && ongoingEvents.length === 0 && !error && (
+          <NoEventsDisplay
+            message={`No ${getCategoryString(catTabId[1])} happening right now`}
+            type="ongoing"
+            timelineLink={getTimelineLink(upcomingEvents)}
+          />
+        )}
+        {error && (
+          <Box sx={{ p: 4, textAlign: 'center' }}>
+            <Typography color="error">Failed to load events</Typography>
+          </Box>
+        )}
+      </Section>
+    ),
+    upcoming: () => (
+      <Section title='Upcoming Events' key='upcoming' moreLink={getTimelineLink(upcomingEvents)}>
+        <HorizontalScroll whileTap={{ cursor: 'grabbing' }}>
+          {isEventsLoading
+            ? renderEventCardShimmers(8)
+            : upcomingEvents.map((event, idx) => <EventCard key={event.id} event={event} delay={idx} />)}
+        </HorizontalScroll>
+        {!isEventsLoading && upcomingEvents.length === 0 && !error && (
+          <NoEventsDisplay
+            message={`No upcoming ${getCategoryString(catTabId[1])} scheduled`}
+            type="upcoming"
+            timelineLink={getTimelineLink(pastEvents)}
+          />
+        )}
+      </Section>
+    ),
+    past: () => (
+      <Section title='Past Events' key='past' moreLink={getTimelineLink(pastEvents)}>
+        {isEventsLoading
+          ? renderEventCardShimmers(3, 'horizontal')
+          : pastEvents.map((event, idx) => <EventCard key={event.id} event={event} variant="horizontal" delay={idx} />)}
+        {!isEventsLoading && pastEvents.length === 0 && !error && (
+          <NoEventsDisplay
+            message={`No past ${getCategoryString(catTabId[1])} available`}
+            type="past"
+            timelineLink={getTimelineLink(upcomingEvents)}
+          />
+        )}
+      </Section>
+    )
+  }
+
+  // Memoize the sections to prevent unnecessary re-creation
+  const sortedSections = useMemo(() => {
+    return [
+      { items: ongoingEvents, view: <EventSection.ongoing />, key: 'ongoing' },
+      { items: upcomingEvents, view: <EventSection.upcoming />, key: 'upcoming' },
+      { items: pastEvents, view: <EventSection.past />, key: 'past' },
+    ].sort((a, b) => (a.items.length === 0 ? 1 : 0) - (b.items.length === 0 ? 1 : 0));
+  }, [events]);
+
+
   return (
     <PageTransition>
       <Container maxWidth="lg">
         <HomeHeader tabValue={catTabId[0]} onTabChange={handleTabChange} />
 
-        {/* Ongoing Events Section */}
-        <Section title='Happening Now' moreLink={getTimelineLink(ongoingEvents)}>
-          <HorizontalScroll whileTap={{ cursor: 'grabbing' }}>
-            {isEventsLoading
-              ? renderEventCardShimmers(8)
-              : ongoingEvents.map((event, idx) => <EventCard key={event.id} event={event} delay={idx} />)}
-          </HorizontalScroll>
-          {!isEventsLoading && ongoingEvents.length === 0 && !error && (
-            <NoEventsDisplay
-              message={`No ${getCategoryString(catTabId[1])} happening right now`}
-              type="ongoing"
-              timelineLink={getTimelineLink(upcomingEvents)}
-            />
-          )}
-          {error && (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography color="error">Failed to load events</Typography>
-            </Box>
-          )}
-        </Section>
-
-        {/* Upcoming Events Section */}
-        <Section title='Upcoming Events' moreLink={getTimelineLink(upcomingEvents)}>
-          {isEventsLoading
-            ? renderEventCardShimmers(3, 'horizontal')
-            : upcomingEvents.map((event, idx) => <EventCard key={event.id} event={event} variant="horizontal" delay={idx} />)}
-          {!isEventsLoading && upcomingEvents.length === 0 && !error && (
-            <NoEventsDisplay
-              message={`No upcoming ${getCategoryString(catTabId[1])} scheduled`}
-              type="upcoming"
-              timelineLink={getTimelineLink(pastEvents)}
-            />
-          )}
-        </Section>
-
-        {/* Past Events Section */}
-        <Section title='Past Events' moreLink={getTimelineLink(pastEvents)}>
-          {isEventsLoading
-            ? renderEventCardShimmers(3, 'horizontal')
-            : pastEvents.map((event, idx) => <EventCard key={event.id} event={event} variant="horizontal" delay={idx} />)}
-          {!isEventsLoading && pastEvents.length === 0 && !error && (
-            <NoEventsDisplay
-              message={`No past ${getCategoryString(catTabId[1])} available`}
-              type="past"
-              timelineLink={getTimelineLink(upcomingEvents)}
-            />
-          )}
-        </Section>
+        {/* Dynamically render the Events section with more events first (past tries to be last) */}
+        {sortedSections.map(section => (
+          <React.Fragment key={section.key}>
+            {section.view}
+          </React.Fragment>
+        ))}
 
         {/* Photos Section */}
         <Section title='Photos'>
