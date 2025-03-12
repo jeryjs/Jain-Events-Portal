@@ -16,6 +16,7 @@ import PageTransition from '../components/shared/PageTransition';
 import { EventType } from '@common/constants';
 import { getBaseEventType } from '@common/utils';
 import { generateColorFromString } from '@utils/utils';
+import useImgur from '@hooks/useImgur';
 
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
