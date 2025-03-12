@@ -15,7 +15,7 @@ import {
   useMediaQuery,
   useTheme 
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import { Gender } from "@common/constants";
 import PersonIcon from "@mui/icons-material/Person";
 import WomanIcon from "@mui/icons-material/Woman";
@@ -23,19 +23,19 @@ import TagIcon from "@mui/icons-material/Tag";
 import SportsIcon from "@mui/icons-material/Sports";
 import SubdirectoryArrowRightIcon from "@mui/icons-material/SubdirectoryArrowRight";
 
-const PlayersTab = ({ activity }) => {
+// Optimized PascalCase function
+const toPascalCase = (name) => {
+  if (!name) return "";
+  const words = name.split(/\s+/);
+  return words.map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(" ");
+};
+
+const PlayersTab = memo(({ activity }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [selectedTeamIndex, setSelectedTeamIndex] = useState(0);
-  
-  // Convert string to PascalCase with spaces preserved
-  const toPascalCase = (name) => {
-    if (!name) return "";
-    const words = name.split(/\s+/);
-    return words.map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join(" "); // Join with spaces between words
-  };
 
   const handleTeamChange = (_, newValue) => {
     setSelectedTeamIndex(newValue);
@@ -49,12 +49,15 @@ const PlayersTab = ({ activity }) => {
     );
   }
 
-  const selectedTeam = activity.teams[selectedTeamIndex];
-  const allTeamPlayers = activity.getTeamPlayers(selectedTeam.id);
+  const selectedTeam = useMemo(() => activity.teams[selectedTeamIndex], [activity.teams, selectedTeamIndex]);
+  const allTeamPlayers = useMemo(() => activity.getTeamPlayers(selectedTeam.id), [activity, selectedTeam?.id]);
   
-  // Separate players into playing and substitutes
-  const playingPlayers = allTeamPlayers.filter(player => player.isPlaying);
-  const substitutePlayers = allTeamPlayers.filter(player => !player.isPlaying);
+  // Separate players into playing and substitutes using useMemo
+  const { playingPlayers, substitutePlayers } = useMemo(() => {
+    const playing = allTeamPlayers.filter(player => player.isPlaying);
+    const substitute = allTeamPlayers.filter(player => !player.isPlaying);
+    return { playingPlayers: playing, substitutePlayers: substitute };
+  }, [allTeamPlayers]);
   
   return (
     <Box>
@@ -110,10 +113,10 @@ const PlayersTab = ({ activity }) => {
                   }}
                 >
                   <Typography variant="body2" sx={{ color: theme.palette.primary.contrastText, fontWeight: 'bold' }}>
-                    {selectedTeam.name.charAt(0)}
+                    {selectedTeam?.name?.charAt(0) || ''}
                   </Typography>
                 </Box>
-                <Typography variant="h6">{selectedTeam.name}</Typography>
+                <Typography variant="h6">{selectedTeam?.name || 'Team'}</Typography>
               </Box>
               
               <Divider sx={{ my: 2 }} />
@@ -130,7 +133,7 @@ const PlayersTab = ({ activity }) => {
                 <List sx={{ pt: 0 }}>
                   {playingPlayers.map((player, idx) => (
                     <ListItem 
-                      key={player.usn || idx}
+                      key={player.usn || player.id || idx}
                       sx={{ 
                         py: 1.5,
                         borderRadius: 1,
@@ -177,7 +180,7 @@ const PlayersTab = ({ activity }) => {
                           <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                             <TagIcon sx={{ fontSize: 16, mr: 0.5, color: theme.palette.text.secondary }} />
                             <Typography variant="caption" color="text.secondary">
-                              {player.usn}
+                              {player.usn || 'USN N/A'}
                             </Typography>
                           </Box>
                         }
@@ -216,7 +219,7 @@ const PlayersTab = ({ activity }) => {
                   <List sx={{ pt: 0 }}>
                     {substitutePlayers.map((player, idx) => (
                       <ListItem 
-                        key={player.usn || idx}
+                        key={player.usn || player.id || idx}
                         sx={{ 
                           py: 1.5,
                           borderRadius: 1,
@@ -264,7 +267,7 @@ const PlayersTab = ({ activity }) => {
                             <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                               <TagIcon sx={{ fontSize: 16, mr: 0.5, color: theme.palette.text.secondary }} />
                               <Typography variant="caption" color="text.secondary">
-                                {player.usn}
+                                {player.usn || 'USN N/A'}
                               </Typography>
                             </Box>
                           }
@@ -294,6 +297,6 @@ const PlayersTab = ({ activity }) => {
       </Grid>
     </Box>
   );
-};
+});
 
 export default PlayersTab;
