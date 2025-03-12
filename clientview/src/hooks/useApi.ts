@@ -25,7 +25,7 @@ const _fetchEvents = async (): Promise<Event[]> => {
 };
 
 export const useEvents = () => {
-	// return useDummyEvents(20); // Use dummy events for now while testing
+	return useDummyEvents(200); // Use dummy events for now while testing
 
 	return useQuery({
 		queryKey: ["events"],
