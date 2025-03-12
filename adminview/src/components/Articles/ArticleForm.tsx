@@ -1,29 +1,32 @@
-import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  TextField, 
-  Button, 
-  Paper, 
-  Typography, 
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Grid2 as Grid,
-  Divider,
-  FormHelperText,
-  CircularProgress,
-  IconButton
-} from '@mui/material';
-import MarkdownIcon from '@mui/icons-material/CodeTwoTone';
-import EditIcon from '@mui/icons-material/Edit';
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import { useCreateBlockNote } from "@blocknote/react";
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import CloseIcon from '@mui/icons-material/Close';
+import MarkdownIcon from '@mui/icons-material/CodeTwoTone';
+import EditIcon from '@mui/icons-material/Edit';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Fade,
+  FormControl,
+  FormHelperText,
+  Grid2 as Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography
+} from '@mui/material';
+import { useEffect, useState } from 'react';
 
-import { Article } from '@common/models';
 import { EventType } from '@common/constants';
+import { Article } from '@common/models';
 
 interface ArticleFormProps {
   article?: Article;
@@ -47,6 +50,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [isMarkdownMode, setIsMarkdownMode] = useState(false);
+  const [isImageEditOpen, setIsImageEditOpen] = useState(false);
 
   // Reset form when article changes
   useEffect(() => {
@@ -137,6 +141,131 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
       
       <Grid container spacing={3}>
         <Grid size={{xs: 12}}>
+          {/* Banner Image Section */}
+          <Box
+            sx={{
+              position: 'relative',
+              width: '100%',
+              height: '350px',
+              bgcolor: formData.image?.url ? 'transparent' : '#F0F0F0',
+              borderBottom: formData.image?.url ? 'none' : '2px dashed #CCCCCC',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              overflow: 'hidden'
+            }}
+          >
+            {formData.image?.url ? (
+              <Box
+                onClick={() => setIsImageEditOpen(!isImageEditOpen)}
+                component="img"
+                src={formData.image.url}
+                alt={formData.title}
+                sx={{ width: '100%', height: '100%' }}
+                style={
+                  formData.image.customCss
+                    ? Object.fromEntries(
+                      formData.image.customCss.split(';')
+                        .filter(prop => prop.trim())
+                        .map(prop => {
+                          const [key, value] = prop.split(':').map(p => p.trim());
+                          return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
+                        })
+                    )
+                    : {}
+                }
+              />
+            ) : (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                <AddPhotoAlternateIcon sx={{ fontSize: 48, color: '#999999' }} />
+                <Typography variant="subtitle1" color="#999999" mt={1}>
+                  Add Banner Image
+                </Typography>
+              </Box>
+            )}
+
+            {/* Image Edit Overlay */}
+            <Fade in={isImageEditOpen} timeout={300}>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  bgcolor: 'rgba(0, 0, 0, 0.5)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 2,
+                  zIndex: 1,
+                }}
+              >
+                <Box sx={{ p: 2, bgcolor: 'rgba(255, 255, 255, 0.8)', borderRadius: 2, width: '80%', maxWidth: '500px' }}>
+                  <IconButton
+                    aria-label="close"
+                    onClick={() => setIsImageEditOpen(false)}
+                    sx={{
+                      position: 'absolute',
+                      right: 8,
+                      top: 8,
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6" gutterBottom>Edit Banner Image</Typography>
+
+                  <TextField
+                    label="Banner Image URL"
+                    placeholder="Enter image URL here..."
+                    fullWidth
+                    margin="normal"
+                    value={formData.image?.url || ''}
+                    onChange={(e) => handleChange('image', { ...formData.image, url: e.target.value })}
+                    sx={{ mb: 2 }}
+                  />
+
+                  <TextField
+                    label="Custom CSS"
+                    placeholder="e.g., object-fit: cover; object-position: center top;"
+                    fullWidth
+                    margin="normal"
+                    value={formData.image?.customCss || ''}
+                    onChange={(e) => handleChange('image', { ...formData.image, customCss: e.target.value })}
+                    multiline
+                    helperText="Enter CSS properties for fine-tuning image display"
+                    sx={{ mb: 2 }}
+                  />
+                </Box>
+              </Box>
+            </Fade>
+            <IconButton
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                bgcolor: 'rgba(255,255,255,0.8)',
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' },
+                zIndex: 2,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsImageEditOpen(!isImageEditOpen);
+              }}
+            >
+              {isImageEditOpen ? <CloseIcon /> : <EditIcon />}
+            </IconButton>
+          </Box>
+        </Grid>
+        <Grid size={{xs: 12}}>
           <TextField
             fullWidth
             label="Title"
@@ -162,7 +291,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
           />
         </Grid>
         
-        <Grid size={{xs: 12, md: 6}}>
+        {/* <Grid size={{xs: 12, md: 6}}>
           <TextField
             fullWidth
             label="Image URL"
@@ -182,7 +311,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
             onChange={e => handleChange('image', { ...formData.image, alt: e.target.value })}
             helperText="Alternative text for the image"
           />
-        </Grid>
+        </Grid> */}
         
         <Grid size={{xs: 12, md: 6}}>
           <FormControl fullWidth>
@@ -245,12 +374,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
           >
             <IconButton
               sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
-              onClick={() => {
-                setIsMarkdownMode(!isMarkdownMode)
-                editor.tryParseMarkdownToBlocks(formData.content).then((it) => {
-                  editor.replaceBlocks(editor.document, it);
-                });
-              }}
+              onClick={() => setIsMarkdownMode(!isMarkdownMode)}
             >
               {isMarkdownMode ? <EditIcon /> : <MarkdownIcon />}
             </IconButton>
