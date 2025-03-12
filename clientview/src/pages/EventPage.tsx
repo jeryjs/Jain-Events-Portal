@@ -1,8 +1,10 @@
 import { Suspense, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper, 
-  Accordion, AccordionSummary, AccordionDetails, alpha, 
-  Dialog} from '@mui/material';
+import {
+  Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper,
+  Accordion, AccordionSummary, AccordionDetails, alpha,
+  Dialog
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -68,11 +70,11 @@ const InfoIconWrapper = styled(Box)(({ theme }) => `
     background-color: ${theme.palette.action.disabledBackground};
   }
 `);
-        
+
 const ActivitySectionContainer = styled(Box)(({ theme }) => `
   margin: ${theme.spacing(3)} 0;
 `);
-  
+
 // Helper function to get event type text based on EventType enum
 const getEventTypeText = (type: number): string => {
   if (type >= EventType.TECH) return 'Tech Event';
@@ -161,14 +163,14 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
           boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
         }}
       >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{backgroundColor: alpha(color, 0.1), "& .MuiAccordionSummary-content": { alignItems: "center" }}}>
-          <Chip label={activityType} size="small" sx={{ backgroundColor: alpha(color, 0.3), fontWeight: "medium", mr: 2}} />
-          
+        <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ backgroundColor: alpha(color, 0.1), "& .MuiAccordionSummary-content": { alignItems: "center" } }}>
+          <Chip label={activityType} size="small" sx={{ backgroundColor: alpha(color, 0.3), fontWeight: "medium", mr: 2 }} />
+
           <Typography variant="subtitle1" sx={{ fontWeight: "medium" }}>
-            {activities.length}{" "} {getBaseEventType(eventType) === EventType.SPORTS? "Matches": activities.length === 1 ? "Activity" : "Activities"}
+            {activities.length}{" "} {getBaseEventType(eventType) === EventType.SPORTS ? "Matches" : activities.length === 1 ? "Activity" : "Activities"}
           </Typography>
-          
-          {fixtures[eventType] && ( <IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
+
+          {fixtures[eventType] && (<IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
             <Typography variant="caption">Fixtures</Typography>
           </IconButton>)}
         </AccordionSummary>
@@ -194,7 +196,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
 const ActivitiesSection = ({ eventId }: { eventId: string }) => {
   const { data: activities, isLoading } = useActivities(eventId);
   const len = activities && Array.isArray(activities) ? activities.length : 0;
-  
+
   if (isLoading) {
     return (
       <Box>
@@ -206,7 +208,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
       </Box>
     );
   }
-  
+
   if (!activities || len === 0) {
     return (
       <Paper sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
@@ -214,7 +216,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
       </Paper>
     );
   }
-  
+
   // Group activities by event type
   const groupedActivities = activities.reduce((acc, activity) => {
     const activityType = activity.eventType;
@@ -231,10 +233,10 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
       {Object.entries(groupedActivities)
         .sort(([typeA], [typeB]) => Number(typeA) - Number(typeB))
         .map(([type, acts]) => (
-          <ActivityAccordion 
-            key={type} 
-            eventType={Number(type) as EventType} 
-            activities={acts} 
+          <ActivityAccordion
+            key={type}
+            eventType={Number(type) as EventType}
+            activities={acts}
             eventId={eventId}
           />
         ))
@@ -250,18 +252,18 @@ function EventPage() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
-  
+
   // Check if description is truncated
   useEffect(() => {
     if (descriptionRef.current && event?.description) {
       const element = descriptionRef.current;
       setIsDescriptionTruncated(
-        element.scrollHeight > element.clientHeight || 
+        element.scrollHeight > element.clientHeight ||
         element.offsetHeight < element.scrollHeight
       );
     }
   }, [event?.description]);
-  
+
   const formatEventDate = () => {
     if (!event) return { date: '', dayTime: '' };
     const start = new Date(event.time.start);
@@ -310,146 +312,148 @@ function EventPage() {
 
   return (
     <Suspense fallback={null}>
-    <PageTransition>
-      {/* Hero Section with Background Image */}
-      <Box>
-        <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-          <HeroImage 
-            src={getDefaultImage(event.banner.url)} 
-            alt={event.name} 
-            style={event.eventBannerStyles}
-          />
-          <HeroOverlay>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-              <IconButton onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
-                <ArrowBackIcon />
-              </IconButton>
-              <Typography variant="h5" sx={{ color: 'white', fontWeight: '500', ml: 3 }}>
-                Event Details
+      <PageTransition>
+        {/* Hero Section with Background Image */}
+        <Box>
+          <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+            <HeroImage
+              src={getDefaultImage(event.banner.url)}
+              alt={event.name}
+              style={event.eventBannerStyles}
+            />
+            <HeroOverlay>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                <IconButton onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
+                  <ArrowBackIcon />
+                </IconButton>
+                <Typography variant="h5" sx={{ color: 'white', fontWeight: '500', ml: 3 }}>
+                  Event Details
+                </Typography>
+              </Box>
+            </HeroOverlay>
+          </HeroContainer>
+          <EventTypeChip label={eventTypeText} />
+        </Box>
+
+        <Container maxWidth="lg" sx={{ pt: 3, pb: 8 }}>
+          {/* Event Title */}
+          <Typography variant="h4" sx={{ fontWeight: '500', my: 3, color: 'text.primary' }}>
+            {event.name}
+          </Typography>
+
+          {/* Date, Time, Location Info */}
+          <InfoIconWrapper>
+            <IconSquircle>
+              <CalendarTodayIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+            </IconSquircle>
+            <Box>
+              <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
+                {formattedDate.date}
+              </Typography>
+              <Typography variant="subtitle1" color="text.secondary">
+                {formattedDate.dayTime}
               </Typography>
             </Box>
-          </HeroOverlay>
-        </HeroContainer>
-        <EventTypeChip label={eventTypeText} />
-      </Box>
-        
-      <Container maxWidth="lg" sx={{ pt: 3, pb: 8 }}>
-        {/* Event Title */}
-        <Typography variant="h4" sx={{ fontWeight: '500', my: 3, color: 'text.primary' }}>
-          {event.name}
-        </Typography>
+          </InfoIconWrapper>
 
-        {/* Date, Time, Location Info */}
-        <InfoIconWrapper>
-          <IconSquircle>
-            <CalendarTodayIcon sx={{ color: 'primary.main', fontSize: 24 }} />
-          </IconSquircle>
-          <Box>
-            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
-              {formattedDate.date}
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              {formattedDate.dayTime}
-            </Typography>
-          </Box>
-        </InfoIconWrapper>
-        
-        <InfoIconWrapper>
-          <IconSquircle>
-            <LocationOnIcon sx={{ color: 'primary.main', fontSize: 24 }} />
-          </IconSquircle>
-          <Box>
-            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
-              {event.venue}
-            </Typography>
-            {/* <Typography variant="subtitle1" color="text.secondary">
+          <InfoIconWrapper>
+            <IconSquircle>
+              <LocationOnIcon sx={{ color: 'primary.main', fontSize: 24 }} />
+            </IconSquircle>
+            <Box>
+              <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
+                {event.venue}
+              </Typography>
+              {/* <Typography variant="subtitle1" color="text.secondary">
               Tap for directions
             </Typography> */}
-          </Box>
-        </InfoIconWrapper>
-
-        <Divider sx={{ my: 3 }} />
-
-        {/* About Section */}
-        <ContentSection>
-          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-            About Event
-          </Typography>
-          {showFullDescription ? (
-            <Typography variant="body1" color="text.secondary" paragraph>
-              {event.description}
-              {isDescriptionTruncated && (
-                <Typography 
-                  component="span" 
-                  sx={{ 
-                    color: 'primary.main', 
-                    fontWeight: 'medium',
-                    cursor: 'pointer',
-                    display: 'block',
-                    mt: 1,
-                    '&:hover': { textDecoration: 'underline' }
-                  }}
-                  onClick={() => setShowFullDescription(false)}
-                >
-                  Show Less
-                </Typography>
-              )}
-            </Typography>
-          ) : (
-            <>
-              <DescriptionText 
-                variant="body1" 
-                color="text.secondary"
-                ref={descriptionRef}
-              >
-                {event.description}
-              </DescriptionText>
-              {isDescriptionTruncated && (
-                <Typography 
-                  component="span" 
-                  sx={{ 
-                    color: 'primary.main', 
-                    fontWeight: 'medium',
-                    cursor: 'pointer',
-                    '&:hover': { textDecoration: 'underline' }
-                  }}
-                  onClick={() => setShowFullDescription(true)}
-                >
-                  Read More
-                </Typography>
-              )}
-            </>
-          )}
-        </ContentSection>
-        <ActivitySectionContainer>
-            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
-            {getBaseEventType(event.type) === EventType.SPORTS ? 'Matches' : 'Activities'}
-            </Typography>
-          <Suspense fallback={
-            <Box>
-              {Array(3).fill(0).map((_, index) => (
-                <Box key={index} sx={{ mb: 2 }}>
-                  <Skeleton variant="rounded" height={80} sx={{ borderRadius: 1 }} />
-                </Box>
-              ))}
             </Box>
-          }>
-            <ActivitiesSection eventId={eventId || ''} />
-          </Suspense>
-        </ActivitySectionContainer>
+          </InfoIconWrapper>
 
-        <Divider sx={{ my: 3 }} />
+          <Divider sx={{ my: 3 }} />
 
-        <Divider sx={{ my: 3 }} />
-          
-        <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
+          {/* About Section */}
+          <ContentSection>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+              About Event
+            </Typography>
+            {showFullDescription ? (
+              <Typography variant="body1" color="text.secondary" paragraph>
+                {event.description}
+                {isDescriptionTruncated && (
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: 'primary.main',
+                      fontWeight: 'medium',
+                      cursor: 'pointer',
+                      display: 'block',
+                      mt: 1,
+                      '&:hover': { textDecoration: 'underline' }
+                    }}
+                    onClick={() => setShowFullDescription(false)}
+                  >
+                    Show Less
+                  </Typography>
+                )}
+              </Typography>
+            ) : (
+              <>
+                <DescriptionText
+                  variant="body1"
+                  color="text.secondary"
+                  ref={descriptionRef}
+                >
+                  {event.description}
+                </DescriptionText>
+                {isDescriptionTruncated && (
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: 'primary.main',
+                      fontWeight: 'medium',
+                      cursor: 'pointer',
+                      '&:hover': { textDecoration: 'underline' }
+                    }}
+                    onClick={() => setShowFullDescription(true)}
+                  >
+                    Read More
+                  </Typography>
+                )}
+              </>
+            )}
+          </ContentSection>
+
+          <Divider sx={{ my: 3 }} />
+
+          {/* Activities Section */}
+          <ActivitySectionContainer>
+            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
+              {getBaseEventType(event.type) === EventType.SPORTS ? 'Matches' : 'Activities'}
+            </Typography>
+            <Suspense fallback={
+              <Box>
+                {Array(3).fill(0).map((_, index) => (
+                  <Box key={index} sx={{ mb: 2 }}>
+                    <Skeleton variant="rounded" height={80} sx={{ borderRadius: 1 }} />
+                  </Box>
+                ))}
+              </Box>
+            }>
+              <ActivitiesSection eventId={eventId || ''} />
+            </Suspense>
+          </ActivitySectionContainer>
+
+          <Divider sx={{ my: 3 }} />
+
+          {/* Photo Gallery Section */}
+          <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
             Photos
           </Typography>
-        {/* Photo Gallery Section */}
-        <PhotoGallery />
+          <PhotoGallery />
 
-      </Container>
-    </PageTransition>
+        </Container>
+      </PageTransition>
     </Suspense>
   );
 }
