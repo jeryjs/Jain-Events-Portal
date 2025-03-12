@@ -154,7 +154,7 @@ const _fetchArticles = async (): Promise<Article[]> => {
 };
 
 export const useArticles = () => {
-  return useDummyArticles(20); // Use dummy articles for now while testing
+//   return useDummyArticles(20); // Use dummy articles for now while testing
   
   return useQuery({
     queryKey: ["articles"],
