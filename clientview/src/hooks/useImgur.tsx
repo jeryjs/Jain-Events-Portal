@@ -30,8 +30,8 @@ const IMGUR_CLIENT_ID = "92e7daf3ff48945";
  * Extract album/gallery ID from an Imgur URL
  */
 const extractImgurId = (url: string): { type: 'album' | 'gallery' | 'image', id: string } | null => {
-  // For album URLs (e.g., https://imgur.com/a/abcdef)
-  const albumMatch = url.match(/imgur\.com\/a\/([a-zA-Z0-9]+)/);
+  // For album URLs (e.g., https://imgur.com/a/infinty-2025-FQ1Q1gF)
+  const albumMatch = url.match(/imgur\.com\/a\/(?:[a-zA-Z0-9-]+-)?([a-zA-Z0-9]+)$/);
   if (albumMatch) return { type: 'album', id: albumMatch[1] };
   
   // For gallery URLs (e.g., https://imgur.com/gallery/abcdef)

@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import useImgur from '@hooks/useImgur';
 
 // Styled components
 const GalleryContainer = styled(Box)(({ theme }) => ({
@@ -59,8 +60,6 @@ const NavigationButton = styled(IconButton)(({ theme }) => ({
   zIndex: 1,
 }));
 
-// Sample placeholder images
-const placeholderImages = Array.from({ length: 20 }, (_, i) => `https://picsum.photos/480/360?random=${i + 1}`);
 
 interface ResponsiveBreakpoints {
   xs?: number;
@@ -81,8 +80,13 @@ interface PhotoGalleryProps {
   imageMargin?: number;
 }
 
+interface ImageData {
+  thumbnail: string;
+  fullSize: string;
+}
+
 const PhotoGallery: React.FC<PhotoGalleryProps> = ({ 
-  images = placeholderImages,
+  images = [],
   isLoading = false,
   rows = { xs: 2, sm: 2, md: 2 },
   columns = { xs: 3, sm: 4, md: 6 },
@@ -90,9 +94,31 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   imageHeight = 150,
   imageMargin = 1
 }) => {
+  const [imageData, setImageData] = useState<ImageData[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dragDirection, setDragDirection] = useState<number>(0);
+  
+  const { data, isLoading: imgurLoading } = useImgur('https://imgur.com/a/infinty-2025-FQ1Q1gF');
+  
+  useEffect(() => {
+    if (images.length > 0) {
+      const initialImageData = images.map(image => ({ thumbnail: image, fullSize: image }));
+      return setImageData(initialImageData);
+    } else if (data && data.length > 0) {
+      const fetchedImageData = data.map(item => {
+        const { link } = item;
+        const dotIndex = link.lastIndexOf('.');
+        // Insert 'm' before the file extension for the thumbnail URL
+        const thumbnailLink = dotIndex !== -1 ? link.slice(0, dotIndex) + 'm' + link.slice(dotIndex) : link;
+        return {
+          thumbnail: thumbnailLink, // Thumbnail with medium size
+          fullSize: link,
+        };
+      });
+      setImageData(fetchedImageData);
+    }
+  }, [images, data]);
 
   // Calculate grid properties for columns
   const gridSize = Object.keys(columns).reduce((acc, key) => {
@@ -115,8 +141,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   };
   
   const calcMaxImagesCount = getMaxImagesCount();
-  const hasMoreImages = images.length > calcMaxImagesCount;
-  const displayedImages = images.slice(0, calcMaxImagesCount);
+  const displayedImages = imageData.slice(0, calcMaxImagesCount);
 
   const handleImageClick = (index: number) => {
     setSelectedImageIndex(index);
@@ -132,7 +157,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
     if (selectedImageIndex === null || !displayedImages.length) return;
     setSelectedImageIndex((prevIndex) => (prevIndex + 1) % displayedImages.length);
   };
-
+ 
   const goToPreviousImage = () => {
     if (selectedImageIndex === null || !displayedImages.length) return;
     setSelectedImageIndex((prevIndex) => (prevIndex - 1 + displayedImages.length) % displayedImages.length);
@@ -197,14 +222,14 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 onClick={() => handleImageClick(index)}
               >
                 <Box sx={{ height: imageHeight }}>
-                  <Image src={image} alt={`Gallery image ${index + 1}`} />
+                  <Image src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
                 </Box>
               </PhotoItem>
             </Grid>
           ))
         )}
       </Grid>
-
+      
       {/* Image dialog for expanded view */}
       <Dialog
         open={dialogOpen}
@@ -248,7 +273,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
                 <ExpandedImage 
-                  src={displayedImages[selectedImageIndex]} 
+                  src={displayedImages[selectedImageIndex].fullSize} 
                   alt={`Expanded view ${selectedImageIndex + 1}`}
                 />
               </motion.div>
