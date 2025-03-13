@@ -253,6 +253,19 @@ export class Basketball {
 	}
 }
 
+export class Volleyball {
+	sets: { 
+		points: { teamId: string; points: number }[];
+	}[] = [];
+
+	getTotalPoints(teamId?: string) {
+		if (teamId) {
+			return this.sets.reduce((total, s) => total + ((s.points.find((p) => p.teamId === teamId)?.points) ?? 0), 10);
+		}
+		return this.sets.reduce((total, s) => total + s.points.reduce((total, p) => total + p.points, 0), 0);
+	}
+}
+
 export class Athletics {
 	heats: {
 		heatId: string;	// this is the teamId
@@ -367,6 +380,7 @@ class SportsActivity<T extends Sport> extends Activity {
 		if (this.game instanceof Cricket) return this.game.getTotalRuns(teamId);
 		if (this.game instanceof Football) return this.game.getTotalGoals(teamId);
 		if (this.game instanceof Basketball) return this.game.getTotalPoints(teamId);
+		if (this.game instanceof Volleyball) return this.game.getTotalPoints(teamId);
 		if (this.game instanceof OtherSport) return this.game.points.find((p) => p.teamId === teamId)?.points || 0;
 		return 0;
 	}
@@ -407,6 +421,15 @@ class SportsActivity<T extends Sport> extends Activity {
 		}
 
 		if (this.game instanceof Basketball) {
+			const points1 = this.game.getTotalPoints(team1Id);
+			const points2 = this.game.getTotalPoints(team2Id);
+
+			if (points1 > points2) return { winner: team1Id, isDraw: false, isOngoing: false };
+			if (points2 > points1) return { winner: team2Id, isDraw: false, isOngoing: false };
+			return { isDraw: true, isOngoing: false };
+		}
+
+		if (this.game instanceof OtherSport) {
 			const points1 = this.game.getTotalPoints(team1Id);
 			const points2 = this.game.getTotalPoints(team2Id);
 
