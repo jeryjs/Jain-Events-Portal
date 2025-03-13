@@ -268,6 +268,10 @@ function EventPage() {
     if (!event) return { date: '', dayTime: '' };
     const start = new Date(event.time.start);
     const end = new Date(event.time.end);
+    // If the event year is greater than 3000, use a special "Coming Soon" message and a fancy tagline
+    if (start.getFullYear() >= 3000) {
+      return { date: "Coming Soon", dayTime: "Stay tuned for the big reveal!" };
+    }
     const date = start.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
     const dayOfWeek = start.toLocaleDateString('en-US', { weekday: 'long' });
     const startTime = start.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
