@@ -169,9 +169,9 @@ function HomePage() {
         ))}
 
         {/* Photos Section */}
-        <Section title='Photos'>
+        {/* <Section title='Photos'>
           <PhotoGallery isLoading={isEventsLoading} />
-        </Section>
+        </Section> */}
 
         {/* Articles Section */}
         <Section title='Articles' moreLink='/articles'>
