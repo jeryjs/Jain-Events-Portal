@@ -265,13 +265,17 @@ export class Volleyball {
 		return this.sets.reduce((total, s) => total + s.points.reduce((total, p) => total + p.points, 0), 0);
 	}
 
-	getScore(teamId: string): number {
-		let wins = 0;
-		for (const set of this.sets) {
-			const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
-			if (winner.teamId === teamId) wins++;
+	getScore(teamId?: string): number {
+		if (teamId) {
+			let wins = 0;
+			for (const set of this.sets) {
+				const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+				if (winner.teamId === teamId) wins++;
+			}
+			return wins;
+		} else {
+			return this.sets.reduce((total, set) => total + set.points.reduce((total, p) => total + p.points, 0), 0);
 		}
-		return wins;
 	}
 }
 
@@ -287,13 +291,17 @@ export class Throwball {
 		return this.sets.reduce((total, s) => total + s.points.reduce((total, p) => total + p.points, 0), 0);
 	}
 
-	getScore(teamId: string): number {
-		let wins = 0;
-		for (const set of this.sets) {
-			const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
-			if (winner.teamId === teamId) wins++;
+	getScore(teamId?: string): number {
+		if (teamId) {
+			let wins = 0;
+			for (const set of this.sets) {
+				const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+				if (winner.teamId === teamId) wins++;
+			}
+			return wins;
+		} else {
+			return this.sets.reduce((total, set) => total + set.points.reduce((total, p) => total + p.points, 0), 0);
 		}
-		return wins;
 	}
 }
 
