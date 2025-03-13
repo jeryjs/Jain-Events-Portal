@@ -209,7 +209,7 @@ const PlayersTab = ({ activity }) => {
               {substitutePlayers.length > 0 && (
                 <Box sx={{ mt: 4 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <SubdirectoryArrowRightIcon fontSize="small" sx={{ mr: 1, color: theme.palette.grey[600] }} />
+                    <SubdirectoryArrowRightIcon fontSize="small" sx={{ mr: 1 }} />
                     <Typography variant="subtitle1" fontWeight="medium" color="text.secondary">
                       Substitutes ({substitutePlayers.length})
                     </Typography>

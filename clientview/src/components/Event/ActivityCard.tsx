@@ -575,7 +575,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
               )}
 
               {status === 'completed' && isTeamsConfirmed && (
-                <Box sx={{ mt: -1.5 }}>
+                <Box sx={{ mt: 1.5 }}>
                   {matchResult.winner ? (
                     <Typography variant="body1" align="center" sx={{ fontWeight: 600 }}>
                       Won by {sportActivity.teams?.find(team => team.id === matchResult.winner)?.name}

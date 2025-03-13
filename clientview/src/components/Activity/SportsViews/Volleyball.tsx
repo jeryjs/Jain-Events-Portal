@@ -354,7 +354,7 @@ const VolleyballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                                       label={player.name} 
                                       size="small"
                                       variant="outlined"
-                                      avatar={<Avatar sx={{ bgcolor: 'grey.300' }}>{player.name.charAt(0)}</Avatar>}
+                                      avatar={<Avatar>{player.name.charAt(0)}</Avatar>}
                                     />
                                   ))
                                 }
