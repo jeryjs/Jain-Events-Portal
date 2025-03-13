@@ -74,10 +74,18 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
     // Initialize game stats if needed
     const initializeGameStats = useCallback(() => {
         if (!game.stats || game.stats.length === 0) {
+            // Make sure we validate team IDs before creating stats
             const initialStats = teams.map(team => ({
-                teamId: team.id,
+                teamId: team.id || '', // Ensure teamId is never undefined
                 points: [],
             }));
+
+            // Validate that all teams have IDs
+            if (initialStats.some(stat => !stat.teamId)) {
+                console.error("Some teams are missing IDs:", teams);
+                setNotification("Error: Some teams are missing IDs");
+                return;
+            }
 
             setFormData({
                 ...formData,
@@ -86,11 +94,35 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                     stats: initialStats
                 },
             } as SportsActivity<Sport>);
+        } else {
+            // Verify existing stats have valid team IDs
+            const statsNeedFix = game.stats.some(stat => !stat.teamId);
+            
+            if (statsNeedFix) {
+                // Fix existing stats by matching with teams array
+                const fixedStats = game.stats.map((stat, idx) => {
+                    if (!stat.teamId && teams[idx]) {
+                        return { ...stat, teamId: teams[idx].id };
+                    }
+                    return stat;
+                });
+                
+                setFormData({
+                    ...formData,
+                    game: {
+                        ...game,
+                        stats: fixedStats
+                    },
+                } as SportsActivity<Sport>);
+            }
         }
-    }, [formData, game, teams, setFormData]);
+    }, [formData, game, teams, setFormData, setNotification]);
 
     // Initialize on component load
     if (teams.length >= 2 && (!game.stats || game.stats.length === 0)) {
+        initializeGameStats();
+    } else if (teams.length >= 2 && game.stats && game.stats.some(stat => !stat.teamId)) {
+        // Also check for invalid stats on load
         initializeGameStats();
     }
 
@@ -118,20 +150,43 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
 
     // Add points to a player
     const addPoints = useCallback((teamId: string, playerId: string, points: number) => {
-        const updatedStats = [...(game.stats || [])];
-        const teamIndex = updatedStats.findIndex(stat => stat.teamId === teamId);
-
-        if (teamIndex !== -1) {
-            updatedStats[teamIndex] = {
-                ...updatedStats[teamIndex],
-                points: [
-                    ...updatedStats[teamIndex].points,
-                    { playerId, points }
-                ]
-            };
-            updateGameData(updatedStats);
+        // Safety check for empty teamId
+        if (!teamId) {
+            console.error("Attempted to add points with empty teamId");
+            setNotification("Error: Invalid team selected");
+            return;
         }
-    }, [game.stats, updateGameData]);
+
+        const updatedStats = [...(game.stats || [])];
+        let teamIndex = updatedStats.findIndex(stat => stat.teamId === teamId);
+
+        // If team not found in stats, but exists in teams, add it
+        if (teamIndex === -1) {
+            console.log(`Team ${teamId} not found in stats, adding it now`);
+            const teamExists = teams.some(t => t.id === teamId);
+            
+            if (teamExists) {
+                updatedStats.push({
+                    teamId: teamId,
+                    points: []
+                });
+                teamIndex = updatedStats.length - 1;
+            } else {
+                console.error(`Team ${teamId} not found in teams array`);
+                setNotification("Error: Team not found");
+                return;
+            }
+        }
+
+        updatedStats[teamIndex] = {
+            ...updatedStats[teamIndex],
+            points: [
+                ...updatedStats[teamIndex].points,
+                { playerId, points }
+            ]
+        };
+        updateGameData(updatedStats);
+    }, [game.stats, updateGameData, teams, setNotification]);
 
     // Delete a point
     const deletePoint = useCallback((teamIndex: number, pointIndex: number) => {
