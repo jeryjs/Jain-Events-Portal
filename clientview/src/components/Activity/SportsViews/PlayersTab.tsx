@@ -276,7 +276,6 @@ const PlayersTab = ({ activity }) => {
                             px: 1,
                             py: 0.5,
                             borderRadius: 1,
-                            bgcolor: theme.palette.grey[200],
                             color: theme.palette.text.secondary,
                             fontSize: '0.75rem',
                             fontWeight: 500
