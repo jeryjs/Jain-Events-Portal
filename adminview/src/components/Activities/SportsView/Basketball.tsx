@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -70,8 +70,9 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
     const [notification, setNotification] = useState<string | null>(null);
     const [editPoint, setEditPoint] = useState<{ pointIndex: number, teamIndex: number } | null>(null);
     const [editValue, setEditValue] = useState<number>(0);
+    const [gameStatsInitialized, setGameStatsInitialized] = useState(false);
 
-    // Initialize game stats if needed
+    // Initialize game stats if needed - optimized
     const initializeGameStats = useCallback(() => {
         if (!game.stats || game.stats.length === 0) {
             // Make sure we validate team IDs before creating stats
@@ -84,7 +85,7 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
             if (initialStats.some(stat => !stat.teamId)) {
                 console.error("Some teams are missing IDs:", teams);
                 setNotification("Error: Some teams are missing IDs");
-                return;
+                return false;
             }
 
             setFormData({
@@ -94,6 +95,7 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                     stats: initialStats
                 },
             } as SportsActivity<Sport>);
+            return true;
         } else {
             // Verify existing stats have valid team IDs
             const statsNeedFix = game.stats.some(stat => !stat.teamId);
@@ -114,24 +116,35 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                         stats: fixedStats
                     },
                 } as SportsActivity<Sport>);
+                return true;
             }
+            return false;
         }
     }, [formData, game, teams, setFormData, setNotification]);
 
-    // Initialize on component load
-    if (teams.length >= 2 && (!game.stats || game.stats.length === 0)) {
-        initializeGameStats();
-    } else if (teams.length >= 2 && game.stats && game.stats.some(stat => !stat.teamId)) {
-        // Also check for invalid stats on load
-        initializeGameStats();
-    }
+    // Use effect hook instead of conditional rendering for initialization
+    useEffect(() => {
+        if (!gameStatsInitialized && teams.length >= 2) {
+            const didInit = initializeGameStats();
+            if (didInit) setGameStatsInitialized(true);
+        }
+    }, [teams, gameStatsInitialized, initializeGameStats]);
 
-    // Get players for a specific team
+    // Clean up resources when component unmounts
+    useEffect(() => {
+        return () => {
+            // Clean up any timers, etc.
+            setNotification(null);
+            setEditPoint(null);
+        };
+    }, []);
+
+    // Get players for a specific team - memoized to prevent recalculations
     const getTeamPlayers = useCallback((teamId: string) => {
         return players.filter(p => p.teamId === teamId);
     }, [players]);
 
-    // Get team totals for display
+    // Get team totals for display - memoized
     const getTeamTotal = useCallback((teamId: string): number => {
         const stats = game.stats?.find(s => s.teamId === teamId);
         return stats?.points.reduce((sum, p) => sum + p.points, 0) || 0;
