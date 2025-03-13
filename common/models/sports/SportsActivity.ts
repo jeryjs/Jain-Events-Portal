@@ -264,6 +264,15 @@ export class Volleyball {
 		}
 		return this.sets.reduce((total, s) => total + s.points.reduce((total, p) => total + p.points, 0), 0);
 	}
+
+	getScore(teamId: string): number {
+		let wins = 0;
+		for (const set of this.sets) {
+			const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+			if (winner.teamId === teamId) wins++;
+		}
+		return wins;
+	}
 }
 
 export class Throwball {
@@ -276,6 +285,15 @@ export class Throwball {
 			return this.sets.reduce((total, s) => total + ((s.points.find((p) => p.teamId === teamId)?.points) ?? 0), 0);
 		}
 		return this.sets.reduce((total, s) => total + s.points.reduce((total, p) => total + p.points, 0), 0);
+	}
+
+	getScore(teamId: string): number {
+		let wins = 0;
+		for (const set of this.sets) {
+			const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+			if (winner.teamId === teamId) wins++;
+		}
+		return wins;
 	}
 }
 
@@ -335,7 +353,7 @@ export class OtherSport {
 	}
 }
 
-export type Sport = Cricket | Football | Basketball | Athletics | OtherSport;
+export type Sport = Cricket | Football | Basketball | Volleyball | Throwball | Athletics | OtherSport;
 
 class SportsActivity<T extends Sport> extends Activity {
 	constructor(
@@ -357,6 +375,8 @@ class SportsActivity<T extends Sport> extends Activity {
 			case EventType.CRICKET: gameType = new Cricket(); break;
 			case EventType.FOOTBALL: gameType = new Football(); break;
 			case EventType.BASKETBALL: gameType = new Basketball(); break;
+			case EventType.VOLLEYBALL: gameType = new Volleyball(); break;
+			case EventType.THROWBALL: gameType = new Throwball(); break
 			case EventType.ATHLETICS: gameType = new Athletics(); break;
 			default: gameType = new OtherSport(); 
 		}
@@ -393,8 +413,8 @@ class SportsActivity<T extends Sport> extends Activity {
 		if (this.game instanceof Cricket) return this.game.getTotalRuns(teamId);
 		if (this.game instanceof Football) return this.game.getTotalGoals(teamId);
 		if (this.game instanceof Basketball) return this.game.getTotalPoints(teamId);
-		if (this.game instanceof Volleyball) return this.game.getTotalPoints(teamId);
-		if (this.game instanceof Throwball) return this.game.getTotalPoints(teamId);
+		if (this.game instanceof Volleyball) return this.game.getScore(teamId);
+		if (this.game instanceof Throwball) return this.game.getScore(teamId);
 		if (this.game instanceof OtherSport) return this.game.points.find((p) => p.teamId === teamId)?.points || 0;
 		return 0;
 	}
@@ -444,8 +464,8 @@ class SportsActivity<T extends Sport> extends Activity {
 		}
 
 		if (this.game instanceof Volleyball || this.game instanceof Throwball) {
-			const points1 = this.game.getTotalPoints(team1Id);
-			const points2 = this.game.getTotalPoints(team2Id);
+			const points1 = this.game.getScore(team1Id);
+			const points2 = this.game.getScore(team2Id);
 
 			if (points1 > points2) return { winner: team1Id, isDraw: false, isOngoing: false };
 			if (points2 > points1) return { winner: team2Id, isDraw: false, isOngoing: false };
