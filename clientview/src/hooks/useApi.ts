@@ -31,7 +31,6 @@ export const useEvents = () => {
 		queryKey: ["events"],
 		queryFn: _fetchEvents,
 		staleTime: 1000 * 60 * 5, // 5 minutes
-		refetchOnWindowFocus: false,
 	});
 };
 
@@ -56,7 +55,6 @@ export const useDummyEvents = (count = 100) => {
 				.then((it) => new Promise<typeof it>((resolve) => setTimeout(() => resolve(it), 1000))); // Simulate network delay
 		},
 		staleTime: 1000 * 60 * 5, // 5 minutes
-		refetchOnWindowFocus: false,
 	});
 };
 
@@ -87,7 +85,17 @@ export const useActivities = (eventId: string) => {
 		queryKey: ["activities", eventId],
 		queryFn: () => _fetchActivities(eventId),
 		staleTime: 1000 * 60 * 5, // 5 minutes
-		refetchOnWindowFocus: false,
+		refetchInterval: (data) => {
+			if (!data || !data.state.data) return false;
+			
+			// Check if any activities are ongoing
+			const hasOngoingActivities = (data.state.data).some(activity => {
+				return activity.isOngoing;
+			});
+			
+			// Only refetch if there's at least one ongoing activity
+			return hasOngoingActivities ? 60000 : false;
+		}
 	});
 };
 
@@ -101,6 +109,16 @@ export const useActivity = (eventId: string, activityId: string) => {
 		queryFn: async () => activitiesQuery.data?.find((a) => a.id === activityId),
 		staleTime: 1000 * 60 * 5, // 5 minutes
 		enabled: !activitiesQuery.isLoading,
+		refetchInterval: (data) => {
+			if (!data || !data.state.data) return false;
+			
+			// Check if this specific activity is ongoing
+			const activity = data.state.data;
+			const isOngoing = activity.isOngoing;
+			
+			// Only refetch if this activity is ongoing
+			return isOngoing ? 60000 : false;
+		}
 	});
 };
 

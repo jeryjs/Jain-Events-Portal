@@ -111,6 +111,7 @@ export const useImgur = (imgurUrl: string | null) => {
     staleTime: 1000 * 60 * 60, // 1 hour
     refetchOnWindowFocus: false,
     enabled: !!imgurUrl,
+    refetchInterval: 60000, // Auto refetch every minute
   });
 };
 
