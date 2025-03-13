@@ -5,7 +5,8 @@ import { useEventActivities } from '@hooks/App';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AddIcon from '@mui/icons-material/Add';
 import PeopleIcon from '@mui/icons-material/People';
-import { Box, Button, Chip, Divider, LinearProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { Box, Button, Chip, Divider, IconButton, LinearProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
 import dayjs from 'dayjs';
 import { useState } from 'react';
@@ -189,11 +190,18 @@ const ActivityItem = ({
 };
 
 export const ActivitiesList = ({ eventId, selectedActivityId, onSelectActivity, onCreateActivity }: ActivitiesListProps) => {
-  const { activities, isLoading } = useEventActivities(eventId);
+  const { activities, isLoading, refetch } = useEventActivities(eventId);
   const [filter, setFilter] = useState<EventType>(undefined);
+  const [refreshing, setRefreshing] = useState(false);
   const filteredActivities = filter === undefined
     ? activities
     : activities.filter(activity => activity.eventType === filter);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   const groupedActivities = filteredActivities.reduce((acc: Record<string, Activity[]>, activity) => {
     const dateKey = dayjs(activity.startTime).format('YYYY-MM-DD');
@@ -227,7 +235,20 @@ export const ActivitiesList = ({ eventId, selectedActivityId, onSelectActivity, 
           bgcolor: 'background.default'
         }}
       >
-        <Typography variant="h6" fontWeight="bold">Activities</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography variant="h6" fontWeight="bold">Activities</Typography>
+          <Tooltip title="Refresh">
+            <IconButton 
+              onClick={handleRefresh} 
+              size="small" 
+              sx={{ ml: 1 }}
+              color="primary"
+              disabled={isLoading || refreshing}
+            >
+              <RefreshIcon fontSize="small" className={refreshing ? 'spin-animation' : ''} />
+            </IconButton>
+          </Tooltip>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -238,6 +259,18 @@ export const ActivitiesList = ({ eventId, selectedActivityId, onSelectActivity, 
           Create Activity
         </Button>
       </Box>
+
+      {/* Add a CSS rule for the spinning animation */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .spin-animation {
+          animation: spin 1s linear infinite;
+        }
+      `}</style>
+
 
       <Box sx={{ flexGrow: 1, overflow: 'auto', p: 2, position: 'relative' }}>
         {/* Activity Filter UI */}
