@@ -1,7 +1,9 @@
-import { Box, Container, Skeleton, Typography, CardMedia, CardContent } from '@mui/material';
+import { Box, Container, Skeleton, Typography, CardMedia, CardContent, Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 import { EventCard, HomeHeader, Section } from '@components/Home';
 import NoEventsDisplay from '@components/Home/NoEventsDisplay';
@@ -11,6 +13,7 @@ import { useArticles, useEvents } from '@hooks/useApi';
 import { EventType } from '@common/constants';
 import { Link } from 'react-router-dom';
 import React from 'react';
+import { pascalCase } from '@utils/utils';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -23,6 +26,8 @@ const HorizontalScroll = styled(motion.div)(({ theme }) => `
 const ArticleCard = styled(Link)(({ theme }) => ({
   minWidth: 280,
   maxWidth: 300,
+  margin: theme.spacing(1),
+  height: '100%',
   flexShrink: 0,
   scrollSnapAlign: 'start',
   cursor: 'pointer',
@@ -30,6 +35,9 @@ const ArticleCard = styled(Link)(({ theme }) => ({
   boxShadow: theme.shadows[2],
   overflow: 'hidden',
   transition: 'transform 0.3s, box-shadow 0.3s',
+  display: 'flex',
+  flexDirection: 'column',
+  textDecoration: 'none',
   '&:hover': {
     transform: 'translateY(-8px)',
     boxShadow: theme.shadows[8],
@@ -175,33 +183,116 @@ function HomePage() {
 
         {/* Articles Section */}
         <Section title='Articles' moreLink='/articles'>
-          <HorizontalScroll whileTap={{ cursor: 'grabbing' }}>
-            {isArticlesLoading
-              ? renderEventCardShimmers(3)
-              : (articles || []).map((article) => (
-                <ArticleCard
-                  key={article.id}
-                  to={`/articles/${article.id}`}
-                  sx={{ textDecoration: 'none' }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="160"
-                    image={article.image.url}
-                    alt={article.title}
-                    sx={{ transition: 'transform 0.5s', '&:hover': { transform: 'scale(1.05)' } }}
+          <Box sx={{ position: 'relative', mb: 2 }}>
+            <HorizontalScroll 
+              whileTap={{ cursor: 'grabbing' }}
+              dragConstraints={{ left: 0, right: 0 }}
+              drag="x"
+            >
+              {isArticlesLoading
+                ? renderEventCardShimmers(3)
+                : (articles || []).map((article, idx) => (
+                  <motion.div
+                    key={article.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: idx * 0.1 }}
+                  >
+                    <ArticleCard to={`/articles/${article.id}`}>
+                      <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+                        <CardMedia
+                          component="img"
+                          height="180"
+                          image={article.image.url}
+                          alt={article.title}
+                          sx={{ 
+                            transition: 'transform 0.6s ease-in-out',
+                            '&:hover': { transform: 'scale(1.08)' } 
+                          }}
+                        />
+                        <Box sx={{ 
+                          position: 'absolute', 
+                          top: 0, 
+                          left: 0, 
+                          width: '100%', 
+                          height: '100%', 
+                          background: 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.4))',
+                        }}/>
+                        <Chip 
+                          size="small"
+                          label={pascalCase(EventType[article.relatedEventType]) || 'Article'} 
+                          sx={{ 
+                            position: 'absolute', 
+                            top: 12, 
+                            right: 12,
+                            backgroundColor: 'ButtonShadow',
+                            // color: 'white',
+                            fontWeight: 'bold',
+                            fontSize: '0.7rem'
+                          }}
+                        />
+                      </Box>
+                      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <Box>
+                          <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, lineHeight: 1.2 }}>
+                            {article.title}
+                          </Typography>
+                          <Typography 
+                            variant="body2" 
+                            color="text.secondary"
+                            sx={{
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              mb: 2
+                            }}
+                          >
+                            {article.summary}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <AccessTimeIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }}/>
+                            <Typography variant="caption" color="text.secondary">
+                              {article.readingTimeMinutes || 1} min read
+                            </Typography>
+                          </Box>
+                          <Box sx={{ 
+                            color: 'primary.main', 
+                            display: 'flex', 
+                            alignItems: 'center',
+                            fontWeight: 'bold',
+                            fontSize: '0.75rem'
+                          }}>
+                            READ MORE
+                            <ArrowForwardIcon sx={{ ml: 0.5, fontSize: 14 }} />
+                          </Box>
+                        </Box>
+                      </CardContent>
+                    </ArticleCard>
+                  </motion.div>
+                ))}
+            </HorizontalScroll>
+            
+            {!isArticlesLoading && (articles || []).length > 0 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, gap: 1 }}>
+                {[...Array(Math.min(5, (articles || []).length))].map((_, i) => (
+                  <Box 
+                    key={i} 
+                    sx={{ 
+                      width: 8, 
+                      height: 8, 
+                      borderRadius: '50%', 
+                      backgroundColor: 'primary.main',
+                      opacity: i === 0 ? 0.8 : 0.3,
+                    }} 
                   />
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                      {article.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {article.summary}
-                    </Typography>
-                  </CardContent>
-                </ArticleCard>
-              ))}
-          </HorizontalScroll>
+                ))}
+              </Box>
+            )}
+          </Box>
         </Section>
 
       </Container>
