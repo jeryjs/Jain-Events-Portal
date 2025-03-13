@@ -11,11 +11,16 @@ interface GenericSportFormProps {
   setFormData: (data: SportsActivity<Sport>) => void;
 }
 
+interface PointEntry {
+  teamId: string;
+  points: number;
+}
+
 export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) => {
   const game = (formData.game || {}) as OtherSport;
   const teams = formData.teams || [];
 
-  const [notification, setNotification] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{message: string; type: 'success' | 'error'} | null>(null);
 
   // Initialize game stats if needed
   const initializeGameStats = useCallback(() => {
@@ -40,49 +45,84 @@ export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) =
     initializeGameStats();
   }
 
-  // Update game data in the parent form
-  const updateGameData = useCallback((points: any) => {
-    setFormData({
-      ...formData,
-      game: {
-        ...game,
-        points
-      }
-    } as SportsActivity<Sport>);
-
-    setNotification("Match data updated");
+  // Show notification helper
+  const showNotification = useCallback((message: string, type: 'success' | 'error' = 'success') => {
+    setNotification({ message, type });
     setTimeout(() => setNotification(null), 2000);
-  }, [formData, game, setFormData]);
+  }, []);
+
+  // Update game data in the parent form
+  const updateGameData = useCallback((points: PointEntry[]) => {
+    try {
+      setFormData({
+        ...formData,
+        game: {
+          ...game,
+          points
+        }
+      } as SportsActivity<Sport>);
+
+      showNotification("Match data updated");
+    } catch (error) {
+      console.error("Failed to update match data:", error);
+      showNotification("Failed to update match data", "error");
+    }
+  }, [formData, game, setFormData, showNotification]);
 
   // Add points to a team
-  const addPoints = useCallback((teamId: string, points: number) => {
-    const updatedPoints = [...(game.points || [])];
-    const teamIndex = updatedPoints.findIndex(point => point.teamId === teamId);
+  const addPoints = useCallback((teamId: string, pointsToAdd: number) => {
+    try {
+      const updatedPoints = [...(game.points || [])];
+      let teamIndex = updatedPoints.findIndex(point => point.teamId === teamId);
 
-    if (teamIndex === -1) {
-      // Team points not initialized, initialize it
-      updatedPoints.push({
-        teamId: teamId,
-        points: 0
-      });
+      if (teamIndex === -1) {
+        // Team points not initialized, initialize it
+        updatedPoints.push({
+          teamId: teamId,
+          points: pointsToAdd
+        });
+      } else {
+        // Increment existing team's points
+        updatedPoints[teamIndex].points += pointsToAdd;
+      }
+
+      updateGameData(updatedPoints);
+    } catch (error) {
+      console.error("Error adding points:", error);
+      showNotification("Failed to add points", "error");
     }
-
-    updatedPoints[teamIndex].points += points;
-
-    updateGameData(updatedPoints);
-  }, [game.points, updateGameData]);
+  }, [game.points, updateGameData, showNotification]);
 
   // Remove points from a team
-  const removePoints = useCallback((teamId: string, points: number) => {
-    const updatedPoints = [...(game.points || [])];
-    const teamIndex = updatedPoints.findIndex(point => point.teamId === teamId);
+  const removePoints = useCallback((teamId: string, pointsToRemove: number) => {
+    try {
+      const updatedPoints = [...(game.points || [])];
+      const teamIndex = updatedPoints.findIndex(point => point.teamId === teamId);
 
-    if (teamIndex === -1) return;
+      if (teamIndex === -1) {
+        showNotification("Team not found", "error");
+        return;
+      }
 
-    updatedPoints[teamIndex].points = Math.max(0, updatedPoints[teamIndex].points - points);
+      updatedPoints[teamIndex].points = Math.max(0, updatedPoints[teamIndex].points - pointsToRemove);
+      updateGameData(updatedPoints);
+    } catch (error) {
+      console.error("Error removing points:", error);
+      showNotification("Failed to remove points", "error");
+    }
+  }, [game.points, updateGameData, showNotification]);
 
-    updateGameData(updatedPoints);
-  }, [game.points, updateGameData]);
+  if (teams.length < 2) {
+    return (
+      <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography variant="h6" color="text.secondary">
+            At least two teams are required to set up the match.
+          </Typography>
+        </Box>
+      </Paper>
+    );
+  }
 
   return (
     <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
@@ -99,7 +139,7 @@ export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) =
           const teamPoints = game.points?.find(p => p.teamId === team.id)?.points || 0;
 
           return (
-            <Grid item xs={12} md={6} key={team.id}>
+            <Grid item xs={12} sm={6} key={team.id}>
               <Card variant="outlined" sx={{
                 height: '100%',
                 borderWidth: 2,
@@ -109,9 +149,9 @@ export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) =
                   title={
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}>
-                        {team.name.charAt(0)}
+                        {team.name?.charAt(0) || '?'}
                       </Avatar>
-                      <Typography variant="h6">{team.name}</Typography>
+                      <Typography variant="h6" noWrap>{team.name || 'Unnamed Team'}</Typography>
                     </Box>
                   }
                   action={
@@ -119,13 +159,17 @@ export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) =
                       <Typography variant="h4" fontWeight="bold">
                         {teamPoints}
                       </Typography>
-                      <Tooltip title={`Add Points for ${team.name}`}>
+                      <Tooltip title={`Add Points for ${team.name || 'Team'}`}>
                         <IconButton color="success" onClick={() => addPoints(team.id, 1)}>
                           <AddIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title={`Remove Points from ${team.name}`}>
-                        <IconButton color="error" onClick={() => removePoints(team.id, 1)}>
+                      <Tooltip title={`Remove Points from ${team.name || 'Team'}`}>
+                        <IconButton 
+                          color="error" 
+                          onClick={() => removePoints(team.id, 1)}
+                          disabled={teamPoints <= 0}
+                        >
                           <RemoveIcon />
                         </IconButton>
                       </Tooltip>
@@ -145,7 +189,7 @@ export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) =
         onClose={() => setNotification(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="success" variant="filled">{notification}</Alert>
+        <Alert severity={notification?.type || 'success'} variant="filled">{notification?.message}</Alert>
       </Snackbar>
     </Paper>
   );
