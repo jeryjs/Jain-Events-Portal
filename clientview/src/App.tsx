@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage';
 import TimelinePage from './pages/TimelinePage';
 import { ColorModeContext, useColorMode } from './utils/ColorMode';
 import queryClient from './utils/QueryClient';
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const colorMode = useColorMode();
@@ -45,6 +46,7 @@ function App() {
               <Route path="/:eventId" element={<EventPage />} />
               <Route path="/" element={<HomePage />} />
             </Routes>
+            <Analytics />
           </BrowserRouter>
         </ThemeProvider>
       </ColorModeContext.Provider>
