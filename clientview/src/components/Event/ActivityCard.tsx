@@ -40,14 +40,16 @@ const TeamBox = styled(Box)(({ theme }) => `
   align-items: center;
   justify-content: space-between;
   margin-top: ${theme.spacing(1.5)};
+  width: 100%;
 `);
 
 const TeamScore = styled(Box)<{ winner?: boolean }>(({ theme, winner }) => `
   display: flex;
   flex-direction: column;
-  width: min-content;
   align-items: center;
-  padding: ${theme.spacing(0.5, 2)};
+  justify-content: center;
+  padding: ${theme.spacing(0.5, 1)};
+  width: 100%;
   ${winner ? `
     background-color: ${theme.palette.mode === 'dark'
       ? 'rgba(46, 125, 50, 0.15)'
@@ -60,11 +62,12 @@ const TeamName = styled(Typography)(({ theme }) => `
   font-weight: 500;
   font-size: 0.85rem;
   color: ${theme.palette.text.secondary};
-  max-width: 30vw;
+  max-width: 100%;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
   text-align: center;
+  padding: 0 ${theme.spacing(0.5)};
 `);
 
 const TeamScoreValue = styled(Typography)<{ winner?: boolean }>(({ theme, winner }) => `
@@ -72,6 +75,7 @@ const TeamScoreValue = styled(Typography)<{ winner?: boolean }>(({ theme, winner
   font-size: 1.5rem;
   color: ${winner ? theme.palette.success.main : theme.palette.text.primary};
   line-height: 1.2;
+  text-align: center;
 `);
 
 const MatchStatus = styled(Box)<{ status: 'upcoming' | 'ongoing' | 'completed' }>(({ theme, status }) => {
@@ -510,7 +514,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
               <Divider sx={{ my: 1.5 }} />
 
                 <TeamBox>
-                <Box sx={{ flex: 1, maxWidth: 'calc(50% - 20px)', textAlign: 'center' }}>
+                <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                   <TeamScore winner={status === 'completed' && isTeamsConfirmed && matchResult.winner === team1?.id}>
                   <TeamName>{team1?.name || 'TBD'}</TeamName>
                   {status !== 'upcoming' && isTeamsConfirmed && (
@@ -526,7 +530,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                   <VsText>VS</VsText>
                 </Box>
 
-                <Box sx={{ flex: 1, maxWidth: 'calc(50% - 20px)', textAlign: 'center', justifyItems: 'flex-end' }}>
+                <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                   <TeamScore winner={status === 'completed' && isTeamsConfirmed && matchResult.winner === team2?.id}>
                   <TeamName>{team2?.name || 'TBD'}</TeamName>
                   {status !== 'upcoming' && isTeamsConfirmed && (
