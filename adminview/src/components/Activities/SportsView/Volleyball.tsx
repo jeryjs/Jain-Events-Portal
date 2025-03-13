@@ -22,39 +22,58 @@ interface SetPoints {
 
 // Export component for both named and default export
 export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
-  const game = formData.game as (VolleyballModel | OtherSport);
+  const game = formData.game || {}; // Handle undefined game
   const teams = formData.teams || [];
   const [expanded, setExpanded] = useState<string | false>('set-0');
   const [notification, setNotification] = useState<{message: string; type: 'success' | 'error'} | null>(null);
 
-  // Handle backwards compatibility
+  // Handle backwards compatibility and initialization
   useEffect(() => {
-    if (isLegacyFormat(game)) {
-      convertLegacyFormat();
+    // Check if game is initialized properly
+    if (!game || Object.keys(game).length === 0) {
+      console.log("Game is not initialized, creating new volleyball game");
+      initializeVolleyballGame();
+      return;
     }
 
-    // Initialize volleyball game if needed
-    if (isVolleyballFormat(game) && (!game.sets || game.sets.length === 0) && teams.length >= 2) {
-      initializeVolleyballGame();
+    // Check for legacy format
+    if (isLegacyFormat(game)) {
+      console.log("Converting legacy format to volleyball format");
+      convertLegacyFormat();
+      return;
     }
-  }, []);
+
+    // Initialize if it's a volleyball model but no sets
+    if (isVolleyballFormat(game) && (!game.sets || game.sets.length === 0) && teams.length >= 2) {
+      console.log("Volleyball game has no sets, initializing");
+      initializeVolleyballGame();
+      return;
+    }
+  }, [teams.length]); // Re-run when teams change
 
   // Check if data is in legacy format (OtherSport)
   const isLegacyFormat = useCallback((game: any): game is OtherSport => {
-    return game.points !== undefined && !('sets' in game);
+    // Safety check for undefined or null game
+    if (!game) return false;
+    return 'points' in game && Array.isArray(game.points) && !('sets' in game);
   }, []);
 
   // Check if data is in volleyball format
   const isVolleyballFormat = useCallback((game: any): game is VolleyballModel => {
-    return 'sets' in game;
+    // Safety check for undefined or null game
+    if (!game) return false;
+    return 'sets' in game && Array.isArray(game.sets);
   }, []);
 
   // Convert from legacy OtherSport format to Volleyball format
   const convertLegacyFormat = useCallback(() => {
     try {
       const legacyGame = game as OtherSport;
+      // Safely access points with a fallback to avoid errors
+      const legacyPoints = legacyGame.points || [];
+      
       const initialSets: SetPoints[] = [{
-        points: legacyGame.points || teams.map(team => ({ teamId: team.id, points: 0 }))
+        points: legacyPoints.length > 0 ? legacyPoints : teams.map(team => ({ teamId: team.id, points: 0 }))
       }];
 
       // Create a volleyball model with the sets
@@ -62,7 +81,6 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
       volleyballGame.sets = initialSets;
       
       setFormData({ ...formData, game: volleyballGame } as unknown as SportsActivity<Sport>);
-
       showNotification("Converted legacy volleyball data format", "success");
     } catch (error) {
       console.error("Error converting legacy format:", error);
@@ -73,6 +91,13 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
   // Initialize a new volleyball game
   const initializeVolleyballGame = useCallback(() => {
     try {
+      console.log("Initializing volleyball game with teams:", teams);
+      
+      if (teams.length < 2) {
+        console.log("Not enough teams to initialize volleyball game");
+        return;
+      }
+      
       const initialSets: SetPoints[] = [{
         points: teams.map(team => ({
           teamId: team.id,
@@ -84,6 +109,7 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
       const volleyballGame = new VolleyballModel();
       volleyballGame.sets = initialSets;
       
+      console.log("Setting form data with new volleyball game:", volleyballGame);
       setFormData({ ...formData, game: volleyballGame } as unknown as SportsActivity<Sport>);
     } catch (error) {
       console.error("Error initializing volleyball game:", error);
@@ -163,15 +189,51 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
     }
   }, [game, updatePoints]);
 
-  // Add a new set
+  // Add a new set - fixed to ensure it works
   const addSet = useCallback(() => {
+    console.log("Add set button clicked");
+    try {
+      // Initialize if necessary
+      if (!isVolleyballFormat(game)) {
+        console.log("Game is not in volleyball format, initializing");
+        initializeVolleyballGame();
+        return;
+      }
+      
+      // Ensure game.sets is an array
+      const currentSets = Array.isArray(game.sets) ? game.sets : [];
+      console.log("Current sets:", currentSets);
+      
+      const updatedSets = [...currentSets];
+      updatedSets.push({ 
+        points: teams.map(team => ({ teamId: team.id, points: 0 })) 
+      });
+      console.log("Updated sets:", updatedSets);
+
+      // Create a volleyball model with the updated sets
+      const volleyballGame = new VolleyballModel();
+      volleyballGame.sets = updatedSets;
+      
+      console.log("Setting form data with updated sets");
+      setFormData({ ...formData, game: volleyballGame } as unknown as SportsActivity<Sport>);
+
+      // Expand the newly added set
+      const newSetIndex = updatedSets.length - 1;
+      setExpanded(`set-${newSetIndex}`);
+      showNotification("New set added");
+    } catch (error) {
+      console.error("Error adding set:", error);
+      showNotification("Failed to add set", "error");
+    }
+  }, [formData, game, teams, setFormData, showNotification, initializeVolleyballGame, setExpanded]);
+
+  // Delete a set
+  const deleteSet = useCallback((setIndex: number) => {
     try {
       if (!isVolleyballFormat(game)) return;
       
       const updatedSets = [...(game.sets || [])];
-      updatedSets.push({ 
-        points: teams.map(team => ({ teamId: team.id, points: 0 })) 
-      });
+      updatedSets.splice(setIndex, 1);
 
       // Create a volleyball model with the updated sets
       const volleyballGame = new VolleyballModel();
@@ -179,14 +241,17 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
       
       setFormData({ ...formData, game: volleyballGame } as unknown as SportsActivity<Sport>);
 
-      // Expand the newly added set
-      setExpanded(`set-${updatedSets.length - 1}`);
-      showNotification("New set added");
+      // Update expanded state if needed
+      if (expanded === `set-${setIndex}`) {
+        setExpanded(updatedSets.length > 0 ? `set-0` : false);
+      }
+      
+      showNotification("Set deleted");
     } catch (error) {
-      console.error("Error adding set:", error);
-      showNotification("Failed to add set", "error");
+      console.error("Error deleting set:", error);
+      showNotification("Failed to delete set", "error");
     }
-  }, [formData, game, teams, setFormData, showNotification]);
+  }, [formData, game, setFormData, expanded, showNotification]);
 
   // Get team's total points across all sets
   const getTeamTotalPoints = useCallback((teamId: string) => {
@@ -204,7 +269,7 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
     
     return game.sets.reduce((wins, set) => {
       const teamPoints = set.points.find(p => p.teamId === teamId)?.points || 0;
-      const maxPoints = Math.max(...set.points.map(p => p.points), 0);
+      const maxPoints = set.points.length > 0 ? Math.max(...set.points.map(p => p.points), 0) : 0;
       return wins + (teamPoints === maxPoints && teamPoints > 0 ? 1 : 0);
     }, 0);
   }, [game]);
@@ -227,7 +292,7 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
       <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <Typography variant="h6" color="text.secondary">
-            Loading volleyball match data...
+            Initializing volleyball match data...
           </Typography>
         </Box>
       </Paper>
@@ -306,6 +371,27 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
                   </Box>
                 );
               })}
+              
+              {/* Subtle delete button */}
+              <IconButton 
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent accordion from toggling
+                  deleteSet(index);
+                }}
+                sx={{ 
+                  opacity: 0.6, 
+                  ml: 1,
+                  '&:hover': { 
+                    opacity: 1, 
+                    color: 'error.main' 
+                  }
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+                </svg>
+              </IconButton>
             </Box>
           </AccordionSummary>
           <AccordionDetails>
