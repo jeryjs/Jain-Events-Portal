@@ -24,6 +24,21 @@ const _fetchEvents = async (): Promise<Event[]> => {
 	return parseEvents(data);
 };
 
+const _fetchEvent = async (eventId: string): Promise<Event> => {
+	const response = await fetch(`${config.API_BASE_URL}/events/${eventId}`, {
+		headers: {
+			"Cache-Control": "max-age=300", // 5 minutes
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error(`Failed to fetch event: ${eventId}`);
+	}
+
+	const data: any = await response.json();
+	return Event.parse(data);
+}
+
 export const useEvents = () => {
 	// return useDummyEvents(20); // Use dummy events for now while testing
 
@@ -35,13 +50,13 @@ export const useEvents = () => {
 };
 
 export const useEvent = (eventId: string) => {
-	const eventsQuery = useEvents();
+	// const eventsQuery = useEvents();
 
 	return useQuery({
 		queryKey: ["event", eventId],
-		queryFn: async () => eventsQuery.data?.find((e) => e.id === eventId),
+		queryFn: () => _fetchEvent(eventId),
 		staleTime: 1000 * 60 * 5, // 5 minutes
-		enabled: !eventsQuery.isLoading,
+		enabled: !!eventId,
 	});
 };
 
@@ -66,7 +81,7 @@ export const useDummyEvents = (count = 100) => {
 const _fetchActivities = async (eventId: string): Promise<Activity[]> => {
 	const response = await fetch(`${config.API_BASE_URL}/activities/${eventId}`, {
 		headers: {
-			"Cache-Control": "max-age=300", // 5 minutes
+			"Cache-Control": "max-age=60", // 1 minute
 		},
 	});
 
@@ -78,13 +93,28 @@ const _fetchActivities = async (eventId: string): Promise<Activity[]> => {
 	return parseActivities(data);
 };
 
+const _fetchActivity = async (eventId: string, activityId: string): Promise<Activity> => {
+	const response = await fetch(`${config.API_BASE_URL}/activities/${eventId}/${activityId}`, {
+		headers: {
+			"Cache-Control": "max-age=60", // 1 minute
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error(`Failed to fetch activity: ${activityId}`);
+	}
+
+	const data: any = await response.json();
+	return Activity.parse(data);
+};
+
 export const useActivities = (eventId: string) => {
 	// return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
 
 	return useQuery({
 		queryKey: ["activities", eventId],
 		queryFn: () => _fetchActivities(eventId),
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		// staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchInterval: (data) => {
 			if (!data || !data.state.data) return false;
 			
@@ -101,14 +131,13 @@ export const useActivities = (eventId: string) => {
 
 export const useActivity = (eventId: string, activityId: string) => {
 	// return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
-
-	const activitiesQuery = useActivities(eventId);
+	// const activitiesQuery = useActivities(eventId);
 
 	return useQuery({
 		queryKey: ["activity", eventId, activityId],
-		queryFn: async () => activitiesQuery.data?.find((a) => a.id === activityId),
-		staleTime: 1000 * 60 * 5, // 5 minutes
-		enabled: !activitiesQuery.isLoading,
+		queryFn: () => _fetchActivity(eventId, activityId),
+		// staleTime: 1000 * 60 * 5, // 5 minutes
+		enabled: !!eventId && !!activityId,
 		refetchInterval: (data) => {
 			if (!data || !data.state.data) return false;
 			
