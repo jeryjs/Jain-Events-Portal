@@ -198,11 +198,11 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
   const AthleticsCard = ({ sportActivity, status, eventId }: { sportActivity: SportsActivity<Sport>, status: 'upcoming' | 'ongoing' | 'completed', eventId: string }) => {
     const athleticsGame = sportActivity.game as Athletics;
 
-    // Get top 3 athletes across all heats based on time
+    // Get top athletes based on rank or time, whichever is available
     const topAthletes = useMemo(() => {
       const allAthletes = athleticsGame.heats?.flatMap(heat =>
         heat.athletes
-          .filter(a => a.time && a.time > 0)
+          .filter(a => a.rank || (a.time && a.time > 0)) // Include athletes with either rank or valid time
           .map(athlete => ({
             ...athlete,
             heatId: heat.heatId,
@@ -211,7 +211,19 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
           }))
       ) || [];
 
-      return allAthletes.sort((a, b) => a.time - b.time).slice(0, 3);
+      // Sort primarily by rank if available, otherwise by time
+      return allAthletes
+        .sort((a, b) => {
+          // If both have ranks, sort by rank
+          if (a.rank && b.rank) return a.rank - b.rank;
+          // If only a has rank, a comes first
+          if (a.rank) return -1;
+          // If only b has rank, b comes first
+          if (b.rank) return 1;
+          // Otherwise sort by time
+          return (a.time || Infinity) - (b.time || Infinity);
+        })
+        .slice(0, 3);
     }, [athleticsGame.heats, sportActivity.teams, sportActivity.participants]);
 
     return (
@@ -355,7 +367,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                                   minWidth: '16px'
                                 }}
                               >
-                                {idx + 1}
+                                {athlete.rank || idx + 1}
                               </Typography>
                               <Avatar
                                 sx={{
@@ -401,7 +413,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                                 whiteSpace: 'nowrap'
                               }}
                             >
-                              {athlete.time?.toFixed(2)}s
+                              {athlete.time && athlete.time > 0 ? 
+                                `${athlete.time.toFixed(2)}s` : 
+                                `Rank ${athlete.rank || '-'}`}
                             </Typography>
                           </Box>
                         );
