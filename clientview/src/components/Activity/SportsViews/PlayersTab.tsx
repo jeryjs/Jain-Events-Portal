@@ -223,7 +223,6 @@ const PlayersTab = ({ activity }) => {
                           py: 1.5,
                           borderRadius: 1,
                           mb: 1,
-                          bgcolor: theme.palette.grey[100],
                           '&:hover': {
                             bgcolor: theme.palette.action.hover
                           }
