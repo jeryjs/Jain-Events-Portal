@@ -1,19 +1,20 @@
-import { Box, Container, Skeleton, Typography, CardMedia, CardContent, Chip } from '@mui/material';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Box, CardContent, CardMedia, Chip, Container, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
+import { EventType } from '@common/constants';
 import { EventCard, HomeHeader, Section } from '@components/Home';
 import NoEventsDisplay from '@components/Home/NoEventsDisplay';
 import PageTransition from '@components/shared/PageTransition';
-import PhotoGallery from '@components/shared/PhotoGallery';
 import { useArticles, useEvents } from '@hooks/useApi';
-import { EventType } from '@common/constants';
-import { Link } from 'react-router-dom';
-import React from 'react';
+import useImgur from '@hooks/useImgur';
 import { pascalCase } from '@utils/utils';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import PhotoGallery from '@components/shared/PhotoGallery';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -50,6 +51,7 @@ function HomePage() {
 
   const { data: events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
+  const { data: imgur, isLoading: imgurLoading } = useImgur('https://imgur.com/a/infinty-2025-FQ1Q1gF');
 
   const [catTabId, setTabId] = useState([0, -1]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
@@ -177,9 +179,9 @@ function HomePage() {
         ))}
 
         {/* Photos Section */}
-        {/* <Section title='Photos'>
-          <PhotoGallery isLoading={isEventsLoading} />
-        </Section> */}
+        <Section title='Gallery'>
+          <PhotoGallery images={imgur ? imgur.map(it => it.link) : []} isLoading={imgurLoading} rows={2} columns={4} />
+        </Section>
 
         {/* Articles Section */}
         <Section title='Articles' moreLink='/articles'>

@@ -5,7 +5,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import useImgur from '@hooks/useImgur';
 
 // Styled components
 const GalleryContainer = styled(Box)(({ theme }) => ({
@@ -28,14 +27,14 @@ const Image = styled('img')({
   display: 'block',
 });
 
-const ExpandedImage = styled(motion.img)({
+const ExpandedImage = styled(motion.img)(() => ({
   minWidth: '60vw',
   maxWidth: '90vw',
   maxHeight: '90vh',
   objectFit: 'cover',
   borderRadius: '8px',
   boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.25)',
-});
+}));
 
 const CloseButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
@@ -60,88 +59,42 @@ const NavigationButton = styled(IconButton)(({ theme }) => ({
   zIndex: 1,
 }));
 
-
-interface ResponsiveBreakpoints {
-  xs?: number;
-  sm?: number;
-  md?: number;
-  lg?: number;
-  xl?: number;
-}
+// Sample placeholder images
+const placeholderImages = Array.from({ length: 20 }, (_, i) => `https://picsum.photos/480/360?random=${i + 1}`);
 
 interface PhotoGalleryProps {
   title?: string;
   images?: string[];
   isLoading?: boolean;
-  rows?: number | ResponsiveBreakpoints;
-  columns?: ResponsiveBreakpoints;
+  rows?: number;
+  columns?: number;
   onSeeAllClick?: () => void;
   imageHeight?: number;
   imageMargin?: number;
 }
 
-interface ImageData {
-  thumbnail: string;
-  fullSize: string;
-}
-
 const PhotoGallery: React.FC<PhotoGalleryProps> = ({ 
-  images = [],
+  images = placeholderImages,
   isLoading = false,
-  rows = { xs: 2, sm: 2, md: 2 },
-  columns = { xs: 3, sm: 4, md: 6 },
+  rows = 2,
+  columns = 3,
   onSeeAllClick,
   imageHeight = 150,
   imageMargin = 1
 }) => {
-  const [imageData, setImageData] = useState<ImageData[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dragDirection, setDragDirection] = useState<number>(0);
-  
-  const { data, isLoading: imgurLoading } = useImgur('https://imgur.com/a/infinty-2025-FQ1Q1gF');
-  
-  useEffect(() => {
-    if (images.length > 0) {
-      const initialImageData = images.map(image => ({ thumbnail: image, fullSize: image }));
-      return setImageData(initialImageData);
-    } else if (data && data.length > 0) {
-      const fetchedImageData = data.map(item => {
-        const { link } = item;
-        const dotIndex = link.lastIndexOf('.');
-        // Insert 'm' before the file extension for the thumbnail URL
-        const thumbnailLink = dotIndex !== -1 ? link.slice(0, dotIndex) + 'm' + link.slice(dotIndex) : link;
-        return {
-          thumbnail: thumbnailLink, // Thumbnail with medium size
-          fullSize: link,
-        };
-      });
-      setImageData(fetchedImageData);
-    }
-  }, [images, data]);
 
-  // Calculate grid properties for columns
-  const gridSize = Object.keys(columns).reduce((acc, key) => {
-    const breakpoint = key as keyof typeof columns;
-    const columnCount = columns[breakpoint] || 1;
-    acc[breakpoint] = 12 / columnCount;
-    return acc;
-  }, {} as {[key: string]: number});
-
-  // Calculate the maximum number of images to display based on responsive rows and columns
-  const getMaxImagesCount = () => {
-    const rowsObj = typeof rows === 'number' ? { xs: rows, sm: rows, md: rows, lg: rows, xl: rows } : rows;
-    
-    let maxImages = 0;
-    if(columns.xs && rowsObj.xs){
-      maxImages = columns.xs * rowsObj.xs
-    }
-    
-    return maxImages
+  // Simple grid size calculation based on 12-column grid
+  const gridSize = {
+    xs: 12 / columns
   };
-  
-  const calcMaxImagesCount = getMaxImagesCount();
-  const displayedImages = imageData.slice(0, calcMaxImagesCount);
+
+  // Calculate the maximum number of images to display
+  const calcMaxImagesCount = rows * columns;
+  const hasMoreImages = images.length > calcMaxImagesCount;
+  const displayedImages = images.slice(0, calcMaxImagesCount);
 
   const handleImageClick = (index: number) => {
     setSelectedImageIndex(index);
@@ -157,7 +110,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
     if (selectedImageIndex === null || !displayedImages.length) return;
     setSelectedImageIndex((prevIndex) => (prevIndex + 1) % displayedImages.length);
   };
- 
+
   const goToPreviousImage = () => {
     if (selectedImageIndex === null || !displayedImages.length) return;
     setSelectedImageIndex((prevIndex) => (prevIndex - 1 + displayedImages.length) % displayedImages.length);
@@ -206,7 +159,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         {isLoading ? (
           // Skeleton loaders
           [...Array(calcMaxImagesCount)].map((_, index) => (
-            <Grid item {...gridSize} key={`skeleton-${index}`}>
+            <Grid item xs={gridSize.xs} key={`skeleton-${index}`}>
               <Box sx={{ height: imageHeight }}>
                 <Skeleton variant="rectangular" width="100%" height="100%" />
               </Box>
@@ -215,21 +168,21 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         ) : (
           // Image grid
           displayedImages.map((image, index) => (
-            <Grid item {...gridSize} key={`image-${index}`}>
+            <Grid item xs={gridSize.xs} key={`image-${index}`}>
               <PhotoItem
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleImageClick(index)}
               >
                 <Box sx={{ height: imageHeight }}>
-                  <Image src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
+                  <Image src={image} alt={`Gallery image ${index + 1}`} />
                 </Box>
               </PhotoItem>
             </Grid>
           ))
         )}
       </Grid>
-      
+
       {/* Image dialog for expanded view */}
       <Dialog
         open={dialogOpen}
@@ -273,7 +226,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
                 <ExpandedImage 
-                  src={displayedImages[selectedImageIndex].fullSize} 
+                  src={displayedImages[selectedImageIndex]} 
                   alt={`Expanded view ${selectedImageIndex + 1}`}
                 />
               </motion.div>

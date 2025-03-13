@@ -248,7 +248,10 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
 function EventPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+
   const { data: event, isLoading: eventLoading } = useEvent(eventId);
+  const { data: imgur, isLoading: imgurLoading } = useImgur("https://imgur.com/a/infinty-2025-FQ1Q1gF");
+
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
@@ -451,11 +454,19 @@ function EventPage() {
           <Divider sx={{ my: 3 }} />
 
           {/* Photo Gallery Section */}
-          {/* <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
-            Photos
+          <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', mb: 2 }}>
+            Event Gallery
           </Typography>
-          <PhotoGallery /> */}
-
+          <PhotoGallery
+            images={
+              eventId === "sportastica-2025" ?
+                (imgur ? [...imgur].reverse().map(it => it.link) : []) :
+                (imgur ? imgur.map(it => it.link) : [])
+            }
+            isLoading={imgurLoading}
+            rows={2}
+            columns={4}
+          />
         </Container>
       </PageTransition>
     </Suspense>
