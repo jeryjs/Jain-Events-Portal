@@ -236,7 +236,7 @@ const VolleyballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                 <TableContainer component={Paper} variant="outlined">
                   <Table size="small">
                     <TableHead>
-                      <TableRow sx={{ bgcolor: 'grey.100' }}>
+                      <TableRow>
                         <TableCell sx={{ fontWeight: 'bold' }}>Set</TableCell>
                         {activity.teams.map(team => (
                           <TableCell align="center" key={team.id} sx={{ fontWeight: 'bold' }}>
