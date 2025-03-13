@@ -11,6 +11,7 @@ import { BasketballForm } from './SportsView/Basketball';
 import { FootballForm } from './SportsView/Football';
 import { VolleyballForm } from './SportsView/Volleyball';
 import { AthleticsForm } from './SportsView/AthleticsForm';
+import { ThrowballForm } from './SportsView/Throwball';
 
 // Define types properly
 interface SportsViewProps {
@@ -60,6 +61,7 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
       case EventType.BASKETBALL: return <BasketballForm formData={formData as SportsActivity<Basketball>} setFormData={setFormData} />;
       case EventType.FOOTBALL: return <FootballForm formData={formData as SportsActivity<Football>} setFormData={setFormData} />;
       case EventType.VOLLEYBALL: return <VolleyballForm formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
+      case EventType.THROWBALL: return <ThrowballForm formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
       case EventType.ATHLETICS: return <AthleticsForm formData={formData as SportsActivity<Athletics>} setFormData={setFormData} />;
       default: return <GenericSport formData={formData} setFormData={setFormData} />;
     }
