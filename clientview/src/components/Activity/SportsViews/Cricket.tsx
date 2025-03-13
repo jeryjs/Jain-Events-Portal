@@ -119,7 +119,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
         isComplete: true,
         winner
       };
-    } else if (!activity.startTime || activity.startTime > now) {
+    } else if (!activity.startTime || activity.startTime > now || !game.innings || game.innings.length === 0) {
       return "Match not started";
     } else {
       const currentInnings = game.innings[game.innings.length - 1];
