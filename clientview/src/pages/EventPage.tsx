@@ -451,10 +451,10 @@ function EventPage() {
           <Divider sx={{ my: 3 }} />
 
           {/* Photo Gallery Section */}
-          <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
+          {/* <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
             Photos
           </Typography>
-          <PhotoGallery />
+          <PhotoGallery /> */}
 
         </Container>
       </PageTransition>
