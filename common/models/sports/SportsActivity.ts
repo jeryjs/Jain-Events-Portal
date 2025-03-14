@@ -266,28 +266,44 @@ export class Volleyball {
 	}
 
 	getScore(teamId?: string): number {
-		// A set is considered complete if one team scores at least 25 and leads by at least 2 points.
-		const isSetComplete = (set: { points: { teamId: string; points: number }[] }): boolean => {
+		const numSets = this.sets.length;
+		let result = 0;
+
+		const isSetCompleteStandard = (set: { points: { teamId: string; points: number }[] }): boolean => {
 			if (set.points.length < 2) return false;
 			const [teamA, teamB] = set.points;
 			const diff = Math.abs(teamA.points - teamB.points);
 			return ((teamA.points >= 25 || teamB.points >= 25) && diff >= 2);
 		};
 
-		if (teamId) {
-			let wins = 0;
-			for (const set of this.sets) {
-				if (!isSetComplete(set)) continue;
-				const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
-				if (winner.teamId === teamId) wins++;
+		for (let i = 0; i < numSets; i++) {
+			const set = this.sets[i];
+			let setWinner: { teamId: string; points: number } | undefined;
+
+			if (i < numSets - 1) {
+				// Any set that is not the last one is considered ended,
+				// even if it doesn't meet the 25-point criteria.
+				setWinner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+			} else {
+				// Last set
+				if (numSets >= 3) {
+					// For the final set of 3 or more, pick the highest score bearer regardless of the completion criteria.
+					setWinner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+				} else {
+					// For less than 3 sets, follow the usual 25-point completion criteria.
+					if (!isSetCompleteStandard(set)) continue;
+					setWinner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+				}
 			}
-			return wins;
-		} else {
-			return this.sets.reduce((total, set) => {
-				if (!isSetComplete(set)) return total;
-				return total + set.points.reduce((sum, p) => sum + p.points, 0);
-			}, 0);
+
+			if (teamId) {
+				if (setWinner && setWinner.teamId === teamId) result++;
+			} else {
+				// If no teamId is provided, sum up total points from the completed set.
+				result += set.points.reduce((sum, p) => sum + p.points, 0);
+			}
 		}
+		return result;
 	}
 }
 
@@ -304,25 +320,49 @@ export class Throwball {
 	}
 
 	getScore(teamId?: string): number {
-		// Consider a set complete if one team reaches at least 25 points and leads by 2 or more.
 		const threshold = 25;
-		const completeSets = this.sets.filter(set => {
-			if (set.points.length < 2) return false;
-			const [teamA, teamB] = set.points;
-			const diff = Math.abs(teamA.points - teamB.points);
-			return ((teamA.points >= threshold || teamB.points >= threshold) && diff >= 2);
+		let wins = 0;
+		let totalPoints = 0;
+		const totalSets = this.sets.length;
+
+		this.sets.forEach((set, idx) => {
+			// Skip sets that don't have both teams
+			if (set.points.length < 2) return;
+
+			let complete = false;
+			let winner: { teamId: string; points: number } | null = null;
+
+			// If there's a set after the current one, this set has ended
+			if (idx < totalSets - 1) {
+				complete = true;
+				winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+			} else {
+				// Last (current) set
+				if (totalSets >= 3) {
+					// Final set (3 or more): choose highest scorer regardless of the 25 point rule
+					complete = true;
+					winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+				} else {
+					// Use the threshold criteria if fewer than 3 sets
+					const [teamA, teamB] = set.points;
+					const diff = Math.abs(teamA.points - teamB.points);
+					if ((teamA.points >= threshold || teamB.points >= threshold) && diff >= 2) {
+						complete = true;
+						winner = teamA.points > teamB.points ? teamA : teamB;
+					}
+				}
+			}
+
+			if (complete) {
+				if (teamId) {
+					if (winner && winner.teamId === teamId) wins++;
+				} else {
+					totalPoints += set.points.reduce((sum, p) => sum + p.points, 0);
+				}
+			}
 		});
 
-		if (teamId) {
-			let wins = 0;
-			for (const set of completeSets) {
-				const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
-				if (winner.teamId === teamId) wins++;
-			}
-			return wins;
-		} else {
-			return completeSets.reduce((total, set) => total + set.points.reduce((sum, p) => sum + p.points, 0), 0);
-		}
+		return teamId ? wins : totalPoints;
 	}
 }
 
