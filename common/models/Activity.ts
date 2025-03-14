@@ -34,6 +34,9 @@ export default class Activity {
     }
 
     get isOngoing(): boolean {
-        return this.endTime ? this.endTime > new Date() : false;
+        const now = new Date();
+        if (!this.startTime) return false;
+        if (this.startTime > now && !this.endTime) return true;
+        return this.startTime >= now && now < this.endTime;
     }
 }

@@ -218,7 +218,7 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                   .filter(player => player.teamId === team.id && !player.isPlaying)
                   .length > 0 && (
                     <TableRow>
-                      <TableCell colSpan={5} sx={{ bgcolor: 'grey.100', py: 1 }}>
+                      <TableCell colSpan={5} sx={{ py: 1 }}>
                         <Typography variant="subtitle2" fontWeight="medium">
                           Substitutes
                         </Typography>
@@ -249,7 +249,7 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                   })
                   .sort((a, b) => b.totalPoints - a.totalPoints)
                   .map((playerWithPoints: any) => (
-                    <TableRow key={playerWithPoints.usn} sx={{ bgcolor: 'grey.50' }}>
+                    <TableRow key={playerWithPoints.usn}>
                     <TableCell>
                       <Typography color="text.secondary">{playerWithPoints.name}</Typography>
                     </TableCell>

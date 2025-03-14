@@ -1,15 +1,16 @@
-import React, { useMemo } from 'react';
-import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
+import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import EventPage from './pages/EventPage';
+import { useMemo } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import ActivityPage from './pages/ActivityPage';
-import ArticlesPage from './pages/ArticlesPage';
 import ArticlePage from './pages/ArticlePage';
+import ArticlesPage from './pages/ArticlesPage';
+import EventPage from './pages/EventPage';
+import HomePage from './pages/HomePage';
 import TimelinePage from './pages/TimelinePage';
-import queryClient from './utils/QueryClient';
 import { ColorModeContext, useColorMode } from './utils/ColorMode';
+import queryClient from './utils/QueryClient';
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const colorMode = useColorMode();
@@ -23,7 +24,7 @@ function App() {
             main: colorMode.mode === 'light' ? '#000' : '#fff',
           },
         },
-        typography: { fontFamily: '"Inter","Roboto","Helvetica","Arial",sans-serif' },
+        typography: { fontFamily: '"Roboto","Helvetica","Arial",sans-serif' },
       }),
     [colorMode.mode],
   );
@@ -33,7 +34,7 @@ function App() {
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Router>
+          <BrowserRouter>
             <Routes>
               {/* Articles routes - specific ones first */}
               <Route path="/articles/:articleId" element={<ArticlePage />} />
@@ -45,7 +46,8 @@ function App() {
               <Route path="/:eventId" element={<EventPage />} />
               <Route path="/" element={<HomePage />} />
             </Routes>
-          </Router>
+            <Analytics />
+          </BrowserRouter>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </QueryClientProvider>

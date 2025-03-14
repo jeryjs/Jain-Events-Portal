@@ -78,7 +78,7 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
 
   // Utility to update formData
   const editFormData = (key: string, value: any) => {
-    setFormData(Event.parse({ ...formData.toJSON(), [key]: value }));
+    setFormData(Event.parse({ ...formData, [key]: value }));
   };
 
   // Handle form submission

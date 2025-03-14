@@ -16,6 +16,7 @@ export function useEventActivities(eventId?: string) {
     activities: query.data || [],
     isLoading: query.isLoading,
     error: query.error,
+    refetch: query.refetch
   };
 }
 

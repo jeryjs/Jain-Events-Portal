@@ -29,16 +29,15 @@
             "dest": "/backend/dist/backend/index.js"
         },
         {
-            "src": "/admin/assets/(.*)",
-            "dest": "/adminview/assets/$1"
-        },
-        {
             "src": "/admin(/?.*)",
             "dest": "/adminview/$1"
         },
         {
             "src": "/(.*)",
             "dest": "/clientview/$1"
+        },
+        {
+            "handle": "filesystem"
         }
     ]
 }

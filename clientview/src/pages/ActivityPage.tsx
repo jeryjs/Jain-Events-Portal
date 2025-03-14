@@ -7,7 +7,8 @@ import {
   Chip,
   Container,
   IconButton,
-  Typography
+  Typography,
+  Skeleton
 } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -60,7 +61,7 @@ function ActivityPage() {
     return <ActivitySkeleton />;
   }
 
-  if (!activity && !isLoading) {
+  if (!isLoading && !activity) {
     return <ActivityNotFound eventId={eventId || ''} />;
   }
 

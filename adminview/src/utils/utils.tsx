@@ -3,17 +3,16 @@ import useTheme from "@mui/material/styles/useTheme";
 
 // Helper function to generate a unique color based on a string
 export const generateColorFromString = (str: string): string => {
-    const theme = useTheme();
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    const baseColor = (hash & 0x00FFFFFF);
+    const baseColor = hash & 0x00FFFFFF;
     const hexColor = '#' + baseColor.toString(16).toUpperCase().padStart(6, '0');
     
-    // Darken the color in dark mode
-    const isDarkMode = theme.palette.mode === 'dark';
+    // Darken the color in dark mode without using hooks
+    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     const color = isDarkMode ? darkenColor(hexColor) : hexColor;
     return color.substring(0, 7);
 };

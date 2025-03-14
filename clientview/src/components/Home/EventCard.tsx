@@ -85,22 +85,34 @@ interface EventCardProps {
 
 const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', delay = 0 }) => {
 
-  // Format date for display
+  // Check the start date year and set date/time accordingly
   const startDate = new Date(event.time.start);
-  const formattedDate = startDate.toLocaleDateString('en-US', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'long',
-  });
+  let formattedDate: string;
+  let formattedTime: string;
+  let day: number | string;
+  let month: string;
 
-  const formattedTime = startDate.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  if (startDate.getFullYear() >= 3000) {
+    formattedDate = "Coming Soon";
+    formattedTime = "Stay tuned for the big reveal!";
+    day = "";
+    month = "";
+  } else {
+    formattedDate = startDate.toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'long',
+    });
 
-  // Extract date parts for badge
-  const day = startDate.getDate();
-  const month = startDate.toLocaleString('default', { month: 'short' });
+    formattedTime = startDate.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    // Extract date parts for badge
+    day = startDate.getDate();
+    month = startDate.toLocaleString('default', { month: 'short' });
+  }
 
   // Load the event image and show shimmer while loading
   const getEventImage = async () => {
@@ -181,10 +193,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
       >
         <Link to={`/${event.id}`} style={{ textDecoration: 'none' }}>
           <StyledCard sx={{ position: 'relative' }}>
-            <DateBadge>
+            {day && <DateBadge>
               <Typography variant="h6" fontWeight="bold">{day}</Typography>
               <Typography variant="caption">{month}</Typography>
-            </DateBadge>
+            </DateBadge>}
             <Box sx={{ height: 200, position: 'relative' }}>
               {isLoading
                 ? <Shimmer />

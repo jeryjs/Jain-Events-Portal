@@ -1,11 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Box, Typography, Container, Paper, Grid, Card, IconButton, Breadcrumbs, CircularProgress, Alert, Snackbar } from '@mui/material';
+import { Box, Typography, Container, Paper, Grid, Card, IconButton, Breadcrumbs, CircularProgress, Alert, Snackbar, Skeleton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useEventActivities, useCreateActivity, useUpdateActivity, useDeleteActivity } from '@hooks/App';
 import { ActivitiesList } from '@components/Activities/ActivitiesList';
 import { Activity } from '@common/models';
 import { ActivityForm } from '@components/Activities';
+
+// Activity form skeleton component
+const ActivityFormSkeleton = () => (
+    <Paper elevation={3} sx={{ p: 3 }}>
+        <Skeleton variant="text" width="40%" height={40} sx={{ mb: 2 }} />
+        
+        <Box sx={{ mb: 4 }}>
+            <Skeleton variant="text" width="30%" height={30} sx={{ mb: 2 }} />
+            <Skeleton variant="rectangular" height={56} sx={{ mb: 2 }} />
+            <Skeleton variant="rectangular" height={56} sx={{ mb: 2 }} />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+                <Skeleton variant="rectangular" height={56} width="50%" />
+                <Skeleton variant="rectangular" height={56} width="50%" />
+            </Box>
+        </Box>
+        
+        <Box sx={{ mb: 4 }}>
+            <Skeleton variant="text" width="30%" height={30} sx={{ mb: 2 }} />
+            <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
+            <Skeleton variant="rectangular" height={120} />
+        </Box>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            <Skeleton variant="rectangular" width={100} height={36} />
+            <Skeleton variant="rectangular" width={150} height={36} />
+        </Box>
+    </Paper>
+);
 
 const ActivitiesPage = () => {
     const { eventId, activityId } = useParams<{ eventId: string; activityId: string }>();
@@ -16,6 +44,8 @@ const ActivitiesPage = () => {
     const [isCreating, setIsCreating] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isActivityChanging, setIsActivityChanging] = useState(false);
+    const [previousActivityId, setPreviousActivityId] = useState<string | null>(null);
     
     // Mutations
     const createMutation = useCreateActivity(eventId);
@@ -27,21 +57,38 @@ const ActivitiesPage = () => {
         const isCreateMode = activityId === 'create';
         setIsCreating(isCreateMode);
         
-        if (!isCreateMode && activityId && activities && activities.length > 0) {
-            const activity = activities.find((a: any) => a.id === activityId);
-            setSelectedActivity(activity || null);
+        // If activity ID changed, show skeleton while loading
+        if (activityId !== previousActivityId) {
+            setIsActivityChanging(true);
+            setPreviousActivityId(activityId || null);
             
-            // If activity ID is in URL but not found in data, show error
-            if (!activity && !isCreating) {
-                setError(`Activity with ID "${activityId}" not found`);
-            } else {
-                setError(null);
-            }
-        } else {
+            // Clear the current activity to prevent UI conflicts during transition
             setSelectedActivity(null);
-            setError(null);
+            
+            // Use a small timeout to ensure the skeleton is shown
+            // This prevents UI freezing when switching quickly between complex activities
+            const timer = setTimeout(() => {
+                if (!isCreateMode && activityId && activities && activities.length > 0) {
+                    const activity = activities.find((a: any) => a.id === activityId);
+                    setSelectedActivity(activity || null);
+                    
+                    // If activity ID is in URL but not found in data, show error
+                    if (!activity && !isCreating) {
+                        setError(`Activity with ID "${activityId}" not found`);
+                    } else {
+                        setError(null);
+                    }
+                } else {
+                    setSelectedActivity(null);
+                    setError(null);
+                }
+                
+                setIsActivityChanging(false);
+            }, 100); // Short timeout for better UI experience
+            
+            return () => clearTimeout(timer);
         }
-    }, [activityId, activities]);
+    }, [activityId, activities, isCreating]);
     
     // Handle activity selection
     const handleSelectActivity = (id: string) => {
@@ -210,14 +257,17 @@ const ActivitiesPage = () => {
                                 Use the list on the left to select an existing activity or click "Create Activity"
                             </Typography>
                         </Paper>
+                    ) : isActivityChanging ? (
+                        <ActivityFormSkeleton />
                     ) : (
-                            <ActivityForm
-                                eventId={eventId}
-                                activity={isCreating ? null : selectedActivity}
-                                isCreating={isCreating}
-                                onSave={handleSaveActivity}
-                                onDelete={handleDeleteActivity}
-                            />
+                        <ActivityForm
+                            key={activityId || 'create'} // Add key to force complete remount on activity change
+                            eventId={eventId}
+                            activity={isCreating ? null : selectedActivity}
+                            isCreating={isCreating}
+                            onSave={handleSaveActivity}
+                            onDelete={handleDeleteActivity}
+                        />
                     )}
                 </Grid>
             </Grid>
