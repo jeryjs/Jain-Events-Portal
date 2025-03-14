@@ -201,12 +201,13 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
   // Athletics Card Component
   const AthleticsCard = ({ sportActivity, status, eventId }: { sportActivity: SportsActivity<Sport>, status: 'upcoming' | 'ongoing' | 'completed', eventId: string }) => {
     const athleticsGame = sportActivity.game as Athletics;
+    const eventName = sportActivity.name || '';
+    const isRelay = eventName.includes("Relay");
 
-    // Get top athletes based on rank or time, whichever is available
     const topAthletes = useMemo(() => {
       const allAthletes = athleticsGame.heats?.flatMap(heat =>
         heat.athletes
-          .filter(a => a.rank || (a.time && a.time > 0)) // Include athletes with either rank or valid time
+          .filter(a => a.rank || (a.time && a.time > 0))
           .map(athlete => ({
             ...athlete,
             heatId: heat.heatId,
@@ -214,21 +215,19 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
             athleteName: sportActivity.participants?.find(p => p.usn === athlete.playerId)?.name || 'Unknown'
           }))
       ) || [];
-
-      // Sort primarily by rank if available, otherwise by time
       return allAthletes
         .sort((a, b) => {
-          // If both have ranks, sort by rank
           if (a.rank && b.rank) return a.rank - b.rank;
-          // If only a has rank, a comes first
           if (a.rank) return -1;
-          // If only b has rank, b comes first
           if (b.rank) return 1;
-          // Otherwise sort by time
           return (a.time || Infinity) - (b.time || Infinity);
         })
         .slice(0, 3);
     }, [athleticsGame.heats, sportActivity.teams, sportActivity.participants]);
+
+    const topTeams = useMemo(() => {
+      return sportActivity.teams?.slice(0, 3) || [];
+    }, [sportActivity.teams]);
 
     return (
       <MotionLink
@@ -238,7 +237,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        <Link to={`/${eventId}/${activity.id}`} style={{ textDecoration: 'none' }}>
+        <Link to={`/${eventId}/${sportActivity.id}`} style={{ textDecoration: 'none' }}>
           <StyledCard elevation={4}>
             <MatchStatus status={status}>
               {getStatusIcon(status)}
@@ -260,7 +259,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                 </Avatar>
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '1.1rem' }}>
-                    {activity.name}
+                    {sportActivity.name}
                   </Typography>
                 </Box>
               </Box>
@@ -270,7 +269,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
               {status === 'upcoming' ? (
                 <Box sx={{ mt: 1.5 }}>
                   <Typography variant="body2" color="text.secondary" align="center">
-                    {new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} • {new Date(activity.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(sportActivity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} • {new Date(sportActivity.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </Typography>
                 </Box>
               ) : (
@@ -279,7 +278,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                     <Chip
                       icon={<DirectionsRunIcon sx={{ fontSize: '0.85rem !important' }} />}
-                      label={`${athleticsGame.heats?.length || 0} Heats`}
+                      label={isRelay ? `${sportActivity.teams?.length || 0} teams` : `${athleticsGame.heats?.length || 0} heats`}
                       size="small"
                       sx={{
                         bgcolor: 'background.paper',
@@ -313,7 +312,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                     />
                   </Box>
 
-                  {/* Top Performers Section */}
+                  {/* Leaderboard Section */}
                   <Typography
                     variant="subtitle2"
                     sx={{
@@ -327,51 +326,49 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                     <EmojiEventsIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
                     Leaderboard
                   </Typography>
-
-                  {topAthletes.length > 0 ? (
-                    <Box sx={{
-                      borderRadius: 1,
-                      overflow: 'hidden',
-                      border: '1px solid',
-                      borderColor: 'divider',
-                    }}>
-                      {topAthletes.map((athlete, idx) => {
+                  {(isRelay ? topTeams : topAthletes).length > 0 ? (
+                    <Box
+                      sx={{
+                        borderRadius: 1,
+                        overflow: 'hidden',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}
+                    >
+                      {(isRelay ? topTeams : topAthletes).map((item, idx, arr) => {
                         const medalColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
-
                         return (
                           <Box
-                            key={athlete.playerId}
+                            key={isRelay ? item.id : item.playerId}
                             sx={{
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
                               p: 1,
                               bgcolor: idx % 2 === 0 ? 'rgba(0, 0, 0, 0.02)' : 'transparent',
-                              borderBottom: idx < topAthletes.length - 1 ? '1px solid' : 'none',
+                              borderBottom: idx < arr.length - 1 ? '1px solid' : 'none',
                               borderColor: 'divider',
                               position: 'relative',
                               overflow: 'hidden',
-                              '&:after': idx < 3 ? {
-                                content: '""',
-                                position: 'absolute',
-                                left: 0,
-                                top: 0,
-                                bottom: 0,
-                                width: '4px',
-                                backgroundColor: medalColors[idx]
-                              } : {}
+                              '&:after': idx < 3
+                                ? {
+                                  content: '""',
+                                  position: 'absolute',
+                                  left: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  width: '4px',
+                                  backgroundColor: medalColors[idx]
+                                }
+                                : {}
                             }}
                           >
                             <Box sx={{ display: 'flex', alignItems: 'center', maxWidth: '70%' }}>
                               <Typography
                                 variant="caption"
-                                sx={{
-                                  color: 'text.secondary',
-                                  fontWeight: 'bold',
-                                  minWidth: '16px'
-                                }}
+                                sx={{ color: 'text.secondary', fontWeight: 'bold', minWidth: '16px' }}
                               >
-                                {athlete.rank || idx + 1}
+                                {isRelay ? idx + 1 : item.rank || idx + 1}
                               </Typography>
                               <Avatar
                                 sx={{
@@ -384,7 +381,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                                   ml: 0.5
                                 }}
                               >
-                                {athlete.athleteName.charAt(0)}
+                                {isRelay ? item.name.charAt(0) : item.athleteName.charAt(0)}
                               </Avatar>
                               <Typography
                                 variant="body2"
@@ -395,47 +392,75 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                                   whiteSpace: 'nowrap'
                                 }}
                               >
-                                {athlete.athleteName}
-                                <Typography
-                                  component="span"
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ ml: 0.5 }}
-                                >
-                                  ({athlete.teamName})
-                                </Typography>
+                                {isRelay ? (
+                                  <>
+                                    {item.name}
+                                    {activity.participants && activity.participants.length > 0 && (
+                                      <Typography
+                                        component="span"
+                                        variant="caption"
+                                        color="text.secondary"
+                                        sx={{ ml: 0.5 }}
+                                      >
+                                        ({sportActivity.getTeamPlayers(item.id).map(p => p.name).join(', ')})
+                                      </Typography>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    {item.athleteName}
+                                    <Typography
+                                      component="span"
+                                      variant="caption"
+                                      color="text.secondary"
+                                      sx={{ ml: 0.5 }}
+                                    >
+                                      ({item.teamName})
+                                    </Typography>
+                                  </>
+                                )}
                               </Typography>
                             </Box>
-                            <Typography
-                              variant="body2"
-                              fontWeight={idx === 0 ? 600 : 400}
-                              sx={{
-                                color: idx < 3 ?
-                                  idx === 0 ? 'primary.main' :
-                                    idx === 1 ? 'secondary.main' :
-                                      'warning.main' : 'text.primary',
-                                whiteSpace: 'nowrap'
-                              }}
-                            >
-                              {athlete.time && athlete.time > 0 ? 
-                                `${athlete.time.toFixed(2)}s` : 
-                                `Rank ${athlete.rank || '-'}`}
-                            </Typography>
+                            {!isRelay && (
+                              <Typography
+                                variant="body2"
+                                fontWeight={idx === 0 ? 600 : 400}
+                                sx={{
+                                  color:
+                                    idx < 3
+                                      ? idx === 0
+                                        ? 'primary.main'
+                                        : idx === 1
+                                          ? 'secondary.main'
+                                          : 'warning.main'
+                                      : 'text.primary',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {item.time && item.time > 0
+                                  ? `${item.time.toFixed(2)}s`
+                                  : `Rank ${item.rank || '-'}`}
+                              </Typography>
+                            )}
                           </Box>
                         );
                       })}
                     </Box>
                   ) : (
-                    <Box sx={{
-                      textAlign: 'center',
-                      py: 2,
-                      bgcolor: 'background.paper',
-                      border: '1px dashed',
-                      borderColor: 'divider',
-                      borderRadius: 1
-                    }}>
+                    <Box
+                      sx={{
+                        textAlign: 'center',
+                        py: 2,
+                        bgcolor: 'background.paper',
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                        borderRadius: 1
+                      }}
+                    >
                       <Typography color="text.secondary" variant="body2">
-                        {status === 'ongoing' ? 'Event in progress - No results yet' : 'No results recorded'}
+                        {status === 'ongoing'
+                          ? 'Event in progress - No results yet'
+                          : 'No results recorded'}
                       </Typography>
                     </Box>
                   )}
@@ -513,16 +538,16 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
 
               <Divider sx={{ my: 1.5 }} />
 
-                <TeamBox>
+              <TeamBox>
                 <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                   <TeamScore winner={status === 'completed' && isTeamsConfirmed && matchResult.winner === team1?.id}>
-                  <TeamName>{team1?.name || 'TBD'}</TeamName>
-                  {status !== 'upcoming' && isTeamsConfirmed && (
-                    <>
-                      <TeamScoreValue winner={matchResult.winner === team1?.id}> {sportActivity.getTotalScore(team1.id)}</TeamScoreValue>
-                      {sportActivity.getSecondaryStat(team1.id) && (<ScoreSecondary> {sportActivity.getSecondaryStat(team1.id)}</ScoreSecondary>)}
-                    </>
-                  )}
+                    <TeamName>{team1?.name || 'TBD'}</TeamName>
+                    {status !== 'upcoming' && isTeamsConfirmed && (
+                      <>
+                        <TeamScoreValue winner={matchResult.winner === team1?.id}> {sportActivity.getTotalScore(team1.id)}</TeamScoreValue>
+                        {sportActivity.getSecondaryStat(team1.id) && (<ScoreSecondary> {sportActivity.getSecondaryStat(team1.id)}</ScoreSecondary>)}
+                      </>
+                    )}
                   </TeamScore>
                 </Box>
 
@@ -532,16 +557,16 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
 
                 <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                   <TeamScore winner={status === 'completed' && isTeamsConfirmed && matchResult.winner === team2?.id}>
-                  <TeamName>{team2?.name || 'TBD'}</TeamName>
-                  {status !== 'upcoming' && isTeamsConfirmed && (
-                    <>
-                      <TeamScoreValue winner={matchResult.winner === team2?.id}>{sportActivity.getTotalScore(team2.id)}</TeamScoreValue>
-                      {sportActivity.getSecondaryStat(team2.id) && ( <ScoreSecondary>{sportActivity.getSecondaryStat(team2.id)}</ScoreSecondary> )}
-                    </>
-                  )}
+                    <TeamName>{team2?.name || 'TBD'}</TeamName>
+                    {status !== 'upcoming' && isTeamsConfirmed && (
+                      <>
+                        <TeamScoreValue winner={matchResult.winner === team2?.id}>{sportActivity.getTotalScore(team2.id)}</TeamScoreValue>
+                        {sportActivity.getSecondaryStat(team2.id) && (<ScoreSecondary>{sportActivity.getSecondaryStat(team2.id)}</ScoreSecondary>)}
+                      </>
+                    )}
                   </TeamScore>
                 </Box>
-                </TeamBox>
+              </TeamBox>
 
               {!isTeamsConfirmed && (
                 <Box sx={{ mt: 2, textAlign: 'center' }}>
