@@ -145,11 +145,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   };
 
   const goToNextImage = () => {
+    setDragDirection(0);
     if (selectedImageIndex === null || !displayedImages.length) return;
     setSelectedImageIndex((prevIndex) => (prevIndex + 1) % displayedImages.length);
   };
 
   const goToPreviousImage = () => {
+    setDragDirection(0);
     if (selectedImageIndex === null || !displayedImages.length) return;
     setSelectedImageIndex((prevIndex) => (prevIndex - 1 + displayedImages.length) % displayedImages.length);
   };
