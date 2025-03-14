@@ -266,15 +266,27 @@ export class Volleyball {
 	}
 
 	getScore(teamId?: string): number {
+		// A set is considered complete if one team scores at least 25 and leads by at least 2 points.
+		const isSetComplete = (set: { points: { teamId: string; points: number }[] }): boolean => {
+			if (set.points.length < 2) return false;
+			const [teamA, teamB] = set.points;
+			const diff = Math.abs(teamA.points - teamB.points);
+			return ((teamA.points >= 25 || teamB.points >= 25) && diff >= 2);
+		};
+
 		if (teamId) {
 			let wins = 0;
 			for (const set of this.sets) {
+				if (!isSetComplete(set)) continue;
 				const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
 				if (winner.teamId === teamId) wins++;
 			}
 			return wins;
 		} else {
-			return this.sets.reduce((total, set) => total + set.points.reduce((total, p) => total + p.points, 0), 0);
+			return this.sets.reduce((total, set) => {
+				if (!isSetComplete(set)) return total;
+				return total + set.points.reduce((sum, p) => sum + p.points, 0);
+			}, 0);
 		}
 	}
 }
@@ -292,15 +304,24 @@ export class Throwball {
 	}
 
 	getScore(teamId?: string): number {
+		// Consider a set complete if one team reaches at least 25 points and leads by 2 or more.
+		const threshold = 25;
+		const completeSets = this.sets.filter(set => {
+			if (set.points.length < 2) return false;
+			const [teamA, teamB] = set.points;
+			const diff = Math.abs(teamA.points - teamB.points);
+			return ((teamA.points >= threshold || teamB.points >= threshold) && diff >= 2);
+		});
+
 		if (teamId) {
 			let wins = 0;
-			for (const set of this.sets) {
+			for (const set of completeSets) {
 				const winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
 				if (winner.teamId === teamId) wins++;
 			}
 			return wins;
 		} else {
-			return this.sets.reduce((total, set) => total + set.points.reduce((total, p) => total + p.points, 0), 0);
+			return completeSets.reduce((total, set) => total + set.points.reduce((sum, p) => sum + p.points, 0), 0);
 		}
 	}
 }
