@@ -20,8 +20,18 @@ const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
   overflow-x: auto;
   padding: 8px 0;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
   &::-webkit-scrollbar { display: none; }
   scrollbar-width: none;
+  @media (max-width: ${theme.breakpoints.values.sm}px) {
+    padding: 4px 0;
+    margin: 0 -16px;
+    width: calc(100% + 32px);
+    padding-left: 16px; /* Add padding to the left */
+    padding-right: 16px; /* Add padding to the right for consistency */
+  }
 `);
 
 const ArticleCard = styled(Link)(({ theme }) => ({
@@ -39,6 +49,11 @@ const ArticleCard = styled(Link)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   textDecoration: 'none',
+  '@media (max-width: 600px)': {
+    minWidth: 260,
+    maxWidth: 280,
+    margin: theme.spacing(0.5, 1, 0.5, 0), /* Adjust margin for mobile */
+  },
   '&:hover': {
     transform: 'translateY(-8px)',
     boxShadow: theme.shadows[8],
@@ -185,11 +200,14 @@ function HomePage() {
 
         {/* Articles Section */}
         <Section title='Articles' moreLink='/articles'>
-          <Box sx={{ position: 'relative', mb: 2 }}>
+          <Box sx={{ position: 'relative', px: 2, mb: 2, overflow: 'visible' }}>
             <HorizontalScroll 
               whileTap={{ cursor: 'grabbing' }}
-              dragConstraints={{ left: 0, right: 0 }}
-              drag="x"
+              // Only apply these props for non-mobile (they can interfere with native scrolling)
+              {...(window.innerWidth > 600 ? {
+                drag: "x",
+                dragConstraints: { left: 0, right: 0 }
+              } : {})}
             >
               {isArticlesLoading
                 ? renderEventCardShimmers(3)
@@ -276,27 +294,11 @@ function HomePage() {
                     </ArticleCard>
                   </motion.div>
                 ))}
+              {/* Add empty spacer at the end for better scrolling experience */}
+              <Box sx={{ minWidth: 16 }} /> 
             </HorizontalScroll>
-            
-            {!isArticlesLoading && (articles || []).length > 0 && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, gap: 1 }}>
-                {[...Array(Math.min(5, (articles || []).length))].map((_, i) => (
-                  <Box 
-                    key={i} 
-                    sx={{ 
-                      width: 8, 
-                      height: 8, 
-                      borderRadius: '50%', 
-                      backgroundColor: 'primary.main',
-                      opacity: i === 0 ? 0.8 : 0.3,
-                    }} 
-                  />
-                ))}
-              </Box>
-            )}
           </Box>
         </Section>
-
       </Container>
     </PageTransition>
   );
