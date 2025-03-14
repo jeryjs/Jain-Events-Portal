@@ -128,29 +128,36 @@ function TimelinePage() {
   // Memoize expensive calculations
   const groupedEvents = useMemo<GroupedEvents>(() => {
     if (!events || !Array.isArray(events)) return {};
-
-    // Filter events if an event type is selected
-    const filteredEvents = selectedEventType === -1
-      ? events 
-      : events.filter(event => getBaseEventType(event.type) === selectedEventType);
-
+  
+    const filteredEvents =
+      selectedEventType === -1
+        ? events
+        : events.filter(
+            (event) => getBaseEventType(event.type) === selectedEventType
+          );
+  
     return filteredEvents.reduce((groups: GroupedEvents, event) => {
       const date = new Date(event.time.start);
-      const year = date.getFullYear().toString();
-      const month = date.toLocaleString('default', { month: 'long' });
-
-      if (!groups[year]) {
-        groups[year] = {};
+      const eventYear = date.getFullYear();
+      // Use a special key when the year is >= 3000.
+      const yearKey = eventYear >= 3000 ? '' : eventYear.toString();
+      // For coming soon events we can use a single month key.
+      const monthKey =
+        eventYear >= 3000
+          ? 'Coming Soon!'
+          : date.toLocaleString('default', { month: 'long' });
+  
+      if (!groups[yearKey]) {
+        groups[yearKey] = {};
       }
-
-      if (!groups[year][month]) {
-        groups[year][month] = [];
+      if (!groups[yearKey][monthKey]) {
+        groups[yearKey][monthKey] = [];
       }
-
-      groups[year][month].push(event);
+      groups[yearKey][monthKey].push(event);
       return groups;
     }, {});
   }, [events, selectedEventType]);
+  
 
   // Total number of events
   const totalEventCount = useMemo(() => {
