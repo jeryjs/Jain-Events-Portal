@@ -852,7 +852,7 @@ const BallEditorPopover = ({
           </Select>
         </FormControl>
 
-        {ballDetails.type !== "W" && ballDetails.type !== "D" && (
+        {ballDetails.type !== "D" && (
           <TextField
             label="Runs"
             type="number"
