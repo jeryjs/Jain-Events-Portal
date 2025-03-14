@@ -59,12 +59,33 @@ const NavigationButton = styled(IconButton)(({ theme }) => ({
   zIndex: 1,
 }));
 
+// Helper function to generate a thumbnail link from imgur link
+const getImgurThumbnail = (imgurLink: string, size: 's'|'t'|'m'|'l'|'h') => {
+  const lastDotIndex = imgurLink.lastIndexOf('.');
+  if (lastDotIndex === -1) return imgurLink;
+  const base = imgurLink.substring(0, lastDotIndex);
+  const extension = imgurLink.substring(lastDotIndex);
+  return `${base}${size}${extension}`;
+};
+
 // Sample placeholder images
 const placeholderImages = Array.from({ length: 20 }, (_, i) => `https://picsum.photos/480/360?random=${i + 1}`);
 
+// Define the image item interface
+interface ImageItem {
+  link: string;
+  thumbnail?: string;
+}
+
+// Normalized image type after processing
+interface NormalizedImage {
+  link: string;
+  thumbnail: string;
+}
+
 interface PhotoGalleryProps {
   title?: string;
-  images?: string[];
+  images?: (string | ImageItem)[];
   isLoading?: boolean;
   rows?: number;
   columns?: number;
@@ -86,6 +107,22 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dragDirection, setDragDirection] = useState<number>(0);
 
+  // Normalize the images to have consistent format
+  const normalizeImages = (imgs: (string | ImageItem)[]): NormalizedImage[] => {
+    return imgs.map(img => {
+      if (typeof img === 'string') {
+        return { 
+          link: img,
+          thumbnail: img.includes('imgur.com') ? getImgurThumbnail(img, 'm') : img
+        };
+      }
+      return {
+        link: img.link,
+        thumbnail: img.thumbnail || img.link
+      };
+    });
+  };
+
   // Simple grid size calculation based on 12-column grid
   const gridSize = {
     xs: 12 / columns
@@ -93,8 +130,9 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
 
   // Calculate the maximum number of images to display
   const calcMaxImagesCount = rows * columns;
-  const hasMoreImages = images.length > calcMaxImagesCount;
-  const displayedImages = images.slice(0, calcMaxImagesCount);
+  const normalizedImages = normalizeImages(images);
+  const hasMoreImages = normalizedImages.length > calcMaxImagesCount;
+  const displayedImages = normalizedImages.slice(0, calcMaxImagesCount);
 
   const handleImageClick = (index: number) => {
     setSelectedImageIndex(index);
@@ -175,7 +213,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 onClick={() => handleImageClick(index)}
               >
                 <Box sx={{ height: imageHeight }}>
-                  <Image src={image} alt={`Gallery image ${index + 1}`} />
+                  <Image src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
                 </Box>
               </PhotoItem>
             </Grid>
@@ -226,7 +264,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
                 <ExpandedImage 
-                  src={displayedImages[selectedImageIndex]} 
+                  src={displayedImages[selectedImageIndex].link} 
                   alt={`Expanded view ${selectedImageIndex + 1}`}
                 />
               </motion.div>

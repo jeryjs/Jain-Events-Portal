@@ -88,14 +88,6 @@ const getDefaultImage = (src): string => {
   return src || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg';
 };
 
-// Helper function to generate a thumbnail link from imgur link
-const getThumbnailLink = (imgurLink: string, size: 's'|'t'|'m'|'l'|'h') => {
-  const lastDotIndex = imgurLink.lastIndexOf('.');
-  if (lastDotIndex === -1) return imgurLink;
-  const base = imgurLink.substring(0, lastDotIndex);
-  const extension = imgurLink.substring(lastDotIndex);
-  return `${base}${size}${extension}`;
-};
 
 // Helper function to get event type information
 const getEventTypeInfo = (type: EventType) => {
