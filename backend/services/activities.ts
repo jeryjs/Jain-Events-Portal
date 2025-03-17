@@ -20,6 +20,7 @@ export const getActivities = async (eventId: string) => {
         return cachedActivities as Activity[];
     }
 
+    console.log(`🔥 Database: Fetching all activities for event ID: ${eventId}`);
     const snapshot = await activitiesCollection(eventId).get();
     const activities = parseActivities(snapshot.docs.map(doc => doc.data()));
 
@@ -40,6 +41,7 @@ export const getActivityById = async (eventId: string, activityId: string) => {
         return cachedActivity as Activity;
     }
 
+    console.log(`🔥 Database: Fetching activity by ID: ${activityId} for event ID: ${eventId}`);
     const doc = await activitiesCollection(eventId).doc(activityId).get();
     
     if (!doc.exists) return null;
@@ -63,6 +65,7 @@ export const createActivity = async (eventId: string, activityData: any) => {
     const activityId = activityData.id || uuidv4();
     const activityDoc = activitiesCollection(eventId).doc(activityId);
     
+    console.log(`🔥 Database: Creating new activity with ID: ${activityId} for event ID: ${eventId}`);
     await activityDoc.set(activityData);
 
     const cacheKey = `activities-${eventId}`;
@@ -79,6 +82,7 @@ export const createActivity = async (eventId: string, activityData: any) => {
  */
 export const updateActivity = async (eventId: string, activityId: string, activityData: any) => {
     const activityDoc = activitiesCollection(eventId).doc(activityId);
+    console.log(`🔥 Database: Updating activity with ID: ${activityId} for event ID: ${eventId}`);
     const doc = await activityDoc.get();
     
     if (!doc.exists) return null;
@@ -106,6 +110,7 @@ export const updateActivity = async (eventId: string, activityId: string, activi
  */
 export const deleteActivity = async (eventId: string, activityId: string) => {
     const activityDoc = activitiesCollection(eventId).doc(activityId);
+    console.log(`🔥 Database: Deleting activity with ID: ${activityId} for event ID: ${eventId}`);
     
     await activityDoc.delete();    
 

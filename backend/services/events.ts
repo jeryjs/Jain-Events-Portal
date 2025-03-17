@@ -17,6 +17,7 @@ export const getEvents = async () => {
         console.log(`📦 Serving cached events`);
         return cachedEvents as Event[];
     }
+    console.log(`🔥 Database: Fetching all events`);
     const snapshot = await eventsCollection.get();
     const events = parseEvents(snapshot.docs.map(doc => doc.data()));
 
@@ -36,6 +37,7 @@ export const getEventById = async (eventId: string) => {
         return cachedEvent as Event;
     }
 
+    console.log(`🔥 Database: Fetching event by ID: ${eventId}`);
     const doc = await eventsCollection.doc(eventId).get();
     
     if (!doc.exists) return null;
@@ -53,6 +55,7 @@ export const createEvent = async (eventData: any) => {
     const event = Event.parse(eventData);
     const eventDoc = eventsCollection.doc(event.id);
     
+    console.log(`🔥 Database: Creating new event with ID: ${event.id}`);
     await eventDoc.set(event.toJSON());
 
     const cachedEvents = (cache.get("events") || []) as Event[];
@@ -69,6 +72,7 @@ export const updateEvent = async (eventId: string, eventData: any) => {
     const event = Event.parse(eventData);
     const eventDoc = eventsCollection.doc(event.id);
     
+    console.log(`🔥 Database: Updating event with ID: ${event.id}`);
     await eventDoc.update(event.toJSON());
 
     const cachedEvents = (cache.get("events") || []) as Event[];
@@ -91,6 +95,7 @@ export const updateEvent = async (eventId: string, eventData: any) => {
  */
 export const deleteEvent = async (eventId: string) => {
     const eventDoc = eventsCollection.doc(eventId);
+    console.log(`🔥 Database: Fetching event for deletion with ID: ${eventId}`);
     const doc = await eventDoc.get();
     
     if (!doc.exists) return false;
@@ -99,6 +104,7 @@ export const deleteEvent = async (eventId: string) => {
     const eventSubCollections = await eventDoc.listCollections();
     const batch = db.batch();
     await Promise.all(eventSubCollections.map(async collection => {
+      console.log(`🔥 Database: Deleting subcollection from event with ID: ${eventId}`);
       const collectionDocs = await collection.get();
       collectionDocs.docs.forEach(doc => {
         batch.delete(doc.ref);
@@ -106,6 +112,7 @@ export const deleteEvent = async (eventId: string) => {
     }));
     
     // Then delete the event itself
+    console.log(`🔥 Database: Committing batch delete for event with ID: ${eventId}`);
     batch.delete(eventDoc);
     await batch.commit();
 

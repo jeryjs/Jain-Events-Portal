@@ -17,6 +17,7 @@ export const getArticles = async () => {
         console.log(`📦 Serving cached articles`);
         return cachedArticles as Article[];
     }
+    console.log(`🔥 Database: Fetching all articles`);
     const snapshot = await articlesCollection.get();
     const articles = parseArticles(snapshot.docs.map(doc => doc.data()));
 
@@ -36,6 +37,7 @@ export const getArticleById = async (articleId: string) => {
         return cachedArticle as Article;
     }
 
+    console.log(`🔥 Database: Fetching article by ID: ${articleId}`);
     const doc = await articlesCollection.doc(articleId).get();
     
     if (!doc.exists) return null;
@@ -57,6 +59,7 @@ export const updateArticleViewCount = async (articleId: string) => {
     console.log(`📦 Serving cached article ${articleId} from cache`);
     articleData = cachedArticle as Article;
   } else {
+    console.log(`🔥 Database: Fetching article by ID for view count update: ${articleId}`);
     const doc = await articlesCollection.doc(articleId).get();
 
     if (!doc.exists) return null;
@@ -67,6 +70,7 @@ export const updateArticleViewCount = async (articleId: string) => {
   if (!articleData) return null;
 
   articleData.viewCount = (articleData.viewCount || 0) + 1;
+  console.log(`🔥 Database: Updating article view count for ID: ${articleId}`);
   await articlesCollection.doc(articleId).update({ viewCount: articleData.viewCount });
   cache.set(`articles-${articleId}`, articleData, TTL.ARTICLES); // Update cache with new view count
 
@@ -80,6 +84,7 @@ export const createArticle = async (articleData: any) => {
     const article = Article.parse(articleData);
     const articleDoc = articlesCollection.doc(article.id);
     
+    console.log(`🔥 Database: Creating new article with ID: ${article.id}`);
     await articleDoc.set(article.toJSON());
 
     const cachedArticles = (cache.get("articles") || []) as Article[];
@@ -96,6 +101,7 @@ export const updateArticle = async (articleId: string, articleData: any) => {
     const article = Article.parse(articleData);
     const articleDoc = articlesCollection.doc(article.id);
     
+    console.log(`🔥 Database: Updating article with ID: ${article.id}`);
     await articleDoc.update(article.toJSON());
 
     const cachedArticles = (cache.get("articles") || []) as Article[];
@@ -118,6 +124,7 @@ export const updateArticle = async (articleId: string, articleData: any) => {
  */
 export const deleteArticle = async (articleId: string) => {
     const articleDoc = articlesCollection.doc(articleId);
+    console.log(`🔥 Database: Deleting article with ID: ${articleId}`);
     const doc = await articleDoc.get();
     
     if (!doc.exists) return false;
