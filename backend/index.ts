@@ -16,6 +16,7 @@ import "dotenv/config";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 import eventRoutes from "@routes/eventRoutes";
 import activityRoutes from "@routes/activityRoutes";

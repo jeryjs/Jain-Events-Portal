@@ -1,8 +1,7 @@
 import {
   Box,
   Container,
-  Grid2 as Grid,
-  Paper
+  Grid2 as Grid
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
@@ -14,11 +13,10 @@ import "@blocknote/mantine/style.css";
 import { useCreateBlockNote } from "@blocknote/react";
 import ArticleContent from '@components/Article/ArticleContent';
 import ArticleHero from '@components/Article/ArticleHero';
+import ArticleSkeleton from '@components/Article/ArticleSkeleton';
 import RecentArticles from '@components/Articles/RecentArticles';
 import PageTransition from '@components/shared/PageTransition';
-import { useArticles } from '@hooks/useApi';
-import { generateLoremMarkdown } from '@utils/loremMarkdownGenerator';
-import ArticleSkeleton from '@components/Article/ArticleSkeleton';
+import { useArticles, useUpdateArticleViewCount } from '@hooks/useApi';
 
 const ArticlePage: React.FC = () => {
   const { articleId } = useParams<{ articleId: string }>();
@@ -31,6 +29,7 @@ const ArticlePage: React.FC = () => {
   const article = allArticles?.find(a => a.id === articleId);
   const [bookmarked, setBookmarked] = useState<boolean>(false);
   const [recentArticles, setRecentArticles] = useState<any[]>([]);
+  const { updateViewCount } = useUpdateArticleViewCount();
 
   useEffect(() => {
     if (allArticles) {
@@ -56,6 +55,12 @@ const ArticlePage: React.FC = () => {
     // Reset page scroll on load
     window.scrollTo(0, 0);
   }, [allArticles, articleId, article, editor]);
+
+  useEffect(() => {
+    if (articleId) {
+      updateViewCount(articleId);
+    }
+  }, [articleId, updateViewCount]);
 
   const handleBack = () => {
     navigate(-1);

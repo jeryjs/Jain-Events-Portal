@@ -47,6 +47,33 @@ export const getArticleById = async (articleId: string) => {
 };
 
 /**
+ * Update article view count
+ */
+export const updateArticleViewCount = async (articleId: string) => {
+  const cachedArticle = cache.get(`articles-${articleId}`);
+  let articleData: Article | undefined;
+
+  if (cachedArticle) {
+    console.log(`📦 Serving cached article ${articleId} from cache`);
+    articleData = cachedArticle as Article;
+  } else {
+    const doc = await articlesCollection.doc(articleId).get();
+
+    if (!doc.exists) return null;
+
+    articleData = Article.parse(doc.data());
+  }
+
+  if (!articleData) return null;
+
+  articleData.viewCount = (articleData.viewCount || 0) + 1;
+  await articlesCollection.doc(articleId).update({ viewCount: articleData.viewCount });
+  cache.set(`articles-${articleId}`, articleData, TTL.ARTICLES); // Update cache with new view count
+
+  return articleData;
+};
+
+/**
  * Create new article
  */
 export const createArticle = async (articleData: any) => {
