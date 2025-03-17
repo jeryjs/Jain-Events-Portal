@@ -55,8 +55,9 @@ export const createEvent = async (eventData: any) => {
     
     await eventDoc.set(event.toJSON());
 
+    const cachedEvents = (cache.get("events") || []) as Event[];
     cache.set(`events-${event.id}`, event, TTL.EVENTS);
-    cache.del("events");
+    cache.set("events", [event, ...cachedEvents], TTL.EVENTS);
     
     return event;
 };
@@ -70,8 +71,17 @@ export const updateEvent = async (eventId: string, eventData: any) => {
     
     await eventDoc.update(event.toJSON());
 
+    const cachedEvents = (cache.get("events") || []) as Event[];
+
+    const updatedEvents = cachedEvents.map(cachedEvent => {
+        if (cachedEvent.id === eventId) {
+            return { ...cachedEvent, ...event }; // Merge properties
+        }
+        return cachedEvent;
+    });
+
     cache.set(`events-${eventId}`, event, TTL.EVENTS);
-    cache.del("events");
+    cache.set("events", updatedEvents, TTL.EVENTS);
 
     return event;
 };
@@ -98,6 +108,10 @@ export const deleteEvent = async (eventId: string) => {
     // Then delete the event itself
     batch.delete(eventDoc);
     await batch.commit();
+
+    let cachedEvents = (cache.get("events") || []) as Event[];
+    cachedEvents = cachedEvents.filter(event => event.id !== eventId);
+    cache.set("events", cachedEvents, TTL.EVENTS);
     
     return true;
 };

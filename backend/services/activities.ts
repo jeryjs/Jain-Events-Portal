@@ -65,9 +65,11 @@ export const createActivity = async (eventId: string, activityData: any) => {
     
     await activityDoc.set(activityData);
 
-    // updateActivitiesCache(eventId, activityId, dataToStore);
+    const cacheKey = `activities-${eventId}`;
+    const cachedActivities = (cache.get(cacheKey) || []) as Activity[];
+
     cache.set(`activities-${eventId}-${activityId}`, activityData, TTL.ACTIVITIES);
-    cache.del(`activities-${eventId}`);
+    cache.set(cacheKey, [activityData, ...cachedActivities], TTL.ACTIVITIES);
     
     return activityData;
 };
@@ -83,9 +85,18 @@ export const updateActivity = async (eventId: string, activityId: string, activi
     
     await activityDoc.update(activityData);
     
-    // updateActivitiesCache(eventId, activityId, updatedDoc.data());
+    const cacheKey = `activities-${eventId}`;
+    const cachedActivities = (cache.get(cacheKey) || []) as Activity[];
+
+    const updatedActivities = cachedActivities.map(activity => {
+        if (activity.id === activityId) {
+            return { ...activity, ...activityData };
+        }
+        return activity;
+    });
+
     cache.set(`activities-${eventId}-${activityId}`, activityData, TTL.ACTIVITIES);
-    cache.del(`activities-${eventId}`);
+    cache.set(cacheKey, updatedActivities, TTL.ACTIVITIES);
 
     return activityData;
 };
@@ -98,25 +109,12 @@ export const deleteActivity = async (eventId: string, activityId: string) => {
     
     await activityDoc.delete();    
 
+    const cacheKey = `activities-${eventId}`;
+    let cachedActivities = (cache.get(cacheKey) || []) as Activity[];
+    cachedActivities = cachedActivities.filter(activity => activity.id !== activityId);
+
     cache.del(`activities-${eventId}-${activityId}`); 
-    cache.del(`activities-${eventId}`);
+    cache.set(cacheKey, cachedActivities, TTL.ACTIVITIES);
 
     return true;
 };
-
-
-// cache utility function
-const updateActivitiesCache = (eventId: string, activityId: string, data: any) => {
-    const cacheKey = `activities-${eventId}`;
-    const cachedActivities = (cache.get(cacheKey) || []) as Activity[];
-
-    const updatedActivities = cachedActivities.map(activity => {
-        if (activity.id === activityId) {
-            return { ...activity, ...data };
-        }
-        return activity;
-    });
-
-    cache.set(`${cacheKey}-${activityId}`, data, TTL.ACTIVITIES);
-    cache.set(cacheKey, updatedActivities, TTL.ACTIVITIES);
-}

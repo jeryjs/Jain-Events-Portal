@@ -82,8 +82,9 @@ export const createArticle = async (articleData: any) => {
     
     await articleDoc.set(article.toJSON());
 
+    const cachedArticles = (cache.get("articles") || []) as Article[];
     cache.set(`articles-${article.id}`, article, TTL.ARTICLES);
-    cache.del("articles");
+    cache.set("articles", [article, ...cachedArticles], TTL.ARTICLES);
     
     return article;
 };
@@ -97,8 +98,17 @@ export const updateArticle = async (articleId: string, articleData: any) => {
     
     await articleDoc.update(article.toJSON());
 
+    const cachedArticles = (cache.get("articles") || []) as Article[];
+
+    const updatedArticles = cachedArticles.map(cachedArticle => {
+        if (cachedArticle.id === articleId) {
+            return { ...cachedArticle, ...article };
+        }
+        return cachedArticle;
+    });
+
     cache.set(`articles-${articleId}`, article, TTL.ARTICLES);
-    cache.del("articles");
+    cache.set("articles", updatedArticles, TTL.ARTICLES);
 
     return article;
 };
@@ -114,8 +124,9 @@ export const deleteArticle = async (articleId: string) => {
     
     await articleDoc.delete();
     
-    cache.del(`articles-${articleId}`);
-    cache.del("articles");
+    let cachedArticles = (cache.get("articles") || []) as Article[];
+    cachedArticles = cachedArticles.filter(article => article.id !== articleId);
+    cache.set("articles", cachedArticles, TTL.ARTICLES);
     
     return true;
 };
