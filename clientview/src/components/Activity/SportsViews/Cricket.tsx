@@ -119,7 +119,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
         isComplete: true,
         winner
       };
-    } else if (!activity.startTime || activity.startTime > now) {
+    } else if (!activity.startTime || activity.startTime > now || !game.innings || game.innings.length === 0) {
       return "Match not started";
     } else {
       const currentInnings = game.innings[game.innings.length - 1];
@@ -697,7 +697,7 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                 return ballsFaced > 0;
                               }) && (
                                 <TableRow>
-                                  <TableCell colSpan={6} sx={{ bgcolor: 'grey.100', py: 1 }}>
+                                  <TableCell colSpan={6} sx={{ py: 1 }}>
                                     <Typography variant="subtitle2" fontWeight="medium">
                                       Substitutes
                                     </Typography>
@@ -733,7 +733,7 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                 const showHalfCenturyBadge = runs >= 50;
 
                                 return (
-                                  <TableRow key={player.usn} sx={{ bgcolor: 'grey.50' }}>
+                                  <TableRow key={player.usn} sx={{ }}>
                                     <TableCell>
                                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Typography color="text.secondary">{player.name}</Typography>
@@ -878,7 +878,7 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                   {/* Substitute Bowlers Header */}
                                   {substituteStats.length > 0 && (
                                     <TableRow>
-                                      <TableCell colSpan={5} sx={{ bgcolor: 'grey.100', py: 1 }}>
+                                      <TableCell colSpan={5} sx={{ py: 1 }}>
                                         <Typography variant="subtitle2" fontWeight="medium">
                                           Substitute Bowlers
                                         </Typography>
@@ -906,7 +906,7 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                       : '0.00';
 
                                     return (
-                                      <TableRow key={stats.playerId} sx={{ bgcolor: 'grey.50' }}>
+                                      <TableRow key={stats.playerId} sx={{ }}>
                                         <TableCell>
                                           <Typography color="text.secondary">{player.name}</Typography>
                                         </TableCell>

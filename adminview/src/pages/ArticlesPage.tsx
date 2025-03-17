@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton } from '@mui/material';
 
 import { ArticlesList, ArticleForm } from '../components/Articles';
-import { useArticle, useCreateArticle, useUpdateArticle } from '@hooks/App';
+import { useArticle, useCreateArticle, useUpdateArticle, useDeleteArticle } from '@hooks/App';
 import { Article } from '@common/models';
 
 const ArticlesPage = () => {
@@ -15,6 +15,7 @@ const ArticlesPage = () => {
     const articleQuery = useArticle(articleId, !isCreating && !!articleId);
     const createMutation = useCreateArticle();
     const updateMutation = useUpdateArticle();
+    const deleteMutation = useDeleteArticle();
 
     // Handle article selection
     const handleSelectArticle = (id: string) => {
@@ -44,6 +45,14 @@ const ArticlesPage = () => {
         }
     };
 
+    const handleDeleteArticle = async (articleId: string) => {
+        await deleteMutation.mutateAsync(articleId, {
+            onSuccess: () => {
+                navigate('/articles');
+            },
+        });
+    };
+
     return (
         <Container maxWidth={false} sx={{ height: '100vh', py: 3 }}>
             <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -51,14 +60,14 @@ const ArticlesPage = () => {
                     Article Management
                 </Typography>
 
-                <IconButton component={Link} to="/">
-                    go to home
+                <IconButton component={Link} to="/events">
+                    go to events
                 </IconButton>
             </Card>
 
             <Grid container spacing={3} sx={{ height: 'calc(100% - 60px)', width: '100%' }}>
                 {/* Left pane - Articles list */}
-                <Grid>
+                <Grid flex={1}>
                     <ArticlesList
                         selectedArticleId={articleId}
                         onSelectArticle={handleSelectArticle}
@@ -67,7 +76,7 @@ const ArticlesPage = () => {
                 </Grid>
 
                 {/* Right pane - Article form */}
-                <Grid flex={1}>
+                <Grid flex={2.8}>
                     {!articleId && !isCreating ? (
                         <Paper
                             elevation={2}
@@ -95,6 +104,7 @@ const ArticlesPage = () => {
                                 article={articleQuery.data}
                                 isCreating={isCreating}
                                 onSave={handleSaveArticle}
+                                onDelete={handleDeleteArticle}
                             />
                         </Box>
                     )}

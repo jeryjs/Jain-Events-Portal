@@ -303,7 +303,7 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                             return goals > 0 || assists > 0 || redCards > 0 || yellowCards > 0;
                           }) && (
                           <TableRow>
-                            <TableCell colSpan={7} sx={{ bgcolor: 'grey.100', py: 1 }}>
+                            <TableCell colSpan={7} sx={{ py: 1 }}>
                               <Typography variant="subtitle2" fontWeight="medium">
                                 Substitutes
                               </Typography>
@@ -352,7 +352,7 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                             if (goals === 0 && assists === 0 && redCards === 0 && yellowCards === 0) return null;
 
                             return (
-                              <TableRow key={player.usn} sx={{ bgcolor: 'grey.50' }}>
+                              <TableRow key={player.usn}>
                                 <TableCell>
                                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                     <Avatar sx={{ width: 24, height: 24, mr: 1, opacity: 0.8 }}>

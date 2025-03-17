@@ -12,24 +12,35 @@ import {
   Grid2 as Grid,
   Divider,
   FormHelperText,
-  CircularProgress
+  CircularProgress,
+  IconButton,
+  Fade,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } from '@mui/material';
 
+import { EventType } from '@common/constants';
+import { Article } from '@common/models';
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import { useCreateBlockNote } from "@blocknote/react";
-
-import { Article } from '@common/models';
-import { EventType } from '@common/constants';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import CloseIcon from '@mui/icons-material/Close';
+import MarkdownIcon from '@mui/icons-material/CodeTwoTone';
+import EditIcon from '@mui/icons-material/Edit';
 
 interface ArticleFormProps {
   article?: Article;
   isCreating: boolean;
   onSave: (article: Article) => Promise<void>;
+  onDelete?: (articleId: string) => Promise<void>;
 }
 
-export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) => {
+export const ArticleForm = ({ article, isCreating, onSave, onDelete }: ArticleFormProps) => {
   const [formData, setFormData] = useState<Partial<Article>>(
     article || {
       title: '',
@@ -44,6 +55,10 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
   const editor = useCreateBlockNote({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [isMarkdownMode, setIsMarkdownMode] = useState(false);
+  const [isImageEditOpen, setIsImageEditOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [openConfirmation, setOpenConfirmation] = useState(false);
 
   // Reset form when article changes
   useEffect(() => {
@@ -134,6 +149,130 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
       
       <Grid container spacing={3}>
         <Grid size={{xs: 12}}>
+          {/* Banner Image Section */}
+          <Box
+            sx={{
+              position: 'relative',
+              width: '100%',
+              height: '350px',
+              bgcolor: formData.image?.url ? 'transparent' : '#F0F0F0',
+              borderBottom: formData.image?.url ? 'none' : '2px dashed #CCCCCC',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              overflow: 'hidden'
+            }}
+          >
+            {formData.image?.url ? (
+              <Box
+                onClick={() => setIsImageEditOpen(!isImageEditOpen)}
+                component="img"
+                src={formData.image.url}
+                alt={formData.title}
+                sx={{ width: '100%', height: '100%' }}
+                style={formData.image.customCss
+                  ? Object.fromEntries(
+                      formData.image.customCss.split(';')
+                        .filter(prop => prop.trim())
+                        .map(prop => {
+                          const [key, value] = prop.split(':').map(p => p.trim());
+                          return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
+                        })
+                    )
+                  : {}
+                }
+              />
+            ) : (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                <AddPhotoAlternateIcon sx={{ fontSize: 48, color: '#999999' }} />
+                <Typography variant="subtitle1" color="#999999" mt={1}>
+                  Add Banner Image
+                </Typography>
+              </Box>
+            )}
+
+            {/* Image Edit Overlay */}
+            <Fade in={isImageEditOpen} timeout={300}>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  bgcolor: 'rgba(0, 0, 0, 0.5)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 2,
+                  zIndex: 1,
+                }}
+              >
+                <Box sx={{ p: 2, bgcolor: 'rgba(255, 255, 255, 0.8)', borderRadius: 2, width: '80%', maxWidth: '500px' }}>
+                  <IconButton
+                    aria-label="close"
+                    onClick={() => setIsImageEditOpen(false)}
+                    sx={{
+                      position: 'absolute',
+                      right: 8,
+                      top: 8,
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6" gutterBottom>Edit Banner Image</Typography>
+
+                  <TextField
+                    label="Banner Image URL"
+                    placeholder="Enter image URL here..."
+                    fullWidth
+                    margin="normal"
+                    value={formData.image?.url || ''}
+                    onChange={(e) => handleChange('image', { ...formData.image, url: e.target.value })}
+                    sx={{ mb: 2 }}
+                  />
+
+                  <TextField
+                    label="Custom CSS"
+                    placeholder="e.g., object-fit: cover; object-position: center top;"
+                    fullWidth
+                    margin="normal"
+                    value={formData.image?.customCss || ''}
+                    onChange={(e) => handleChange('image', { ...formData.image, customCss: e.target.value })}
+                    multiline
+                    helperText="Enter CSS properties for fine-tuning image display"
+                    sx={{ mb: 2 }}
+                  />
+                </Box>
+              </Box>
+            </Fade>
+            <IconButton
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                bgcolor: 'rgba(255,255,255,0.8)',
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' },
+                zIndex: 2,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsImageEditOpen(!isImageEditOpen);
+              }}
+            >
+              {isImageEditOpen ? <CloseIcon /> : <EditIcon />}
+            </IconButton>
+          </Box>
+        </Grid>
+        <Grid size={{xs: 12}}>
           <TextField
             fullWidth
             label="Title"
@@ -159,7 +298,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
           />
         </Grid>
         
-        <Grid size={{xs: 12, md: 6}}>
+        {/* <Grid size={{xs: 12, md: 6}}>
           <TextField
             fullWidth
             label="Image URL"
@@ -179,7 +318,7 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
             onChange={e => handleChange('image', { ...formData.image, alt: e.target.value })}
             helperText="Alternative text for the image"
           />
-        </Grid>
+        </Grid> */}
         
         <Grid size={{xs: 12, md: 6}}>
           <FormControl fullWidth>
@@ -236,13 +375,38 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
                 border: 'none',
                 borderRadius: 0,
                 height: '100%'
-              }
+              },
+              position: 'relative'
             }}
           >
-            <BlockNoteView
-              editor={editor}
-              theme='light'
-              onChange={() => editor.blocksToMarkdownLossy().then((it) => handleChange('content', it))} />
+            <IconButton
+              sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+              onClick={() => {
+                setIsMarkdownMode(!isMarkdownMode)
+                editor.tryParseMarkdownToBlocks(formData.content).then((it) => {
+                  editor.replaceBlocks(editor.document, it);
+                });
+              }}
+            >
+              {isMarkdownMode ? <EditIcon /> : <MarkdownIcon />}
+            </IconButton>
+            {isMarkdownMode ? (
+              <TextField
+                fullWidth
+                multiline
+                minRows={18}
+                value={formData.content || ''}
+                onChange={(e) => handleChange('content', e.target.value)}
+                variant="outlined"
+                error={!!errors.content}
+                helperText={errors.content}
+              />
+            ) : (
+              <BlockNoteView
+                editor={editor}
+                theme='light'
+                onChange={() => editor.blocksToMarkdownLossy().then((it) => handleChange('content', it))} />
+            )}
           </Paper>
           <FormHelperText sx={{ m: 2 }}>
             Format your article using the rich text editor above. Use headings, lists, and formatting tools to make your content engaging.
@@ -251,6 +415,52 @@ export const ArticleForm = ({ article, isCreating, onSave }: ArticleFormProps) =
       </Grid>
       
       <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+        {onDelete && article && (
+          <>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setOpenConfirmation(true)}
+              disabled={saving || isDeleting}
+            >
+              Delete Article
+            </Button>
+            <Dialog
+              open={openConfirmation}
+              onClose={() => setOpenConfirmation(false)}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                {"Confirm Delete"}
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Are you sure you want to delete this article?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpenConfirmation(false)}>Cancel</Button>
+                <Button
+                  onClick={async () => {
+                    setOpenConfirmation(false);
+                    setIsDeleting(true);
+                    try {
+                      await onDelete(article.id);
+                    } finally {
+                      setIsDeleting(false);
+                    }
+                  }}
+                  color="error"
+                  disabled={isDeleting}
+                  startIcon={isDeleting && <CircularProgress size={20} color="inherit" />}
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </>
+        )}
         <Button
           type="submit"
           variant="contained"
