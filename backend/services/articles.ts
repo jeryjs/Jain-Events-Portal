@@ -72,7 +72,10 @@ export const updateArticleViewCount = async (articleId: string) => {
   articleData.viewCount = (articleData.viewCount || 0) + 1;
   console.log(`🔥 Database: Updating article view count for ID: ${articleId}`);
   await articlesCollection.doc(articleId).update({ viewCount: articleData.viewCount });
+
+  const cachedArticles = (cache.get("articles") || []) as Article[];
   cache.set(`articles-${articleId}`, articleData, TTL.ARTICLES); // Update cache with new view count
+  cachedArticles.length>0 && cache.set("articles", cachedArticles.map(cachedArticle => cachedArticle.id === articleId ? articleData : cachedArticle), TTL.ARTICLES);
 
   return articleData;
 };
