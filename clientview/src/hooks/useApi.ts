@@ -259,7 +259,7 @@ export const useUpdateArticleViewCount = () => {
 		const lastViewed = views[articleId];
 
 		if (lastViewed && lastViewed > Date.now() - 30 * 60 * 1000) {
-			console.log("Article already viewed in the last 30 minutes.");
+			console.log("updateViewCount: Article already viewed.");
 			return;
 		}
 
@@ -278,7 +278,7 @@ export const useUpdateArticleViewCount = () => {
 			} finally {
 				timeoutRef.current = null;
 			}
-		}, 1000);
+		}, 10000);
 	};
 
 	return { updateViewCount };
