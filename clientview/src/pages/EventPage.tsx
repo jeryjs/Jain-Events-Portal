@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper,
   Accordion, AccordionSummary, AccordionDetails, alpha,
-  Dialog
+  Dialog, Button
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -424,6 +424,71 @@ function EventPage() {
               </>
             )}
           </ContentSection>
+
+          <Divider sx={{ my: 3 }} />
+
+          {/* Registration Links Section */}
+          <Box id="registration-link" sx={{ my: 3, textAlign: 'center' }}>
+            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', mb: 2 }}>
+              Registration Links
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                href={window.location.origin + '/brochure.pdf'}
+                target="_blank"
+                sx={{
+                  borderRadius: '20px',
+                  width: '250px',
+                  py: 1.5,
+                  background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+                  boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #FF8E53 30%, #FE6B8B 90%)',
+                  },
+                }}
+              >
+                Brochure
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                href="https://forms.gle/GU5uSgSxM7vXwu878"
+                target="_blank"
+                sx={{
+                  borderRadius: '20px',
+                  width: '250px',
+                  py: 1.5,
+                  background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+                  boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #21CBF3 30%, #2196F3 90%)',
+                  },
+                }}
+              >
+                Register For Cultural Events
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                href="https://forms.gle/CBeZnGKREd15Vzg26"
+                target="_blank"
+                sx={{
+                  borderRadius: '20px',
+                  width: '250px',
+                  py: 1.5,
+                  background: 'linear-gradient(45deg, #66BB6A 30%, #43A047 90%)',
+                  boxShadow: '0 3px 5px 2px rgba(102, 187, 106, .3)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #43A047 30%, #66BB6A 90%)',
+                  },
+                }}
+              >
+                Register For Technical Events
+              </Button>
+            </Box>
+          </Box>
 
           <Divider sx={{ my: 3 }} />
 
