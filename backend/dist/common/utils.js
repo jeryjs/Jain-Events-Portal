@@ -28,14 +28,14 @@ function parseArticles(data) {
         new Date(b.publishedAt || Date.now()).getTime());
 }
 const getBaseEventType = (it) => {
-    if (it >= constants_1.EventType.INFO)
-        return constants_1.EventType.INFO;
     if (it >= constants_1.EventType.TECH)
         return constants_1.EventType.TECH;
     if (it >= constants_1.EventType.CULTURAL)
         return constants_1.EventType.CULTURAL;
     if (it >= constants_1.EventType.SPORTS)
         return constants_1.EventType.SPORTS;
+    if (it >= constants_1.EventType.INFO)
+        return constants_1.EventType.INFO;
     return constants_1.EventType.GENERAL;
 };
 exports.getBaseEventType = getBaseEventType;

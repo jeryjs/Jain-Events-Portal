@@ -1,15 +1,23 @@
 // Workaround for module-alias in vercel deployment.
-if (process.env.VERCEL == "1" || __filename.endsWith(".js")) {
-	const tsConfig = require("../../tsconfig.json");
-    // Manually append dirname to path aliases to turn them into absolute paths
-	const resolvedPaths = Object.entries(tsConfig.compilerOptions.paths).reduce<Record<string, string[]>>((acc, [key, paths]) => {
-		acc[key] = (paths as string[]).map((path: string) => (path.startsWith("./") || path.startsWith("../") ? __dirname + "/" + path : path));
-		return acc;
-	}, {});
-
-	require("tsconfig-paths").register({ baseUrl: ".", paths: resolvedPaths });
-} else {
-	require("module-alias/register");
+if (process.env.VERCEL == '1' || __filename.endsWith('.js')) {
+    // Workaround for tsconfig-paths in vercel deployment.
+    const tsConfigPaths = require("../../tsconfig.json").compilerOptions.paths;
+    const resolvedPaths: Record<string, string[]> = {};
+    for (const key in tsConfigPaths) {
+        resolvedPaths[key] = tsConfigPaths[key].map((path: string) => {
+            // Prepend __dirname only if the path is relative
+            if (path.startsWith("./") || path.startsWith("../"))
+                return __dirname + "/" + path;
+            return path; // Keep absolute paths as is
+        });
+    }
+    require('tsconfig-paths').register({
+        baseUrl: '.',
+        paths: resolvedPaths
+    });
+}
+else {
+    require('module-alias/register');
 }
 
 import "dotenv/config";
