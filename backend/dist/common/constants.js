@@ -4,6 +4,7 @@ exports.Gender = exports.Role = exports.ArticleStatus = exports.EventType = void
 var EventType;
 (function (EventType) {
     EventType[EventType["GENERAL"] = 0] = "GENERAL";
+    EventType[EventType["INFO"] = 1] = "INFO";
     EventType[EventType["SPORTS"] = 1000] = "SPORTS";
     EventType[EventType["BASKETBALL"] = 1001] = "BASKETBALL";
     EventType[EventType["FOOTBALL"] = 1002] = "FOOTBALL";

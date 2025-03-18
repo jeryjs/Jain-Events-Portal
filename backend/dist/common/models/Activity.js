@@ -27,10 +27,9 @@ class Activity {
     static parse(data) {
         // Determine the type of activity based on eventType
         switch ((0, utils_1.getBaseEventType)(data.eventType)) {
-            case constants_1.EventType.SPORTS:
-                return models_1.SportsActivity.parse(data);
-            case constants_1.EventType.CULTURAL:
-                return models_1.CulturalActivity.parse(data);
+            case constants_1.EventType.SPORTS: return models_1.SportsActivity.parse(data);
+            case constants_1.EventType.CULTURAL: return models_1.CulturalActivity.parse(data);
+            case constants_1.EventType.INFO: return models_1.InfoActivity.parse(data);
             default:
                 // Default Activity parsing logic
                 const participants = data.participants.map((p) => Participant_1.default.parse(p));
@@ -38,7 +37,12 @@ class Activity {
         }
     }
     get isOngoing() {
-        return this.endTime ? this.endTime > new Date() : false;
+        const now = new Date();
+        if (!this.startTime)
+            return false;
+        if (this.startTime > now && !this.endTime)
+            return true;
+        return this.startTime >= now && now < this.endTime;
     }
 }
 exports.default = Activity;

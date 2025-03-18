@@ -28,6 +28,8 @@ function parseArticles(data) {
         new Date(b.publishedAt || Date.now()).getTime());
 }
 const getBaseEventType = (it) => {
+    if (it >= constants_1.EventType.INFO)
+        return constants_1.EventType.INFO;
     if (it >= constants_1.EventType.TECH)
         return constants_1.EventType.TECH;
     if (it >= constants_1.EventType.CULTURAL)

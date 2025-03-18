@@ -18,6 +18,7 @@ const uuid_1 = require("uuid");
 const cache_1 = require("@config/cache");
 const models_1 = require("@common/models");
 const utils_1 = require("@common/utils");
+const cacheUtils_1 = require("@utils/cacheUtils");
 // Collection references
 const eventsCollection = firebase_1.default.collection('events');
 const activitiesCollection = (eventId) => eventsCollection.doc(eventId).collection('activities');
@@ -25,34 +26,31 @@ const activitiesCollection = (eventId) => eventsCollection.doc(eventId).collecti
  * Get all activities for an event
  */
 const getActivities = (eventId) => __awaiter(void 0, void 0, void 0, function* () {
-    const cacheKey = `activities-${eventId}`;
-    const cachedActivities = cache_1.cache.get(cacheKey);
-    if (cachedActivities) {
-        console.log(`📦 Serving cached activities for event ${eventId}`);
-        return cachedActivities;
-    }
-    const snapshot = yield activitiesCollection(eventId).get();
-    const activities = (0, utils_1.parseActivities)(snapshot.docs.map(doc => doc.data()));
-    cache_1.cache.set(cacheKey, activities, cache_1.TTL.ACTIVITIES);
-    return activities;
+    const collectionKey = `activities-${eventId}`;
+    return (0, cacheUtils_1.getCachedCollection)({
+        key: collectionKey,
+        fetchFn: () => __awaiter(void 0, void 0, void 0, function* () {
+            const snapshot = yield activitiesCollection(eventId).get();
+            return (0, utils_1.parseActivities)(snapshot.docs.map(doc => doc.data()));
+        }),
+        ttl: cache_1.TTL.ACTIVITIES
+    });
 });
 exports.getActivities = getActivities;
 /**
  * Get specific activity by ID
  */
 const getActivityById = (eventId, activityId) => __awaiter(void 0, void 0, void 0, function* () {
-    const cacheKey = `activities-${eventId}-${activityId}`;
-    const cachedActivity = cache_1.cache.get(cacheKey);
-    if (cachedActivity) {
-        console.log(`📦 Serving cached activity ${activityId}`);
-        return cachedActivity;
-    }
-    const doc = yield activitiesCollection(eventId).doc(activityId).get();
-    if (!doc.exists)
-        return null;
-    const activityData = models_1.Activity.parse(doc.data());
-    cache_1.cache.set(cacheKey, activityData, cache_1.TTL.ACTIVITIES);
-    return activityData;
+    return (0, cacheUtils_1.getCachedItem)({
+        key: `activities-${eventId}-${activityId}`,
+        fetchFn: () => __awaiter(void 0, void 0, void 0, function* () {
+            const doc = yield activitiesCollection(eventId).doc(activityId).get();
+            if (!doc.exists)
+                return null;
+            return models_1.Activity.parse(doc.data());
+        }),
+        ttl: cache_1.TTL.ACTIVITIES
+    });
 });
 exports.getActivityById = getActivityById;
 /**
@@ -64,12 +62,16 @@ const createActivity = (eventId, activityData) => __awaiter(void 0, void 0, void
         throw new Error(`Event ${eventId} does not exist`);
     }
     const activityId = activityData.id || (0, uuid_1.v4)();
-    const activityDoc = activitiesCollection(eventId).doc(activityId);
-    yield activityDoc.set(activityData);
-    // updateActivitiesCache(eventId, activityId, dataToStore);
-    cache_1.cache.set(`activities-${eventId}-${activityId}`, activityData, cache_1.TTL.ACTIVITIES);
-    cache_1.cache.del(`activities-${eventId}`);
-    return activityData;
+    activityData.id = activityId;
+    return (0, cacheUtils_1.createCachedItem)({
+        item: activityData,
+        collectionKey: `activities-${eventId}`,
+        itemKeyPrefix: `activities-${eventId}`,
+        saveFn: (item) => __awaiter(void 0, void 0, void 0, function* () {
+            yield activitiesCollection(eventId).doc(activityId).set(item);
+        }),
+        ttl: cache_1.TTL.ACTIVITIES
+    });
 });
 exports.createActivity = createActivity;
 /**
@@ -80,11 +82,17 @@ const updateActivity = (eventId, activityId, activityData) => __awaiter(void 0, 
     const doc = yield activityDoc.get();
     if (!doc.exists)
         return null;
-    yield activityDoc.update(activityData);
-    // updateActivitiesCache(eventId, activityId, updatedDoc.data());
-    cache_1.cache.set(`activities-${eventId}-${activityId}`, activityData, cache_1.TTL.ACTIVITIES);
-    cache_1.cache.del(`activities-${eventId}`);
-    return activityData;
+    // Ensure the ID is set correctly
+    activityData.id = activityId;
+    return (0, cacheUtils_1.updateCachedItem)({
+        item: activityData,
+        collectionKey: `activities-${eventId}`,
+        itemKeyPrefix: `activities-${eventId}`,
+        updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () {
+            yield activityDoc.update(activityData);
+        }),
+        ttl: cache_1.TTL.ACTIVITIES
+    });
 });
 exports.updateActivity = updateActivity;
 /**
@@ -92,22 +100,14 @@ exports.updateActivity = updateActivity;
  */
 const deleteActivity = (eventId, activityId) => __awaiter(void 0, void 0, void 0, function* () {
     const activityDoc = activitiesCollection(eventId).doc(activityId);
-    yield activityDoc.delete();
-    cache_1.cache.del(`activities-${eventId}-${activityId}`);
-    cache_1.cache.del(`activities-${eventId}`);
-    return true;
+    return (0, cacheUtils_1.deleteCachedItem)({
+        id: activityId,
+        collectionKey: `activities-${eventId}`,
+        itemKeyPrefix: `activities-${eventId}`,
+        deleteFn: () => __awaiter(void 0, void 0, void 0, function* () {
+            yield activityDoc.delete();
+        }),
+        ttl: cache_1.TTL.ACTIVITIES
+    });
 });
 exports.deleteActivity = deleteActivity;
-// cache utility function
-const updateActivitiesCache = (eventId, activityId, data) => {
-    const cacheKey = `activities-${eventId}`;
-    const cachedActivities = (cache_1.cache.get(cacheKey) || []);
-    const updatedActivities = cachedActivities.map(activity => {
-        if (activity.id === activityId) {
-            return Object.assign(Object.assign({}, activity), data);
-        }
-        return activity;
-    });
-    cache_1.cache.set(`${cacheKey}-${activityId}`, data, cache_1.TTL.ACTIVITIES);
-    cache_1.cache.set(cacheKey, updatedActivities, cache_1.TTL.ACTIVITIES);
-};

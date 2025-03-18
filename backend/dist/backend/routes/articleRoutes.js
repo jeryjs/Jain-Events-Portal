@@ -8,11 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const articles_1 = require("@services/articles");
 const auth_1 = require("@middlewares/auth");
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const router = (0, express_1.Router)();
+// Rate limiter to prevent abuse (1 request per minute per article)
+const viewCountLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 30 * 60 * 1000, // 30 minutes
+    max: 1,
+    message: 'Article already marked as read!',
+    keyGenerator: function (req, res) {
+        return req.ip + '-' + req.params.articleId; // Unique key per IP and article ID
+    },
+});
 /**
  * Article Routes
  */
@@ -79,6 +92,23 @@ router.delete('/articles/:articleId', auth_1.adminMiddleware, (req, res) => __aw
     catch (error) {
         console.error('Error deleting article:', error);
         res.status(500).json({ message: 'Error deleting article', details: error });
+    }
+}));
+// Update article view count
+router.post('/articles/:articleId/view', viewCountLimiter, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const articleId = req.params.articleId;
+        const article = yield (0, articles_1.updateArticleViewCount)(articleId);
+        if (article) {
+            res.json({ message: 'View count updated successfully' });
+        }
+        else {
+            res.status(404).json({ message: 'Article not found' });
+        }
+    }
+    catch (error) {
+        console.error('Error updating article view count:', error);
+        res.status(500).json({ message: 'Error updating article view count', details: error });
     }
 }));
 exports.default = router;

@@ -17,38 +17,39 @@ const Event_1 = __importDefault(require("@common/models/Event"));
 const utils_1 = require("@common/utils");
 const cache_1 = require("@config/cache");
 const firebase_1 = __importDefault(require("@config/firebase"));
+const cacheUtils_1 = require("@utils/cacheUtils");
 // Collection references
 const eventsCollection = firebase_1.default.collection('events');
+const COLLECTION_KEY = "events";
+const ITEM_KEY_PREFIX = "events";
 /**
  * Get all events
  */
 const getEvents = () => __awaiter(void 0, void 0, void 0, function* () {
-    const cachedEvents = cache_1.cache.get("events");
-    if (cachedEvents) {
-        console.log(`📦 Serving cached events`);
-        return cachedEvents;
-    }
-    const snapshot = yield eventsCollection.get();
-    const events = (0, utils_1.parseEvents)(snapshot.docs.map(doc => doc.data()));
-    cache_1.cache.set("events", events, cache_1.TTL.EVENTS);
-    return events;
+    return (0, cacheUtils_1.getCachedCollection)({
+        key: COLLECTION_KEY,
+        fetchFn: () => __awaiter(void 0, void 0, void 0, function* () {
+            const snapshot = yield eventsCollection.get();
+            return (0, utils_1.parseEvents)(snapshot.docs.map(doc => doc.data()));
+        }),
+        ttl: cache_1.TTL.EVENTS
+    });
 });
 exports.getEvents = getEvents;
 /**
  * Get event by ID
  */
 const getEventById = (eventId) => __awaiter(void 0, void 0, void 0, function* () {
-    const cachedEvent = cache_1.cache.get(`events-${eventId}`);
-    if (cachedEvent) {
-        console.log(`📦 Serving cached event ${eventId}`);
-        return cachedEvent;
-    }
-    const doc = yield eventsCollection.doc(eventId).get();
-    if (!doc.exists)
-        return null;
-    const eventData = Event_1.default.parse(doc.data());
-    cache_1.cache.set(`events-${eventId}`, eventData, cache_1.TTL.EVENTS);
-    return eventData;
+    return (0, cacheUtils_1.getCachedItem)({
+        key: `${ITEM_KEY_PREFIX}-${eventId}`,
+        fetchFn: () => __awaiter(void 0, void 0, void 0, function* () {
+            const doc = yield eventsCollection.doc(eventId).get();
+            if (!doc.exists)
+                return null;
+            return Event_1.default.parse(doc.data());
+        }),
+        ttl: cache_1.TTL.EVENTS
+    });
 });
 exports.getEventById = getEventById;
 /**
@@ -56,11 +57,15 @@ exports.getEventById = getEventById;
  */
 const createEvent = (eventData) => __awaiter(void 0, void 0, void 0, function* () {
     const event = Event_1.default.parse(eventData);
-    const eventDoc = eventsCollection.doc(event.id);
-    yield eventDoc.set(event.toJSON());
-    cache_1.cache.set(`events-${event.id}`, event, cache_1.TTL.EVENTS);
-    cache_1.cache.del("events");
-    return event;
+    return (0, cacheUtils_1.createCachedItem)({
+        item: event,
+        collectionKey: COLLECTION_KEY,
+        itemKeyPrefix: ITEM_KEY_PREFIX,
+        saveFn: (item) => __awaiter(void 0, void 0, void 0, function* () {
+            yield eventsCollection.doc(item.id).set(item.toJSON());
+        }),
+        ttl: cache_1.TTL.EVENTS
+    });
 });
 exports.createEvent = createEvent;
 /**
@@ -68,11 +73,15 @@ exports.createEvent = createEvent;
  */
 const updateEvent = (eventId, eventData) => __awaiter(void 0, void 0, void 0, function* () {
     const event = Event_1.default.parse(eventData);
-    const eventDoc = eventsCollection.doc(event.id);
-    yield eventDoc.update(event.toJSON());
-    cache_1.cache.set(`events-${eventId}`, event, cache_1.TTL.EVENTS);
-    cache_1.cache.del("events");
-    return event;
+    return (0, cacheUtils_1.updateCachedItem)({
+        item: event,
+        collectionKey: COLLECTION_KEY,
+        itemKeyPrefix: ITEM_KEY_PREFIX,
+        updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () {
+            yield eventsCollection.doc(item.id).update(item.toJSON());
+        }),
+        ttl: cache_1.TTL.EVENTS
+    });
 });
 exports.updateEvent = updateEvent;
 /**
@@ -83,18 +92,26 @@ const deleteEvent = (eventId) => __awaiter(void 0, void 0, void 0, function* () 
     const doc = yield eventDoc.get();
     if (!doc.exists)
         return false;
-    // Delete all activities/subCollections first
-    const eventSubCollections = yield eventDoc.listCollections();
-    const batch = firebase_1.default.batch();
-    yield Promise.all(eventSubCollections.map((collection) => __awaiter(void 0, void 0, void 0, function* () {
-        const collectionDocs = yield collection.get();
-        collectionDocs.docs.forEach(doc => {
-            batch.delete(doc.ref);
-        });
-    })));
-    // Then delete the event itself
-    batch.delete(eventDoc);
-    yield batch.commit();
-    return true;
+    return (0, cacheUtils_1.deleteCachedItem)({
+        id: eventId,
+        collectionKey: COLLECTION_KEY,
+        itemKeyPrefix: ITEM_KEY_PREFIX,
+        deleteFn: () => __awaiter(void 0, void 0, void 0, function* () {
+            // Delete all activities/subCollections first
+            const eventSubCollections = yield eventDoc.listCollections();
+            const batch = firebase_1.default.batch();
+            yield Promise.all(eventSubCollections.map((collection) => __awaiter(void 0, void 0, void 0, function* () {
+                console.log(`🔥 Database: Deleting subcollection from event with ID: ${eventId}`);
+                const collectionDocs = yield collection.get();
+                collectionDocs.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+            })));
+            // Then delete the event itself
+            batch.delete(eventDoc);
+            yield batch.commit();
+        }),
+        ttl: cache_1.TTL.EVENTS
+    });
 });
 exports.deleteEvent = deleteEvent;
