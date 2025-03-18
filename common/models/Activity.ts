@@ -1,7 +1,7 @@
 import Participant from './Participant';
 import { EventType } from '../constants';
 import { getBaseEventType } from '@common/utils';
-import { SportsActivity, CulturalActivity } from '@common/models';
+import { SportsActivity, CulturalActivity, InfoActivity } from '@common/models';
 
 export default class Activity {
     constructor(
@@ -21,11 +21,10 @@ export default class Activity {
     
     static parse(data: any): Activity {
         // Determine the type of activity based on eventType
-        switch (getBaseEventType(data.eventType)) {
-            case EventType.SPORTS: 
-                return SportsActivity.parse(data);
-            case EventType.CULTURAL: 
-                return CulturalActivity.parse(data);
+        switch (getBaseEventType(data.eventType)) { 
+            case EventType.SPORTS: return SportsActivity.parse(data);
+            case EventType.CULTURAL: return CulturalActivity.parse(data);
+            case EventType.INFO: return InfoActivity.parse(data);
             default:
                 // Default Activity parsing logic
                 const participants = data.participants.map((p: any) => Participant.parse(p));

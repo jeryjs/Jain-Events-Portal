@@ -1,5 +1,6 @@
 export enum EventType {
 	GENERAL = 0,
+	INFO = 1,
 
 	SPORTS = 1000,
 	BASKETBALL = 1001,

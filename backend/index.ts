@@ -16,13 +16,13 @@ import "dotenv/config";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 
 import eventRoutes from "@routes/eventRoutes";
 import activityRoutes from "@routes/activityRoutes";
 import articleRoutes from "@routes/articleRoutes";
 import authRoutes from "@routes/authRoutes";
 
+const os = require('os');
 const app = express();
 
 // Middlewares to use only in production
@@ -47,8 +47,14 @@ app.listen(PORT, "0.0.0.0", () => {
     const serverUrl = `http://localhost:${PORT}`;
     console.log(`✅ API server running successfully!`);
     console.log(`📡 Listening on port ${PORT} (${serverUrl})`);
-    console.log(`🚀 API endpoints available at ${serverUrl}/api`);
-    console.log(`📚 Routes loaded: events, activities, user, admin`);
+    const nets = os.networkInterfaces();
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]!) {
+            if (net.family === 'IPv4' && !net.internal) {
+                console.log(`🖧 Accessible on ${name}: http://${net.address}:${PORT}`);
+            }
+        }
+    }
     console.log(`💻 Environment: ${process.env.NODE_ENV || 'development'}`);
 }).on('error', (err) => {
     console.error(`❌ Failed to start server: ${err.message}`);

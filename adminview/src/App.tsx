@@ -81,7 +81,6 @@ const App = () => {
                   
                   {/* Activities routes */}
                   <Route path="events/:eventId/activities" element={<ActivitiesPage />} />
-                  <Route path="events/:eventId/activities/create" element={<ActivitiesPage />} />
                   <Route path="events/:eventId/activities/:activityId" element={<ActivitiesPage />} />
 
                   {/* Articles routes */}

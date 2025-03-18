@@ -1,19 +1,20 @@
-import { useEffect, useState, memo, useCallback } from 'react';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Box, Button, CircularProgress, FormControl, Grid, IconButton, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, FormControl, Grid2 as Grid, IconButton, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
 import { ClearIcon, renderTimeViewClock } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
+import { memo, useCallback, useEffect, useState } from 'react';
 
 import { EventType } from '@common/constants';
-import { Activity, CulturalActivity, SportsActivity } from '@common/models';
+import { Activity, CulturalActivity, InfoActivity, SportsActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getBaseEventType } from '@common/utils';
 
 import { CulturalsView } from './CulturalsView';
 import { GeneralView } from './GeneralView';
+import { InfoView } from './InfoView';
 import { SportsView } from './SportsView';
 
 interface ActivityFormProps {
@@ -27,6 +28,7 @@ interface ActivityFormProps {
 const MemoizedSportsView = memo(SportsView);
 const MemoizedCulturalsView = memo(CulturalsView);
 const MemoizedGeneralView = memo(GeneralView);
+const MemoizedInfoView = memo(InfoView);
 
 export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }: ActivityFormProps) => {
     const [formData, setFormData] = useState<Partial<Activity>>({
@@ -127,14 +129,11 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
     // Render different view based on activity type - memoized
     const renderActivityTypeSpecificView = useCallback(() => {
         switch (getBaseEventType(formData.eventType)) {
-            case EventType.SPORTS:
-                return <MemoizedSportsView formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
-            case EventType.CULTURAL:
-                return <MemoizedCulturalsView formData={formData as CulturalActivity} setFormData={setFormData} />;
-            case EventType.TECH:
-                return <MemoizedGeneralView formData={formData} setFormData={setFormData} />; // Use GeneralView for Tech for now
-            default:
-                return <MemoizedGeneralView formData={formData} setFormData={setFormData} />;
+            case EventType.INFO: return <MemoizedInfoView formData={formData as InfoActivity} setFormData={setFormData} />;
+            case EventType.SPORTS: return <MemoizedSportsView formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
+            case EventType.CULTURAL: return <MemoizedCulturalsView formData={formData as CulturalActivity} setFormData={setFormData} />;
+            case EventType.TECH: return <MemoizedGeneralView formData={formData} setFormData={setFormData} />; // Use GeneralView for Tech for now
+            default: return <MemoizedGeneralView formData={formData} setFormData={setFormData} />;
         }
     }, [formData]);
     const eventTypes = Object.entries(EventType).map(([key, value]) => ({ key, value }));
@@ -174,9 +173,8 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                         </Select>
                         {errors.eventType && <Typography color="error">{errors.eventType}</Typography>}
                     </FormControl>
-
                     <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={12} md={6} display="flex" alignItems="center">
+                        <Grid size={{xs:12, md:6}} display="flex" alignItems="center">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
                                     label="Start Time"
@@ -191,7 +189,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                             </LocalizationProvider>
                             <IconButton onClick={() => handleChange('startTime', null)}><ClearIcon /></IconButton>
                         </Grid>
-                        <Grid item xs={12} md={6} display="flex" alignItems="center">
+                        <Grid size={{xs:12, md:6}} display="flex" alignItems="center">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
                                     label="End Time"

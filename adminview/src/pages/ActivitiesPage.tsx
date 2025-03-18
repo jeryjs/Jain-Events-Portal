@@ -11,7 +11,7 @@ import { ActivityForm } from '@components/Activities';
 const ActivityFormSkeleton = () => (
     <Paper elevation={3} sx={{ p: 3 }}>
         <Skeleton variant="text" width="40%" height={40} sx={{ mb: 2 }} />
-        
+
         <Box sx={{ mb: 4 }}>
             <Skeleton variant="text" width="30%" height={30} sx={{ mb: 2 }} />
             <Skeleton variant="rectangular" height={56} sx={{ mb: 2 }} />
@@ -21,13 +21,13 @@ const ActivityFormSkeleton = () => (
                 <Skeleton variant="rectangular" height={56} width="50%" />
             </Box>
         </Box>
-        
+
         <Box sx={{ mb: 4 }}>
             <Skeleton variant="text" width="30%" height={30} sx={{ mb: 2 }} />
             <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
             <Skeleton variant="rectangular" height={120} />
         </Box>
-        
+
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
             <Skeleton variant="rectangular" width={100} height={36} />
             <Skeleton variant="rectangular" width={150} height={36} />
@@ -39,68 +39,59 @@ const ActivitiesPage = () => {
     const { eventId, activityId } = useParams<{ eventId: string; activityId: string }>();
     const navigate = useNavigate();
     const { activities = [], isLoading: isActivitiesLoading, error: activitiesError } = useEventActivities(eventId);
-    
+
     // Local state
     const [isCreating, setIsCreating] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
     const [isActivityChanging, setIsActivityChanging] = useState(false);
     const [previousActivityId, setPreviousActivityId] = useState<string | null>(null);
-    
+
     // Mutations
     const createMutation = useCreateActivity(eventId);
     const updateMutation = useUpdateActivity(eventId);
     const deleteMutation = useDeleteActivity(eventId);
-    
+
     // Set isCreating based on URL and find selected activity from activities array
     useEffect(() => {
         const isCreateMode = activityId === 'create';
         setIsCreating(isCreateMode);
-        
-        // If activity ID changed, show skeleton while loading
-        if (activityId !== previousActivityId) {
-            setIsActivityChanging(true);
-            setPreviousActivityId(activityId || null);
-            
-            // Clear the current activity to prevent UI conflicts during transition
-            setSelectedActivity(null);
-            
-            // Use a small timeout to ensure the skeleton is shown
-            // This prevents UI freezing when switching quickly between complex activities
-            const timer = setTimeout(() => {
-                if (!isCreateMode && activityId && activities && activities.length > 0) {
-                    const activity = activities.find((a: any) => a.id === activityId);
-                    setSelectedActivity(activity || null);
-                    
-                    // If activity ID is in URL but not found in data, show error
-                    if (!activity && !isCreating) {
-                        setError(`Activity with ID "${activityId}" not found`);
-                    } else {
-                        setError(null);
-                    }
+
+        setIsActivityChanging(true);
+        setSelectedActivity(null);
+
+        const timer = setTimeout(() => {
+            if (!isCreateMode && activityId && activities && activities.length > 0) {
+                const activity = activities.find((a: any) => a.id === activityId);
+                setSelectedActivity(activity || null);
+
+                if (!activity) {
+                    setError(`Activity with ID "${activityId}" not found`);
                 } else {
-                    setSelectedActivity(null);
                     setError(null);
                 }
-                
-                setIsActivityChanging(false);
-            }, 100); // Short timeout for better UI experience
-            
-            return () => clearTimeout(timer);
-        }
-    }, [activityId, activities, isCreating]);
-    
+            } else {
+                setSelectedActivity(null);
+                setError(null);
+            }
+            setIsActivityChanging(false);
+        }, 100);
+
+        return () => clearTimeout(timer);
+    }, [activityId, activities]);
+
+
     // Handle activity selection
     const handleSelectActivity = (id: string) => {
         navigate(`/events/${eventId}/activities/${id}`);
     };
-    
+
     // Handle create new activity
     const handleCreateActivity = () => {
         setIsCreating(true);
         navigate(`/events/${eventId}/activities/create`);
     };
-    
+
     // Handle save (create or update)
     const handleSaveActivity = async (formData: Activity) => {
         try {
@@ -128,7 +119,7 @@ const ActivitiesPage = () => {
         } catch (err) {
             console.error('Delete activity error:', err);
             let errorMessage = 'Failed to delete activity';
-            
+
             if (err instanceof Error) {
                 if (err.message.includes('401') || err.message.includes('authorized')) {
                     errorMessage = `Not authorized to delete this activity. Please check your permissions or log in again.`;
@@ -136,28 +127,28 @@ const ActivitiesPage = () => {
                     errorMessage = `Failed to delete activity: ${err.message}`;
                 }
             }
-            
+
             setError(errorMessage);
         }
     };
-    
+
     // Error handling
-    const hasError = activitiesError || error;
-    if (hasError) {
-        return (
-            <Container maxWidth={false} sx={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Paper sx={{ p: 4, textAlign: 'center' }}>
-                    <Typography variant="h5" gutterBottom>
-                        {activitiesError ? 'Failed to load activities' : 'An error occurred'}
-                    </Typography>
-                    <Typography color="textSecondary">
-                        {activitiesError ? activitiesError.message : error}
-                    </Typography>
-                </Paper>
-            </Container>
-        );
-    }
-    
+    // const hasError = activitiesError || error;
+    // if (hasError) {
+    //     return (
+    //         <Container maxWidth={false} sx={{ height: '80vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    //             <Paper sx={{ p: 4, textAlign: 'center' }}>
+    //                 <Typography variant="h5" gutterBottom>
+    //                     {activitiesError ? 'Failed to load activities' : 'An error occurred'}
+    //                 </Typography>
+    //                 <Typography color="textSecondary">
+    //                     {activitiesError ? activitiesError.message : error}
+    //                 </Typography>
+    //             </Paper>
+    //         </Container>
+    //     );
+    // }
+
     return (
         <Container maxWidth={false} sx={{ height: '80vh' }}>
             {/* Header */}
@@ -183,9 +174,9 @@ const ActivitiesPage = () => {
             </Card>
 
             {/* Error notification */}
-            <Snackbar 
-                open={!!error} 
-                autoHideDuration={6000} 
+            <Snackbar
+                open={!!error}
+                autoHideDuration={6000}
                 onClose={() => setError(null)}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
@@ -209,12 +200,12 @@ const ActivitiesPage = () => {
                 {/* Right pane - Activity form */}
                 <Grid item xs={12} md={9} >
                     {isActivitiesLoading ? (
-                        <Paper 
-                            sx={{ 
-                                height: '100%', 
-                                display: 'flex', 
-                                justifyContent: 'center', 
-                                alignItems: 'center' 
+                        <Paper
+                            sx={{
+                                height: '100%',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center'
                             }}
                         >
                             <CircularProgress />
@@ -231,8 +222,8 @@ const ActivitiesPage = () => {
                             }}
                         >
                             <Alert severity="error" sx={{ width: '100%' }}>
-                                {activitiesError instanceof Error 
-                                    ? activitiesError.message 
+                                {activitiesError instanceof Error
+                                    ? activitiesError.message
                                     : 'Failed to load activities'}
                             </Alert>
                         </Paper>

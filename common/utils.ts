@@ -29,6 +29,7 @@ export function parseArticles(data: any[]): Article[] {
 }
 
 export const getBaseEventType = (it: number): EventType => {
+    if (it >= EventType.INFO) return EventType.INFO;
     if (it >= EventType.TECH) return EventType.TECH;
     if (it >= EventType.CULTURAL) return EventType.CULTURAL;
     if (it >= EventType.SPORTS) return EventType.SPORTS;

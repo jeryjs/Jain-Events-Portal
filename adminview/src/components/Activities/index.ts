@@ -1,7 +1,8 @@
 export { ActivitiesList } from './ActivitiesList';
 export { ActivityForm } from './ActivityForm';
-export { SportsView } from './SportsView';
 export { GeneralView } from './GeneralView';
+export { InfoView } from './InfoView';
+export { SportsView } from './SportsView';
 export { CulturalsView } from './CulturalsView';
 export { ParticipantsForm } from './ParticipantsForm';
 
