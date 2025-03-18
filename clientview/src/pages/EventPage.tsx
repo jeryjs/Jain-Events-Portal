@@ -211,21 +211,31 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
     );
   }
 
-  // Group activities by event type
-  const groupedActivities = activities.reduce((acc, activity) => {
-    const activityType = activity.eventType;
-    if (!acc[activityType]) {
-      acc[activityType] = [];
-    }
-    acc[activityType].push(activity);
-    return acc;
-  }, {} as Record<number, any[]>);
+  // Separate info activities from other activities
+  const infoActivities = activities.filter(activity => getBaseEventType(activity.eventType) === EventType.INFO);
+  const nonInfoActivities = activities.filter(activity => getBaseEventType(activity.eventType) !== EventType.INFO);
 
-  // Sort the groups by event type (so they appear in a consistent order)
+  // Group activities by event type
+  const groupedActivities: Record<number, any[]> = {};
+
+  // First handle INFO activities if they exist
+  if (infoActivities.length > 0) {
+    groupedActivities[EventType.INFO] = infoActivities;
+  }
+
+  // Then handle the rest of activity types
+  nonInfoActivities.forEach(activity => {
+    const activityType = activity.eventType;
+    if (!groupedActivities[activityType]) {
+      groupedActivities[activityType] = [];
+    }
+    groupedActivities[activityType].push(activity);
+  });
+
+  // Return the activities, now with INFO guaranteed to be first if it exists
   return (
     <Box>
       {Object.entries(groupedActivities)
-        .sort(([typeA], [typeB]) => Number(typeA) - Number(typeB))
         .map(([type, acts]) => (
           <ActivityAccordion
             key={type}

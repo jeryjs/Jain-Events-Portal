@@ -162,7 +162,7 @@ export const InfoView = ({ activity }) => {
                             color="text.secondary"
                             sx={{ px: 2, fontWeight: 500 }}
                         >
-                            INFORMATION
+                            ...
                         </Typography>
                     </Divider>
                     

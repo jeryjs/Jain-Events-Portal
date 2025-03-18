@@ -1,22 +1,25 @@
 import { EventType } from '@common/constants';
+import { InfoActivity } from '@common/models';
 import Activity from '@common/models/Activity';
-import SportsActivity, { Sport, Athletics } from '@common/models/sports/SportsActivity';
+import SportsActivity, { Athletics, Sport } from '@common/models/sports/SportsActivity';
+import { getBaseEventType } from '@common/utils';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ArticleIcon from '@mui/icons-material/Article';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DescriptionIcon from '@mui/icons-material/Description';
+import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import LiveTvIcon from '@mui/icons-material/LiveTv';
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball';
 import SportsCricketIcon from '@mui/icons-material/SportsCricket';
 import SportsSharpIcon from '@mui/icons-material/SportsSharp';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
-import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { Avatar, Badge, Box, Card, CardContent, Chip, Divider, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { generateColorFromString } from '@utils/utils';
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { getBaseEventType } from '@common/utils';
 
 // Styled Components
 const StyledCard = styled(Card)(({ theme }) => `
@@ -140,6 +143,7 @@ interface ActivityCardProps {
 const getActivityType = (type: EventType): string => EventType[type] || 'Activity';
 const getChipColor = (type: EventType): string => generateColorFromString(getActivityType(type));
 const isSportsActivity = (activity: Activity): boolean => getBaseEventType(activity.eventType) === EventType.SPORTS;
+const isInfoActivity = (activity: Activity): boolean => getBaseEventType(activity.eventType) === EventType.INFO;
 
 const getActivityStatus = (activity: Activity): 'upcoming' | 'ongoing' | 'completed' => {
   const now = new Date();
@@ -183,6 +187,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
   const chipColor = getChipColor(activity.eventType);
   const participantCount = activity.participants?.length || 0;
   const isSports = isSportsActivity(activity);
+  const isInfo = isInfoActivity(activity);
   const status = getActivityStatus(activity);
 
   const cardVariants = {
@@ -627,6 +632,45 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
     );
   };
 
+  // Info Card Component
+  const InfoCard = ({ activity, chipColor, eventId }: { activity: InfoActivity, chipColor: string, eventId: string }) => {
+    // Extract a short preview from the content if it exists
+    const doc = new DOMParser().parseFromString(activity.content, 'text/html');
+    doc.querySelectorAll('style').forEach(el => el.remove());
+    const contentPreview = doc.body.textContent?.replace(/\s+/g, ' ').trim() || '';
+
+    return (
+      <MotionLink variants={cardVariants} initial="hidden" animate="visible" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        <Link to={`/${eventId}/${activity.id}`} style={{ textDecoration: 'none' }}>
+          <StyledCard sx={{ borderLeft: `4px solid ${chipColor}` }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Avatar sx={{ bgcolor: `${chipColor}22`, color: chipColor, width: 36, height: 36, mr: 1.5 }}>
+                  <ArticleIcon />
+                </Avatar>
+                <Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, fontSize: '1.1rem' }}>{activity.name}</Typography>
+                </Box>
+              </Box>
+              <Divider sx={{ mt: 0.5 }} />
+              <Box sx={{ bgcolor: 'background.default', p: 1.5, borderRadius: 1, position: 'relative', overflow: 'hidden', '&::after': { content: '""', position: 'absolute', bottom: 0, left: 0, right: 0, height: '20px' } }}>
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.4, display: '-webkit-box', overflow: 'hidden', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}>{contentPreview}</Typography>
+              </Box>
+              <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="caption" color="text.secondary">
+                  {new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 500, display: 'flex', alignItems: 'center' }}>
+                  <DescriptionIcon sx={{ fontSize: '0.9rem', mr: 0.5 }} />View Information
+                </Typography>
+              </Box>
+            </CardContent>
+          </StyledCard>
+        </Link>
+      </MotionLink>
+    );
+  };
+
   // Standard Card Component
   const StandardCard = ({ activity, activityType, chipColor, participantCount, status, eventId }: { activity: Activity, activityType: string, chipColor: string, participantCount: number, status: 'upcoming' | 'ongoing' | 'completed', eventId: string }) => (
     <MotionLink
@@ -689,7 +733,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
   );
 
   // Render appropriate card based on activity type
-  if (isSports) {
+  if (isInfo) {
+    return <InfoCard activity={activity as InfoActivity} chipColor={chipColor} eventId={eventId} />;
+  } else if (isSports) {
     const sportActivity = activity as SportsActivity<Sport>;
     if (activity.eventType === EventType.ATHLETICS) {
       return <AthleticsCard sportActivity={sportActivity} status={status} eventId={eventId} />;
