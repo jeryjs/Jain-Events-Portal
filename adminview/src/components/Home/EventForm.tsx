@@ -423,7 +423,7 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
             />
           </Box>
 
-          {/* Google Drive Link Section */}
+          {/* Gallery Link Section */}
           <Box sx={{ mb: 4 }}>
             <TextField
               label="imgur link"
@@ -431,7 +431,7 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
               fullWidth
               margin="normal"
               value={formData.galleryLink}
-              onChange={(e) => editFormData('googleDriveLink', e.target.value)}
+              onChange={(e) => editFormData('galleryLink', e.target.value)}
               sx={{ mb: 4 }}
             />
           </Box>

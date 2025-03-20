@@ -66,7 +66,7 @@ function HomePage() {
 
   const { data: events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
-  const { data: imgur, isLoading: imgurLoading } = useImgur('https://imgur.com/a/infinty-2025-FQ1Q1gF');
+  const { data: imgur, isLoading: imgurLoading } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
 
   const [catTabId, setTabId] = useState([0, -1]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);

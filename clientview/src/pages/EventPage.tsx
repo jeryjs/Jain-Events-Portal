@@ -254,7 +254,7 @@ function EventPage() {
   const navigate = useNavigate();
 
   const { data: event, isLoading: eventLoading } = useEvent(eventId);
-  const { data: imgur, isLoading: imgurLoading } = useImgur("https://imgur.com/a/infinty-2025-FQ1Q1gF");
+  const { data: imgur, isLoading: imgurLoading } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
