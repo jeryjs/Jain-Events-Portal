@@ -20,6 +20,8 @@ export enum EventType {
 	HACKATHON = 3002,
 	QUIZ = 3003,
 	WORKSHOP = 3004,
+
+	NSS = 5000,
 }
 
 export enum ArticleStatus {
