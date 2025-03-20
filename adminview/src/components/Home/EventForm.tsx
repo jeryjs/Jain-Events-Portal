@@ -75,7 +75,8 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
       errors.timings = 'End time must be after start time';
     }
 
-    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) setFormErrors(errors);
+    alert(JSON.stringify(errors, null, 2)); // For debugging purposes
     return Object.keys(errors).length === 0;
   };
 
