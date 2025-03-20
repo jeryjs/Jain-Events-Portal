@@ -4,7 +4,7 @@ import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton } fr
 
 import { EventForm } from '../components/Home/EventForm';
 import { EventsList, ActivityButton } from '../components/Home';
-import { useEvent, useCreateEvent, useUpdateEvent } from '@hooks/App';
+import { useEvent, useCreateEvent, useUpdateEvent, useDeleteEvent } from '@hooks/App';
 import slugify from '../utils/Slugify';
 import { Event } from '@common/models';
 
@@ -17,6 +17,7 @@ const EventsPage = () => {
   const eventQuery = useEvent(eventId, !isCreating && !!eventId);
   const createMutation = useCreateEvent();
   const updateMutation = useUpdateEvent();
+  const deleteMutation = useDeleteEvent();
 
   // Handle event selection
   const handleSelectEvent = (id: string) => {
@@ -43,6 +44,19 @@ const EventsPage = () => {
     } else if (eventId) {
       await updateMutation.mutateAsync(eventData, {
         onSuccess: () => navigate(`/events/${eventId}`),
+      });
+    }
+  };
+
+
+  // Handle delete action
+  const handleDeleteEvent = async () => {
+    if (eventId) {
+      await deleteMutation.mutateAsync(eventId, {
+        onSuccess: () => {
+          setIsCreating(false);
+          navigate('/events');
+        }
       });
     }
   };
@@ -98,6 +112,7 @@ const EventsPage = () => {
                 event={eventQuery.data}
                 isCreating={isCreating}
                 onSave={handleSaveEvent}
+                onDelete={handleDeleteEvent}
               />
             </Box>
           )}
