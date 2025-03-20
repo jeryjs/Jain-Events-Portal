@@ -89,4 +89,15 @@ router.delete('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req
         res.status(500).json({ message: 'Error deleting activity' });
     }
 }));
+// Invalidate cache for activities
+router.post('/activities/invalidate-cache', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield (0, activities_1.invalidateActivitiesCache)();
+        res.json({ message: result });
+    }
+    catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache' });
+    }
+}));
 exports.default = router;

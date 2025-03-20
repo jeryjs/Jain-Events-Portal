@@ -1,6 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Gender = exports.Role = exports.ArticleStatus = exports.EventType = void 0;
+/**
+ * Represents the different types of events available in the system.
+ *
+ * @remarks
+ * Each base type is identified by an enum value that is divisible by 1000.
+ * Enum values that are increments of a base type represent specific sub-categories.
+ *
+ * For example:
+ * - A value of 1000 (e.g., SPORTS) is a base type.
+ * - A value of 1001 (e.g., BASKETBALL) is a sub-type under the SPORTS base type.
+ */
 var EventType;
 (function (EventType) {
     EventType[EventType["GENERAL"] = 0] = "GENERAL";
@@ -15,12 +26,13 @@ var EventType;
     EventType[EventType["CULTURAL"] = 2000] = "CULTURAL";
     EventType[EventType["DANCE"] = 2001] = "DANCE";
     EventType[EventType["SINGING"] = 2002] = "SINGING";
-    EventType[EventType["DJ"] = 2003] = "DJ";
+    EventType[EventType["FASHION_SHOW"] = 2003] = "FASHION_SHOW";
     EventType[EventType["TECH"] = 3000] = "TECH";
     EventType[EventType["CODING"] = 3001] = "CODING";
     EventType[EventType["HACKATHON"] = 3002] = "HACKATHON";
     EventType[EventType["QUIZ"] = 3003] = "QUIZ";
     EventType[EventType["WORKSHOP"] = 3004] = "WORKSHOP";
+    EventType[EventType["NSS"] = 4000] = "NSS";
 })(EventType || (exports.EventType = EventType = {}));
 var ArticleStatus;
 (function (ArticleStatus) {

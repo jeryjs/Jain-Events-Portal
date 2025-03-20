@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteActivity = exports.updateActivity = exports.createActivity = exports.getActivityById = exports.getActivities = void 0;
+exports.invalidateActivitiesCache = exports.deleteActivity = exports.updateActivity = exports.createActivity = exports.getActivityById = exports.getActivities = void 0;
 const firebase_1 = __importDefault(require("@config/firebase"));
 const uuid_1 = require("uuid");
 const cache_1 = require("@config/cache");
@@ -111,3 +111,16 @@ const deleteActivity = (eventId, activityId) => __awaiter(void 0, void 0, void 0
     });
 });
 exports.deleteActivity = deleteActivity;
+/*
+ * Invalidate cache for activities
+ */
+const invalidateActivitiesCache = () => __awaiter(void 0, void 0, void 0, function* () {
+    cache_1.cache.keys().forEach(key => {
+        if (key.startsWith('activities-')) {
+            cache_1.cache.del(key);
+        }
+    });
+    console.log("Cache invalidated successfully for activities!");
+    return "Cache invalidated successfully for activities!";
+});
+exports.invalidateActivitiesCache = invalidateActivitiesCache;

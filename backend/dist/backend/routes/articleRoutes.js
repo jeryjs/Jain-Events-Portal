@@ -111,4 +111,15 @@ router.post('/articles/:articleId/view', viewCountLimiter, (req, res) => __await
         res.status(500).json({ message: 'Error updating article view count', details: error });
     }
 }));
+// Invalidate cache for articles
+router.post('/articles/invalidate-cache', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const message = yield (0, articles_1.invalidateArticlesCache)();
+        res.json({ message });
+    }
+    catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache', details: error });
+    }
+}));
 exports.default = router;

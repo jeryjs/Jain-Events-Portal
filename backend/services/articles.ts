@@ -124,3 +124,17 @@ export const deleteArticle = async (articleId: string) => {
     ttl: TTL.ARTICLES
   });
 };
+
+/**
+ * Invalidate cache for articles
+ */
+export const invalidateArticlesCache = () => {
+  cache.del(COLLECTION_KEY);
+  cache.keys().forEach(key => {
+    if (key.startsWith(ITEM_KEY_PREFIX)) {
+      cache.del(key);
+    }
+  });
+  console.log("Cache invalidated successfully for articles!");
+  return "Cache invalidated successfully for articles!";
+}

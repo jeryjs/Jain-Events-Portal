@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteEvent = exports.updateEvent = exports.createEvent = exports.getEventById = exports.getEvents = void 0;
+exports.invalidateEventsCache = exports.deleteEvent = exports.updateEvent = exports.createEvent = exports.getEventById = exports.getEvents = void 0;
 const Event_1 = __importDefault(require("@common/models/Event"));
 const utils_1 = require("@common/utils");
 const cache_1 = require("@config/cache");
@@ -115,3 +115,17 @@ const deleteEvent = (eventId) => __awaiter(void 0, void 0, void 0, function* () 
     });
 });
 exports.deleteEvent = deleteEvent;
+/**
+ * Invalidate cache for all events
+ */
+const invalidateEventsCache = () => {
+    cache_1.cache.del(COLLECTION_KEY);
+    cache_1.cache.keys().forEach(key => {
+        if (key.startsWith(ITEM_KEY_PREFIX)) {
+            cache_1.cache.del(key);
+        }
+    });
+    console.log("Cache invalidated successfully for events!");
+    return "Cache invalidated successfully for events!";
+};
+exports.invalidateEventsCache = invalidateEventsCache;

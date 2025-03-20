@@ -6,6 +6,7 @@ import {
     updateArticle, 
     deleteArticle,
     updateArticleViewCount,
+    invalidateArticlesCache,
 } from "@services/articles";
 import { adminMiddleware } from '@middlewares/auth';
 import rateLimit from 'express-rate-limit';
@@ -103,6 +104,17 @@ router.post('/articles/:articleId/view', viewCountLimiter, async (req: Request, 
     console.error('Error updating article view count:', error);
     res.status(500).json({ message: 'Error updating article view count', details: error });
   }
+});
+
+// Invalidate cache for articles
+router.post('/articles/invalidate-cache', adminMiddleware, async (req: Request, res: Response) => {
+    try {
+        const message = await invalidateArticlesCache();
+        res.json({ message });
+    } catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache', details: error });
+    }
 });
 
 export default router;

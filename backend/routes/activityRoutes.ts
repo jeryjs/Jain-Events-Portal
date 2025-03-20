@@ -5,6 +5,7 @@ import {
     createActivity, 
     updateActivity, 
     deleteActivity,
+    invalidateActivitiesCache,
 } from '@services/activities';
 import { adminMiddleware, managerMiddleware } from '@middlewares/auth';
 
@@ -82,6 +83,17 @@ router.delete('/activities/:eventId/:activityId', managerMiddleware, async (req:
     } catch (error) {
         console.error('Error deleting activity:', error);
         res.status(500).json({ message: 'Error deleting activity' });
+    }
+});
+
+// Invalidate cache for activities
+router.post('/activities/invalidate-cache', adminMiddleware, async (req: Request, res: Response) => {
+    try {
+        const result = await invalidateActivitiesCache();
+        res.json({ message: result });
+    } catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache' });
     }
 });
 

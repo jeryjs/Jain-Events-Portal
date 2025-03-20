@@ -109,3 +109,16 @@ export const deleteActivity = async (eventId: string, activityId: string) => {
     ttl: TTL.ACTIVITIES
   });
 };
+
+/*
+ * Invalidate cache for activities
+ */
+export const invalidateActivitiesCache = async () => {
+  cache.keys().forEach(key => {
+    if (key.startsWith('activities-')) {
+      cache.del(key);
+    }
+  });
+  console.log("Cache invalidated successfully for activities!");
+  return "Cache invalidated successfully for activities!";
+};

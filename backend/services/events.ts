@@ -110,3 +110,17 @@ export const deleteEvent = async (eventId: string) => {
     ttl: TTL.EVENTS
   });
 };
+
+/**
+ * Invalidate cache for all events
+ */
+export const invalidateEventsCache = () => {
+  cache.del(COLLECTION_KEY);
+  cache.keys().forEach(key => {
+    if (key.startsWith(ITEM_KEY_PREFIX)) {
+      cache.del(key);
+    }
+  });
+  console.log("Cache invalidated successfully for events!");
+  return "Cache invalidated successfully for events!";
+};

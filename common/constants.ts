@@ -25,7 +25,7 @@ export enum EventType {
 	CULTURAL = 2000,
 	DANCE = 2001,
 	SINGING = 2002,
-	DJ = 2003,
+	FASHION_SHOW = 2003,	
 
 	TECH = 3000,
 	CODING = 3001,
