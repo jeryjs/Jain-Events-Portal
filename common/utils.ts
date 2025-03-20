@@ -37,6 +37,11 @@ export const getBaseEventType = (it: number): EventType => {
     return EventType.GENERAL;
 };
 
+export const getAllBaseEventTypes = (): EventType[] => {
+    return Object.values(EventType)
+        .filter((value) => typeof value === "number" && value % 1000 === 0) as EventType[];
+}
+
 export const getActivityTypes = (type: EventType): EventType[] => {
     const nextBaseType = type + 1000;
     const types: EventType[] = [];
