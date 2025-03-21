@@ -6,8 +6,11 @@ import {
     updateActivity, 
     deleteActivity,
     invalidateActivitiesCache,
+    getPollResults,
+    castVote,
 } from '@services/activities';
-import { adminMiddleware, managerMiddleware } from '@middlewares/auth';
+import { adminMiddleware, authMiddleware, managerMiddleware } from '@middlewares/auth';
+import { getUserFromToken } from '@utils/authUtils';
 
 const router = express.Router();
 
@@ -97,4 +100,37 @@ router.post('/activities/invalidate-cache', adminMiddleware, async (req: Request
     }
 });
 
+// Get poll results for an activity
+router.get('/activities/:eventId/:activityId/poll', async (req: Request, res: Response) => {
+    try {
+        const results = await getPollResults(req.params.eventId, req.params.activityId);
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching poll results:', error);
+        res.status(500).json({ message: 'Error fetching poll results' });
+    }
+});
+
+// Cast a vote for a participant
+router.post('/activities/:eventId/:activityId/vote/:teamId', authMiddleware, async (req: Request, res: Response) => {
+    try {
+        const userdata = getUserFromToken(req.headers.authorization || '');
+        if (!userdata) {
+            res.status(400).json({ message: 'User data missing from token' });
+            return;
+        }
+        const result = await castVote(req.params.eventId, req.params.activityId, req.params.teamId, userdata.username);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error casting vote:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error casting vote';
+        
+        if (errorMessage.includes('already voted')) {
+            res.status(400).json({ message: errorMessage });
+            return;
+        }
+
+        res.status(500).json({ message: errorMessage });
+    }
+});
 export default router;

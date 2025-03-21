@@ -1,7 +1,7 @@
 import db from '@config/firebase';
 import { v4 as uuidv4 } from 'uuid';
 import { cache, TTL } from '@config/cache';
-import { Activity } from '@common/models';
+import { Activity, CulturalActivity } from '@common/models';
 import { parseActivities } from '@common/utils';
 import { 
   getCachedItem, 
@@ -10,6 +10,7 @@ import {
   updateCachedItem, 
   deleteCachedItem 
 } from '@utils/cacheUtils';
+import { getUserFromToken } from '@utils/authUtils';
 
 // Collection references
 const eventsCollection = db.collection('events');
@@ -121,4 +122,70 @@ export const invalidateActivitiesCache = async () => {
   });
   console.log("Cache invalidated successfully for activities!");
   return "Cache invalidated successfully for activities!";
+};
+
+/**
+ * Get poll results for an activity
+ */
+export const getPollResults = async (eventId: string, activityId: string) => {
+  const activityKey = `activities-${eventId}-${activityId}`;
+  
+  // Get activity with poll data
+  const activity = await getCachedItem<Activity>({
+    key: activityKey,
+    fetchFn: async () => {
+      const doc = await activitiesCollection(eventId).doc(activityId).get();
+      if (!doc.exists) return null;
+      return Activity.parse(doc.data());
+    },
+    ttl: TTL.ACTIVITIES
+  });
+  
+  if (!(activity instanceof CulturalActivity)) {
+    throw new Error(`Invalid activity type for poll results: ${typeof activity}`);
+  }
+  
+  return activity.pollData;
+};
+
+/**
+ * Cast a vote for a team (or participant)
+ */
+export const castVote = async (eventId: string, activityId: string, teamId: string, username: string) => {
+  const activityKey = `activities-${eventId}-${activityId}`;
+  const activityDoc = activitiesCollection(eventId).doc(activityId);
+
+  const activity = await getCachedItem<Activity>({
+    key: activityKey,
+    fetchFn: async () => Activity.parse((await activityDoc.get()).data()),
+    ttl: TTL.ACTIVITIES
+  });
+
+  if (!(activity instanceof CulturalActivity)) throw new Error(`Invalid activity type for voting: ${typeof activity}`);
+  if (!activity.showPoll) throw new Error('Poll is not enabled for this activity');
+
+  const pollData = activity.pollData;
+  let teamPoll = pollData.find(poll => poll.teamId === teamId);
+  if (!teamPoll) {
+    teamPoll = { teamId, votes: [] };
+    pollData.push(teamPoll);
+  }
+  
+  if (teamPoll.votes.includes(username)) throw new Error('User has already voted for this team/participant');
+
+  teamPoll.votes.push(username);
+  activity.pollData = pollData;
+
+  await updateCachedItem<CulturalActivity>({
+    item: activity,
+    collectionKey: `activities-${eventId}`,
+    itemKeyPrefix: `activities-${eventId}`,
+    updateFn: async (item) => await activityDoc.update({...item}),
+    ttl: TTL.ACTIVITIES
+  });
+  
+  return { 
+    success: true, 
+    message: 'Vote recorded successfully'
+  };
 };

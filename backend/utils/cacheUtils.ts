@@ -113,7 +113,7 @@ export async function updateCachedItem<T extends Identifiable>({
 	updateFn: (item: T) => Promise<any>;
 	ttl: number;
 }): Promise<T> {
-	console.log(`🔥 Database: Updating item with ID ${item.id}`);
+	console.log(`🔥 Database: Updating ${typeof item} item with ID ${item.id}`);
 	await updateFn(item);
 
 	const itemKey = `${itemKeyPrefix}-${item.id}`;

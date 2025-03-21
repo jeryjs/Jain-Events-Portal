@@ -1,5 +1,6 @@
 import { Gender } from "@common/constants";
 import { Box, Typography, Paper, Avatar, Chip, styled } from "@mui/material";
+import { PollingForm } from "./CulturalsView/PollingForm";
 
 const Section = styled(Box)(({ theme }) => ({
     marginTop: theme.spacing(4),
@@ -55,6 +56,16 @@ export const CulturalsView = ({ activity }) => {
           ))}
         </Box>
       </Section>
+      
+      {/* Poll Section */}
+      {activity.showPoll && (
+        <PollingForm 
+          activityId={activity.id}
+          eventId={activity.eventId || ''}
+          participants={activity.participants || []}
+          showPoll={activity.showPoll}
+        />
+      )}
     </Box>
   );
 };

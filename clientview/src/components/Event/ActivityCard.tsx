@@ -708,15 +708,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                   </Typography>
                 </Box>
               </Box>
-              <Chip
-                label={activityType}
-                size="small"
-                sx={{
-                  backgroundColor: `${chipColor}22`,
-                  color: chipColor,
-                  fontWeight: 'medium',
-                }}
-              />
             </Box>
 
             {status === 'upcoming' && (
