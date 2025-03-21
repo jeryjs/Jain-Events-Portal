@@ -335,7 +335,7 @@ function EventPage() {
   // temp for ininity: Hardcode the highlights-
   const highlights = eventId === "infinity-2025" ? [
     'https://i.imgur.com/hnY5dx2.jpeg',
-    'https://i.imgur.com/axbOpHl.jpeg',
+    'https://i.imgur.com/toE2tOF.jpeg',
     'https://i.imgur.com/2W2fEIY.jpeg'
   ] : [];
 
