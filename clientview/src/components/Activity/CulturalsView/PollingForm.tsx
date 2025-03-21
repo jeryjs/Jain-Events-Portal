@@ -1,472 +1,538 @@
-import useVoteApi from '@hooks/useVoteApi';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Box, Typography, Avatar, useTheme, alpha, CircularProgress } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { useState, useEffect } from 'react';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import SwipeIcon from '@mui/icons-material/SwipeRightAlt';
 import LockIcon from '@mui/icons-material/Lock';
-import PersonIcon from '@mui/icons-material/Person';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import {
-    Alert,
-    Avatar,
-    Box,
-    Button,
-    Chip,
-    CircularProgress,
-    LinearProgress,
-    styled,
-    SwipeableDrawer,
-    Typography,
-    useMediaQuery,
-    useTheme
-} from '@mui/material';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import { useSwipeable } from 'react-swipeable';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { useCastVote } from '@hooks/useApi';
+import { CulturalActivity } from '@common/models';
 
-// Mock authentication function - to be replaced with actual auth
-const isAuthenticated = () => {
-    const token = localStorage.getItem('auth_token');
-    return !!token;
-};
-
-const getUserUSN = () => {
-    // Placeholder for actual user authentication
-    return localStorage.getItem('user_usn') || null;
-};
-
-// Styled components
-const ParticipantCard = styled(motion.div)(({ theme }) => ({
-    position: 'relative',
-    width: '100%',
-    maxWidth: 320,
-    padding: theme.spacing(3),
-    borderRadius: theme.spacing(2),
-    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-    background: theme.palette.background.paper,
-    margin: theme.spacing(1),
-    overflow: 'hidden',
-    transition: 'all 0.3s ease',
+// Styled components for a truly premium UI
+const PollContainer = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  margin: theme.spacing(4, 0),
+  padding: theme.spacing(2, 0),
+  borderRadius: theme.shape.borderRadius * 2,
 }));
 
-const VoteButton = styled(Button)(({ theme }) => ({
-    marginTop: theme.spacing(2),
-    borderRadius: theme.spacing(5),
-    padding: `${theme.spacing(1)} ${theme.spacing(3)}`,
-    position: 'relative',
-    overflow: 'hidden',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
-    '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: '-100%',
-        width: '100%',
-        height: '100%',
-        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
-        transition: 'all 0.6s ease',
-    },
-    '&:hover::before': {
-        left: '100%',
-    }
+const PollHeader = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: theme.spacing(3),
+  '& svg': {
+    fontSize: 30,
+    marginRight: theme.spacing(1.5),
+    color: theme.palette.primary.main
+  },
+  '& h5': {
+    fontWeight: 600,
+    letterSpacing: '0.5px'
+  }
 }));
 
-const ProgressIndicator = styled(Box)(({ theme }) => ({
-    width: '100%',
-    height: 8,
-    borderRadius: 4,
-    marginTop: theme.spacing(1),
-    background: theme.palette.grey[200],
-    position: 'relative',
-    overflow: 'hidden',
+const OptionCard = styled(motion.div)<{ selected?: boolean, userVote?: boolean }>(({ theme, selected, userVote }) => ({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  borderRadius: theme.shape.borderRadius * 2,
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+  overflow: 'hidden',
+  cursor: 'pointer',
+  background: userVote 
+    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.1)}, ${alpha(theme.palette.primary.main, 0.15)})`
+    : selected
+      ? alpha(theme.palette.primary.light, 0.1)
+      : alpha(theme.palette.background.paper, 0.7),
+  backdropFilter: 'blur(10px)',
+  border: `1px solid ${userVote 
+    ? theme.palette.primary.main 
+    : selected 
+      ? alpha(theme.palette.primary.main, 0.5)
+      : alpha(theme.palette.divider, 0.1)
+  }`,
+  boxShadow: userVote || selected 
+    ? `0 4px 20px ${alpha(theme.palette.primary.main, 0.2)}` 
+    : '0 2px 10px rgba(0,0,0,0.05)',
+  transition: 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+  '&:hover': {
+    boxShadow: userVote 
+      ? `0 8px 25px ${alpha(theme.palette.primary.main, 0.25)}`
+      : selected
+        ? `0 8px 25px ${alpha(theme.palette.primary.main, 0.2)}`
+        : '0 5px 15px rgba(0,0,0,0.08)',
+    transform: 'translateY(-2px)',
+  }
 }));
 
-const ResultsBar = styled(motion.div)<{ percentage: number; voted: boolean }>(
-    ({ theme, percentage, voted }) => ({
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        height: '100%',
-        width: `${percentage}%`,
-        background: voted
-            ? `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`
-            : theme.palette.grey[400],
-        borderRadius: 4,
-    })
+// Background progress bar that fills the entire card
+const ProgressBackground = styled('div')<{ width: number, selected?: boolean, userVote?: boolean }>(
+  ({ theme, width, selected, userVote }) => ({
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    height: '100%',
+    width: `${width}%`,
+    background: userVote
+      ? `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.15)}, ${alpha(theme.palette.primary.light, 0.1)})`
+      : selected
+        ? alpha(theme.palette.primary.main, 0.1)
+        : alpha(theme.palette.grey[200], 0.3),
+    borderTopLeftRadius: theme.shape.borderRadius * 2,
+    borderBottomLeftRadius: theme.shape.borderRadius * 2,
+    transition: 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    zIndex: 0,
+  })
 );
 
-const CarouselContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    overflowX: 'auto',
-    scrollSnapType: 'x mandatory',
-    scrollBehavior: 'smooth',
-    WebkitOverflowScrolling: 'touch',
-    msOverflowStyle: '-ms-autohiding-scrollbar',
-    '&::-webkit-scrollbar': {
-        display: 'none'
-    },
-    padding: theme.spacing(2, 0),
-    margin: theme.spacing(0, -2),
-    paddingLeft: theme.spacing(2),
+const VoteCount = styled(Typography)<{ userVote?: boolean }>(({ theme, userVote }) => ({
+  position: 'absolute',
+  right: theme.spacing(2),
+  fontWeight: 600,
+  fontSize: '0.85rem',
+  color: userVote ? theme.palette.primary.main : theme.palette.text.secondary,
+  display: 'flex',
+  alignItems: 'center',
+  '& .icon': {
+    marginLeft: theme.spacing(0.5),
+    fontSize: '1rem'
+  }
 }));
 
-const VoteCountChip = styled(Chip)(({ theme }) => ({
-    position: 'absolute',
-    top: theme.spacing(1),
-    right: theme.spacing(1),
-    background: theme.palette.mode === 'dark'
-        ? 'rgba(255,255,255,0.1)'
-        : 'rgba(0,0,0,0.06)',
+// Elegant swipe button with smooth reveal effect
+const SwipeButtonContainer = styled(motion.div)(({ theme }) => ({
+  position: 'relative',
+  height: 56,
+  marginTop: theme.spacing(3),
+  marginBottom: theme.spacing(1),
+  borderRadius: 28,
+  overflow: 'hidden',
+  boxShadow: `0 5px 20px ${alpha(theme.palette.primary.main, 0.3)}`,
 }));
 
-const ResultsDrawer = styled(SwipeableDrawer)(({ theme }) => ({
-    '& .MuiDrawer-paper': {
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
-        padding: theme.spacing(2),
-        paddingTop: theme.spacing(1),
-    }
+const SwipeTrack = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 }));
 
-const DrawerPuller = styled(Box)(({ theme }) => ({
-    width: 40,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: theme.palette.grey[300],
-    margin: '8px auto 16px',
+const SwipeThumbContainer = styled(motion.div)({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  bottom: 0,
+  width: 56,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 3,
+});
+
+const SwipeThumb = styled(motion.div)(({ theme }) => ({
+  width: 40,
+  height: 40,
+  borderRadius: '50%',
+  background: '#fff',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  boxShadow: theme.shadows[2],
+  color: theme.palette.primary.main,
+  '& svg': {
+    fontSize: 24,
+  }
 }));
 
-interface Participant {
-    usn: string;
-    name: string;
-    gender: string;
-    profilePic?: string;
-    college?: string;
-    [key: string]: any;
-}
+// Message that appears as user swipes
+const SwipeMessage = styled(motion.div)(({ theme }) => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: '#fff',
+  fontWeight: 600,
+  letterSpacing: 1,
+  zIndex: 2,
+}));
+
+// Overlay that reveals as user swipes
+const LockMessageOverlay = styled(motion.div)(({ theme }) => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  paddingRight: theme.spacing(3),
+  background: `linear-gradient(90deg, transparent, ${theme.palette.primary.dark})`,
+  color: '#fff',
+  fontWeight: 600,
+  zIndex: 2,
+  '& svg': {
+    marginRight: theme.spacing(1),
+  }
+}));
+
+const LoginPrompt = styled(motion.button)(({ theme }) => ({
+  position: 'absolute',
+  bottom: theme.spacing(1.5),
+  right: theme.spacing(1.5),
+  background: 'none',
+  border: 'none',
+  color: alpha(theme.palette.text.secondary, 0.7),
+  fontSize: '0.75rem',
+  cursor: 'pointer',
+  padding: theme.spacing(0.5, 1),
+  borderRadius: theme.shape.borderRadius,
+  transition: 'all 0.2s ease',
+  '&:hover': {
+    background: alpha(theme.palette.background.paper, 0.5),
+    color: theme.palette.text.primary,
+  }
+}));
+
+const ResultsSummary = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: theme.spacing(2, 1),
+  marginTop: theme.spacing(2),
+  borderTop: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+  color: theme.palette.text.secondary,
+  '& strong': {
+    color: theme.palette.text.primary,
+    fontWeight: 600,
+  }
+}));
 
 interface PollingFormProps {
-    activityId: string;
-    eventId: string;
-    participants: Participant[];
-    showPoll?: boolean;
+  eventId: string;
+  activityId: string;
+  activity: CulturalActivity
 }
 
-export const PollingForm = ({ activityId, eventId, participants, showPoll = false }: PollingFormProps) => {
-    const [results, setResults] = useState<Record<string, number>>({});
-    const [userVote, setUserVote] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isVoting, setIsVoting] = useState<Record<string, boolean>>({});
-    const [resultsOpen, setResultsOpen] = useState(false);
-    const [animationComplete, setAnimationComplete] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const { castVote, getPollResults } = useVoteApi();
+export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps) => {
+  const theme = useTheme();
+  const castVoteMutation = useCastVote(eventId, activityId);
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+  const [userVoted, setUserVoted] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { participants, pollData = [], showPoll } = activity;
+  
+  // Motion values for the swipe interaction
+  const x = useMotionValue(0);
+  const dragProgress = useTransform(x, [0, 250], [0, 100]);
+  const opacity = useTransform(dragProgress, [0, 60], [1, 0]);
+  const lockOpacity = useTransform(dragProgress, [50, 90], [0, 1]);
+  const thumbScale = useTransform(dragProgress, [0, 100], [1, 1.1]);
+  const containerBackground = useTransform(
+    dragProgress,
+    [0, 90],
+    [
+      `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+      `linear-gradient(90deg, ${theme.palette.primary.dark}, ${theme.palette.primary.dark})`
+    ]
+  );
 
-    useEffect(() => {
-        if (showPoll) {
-            fetchResults();
-        }
-    }, [showPoll]);
+  // Check authentication and user vote
+  useEffect(() => {
+    // For real implementation: const token = localStorage.getItem('auth_token');
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6MywiaWF0IjoxNzQyNDM5OTA2LCJleHAiOjE3NDI1MjYzMDZ9.NUIy-0ILujq_loVYKMhK7U5f8zcQexFFDG2u2yQMJPw"; // Mock token for testing
+    setIsAuthenticated(!!token);
 
-    const fetchResults = async () => {
-        try {
-            setIsLoading(true);
-            const data = await getPollResults(eventId, activityId);
-            setResults(data.votes || {});
-            if (isAuthenticated()) {
-                const userUSN = getUserUSN();
-                if (userUSN && data.userVote) {
-                    setUserVote(data.userVote);
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching poll results:', error);
-            setError('Unable to load poll results. Please try again.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    // For real implementation: const userUsername = localStorage.getItem('user_usn');
+    const userUsername = "admin"; // Mock username for testing
 
-    const handleVote = async (participantId: string) => {
-        if (!isAuthenticated()) {
-            // Prompt user to login
-            setError('Please log in to vote');
-            return;
-        }
-
-        if (userVote) {
-            // User has already voted
-            return;
-        }
-
-        setIsVoting(prev => ({ ...prev, [participantId]: true }));
-
-        try {
-            await castVote(eventId, activityId, participantId);
-            setUserVote(participantId);
-
-            // Update results
-            setResults(prev => ({
-                ...prev,
-                [participantId]: (prev[participantId] || 0) + 1
-            }));
-
-            // Show animation then open results drawer
-            setTimeout(() => {
-                setAnimationComplete(true);
-                setResultsOpen(true);
-            }, 500);
-        } catch (error) {
-            console.error('Error casting vote:', error);
-            setError('Unable to cast your vote. Please try again.');
-        } finally {
-            setIsVoting(prev => ({ ...prev, [participantId]: false }));
-        }
-    };
-
-    const getTotalVotes = () => {
-        return Object.values(results).reduce((sum, count) => sum + count, 0);
-    };
-
-    const getPercentage = (participantId: string) => {
-        const totalVotes = getTotalVotes();
-        if (totalVotes === 0) return 0;
-        return ((results[participantId] || 0) / totalVotes) * 100;
-    };
-
-    const swipeHandlers = useSwipeable({
-        onSwipedRight: (eventData) => {
-            // Find the element that was swiped
-            const element = eventData.event.target as HTMLElement;
-            const card = element.closest('[data-participant-id]');
-            if (card) {
-                const participantId = card.getAttribute('data-participant-id');
-                if (participantId && !userVote && !isVoting[participantId]) {
-                    handleVote(participantId);
-                }
-            }
-        },
-        // preventDefaultTouchmoveEvent: true,
-        trackMouse: true
-    });
-
-    if (!showPoll) {
-        return null;
+    // Find if user has already voted
+    if (pollData.length > 0 && userUsername) {
+      const userVote = pollData.find(poll => poll.votes.includes(userUsername));
+      if (userVote) {
+        setUserVoted(userVote.teamId);
+      }
     }
+  }, [activityId, pollData]);
 
-    if (isLoading) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                <CircularProgress />
-            </Box>
-        );
+  // Handle team selection
+  const handleSelectTeam = (teamId: string) => {
+    if (userVoted || !isAuthenticated || castVoteMutation.isPending) return;
+    setSelectedTeam(teamId === selectedTeam ? null : teamId);
+  };
+
+  // Handle vote submission when swipe completes
+  const handleDragEnd = () => {
+    if (dragProgress.get() > 90 && selectedTeam && !userVoted && !castVoteMutation.isPending) {
+      castVoteMutation.mutate(selectedTeam, {
+        onSuccess: () => {
+          setUserVoted(selectedTeam);
+          x.set(0); // Reset position
+        }
+      });
+    } else {
+      // Reset position if not completed
+      x.set(0);
     }
+  };
 
-    const authenticated = isAuthenticated();
+  // Calculate vote statistics
+  const getTotalVotes = () => {
+    return pollData.reduce((sum, team) => sum + team.votes.length, 0) || 0;
+  };
+  
+  const getVotePercentage = (teamId: string) => {
+    const totalVotes = getTotalVotes();
+    if (totalVotes === 0) return 0;
+    
+    const teamVotes = pollData.find(p => p.teamId === teamId)?.votes.length || 0;
+    return (teamVotes / totalVotes) * 100;
+  };
+  
+  const getVoteCount = (teamId: string) => {
+    return pollData.find(p => p.teamId === teamId)?.votes.length || 0;
+  };
 
-    return (
-        <Box sx={{ mt: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <Typography variant="h5" component="h2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center' }}>
-                    <HowToVoteIcon sx={{ mr: 1 }} /> Live Audience Poll
-                </Typography>
-                <Button
-                    variant="outlined"
-                    startIcon={<VisibilityIcon />}
-                    onClick={() => setResultsOpen(true)}
-                >
-                    Results
-                </Button>
-            </Box>
+  // Get participant name from USN
+  const getParticipantName = (usn: string) => {
+    return participants.find(p => p.usn === usn)?.name || 'Unknown';
+  };
 
-            {error && (
-                <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
-                    {error}
-                </Alert>
-            )}
+  if (!showPoll || participants.length === 0) {
+    return null;
+  }
 
-            {!authenticated ? (
-                <Alert severity="info" sx={{ mb: 2 }}>
-                    Please log in to vote. <Button size="small">Login</Button>
-                </Alert>
-            ) : userVote ? (
-                <Alert severity="success" icon={<CheckCircleIcon />} sx={{ mb: 2 }}>
-                    Thank you for voting! Your choice has been recorded.
-                </Alert>
-            ) : null}
+  return (
+    <PollContainer>
+      <PollHeader>
+        <HowToVoteIcon />
+        <Typography variant="h5">Audience Poll</Typography>
+      </PollHeader>
 
-            <AnimatePresence>
-                <CarouselContainer {...swipeHandlers}>
-                    {participants.map((participant, index) => (
-                        <ParticipantCard
-                            key={participant.usn || index}
-                            data-participant-id={participant.usn}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                        >
-                            <VoteCountChip
-                                size="small"
-                                icon={<HowToVoteIcon fontSize="small" />}
-                                label={results[participant.usn] || 0}
-                            />
-
-                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <Avatar
-                                    sx={{ width: 100, height: 100, mb: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
-                                    alt={participant.name}
-                                    src={participant.profilePic || `https://eu.ui-avatars.com/api/?name=${participant.name}&size=100`}
-                                />
-                                <Typography variant="h6" sx={{ textAlign: 'center', mb: 0.5 }}>
-                                    {participant.name}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 2 }}>
-                                    {participant.college || 'FET, JU'}
-                                </Typography>
-
-                                <ProgressIndicator>
-                                    <ResultsBar
-                                        percentage={getPercentage(participant.usn)}
-                                        voted={userVote === participant.usn}
-                                        initial={{ width: '0%' }}
-                                        animate={{ width: `${getPercentage(participant.usn)}%` }}
-                                        transition={{ duration: 1, delay: 0.2 }}
-                                    />
-                                </ProgressIndicator>
-
-                                <Typography variant="caption" sx={{ mt: 0.5, fontWeight: 'bold', color: 'text.secondary' }}>
-                                    {getPercentage(participant.usn).toFixed(1)}%
-                                </Typography>
-
-                                <VoteButton
-                                    fullWidth
-                                    variant={userVote === participant.usn ? "contained" : "outlined"}
-                                    color={userVote === participant.usn ? "primary" : "inherit"}
-                                    disabled={!!userVote || isVoting[participant.usn] || !authenticated}
-                                    onClick={() => handleVote(participant.usn)}
-                                    endIcon={userVote ? <CheckCircleIcon /> : <ArrowForwardIcon />}
-                                    sx={{ mt: 2 }}
-                                >
-                                    {isVoting[participant.usn] ? (
-                                        <CircularProgress size={24} />
-                                    ) : userVote === participant.usn ? (
-                                        "Voted"
-                                    ) : userVote ? (
-                                        "Locked"
-                                    ) : (
-                                        "Swipe to Vote"
-                                    )}
-                                </VoteButton>
-                            </Box>
-                        </ParticipantCard>
-                    ))}
-                </CarouselContainer>
-            </AnimatePresence>
-
-            <Box sx={{ mt: 2, textAlign: 'center' }}>
-                <Typography variant="body2" color="text.secondary">
-                    {userVote ? (
-                        <Box component="span" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <LockIcon fontSize="small" sx={{ mr: 0.5 }} /> Your vote has been recorded
-                        </Box>
-                    ) : authenticated ? (
-                        "Swipe right on a participant to vote"
-                    ) : (
-                        <Box component="span" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <PersonIcon fontSize="small" sx={{ mr: 0.5 }} /> Login to cast your vote
-                        </Box>
-                    )}
-                </Typography>
-                <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                    Total votes: {getTotalVotes()}
-                </Typography>
-            </Box>
-
-            {/* Results Drawer */}
-            <ResultsDrawer
-                anchor="bottom"
-                open={resultsOpen}
-                onClose={() => setResultsOpen(false)}
-                onOpen={() => setResultsOpen(true)}
-                disableSwipeToOpen
-                swipeAreaWidth={0}
-                ModalProps={{
-                    keepMounted: true,
-                }}
+      {/* Participant Options */}
+      <AnimatePresence>
+        {participants.sort((a, b) => {
+          // Sort by votes (descending)
+          const votesA = getVoteCount(a.usn);
+          const votesB = getVoteCount(b.usn);
+          return votesB - votesA;
+        }).map((participant, index) => {
+          const teamId = participant.usn;
+          const isSelected = selectedTeam === teamId;
+          const isUserVote = userVoted === teamId;
+          const votePercentage = getVotePercentage(teamId);
+          const votes = getVoteCount(teamId);
+          
+          return (
+            <OptionCard
+              key={teamId}
+              selected={isSelected}
+              userVote={isUserVote}
+              onClick={() => handleSelectTeam(teamId)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                scale: isUserVote ? 1.02 : 1,
+              }}
+              transition={{ 
+                delay: index * 0.1,
+                type: 'spring',
+                stiffness: 120,
+                damping: 20
+              }}
+              whileHover={{ scale: isUserVote ? 1.02 : 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              style={{ 
+                opacity: userVoted && !isUserVote ? 0.8 : 1 
+              }}
             >
-                <DrawerPuller />
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-                    Live Poll Results
-                </Typography>
-
-                <Box sx={{ mb: 2 }}>
-                    {participants
-                        .sort((a, b) => (results[b.usn] || 0) - (results[a.usn] || 0))
-                        .map((participant, index) => (
-                            <Box key={participant.usn} sx={{ mb: 2, position: 'relative' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                    <Avatar
-                                        src={participant.profilePic || `https://eu.ui-avatars.com/api/?name=${participant.name}&size=50`}
-                                        alt={participant.name}
-                                        sx={{ mr: 1.5, width: 36, height: 36 }}
-                                    />
-                                    <Box sx={{ flex: 1 }}>
-                                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                                            {participant.name}
-                                            {userVote === participant.usn && (
-                                                <Chip
-                                                    size="small"
-                                                    label="Your Vote"
-                                                    color="primary"
-                                                    sx={{ ml: 1, height: 20, fontSize: '0.65rem' }}
-                                                />
-                                            )}
-                                        </Typography>
-                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                            <LinearProgress
-                                                variant="determinate"
-                                                value={getPercentage(participant.usn)}
-                                                sx={{
-                                                    flex: 1,
-                                                    height: 10,
-                                                    borderRadius: 5,
-                                                    backgroundColor: theme.palette.grey[200],
-                                                    '& .MuiLinearProgress-bar': {
-                                                        borderRadius: 5,
-                                                        background: index === 0
-                                                            ? `linear-gradient(90deg, ${theme.palette.warning.main}, ${theme.palette.warning.light})`
-                                                            : undefined
-                                                    }
-                                                }}
-                                            />
-                                            <Typography variant="body2" color="text.secondary" sx={{ ml: 1, minWidth: 45 }}>
-                                                {getPercentage(participant.usn).toFixed(1)}%
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </Box>
-                        ))}
-                </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, pt: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
-                    <Typography variant="body2" color="text.secondary">
-                        Total votes: {getTotalVotes()}
-                    </Typography>
-                    {authenticated ? (
-                        <Typography variant="body2" color="text.secondary">
-                            {userVote ? "You have voted" : "You haven't voted yet"}
-                        </Typography>
-                    ) : (
-                        <Button size="small" startIcon={<PersonIcon />}>
-                            Login to vote
-                        </Button>
+              {/* Progress background fills entire card */}
+              <ProgressBackground 
+                width={votePercentage} 
+                selected={isSelected}
+                userVote={isUserVote}
+              />
+              
+              {/* Content appears above background */}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                width: '100%',
+                zIndex: 1, 
+                position: 'relative'
+              }}>
+                <Avatar
+                  src={participant.profilePic || `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(participant.name)}&size=60`}
+                  sx={{ 
+                    width: 52, 
+                    height: 52, 
+                    mr: 2,
+                    border: isUserVote ? `2px solid ${theme.palette.primary.main}` : 'none',
+                    boxShadow: isUserVote ? `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}` : 'none'
+                  }}
+                />
+                
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography 
+                    variant="subtitle1" 
+                    sx={{ 
+                      fontWeight: isUserVote ? 700 : 500,
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {participant.name}
+                    {isUserVote && (
+                      <CheckCircleIcon 
+                        color="primary"
+                        sx={{ ml: 1, width: 18, height: 18 }}
+                      />
                     )}
+                  </Typography>
+                  
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                  >
+                    {participant.college || 'FET, JU'}
+                  </Typography>
                 </Box>
-            </ResultsDrawer>
-        </Box>
-    );
+                
+                {(userVoted || !isAuthenticated) && (
+                  <VoteCount userVote={isUserVote}>
+                    {votes}
+                    <Typography 
+                      component="span" 
+                      variant="body2" 
+                      sx={{ 
+                        ml: 0.5,
+                        fontSize: '0.75rem',
+                        opacity: 0.8
+                      }}
+                    >
+                      votes
+                    </Typography>
+                  </VoteCount>
+                )}
+              </Box>
+            </OptionCard>
+          );
+        })}
+      </AnimatePresence>
+
+      {/* Swipe to Vote Button - Only show when a team is selected and user hasn't voted */}
+      <AnimatePresence mode="wait">
+        {selectedTeam && isAuthenticated && !userVoted && !castVoteMutation.isPending && (
+          <motion.div
+            key="swipe-button"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ type: 'spring', damping: 20 }}
+          >
+            <SwipeButtonContainer style={{ background: containerBackground }}>
+              <SwipeTrack>
+                {/* Swipe message that fades out as user swipes */}
+                <SwipeMessage style={{ opacity }}>
+                  SWIPE TO VOTE
+                </SwipeMessage>
+                
+                {/* Lock message that fades in as user swipes */}
+                <LockMessageOverlay style={{ opacity: lockOpacity }}>
+                  <LockIcon /> VOTE CANNOT BE CHANGED
+                </LockMessageOverlay>
+              </SwipeTrack>
+              
+              {/* Swipe thumb */}
+              <SwipeThumbContainer
+                drag="x"
+                dragConstraints={{ left: 0, right: 250 }}
+                dragElastic={0.1}
+                onDragEnd={handleDragEnd}
+                style={{ x }}
+              >
+                <SwipeThumb style={{ scale: thumbScale }}>
+                  <SwipeIcon />
+                </SwipeThumb>
+              </SwipeThumbContainer>
+            </SwipeButtonContainer>
+            
+            <Typography 
+              variant="caption" 
+              align="center" 
+              color="text.secondary"
+              sx={{ 
+                display: 'block',
+                mt: 1.5,
+                opacity: 0.8
+              }}
+            >
+              10% of audience votes will be considered for winner score. Your vote cannot be changed once cast.
+            </Typography>
+          </motion.div>
+        )}
+        
+        {/* Show loading state while voting */}
+        {castVoteMutation.isPending && (
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: 56, 
+              my: 3 
+            }}
+          >
+            <CircularProgress size={32} color="primary" />
+            <Typography 
+              variant="body2" 
+              sx={{ ml: 2, fontWeight: 500 }}
+            >
+              Submitting your vote...
+            </Typography>
+          </Box>
+        )}
+      </AnimatePresence>
+
+      {/* Results Summary */}
+      {(userVoted || !isAuthenticated) && (
+        <ResultsSummary>
+          <Typography variant="body2">
+            Total votes: <strong>{getTotalVotes()}</strong>
+          </Typography>
+          
+          {userVoted && (
+            <Typography variant="body2">
+              Your vote: <strong>{getParticipantName(userVoted)}</strong>
+            </Typography>
+          )}
+        </ResultsSummary>
+      )}
+
+      {/* Login Prompt */}
+      {!isAuthenticated && (
+        <LoginPrompt
+          onClick={() => console.log('Login clicked')}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Login to vote
+        </LoginPrompt>
+      )}
+    </PollContainer>
+  );
 };
 
 export default PollingForm;

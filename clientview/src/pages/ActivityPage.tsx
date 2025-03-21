@@ -84,7 +84,7 @@ function ActivityPage() {
             case EventType.GENERAL: return <GeneralView activity={activity} />;
             case EventType.INFO: return <InfoView activity={activity as InfoActivity} />;
             case EventType.SPORTS: return <SportsView activity={activity as SportsActivity<Sport>} />;
-            case EventType.CULTURAL: return <CulturalsView activity={activity} />;
+            case EventType.CULTURAL: return <CulturalsView eventId={eventId} activity={activity} />;
             case EventType.TECH: return <TechView activity={activity} />;
             default: return null;
           }

@@ -2,9 +2,10 @@ import { Article } from "@common/models";
 import Activity from "@common/models/Activity";
 import Event from "@common/models/Event";
 import { parseActivities, parseArticles, parseEvents } from "@common/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import config from "../config";
+import queryClient from "@utils/QueryClient";
 
 /*
  * Events API
@@ -148,6 +149,29 @@ export const useActivity = (eventId: string, activityId: string) => {
 			// Only refetch if this activity is ongoing
 			return isOngoing ? 60000 : false;
 		},
+	});
+};
+
+export const useCastVote = (eventId: string, activityId: string) => {
+	return useMutation({
+		mutationKey: ["castVote", eventId, activityId],
+		mutationFn: async (teamId: string) => {
+			const response = await fetch(`${config.API_BASE_URL}/activities/${eventId}/${activityId}/vote/${teamId}`, {
+				method: "POST",
+				headers: {
+					"Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+					"Content-Type": "application/json",
+					"Cache-Control": "no-cache",
+				},
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to cast vote");
+			}
+
+			return response.json();
+		},
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["activity", eventId, activityId] }),
 	});
 };
 
