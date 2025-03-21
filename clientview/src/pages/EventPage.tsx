@@ -1,24 +1,35 @@
-import { Suspense, useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper,
-  Accordion, AccordionSummary, AccordionDetails, alpha,
-  Dialog
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { motion } from 'framer-motion';
-import { useActivities, useEvent } from '../hooks/useApi';
-import ActivityCard from '@components/Event/ActivityCard';
-import PhotoGallery from '../components/shared/PhotoGallery';
-import PageTransition from '../components/shared/PageTransition';
 import { EventType } from '@common/constants';
 import { getBaseEventType } from '@common/utils';
-import { generateColorFromString } from '@utils/utils';
+import ActivityCard from '@components/Event/ActivityCard';
+import HighlightsCarousel from '@components/Event/HighlightsCarousel';
 import useImgur from '@hooks/useImgur';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  alpha,
+  Box,
+  Chip,
+  Container,
+  Dialog,
+  Divider,
+  IconButton,
+  Paper,
+  Skeleton,
+  Typography
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { generateColorFromString } from '@utils/utils';
+import { motion } from 'framer-motion';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import PageTransition from '../components/shared/PageTransition';
+import PhotoGallery from '../components/shared/PhotoGallery';
+import { useActivities, useEvent } from '../hooks/useApi';
 
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
@@ -321,6 +332,13 @@ function EventPage() {
     );
   }
 
+  // temp for ininity: Hardcode the highlights-
+  const highlights = eventId === "infinity-2025" ? [
+    'https://i.imgur.com/hnY5dx2.jpeg',
+    'https://i.imgur.com/axbOpHl.jpeg',
+    'https://i.imgur.com/2W2fEIY.jpeg'
+  ] : [];
+
   return (
     <Suspense fallback={null}>
       <PageTransition>
@@ -434,6 +452,15 @@ function EventPage() {
               </>
             )}
           </ContentSection>
+
+          {/*  Temp Infinity Highlights section */}
+          {highlights && <Box>
+            <Divider sx={{ my: 3 }} />
+            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 1 }}>
+              Highlights
+            </Typography>
+            <HighlightsCarousel images={highlights} />
+          </Box>}
 
           <Divider sx={{ my: 3 }} />
 
