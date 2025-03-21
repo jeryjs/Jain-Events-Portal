@@ -72,7 +72,7 @@ function createCachedItem(_a) {
  */
 function updateCachedItem(_a) {
     return __awaiter(this, arguments, void 0, function* ({ item, collectionKey, itemKeyPrefix, updateFn, ttl, }) {
-        console.log(`🔥 Database: Updating item with ID ${item.id}`);
+        console.log(`🔥 Database: Updating ${typeof item} item with ID ${item.id}`);
         yield updateFn(item);
         const itemKey = `${itemKeyPrefix}-${item.id}`;
         // Update individual item cache

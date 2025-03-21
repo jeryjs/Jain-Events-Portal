@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const activities_1 = require("@services/activities");
 const auth_1 = require("@middlewares/auth");
+const authUtils_1 = require("@utils/authUtils");
 const router = express_1.default.Router();
 /**
  * Activity Routes
@@ -98,6 +99,38 @@ router.post('/activities/invalidate-cache', auth_1.adminMiddleware, (req, res) =
     catch (error) {
         console.error('Error invalidating cache:', error);
         res.status(500).json({ message: 'Error invalidating cache' });
+    }
+}));
+// Get poll results for an activity
+router.get('/activities/:eventId/:activityId/poll', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const results = yield (0, activities_1.getPollResults)(req.params.eventId, req.params.activityId);
+        res.json(results);
+    }
+    catch (error) {
+        console.error('Error fetching poll results:', error);
+        res.status(500).json({ message: 'Error fetching poll results' });
+    }
+}));
+// Cast a vote for a participant
+router.post('/activities/:eventId/:activityId/vote/:teamId', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userdata = (0, authUtils_1.getUserFromToken)(req.headers.authorization || '');
+        if (!userdata) {
+            res.status(400).json({ message: 'User data missing from token' });
+            return;
+        }
+        const result = yield (0, activities_1.castVote)(req.params.eventId, req.params.activityId, req.params.teamId, userdata.username);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        console.error('Error casting vote:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error casting vote';
+        if (errorMessage.includes('already voted')) {
+            res.status(400).json({ message: errorMessage });
+            return;
+        }
+        res.status(500).json({ message: errorMessage });
     }
 }));
 exports.default = router;

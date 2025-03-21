@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyToken = exports.generateToken = void 0;
+exports.getUserFromToken = exports.verifyToken = exports.generateToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -36,3 +36,23 @@ const verifyToken = (token) => {
     }
 };
 exports.verifyToken = verifyToken;
+/**
+ * Extract user information from a JWT token
+ */
+const getUserFromToken = (token) => {
+    try {
+        // Verify and decode the token
+        const decoded = jsonwebtoken_1.default.verify(token, JWT_SECRET);
+        if (!decoded)
+            return null;
+        return {
+            username: decoded.username,
+            role: decoded.role
+        };
+    }
+    catch (error) {
+        console.error('Error decoding token:', error);
+        return null;
+    }
+};
+exports.getUserFromToken = getUserFromToken;

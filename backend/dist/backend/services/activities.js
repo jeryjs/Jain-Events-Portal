@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.invalidateActivitiesCache = exports.deleteActivity = exports.updateActivity = exports.createActivity = exports.getActivityById = exports.getActivities = void 0;
+exports.castVote = exports.getPollResults = exports.invalidateActivitiesCache = exports.deleteActivity = exports.updateActivity = exports.createActivity = exports.getActivityById = exports.getActivities = void 0;
 const firebase_1 = __importDefault(require("@config/firebase"));
 const uuid_1 = require("uuid");
 const cache_1 = require("@config/cache");
@@ -124,3 +124,63 @@ const invalidateActivitiesCache = () => __awaiter(void 0, void 0, void 0, functi
     return "Cache invalidated successfully for activities!";
 });
 exports.invalidateActivitiesCache = invalidateActivitiesCache;
+/**
+ * Get poll results for an activity
+ */
+const getPollResults = (eventId, activityId) => __awaiter(void 0, void 0, void 0, function* () {
+    const activityKey = `activities-${eventId}-${activityId}`;
+    // Get activity with poll data
+    const activity = yield (0, cacheUtils_1.getCachedItem)({
+        key: activityKey,
+        fetchFn: () => __awaiter(void 0, void 0, void 0, function* () {
+            const doc = yield activitiesCollection(eventId).doc(activityId).get();
+            if (!doc.exists)
+                return null;
+            return models_1.Activity.parse(doc.data());
+        }),
+        ttl: cache_1.TTL.ACTIVITIES
+    });
+    if (!(activity instanceof models_1.CulturalActivity)) {
+        throw new Error(`Invalid activity type for poll results: ${typeof activity}`);
+    }
+    return activity.pollData;
+});
+exports.getPollResults = getPollResults;
+/**
+ * Cast a vote for a team (or participant)
+ */
+const castVote = (eventId, activityId, teamId, username) => __awaiter(void 0, void 0, void 0, function* () {
+    const activityKey = `activities-${eventId}-${activityId}`;
+    const activityDoc = activitiesCollection(eventId).doc(activityId);
+    const activity = yield (0, cacheUtils_1.getCachedItem)({
+        key: activityKey,
+        fetchFn: () => __awaiter(void 0, void 0, void 0, function* () { return models_1.Activity.parse((yield activityDoc.get()).data()); }),
+        ttl: cache_1.TTL.ACTIVITIES
+    });
+    if (!(activity instanceof models_1.CulturalActivity))
+        throw new Error(`Invalid activity type for voting: ${typeof activity}`);
+    if (!activity.showPoll)
+        throw new Error('Poll is not enabled for this activity');
+    const pollData = activity.pollData;
+    let teamPoll = pollData.find(poll => poll.teamId === teamId);
+    if (!teamPoll) {
+        teamPoll = { teamId, votes: [] };
+        pollData.push(teamPoll);
+    }
+    if (teamPoll.votes.includes(username))
+        throw new Error('User has already voted for this team/participant');
+    teamPoll.votes.push(username);
+    activity.pollData = pollData;
+    yield (0, cacheUtils_1.updateCachedItem)({
+        item: activity,
+        collectionKey: `activities-${eventId}`,
+        itemKeyPrefix: `activities-${eventId}`,
+        updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () { return yield activityDoc.update(Object.assign({}, item)); }),
+        ttl: cache_1.TTL.ACTIVITIES
+    });
+    return {
+        success: true,
+        message: 'Vote recorded successfully'
+    };
+});
+exports.castVote = castVote;

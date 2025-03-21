@@ -136,10 +136,10 @@ const ActivityItem = memo(({
       );
     }
 
-    if (baseType === EventType.CULTURAL && 'performanceDetails' in activity) {
+    if (baseType === EventType.CULTURAL && 'teams' in activity) {
       return (
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {(activity as CulturalActivity).performanceDetails || 'No performance details'}
+          {(activity as CulturalActivity).teams.length > 0 ? `${(activity as CulturalActivity).teams.length} teams participating` : 'No teams assigned'}
         </Typography>
       );
     }
