@@ -110,7 +110,7 @@ const _fetchActivity = async (eventId: string, activityId: string): Promise<Acti
 };
 
 export const useActivities = (eventId: string) => {
-	return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
+	// return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
 
 	return useQuery({
 		queryKey: ["activities", eventId],
@@ -131,7 +131,7 @@ export const useActivities = (eventId: string) => {
 };
 
 export const useActivity = (eventId: string, activityId: string) => {
-	return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
+	// return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
 	// const activitiesQuery = useActivities(eventId);
 
 	return useQuery({
