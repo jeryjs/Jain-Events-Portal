@@ -5,14 +5,22 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ColorModeContext, useColorMode } from './utils/ColorMode';
 import queryClient from './utils/QueryClient';
 import { Analytics } from "@vercel/analytics/react"
+import ActivityPage from '@pages/ActivityPage';
+import ArticlePage from '@pages/ArticlePage';
+import ArticlesPage from '@pages/ArticlesPage';
+import EventPage from '@pages/EventPage';
+import HomePage from '@pages/HomePage';
+import TimelinePage from '@pages/TimelinePage';
 
-// Lazy load pages to optimize performance
-const HomePage = lazy(() => import('./pages/HomePage'));
-const ActivityPage = lazy(() => import('./pages/ActivityPage'));
-const ArticlePage = lazy(() => import('./pages/ArticlePage'));
-const ArticlesPage = lazy(() => import('./pages/ArticlesPage'));
-const EventPage = lazy(() => import('./pages/EventPage'));
-const TimelinePage = lazy(() => import('./pages/TimelinePage'));
+
+
+// // Lazy load pages to optimize performance
+// const HomePage = lazy(() => import('./pages/HomePage'));
+// const ActivityPage = lazy(() => import('./pages/ActivityPage'));
+// const ArticlePage = lazy(() => import('./pages/ArticlePage'));
+// const ArticlesPage = lazy(() => import('./pages/ArticlesPage'));
+// const EventPage = lazy(() => import('./pages/EventPage'));
+// const TimelinePage = lazy(() => import('./pages/TimelinePage'));
 
 function App() {
   const colorMode = useColorMode();
