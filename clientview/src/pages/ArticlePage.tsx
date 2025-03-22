@@ -3,14 +3,10 @@ import {
   Container,
   Grid2 as Grid
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 // Components
-import "@blocknote/core/fonts/inter.css";
-import "@blocknote/mantine/style.css";
-import { useCreateBlockNote } from "@blocknote/react";
 import ArticleContent from '@components/Article/ArticleContent';
 import ArticleHero from '@components/Article/ArticleHero';
 import ArticleSkeleton from '@components/Article/ArticleSkeleton';
@@ -21,10 +17,7 @@ import { useArticles, useUpdateArticleViewCount } from '@hooks/useApi';
 const ArticlePage: React.FC = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isDarkMode = theme.palette.mode === 'dark';
-  const editor = useCreateBlockNote({});
-  
+
   const { data: allArticles, isLoading: articleLoading } = useArticles();
   const article = allArticles?.find(a => a.id === articleId);
   const [bookmarked, setBookmarked] = useState<boolean>(false);
@@ -38,23 +31,11 @@ const ArticlePage: React.FC = () => {
         .filter(a => a.id !== articleId && (a.isRecent || a.isTrending))
         .slice(0, 5);
       setRecentArticles(recents);
-      
-      // Check if article exists before accessing content
-      if (article && article.content) {
-        // const loremIpsum = generateLoremMarkdown(5);
-        // const dummyContent = article.content + "\n\n" + loremIpsum;
-        editor.tryParseMarkdownToBlocks(article.content)
-          .then((blocks) => {
-            editor.replaceBlocks(editor.document, blocks);
-          }).catch(err => {
-            console.error("Error parsing markdown:", err);
-          });
-      }
     }
-    
+
     // Reset page scroll on load
     window.scrollTo(0, 0);
-  }, [allArticles, articleId, article, editor]);
+  }, [allArticles, articleId, article]);
 
   useEffect(() => {
     if (articleId) {
@@ -72,7 +53,7 @@ const ArticlePage: React.FC = () => {
 
   const handleShare = async () => {
     if (!article) return;
-    
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -99,7 +80,6 @@ const ArticlePage: React.FC = () => {
         <ArticleHero
           article={article}
           onBack={handleBack}
-          isDarkMode={isDarkMode}
         />
 
         <Container maxWidth="lg">
@@ -112,8 +92,6 @@ const ArticlePage: React.FC = () => {
                 onToggleBookmark={handleToggleBookmark}
                 onShare={handleShare}
                 relatedArticles={allArticles || []}
-                editor={editor}
-                theme={theme}
               />
             </Grid>
 

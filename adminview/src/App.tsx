@@ -67,7 +67,7 @@ const App = () => {
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <BrowserRouter basename="/admin">
+          <BrowserRouter>
             <Suspense fallback={<div>Loading admin view...</div>}>
               <Routes>
                 {/* Public route - Login */}

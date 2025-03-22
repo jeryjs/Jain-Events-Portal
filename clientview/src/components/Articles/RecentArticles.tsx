@@ -76,7 +76,7 @@ const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
                     </RecentArticleItem>
                 ))}
                 <Box sx={{ textAlign: 'center', mt: 2 }}>
-                    <Button variant="outlined" fullWidth>View Archive</Button>
+                    <Button variant="outlined" component={Link} to="/articles" fullWidth>View Archive</Button>
                 </Box>
             </motion.div>
         </Paper>

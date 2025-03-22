@@ -1,19 +1,9 @@
-import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
-import { useCreateBlockNote } from "@blocknote/react";
 import { Box, Divider, Paper, styled, Typography, useTheme } from "@mui/material";
 import { alpha } from '@mui/material/styles';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
 
-// Function to detect if content is likely HTML
-const isHtmlContent = (content: string): boolean => {
-    if (!content) return false;
-    // Check for common HTML tags with a more precise pattern
-    const htmlTagPattern = /<\/?[\w\s="/.':;#-\/\?]+>/i;
-    return htmlTagPattern.test(content);
-};
+import Markdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
 // Styled components
 const Section = styled(Box)(({ theme }) => ({
@@ -40,94 +30,12 @@ const ContentContainer = styled(Box)(({ theme }) => ({
     },
     ".bn-inline-content": {
         fontSize: '1rem',
-    },
-    // Specific blockNote style overrides
-    "& h1, & h2, & h3, & h4, & h5, & h6": {
-        color: theme.palette.text.primary,
-        fontWeight: 600,
-    },
-    "& a": {
-        color: theme.palette.primary.main,
-    },
-    "& img": {
-        maxWidth: "100%",
-        borderRadius: theme.shape.borderRadius,
-    }
-}));
-
-// HTML content container with styled components
-const HtmlContainer = styled(Box)(({ theme }) => ({
-    marginTop: theme.spacing(2),
-    // Apply the same styling as BlockNote content for consistency
-    "& h1, & h2, & h3, & h4, & h5, & h6": {
-        color: theme.palette.text.primary,
-        fontWeight: 600,
-        marginTop: theme.spacing(2),
-        marginBottom: theme.spacing(1),
-    },
-    "& h1": { fontSize: '2rem' },
-    "& h2": { fontSize: '1.75rem' },
-    "& h3": { fontSize: '1.5rem' },
-    "& h4": { fontSize: '1.25rem' },
-    "& h5": { fontSize: '1.125rem' },
-    "& h6": { fontSize: '1rem' },
-    "& p": {
-        marginBottom: theme.spacing(2),
-        lineHeight: 1.6,
-    },
-    "& a": {
-        color: theme.palette.primary.main,
-        textDecoration: 'none',
-        "&:hover": {
-            textDecoration: 'underline',
-        }
-    },
-    "& img": {
-        maxWidth: "100%",
-        borderRadius: theme.shape.borderRadius,
-        margin: theme.spacing(1, 0),
-    },
-    "& ul, & ol": {
-        marginBottom: theme.spacing(2),
-        paddingLeft: theme.spacing(3),
-    },
-    "& li": {
-        marginBottom: theme.spacing(0.5),
-    },
-    "& table": {
-        width: '100%',
-        borderCollapse: 'collapse',
-        marginBottom: theme.spacing(2),
-        "& th, & td": {
-            padding: theme.spacing(0.75),
-            border: `1px solid ${theme.palette.divider}`,
-        },
-        "& th": {
-            backgroundColor: alpha(theme.palette.primary.light, 0.1),
-        }
     }
 }));
 
 // Info Activity View Component
 export const InfoView = ({ activity }) => {
     const theme = useTheme();
-    const editor = useCreateBlockNote({});
-    const [isHtml, setIsHtml] = useState(false);
-
-    // Load content and detect its type when activity changes
-    useEffect(() => {
-        if (activity?.content) {
-            const contentIsHtml = isHtmlContent(activity.content);
-            setIsHtml(contentIsHtml);
-
-            // Only parse to BlockNote if it's not HTML
-            if (!contentIsHtml) {
-                editor.tryParseMarkdownToBlocks(activity.content).then((blocks) => {
-                    editor.replaceBlocks(editor.document, blocks);
-                });
-            }
-        }
-    }, [activity?.id, activity?.content]);
 
     if (!activity) {
         return (
@@ -165,23 +73,13 @@ export const InfoView = ({ activity }) => {
                             ...
                         </Typography>
                     </Divider>
-                    
-                    {isHtml ? (
-                        // Render HTML content
-                        <HtmlContainer
-                            dangerouslySetInnerHTML={{ __html: activity.content }}
-                            className="html-content"
-                        />
-                    ) : (
-                        // Render Markdown with BlockNote
-                        <ContentContainer>
-                            <BlockNoteView
-                                editor={editor}
-                                editable={false}
-                                theme={theme.palette.mode}
-                            />
-                        </ContentContainer>
-                    )}
+
+                    {/* Render Markdown with HTML support */}
+                    <ContentContainer>
+                        <Markdown remarkRehypeOptions={{ allowDangerousHtml: true }} rehypePlugins={[rehypeRaw]}>
+                            {activity.content}
+                        </Markdown>
+                    </ContentContainer>
                 </StyledPaper>
             </Section>
         </motion.div>
