@@ -1,7 +1,3 @@
-import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
-import { useCreateBlockNote } from "@blocknote/react";
 import { Box, Divider, Paper, styled, Typography, useTheme } from "@mui/material";
 import { alpha } from '@mui/material/styles';
 import { motion } from 'framer-motion';
@@ -111,7 +107,6 @@ const HtmlContainer = styled(Box)(({ theme }) => ({
 // Info Activity View Component
 export const InfoView = ({ activity }) => {
     const theme = useTheme();
-    const editor = useCreateBlockNote({});
     const [isHtml, setIsHtml] = useState(false);
 
     // Load content and detect its type when activity changes
@@ -122,9 +117,6 @@ export const InfoView = ({ activity }) => {
 
             // Only parse to BlockNote if it's not HTML
             if (!contentIsHtml) {
-                editor.tryParseMarkdownToBlocks(activity.content).then((blocks) => {
-                    editor.replaceBlocks(editor.document, blocks);
-                });
             }
         }
     }, [activity?.id, activity?.content]);
@@ -175,11 +167,6 @@ export const InfoView = ({ activity }) => {
                     ) : (
                         // Render Markdown with BlockNote
                         <ContentContainer>
-                            <BlockNoteView
-                                editor={editor}
-                                editable={false}
-                                theme={theme.palette.mode}
-                            />
                         </ContentContainer>
                     )}
                 </StyledPaper>

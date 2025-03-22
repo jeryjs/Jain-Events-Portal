@@ -1,12 +1,8 @@
-import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
-import { useCreateBlockNote } from "@blocknote/react";
 import { InfoActivity } from '@common/models';
 import MarkdownIcon from '@mui/icons-material/CodeTwoTone';
 import EditIcon from '@mui/icons-material/Edit';
 import HtmlIcon from '@mui/icons-material/Html';
-import { Box, Grid, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Box, Divider, Grid, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import FormHelperText from '@mui/material/FormHelperText';
 import IconButton from '@mui/material/IconButton';
 import React, { useEffect, useState } from 'react';
@@ -26,7 +22,7 @@ interface InfoViewProps {
 }
 
 export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) => {
-  const editor = useCreateBlockNote({});
+  // const editor = useCreateBlockNote({});
   const [isMarkdownMode, setIsMarkdownMode] = useState(false);
   
   // Default to HTML for new activities (empty content) or detect content type for existing ones
@@ -40,15 +36,15 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
   // Initialize editor with content when component mounts or content changes
   useEffect(() => {
     if (!formData.content) {
-      editor.replaceBlocks(editor.document, []);
+      // editor.replaceBlocks(editor.document, []);
       return;
     }
     
     // Only parse to BlockNote if it's markdown content
     if (contentType === 'markdown') {
-      editor.tryParseMarkdownToBlocks(formData.content).then((blocks) => {
-        editor.replaceBlocks(editor.document, blocks);
-      });
+      // editor.tryParseMarkdownToBlocks(formData.content).then((blocks) => {
+      //   editor.replaceBlocks(editor.document, blocks);
+      // });
     }
   }, [formData.id, contentType]); // Reinitialize when activity ID or content type changes
   
@@ -61,9 +57,9 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
 
   // Update markdown content when editor changes
   const handleEditorChange = () => {
-    editor.blocksToMarkdownLossy().then((markdown) => {
-      handleChange('content', markdown);
-    });
+    // editor.blocksToMarkdownLossy().then((markdown) => {
+    //   handleChange('content', markdown);
+    // });
   };
 
   const handleContentTypeChange = (event: React.MouseEvent<HTMLElement>, newType: 'markdown' | 'html' | null) => {
@@ -149,9 +145,9 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
                     onClick={() => {
                       setIsMarkdownMode(!isMarkdownMode);
                       if (isMarkdownMode) {
-                        editor.tryParseMarkdownToBlocks(formData.content).then((blocks) => {
-                          editor.replaceBlocks(editor.document, blocks);
-                        });
+                        // editor.tryParseMarkdownToBlocks(formData.content).then((blocks) => {
+                        //   editor.replaceBlocks(editor.document, blocks);
+                        // });
                       }
                     }}
                   >
@@ -170,11 +166,12 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
                       sx={{ height: '100%' }}
                     />
                   ) : (
-                    <BlockNoteView
-                      editor={editor}
-                      theme="light"
-                      onChange={handleEditorChange} 
-                    />
+                    // <BlockNoteView
+                    //   editor={editor}
+                    //   theme="light"
+                    //   onChange={handleEditorChange} 
+                    // />
+                    <Divider />
                   )}
                 </>
               ) : (

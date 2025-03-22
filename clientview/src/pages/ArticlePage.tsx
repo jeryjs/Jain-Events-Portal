@@ -8,9 +8,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 // Components
-import "@blocknote/core/fonts/inter.css";
-import "@blocknote/mantine/style.css";
-import { useCreateBlockNote } from "@blocknote/react";
 import ArticleContent from '@components/Article/ArticleContent';
 import ArticleHero from '@components/Article/ArticleHero';
 import ArticleSkeleton from '@components/Article/ArticleSkeleton';
@@ -23,7 +20,6 @@ const ArticlePage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
-  const editor = useCreateBlockNote({});
   
   const { data: allArticles, isLoading: articleLoading } = useArticles();
   const article = allArticles?.find(a => a.id === articleId);
@@ -43,18 +39,12 @@ const ArticlePage: React.FC = () => {
       if (article && article.content) {
         // const loremIpsum = generateLoremMarkdown(5);
         // const dummyContent = article.content + "\n\n" + loremIpsum;
-        editor.tryParseMarkdownToBlocks(article.content)
-          .then((blocks) => {
-            editor.replaceBlocks(editor.document, blocks);
-          }).catch(err => {
-            console.error("Error parsing markdown:", err);
-          });
       }
     }
     
     // Reset page scroll on load
     window.scrollTo(0, 0);
-  }, [allArticles, articleId, article, editor]);
+  }, [allArticles, articleId, article]);
 
   useEffect(() => {
     if (articleId) {
@@ -112,7 +102,7 @@ const ArticlePage: React.FC = () => {
                 onToggleBookmark={handleToggleBookmark}
                 onShare={handleShare}
                 relatedArticles={allArticles || []}
-                editor={editor}
+                editor={''}
                 theme={theme}
               />
             </Grid>

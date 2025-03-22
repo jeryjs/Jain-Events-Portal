@@ -9,7 +9,7 @@ import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
 import ShareIcon from '@mui/icons-material/Share';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import { BlockNoteView } from "@blocknote/mantine";
+// import { BlockNoteView } from "@blocknote/mantine";
 
 const ContentPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -134,7 +134,7 @@ const ArticleContent: React.FC<ArticleContentProps> = ({
         
         {/* Article Content */}
         <MarkdownContent>
-          <BlockNoteView editor={editor} editable={false} theme={theme.palette.mode} />
+          {/* <BlockNoteView editor={editor} editable={false} theme={theme.palette.mode} /> */}
         </MarkdownContent>
 
         {/* Tags */}

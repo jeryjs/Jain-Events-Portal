@@ -24,10 +24,6 @@ import {
 
 import { EventType } from '@common/constants';
 import { Article } from '@common/models';
-import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView } from "@blocknote/mantine";
-import "@blocknote/mantine/style.css";
-import { useCreateBlockNote } from "@blocknote/react";
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CloseIcon from '@mui/icons-material/Close';
 import MarkdownIcon from '@mui/icons-material/CodeTwoTone';
@@ -52,7 +48,6 @@ export const ArticleForm = ({ article, isCreating, onSave, onDelete }: ArticleFo
       relatedEventType: undefined,
     }
   );
-  const editor = useCreateBlockNote({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [isMarkdownMode, setIsMarkdownMode] = useState(false);
@@ -64,13 +59,9 @@ export const ArticleForm = ({ article, isCreating, onSave, onDelete }: ArticleFo
   useEffect(() => {
     if (isCreating) {
       setFormData(Article.parse({}));
-      editor.replaceBlocks(editor.document, []);
     }
     if (article) {
       setFormData(article);
-      editor.tryParseMarkdownToBlocks(article.content).then((it) => {
-        editor.replaceBlocks(editor.document, it);
-      });
     }
   }, [article]);
 
@@ -383,9 +374,6 @@ export const ArticleForm = ({ article, isCreating, onSave, onDelete }: ArticleFo
               sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
               onClick={() => {
                 setIsMarkdownMode(!isMarkdownMode)
-                editor.tryParseMarkdownToBlocks(formData.content).then((it) => {
-                  editor.replaceBlocks(editor.document, it);
-                });
               }}
             >
               {isMarkdownMode ? <EditIcon /> : <MarkdownIcon />}
@@ -402,10 +390,7 @@ export const ArticleForm = ({ article, isCreating, onSave, onDelete }: ArticleFo
                 helperText={errors.content}
               />
             ) : (
-              <BlockNoteView
-                editor={editor}
-                theme='light'
-                onChange={() => editor.blocksToMarkdownLossy().then((it) => handleChange('content', it))} />
+              <Divider />
             )}
           </Paper>
           <FormHelperText sx={{ m: 2 }}>

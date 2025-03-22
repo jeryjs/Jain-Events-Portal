@@ -1,16 +1,18 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { lazy, useMemo } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import ActivityPage from './pages/ActivityPage';
-import ArticlePage from './pages/ArticlePage';
-import ArticlesPage from './pages/ArticlesPage';
-import EventPage from './pages/EventPage';
-import HomePage from './pages/HomePage';
-import TimelinePage from './pages/TimelinePage';
 import { ColorModeContext, useColorMode } from './utils/ColorMode';
 import queryClient from './utils/QueryClient';
 import { Analytics } from "@vercel/analytics/react"
+
+// Lazy load pages to optimize performance
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ActivityPage = lazy(() => import('./pages/ActivityPage'));
+const ArticlePage = lazy(() => import('./pages/ArticlePage'));
+const ArticlesPage = lazy(() => import('./pages/ArticlesPage'));
+const EventPage = lazy(() => import('./pages/EventPage'));
+const TimelinePage = lazy(() => import('./pages/TimelinePage'));
 
 function App() {
   const colorMode = useColorMode();

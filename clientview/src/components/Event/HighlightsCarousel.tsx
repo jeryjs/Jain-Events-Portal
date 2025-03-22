@@ -86,7 +86,7 @@ export default function HighlightsCarousel({
             position: 'relative',
             height,
             my: 2,
-            overflow: 'visible'
+            overflow: 'hidden'
         }}>
             {/* Main carousel container */}
             <Box
@@ -94,7 +94,7 @@ export default function HighlightsCarousel({
                 sx={{
                     position: 'relative',
                     height: '100%',
-                    overflow: 'visible',
+                    overflow: 'hidden',
                     borderRadius: 3,
                     '&:hover .carousel-controls': {
                         opacity: 1
