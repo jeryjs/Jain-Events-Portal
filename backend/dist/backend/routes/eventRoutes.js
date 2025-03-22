@@ -82,4 +82,15 @@ router.delete('/events/:eventId', auth_1.adminMiddleware, (req, res) => __awaite
         res.status(500).json({ message: 'Error deleting event', details: error });
     }
 }));
+// Invalidate cache for all events
+router.post('/events/invalidate-cache', auth_1.adminMiddleware, (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const message = yield (0, events_1.invalidateEventsCache)();
+        res.json({ message });
+    }
+    catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache' });
+    }
+}));
 exports.default = router;

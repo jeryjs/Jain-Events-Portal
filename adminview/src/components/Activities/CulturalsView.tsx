@@ -1,4 +1,4 @@
-import { Box, TextField, Typography, Paper, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, TextField, Typography, Paper, Grid, FormControl, InputLabel, Select, MenuItem, FormControlLabel, Switch } from '@mui/material';
 import { useState } from 'react';
 import { CulturalActivity, Participant } from '@common/models';
 import { ParticipantsForm } from '.';
@@ -10,7 +10,7 @@ interface CulturalsViewProps {
 
 export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => {
   const [participants, setParticipants] = useState<Participant[]>(formData.participants || []);
-  
+
   // Update parent form data when participants change
   const handleParticipantsChange = (newParticipants: Participant[]) => {
     setParticipants(newParticipants);
@@ -24,7 +24,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
     setFormData(CulturalActivity.parse({
       ...formData,
       [field]: value
-}));
+    }));
   };
 
   return (
@@ -35,95 +35,39 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
         <ParticipantsForm participants={participants} setParticipants={handleParticipantsChange} />
       </Paper>
       
-      {/* Cultural Event Details */}
+      {/* Audience Polling Section */}
       <Paper elevation={1} sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>Cultural Activity Details</Typography>
+        <Typography variant="h6" gutterBottom>Audience Polling</Typography>
         
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <InputLabel>Performance Type</InputLabel>
-              <Select
-                value={formData.eventType || ''}
-                label="Performance Type"
-                onChange={(e) => handleChange('eventType', e.target.value)}
-              >
-                <MenuItem value="dance">Dance</MenuItem>
-                <MenuItem value="music">Music</MenuItem>
-                <MenuItem value="drama">Drama</MenuItem>
-                <MenuItem value="art">Art</MenuItem>
-                <MenuItem value="fashion">Fashion Show</MenuItem>
-                <MenuItem value="other">Other</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Duration"
-              value={formData.performanceDetails || ''}
-              onChange={(e) => handleChange('performanceDetails', e.target.value)}
-              placeholder="e.g., 30 minutes, 1 hour..."
+        <FormControlLabel
+          control={
+            <Switch 
+              checked={formData.showPoll || false}
+              onChange={(e) => handleChange('showPoll', e.target.checked)}
+              color="primary"
             />
-          </Grid>
-          
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Description"
-              multiline
-              rows={4}
-              value={formData.performanceDetails || ''}
-              onChange={(e) => handleChange('performanceDetails', e.target.value)}
-              placeholder="Enter a detailed description of this cultural activity..."
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Venue"
-              value={formData.performanceDetails || ''}
-              onChange={(e) => handleChange('performanceDetails', e.target.value)}
-              placeholder="Enter the venue for this activity..."
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Equipment Required"
-              value={formData.performanceDetails || ''}
-              onChange={(e) => handleChange('performanceDetails', e.target.value)}
-              placeholder="Any special equipment needed..."
-            />
-          </Grid>
-          
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Judging Criteria"
-              multiline
-              rows={3}
-              value={formData.performanceDetails || ''}
-              onChange={(e) => handleChange('performanceDetails', e.target.value)}
-              placeholder="Describe how performances will be judged..."
-            />
-          </Grid>
-          
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Additional Information"
-              multiline
-              rows={2}
-              value={formData.performanceDetails || ''}
-              onChange={(e) => handleChange('performanceDetails', e.target.value)}
-              placeholder="Any other relevant information..."
-            />
-          </Grid>
-        </Grid>
+          }
+          label="Enable audience polling for this activity"
+        />
+        
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 2 }}>
+          When enabled, users will be able to vote for their favorite participants in this activity.
+          Voting results will be visible in real-time to the audience.
+        </Typography>
+        
+        {formData.showPoll && (
+          <Box sx={{ mt: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+            <Typography variant="subtitle2" color="primary" gutterBottom>
+              Polling Enabled
+            </Typography>
+            <Typography variant="body2">
+              • Audience members will be able to cast votes during this activity.<br />
+              • Each user can vote only once.<br />
+              • Results will update in real-time.<br />
+              • You can disable polling at any time.
+            </Typography>
+          </Box>
+        )}
       </Paper>
     </Box>
   );

@@ -6,6 +6,7 @@ import {
     deleteEvent,
     getEventById,
     getEvents,
+    invalidateEventsCache,
     updateEvent,
 } from "@services/events";
 
@@ -75,6 +76,17 @@ router.delete('/events/:eventId', adminMiddleware, async (req: Request, res: Res
     } catch (error) {
         console.error('Error deleting event:', error);
         res.status(500).json({ message: 'Error deleting event', details: error });
+    }
+});
+
+// Invalidate cache for all events
+router.post('/events/invalidate-cache', adminMiddleware, async (_: Request, res: Response) => {
+    try {
+        const message = await invalidateEventsCache();
+        res.json({ message });
+    } catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache' });
     }
 });
 

@@ -1,9 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { Article } from "@common/models";
 import Activity from "@common/models/Activity";
 import Event from "@common/models/Event";
 import { parseActivities, parseArticles, parseEvents } from "@common/utils";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import config from "../config";
-import { Article } from "@common/models";
+import queryClient from "@utils/QueryClient";
 
 /*
  * Events API
@@ -37,7 +39,7 @@ const _fetchEvent = async (eventId: string): Promise<Event> => {
 
 	const data: any = await response.json();
 	return Event.parse(data);
-}
+};
 
 export const useEvents = () => {
 	// return useDummyEvents(20); // Use dummy events for now while testing
@@ -72,7 +74,6 @@ export const useDummyEvents = (count = 100) => {
 		staleTime: 1000 * 60 * 5, // 5 minutes
 	});
 };
-
 
 /*
  * Activities API
@@ -117,15 +118,15 @@ export const useActivities = (eventId: string) => {
 		// staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchInterval: (data) => {
 			if (!data || !data.state.data) return false;
-			
+
 			// Check if any activities are ongoing
-			const hasOngoingActivities = (data.state.data).some(activity => {
+			const hasOngoingActivities = data.state.data.some((activity) => {
 				return activity.isOngoing;
 			});
-			
+
 			// Only refetch if there's at least one ongoing activity
 			return hasOngoingActivities ? 60000 : false;
-		}
+		},
 	});
 };
 
@@ -140,17 +141,39 @@ export const useActivity = (eventId: string, activityId: string) => {
 		enabled: !!eventId && !!activityId,
 		refetchInterval: (data) => {
 			if (!data || !data.state.data) return false;
-			
+
 			// Check if this specific activity is ongoing
 			const activity = data.state.data;
 			const isOngoing = activity.isOngoing;
-			
+
 			// Only refetch if this activity is ongoing
 			return isOngoing ? 60000 : false;
-		}
+		},
 	});
 };
 
+export const useCastVote = (eventId: string, activityId: string) => {
+	return useMutation({
+		mutationKey: ["castVote", eventId, activityId],
+		mutationFn: async (teamId: string) => {
+			const response = await fetch(`${config.API_BASE_URL}/activities/${eventId}/${activityId}/vote/${teamId}`, {
+				method: "POST",
+				headers: {
+					"Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+					"Content-Type": "application/json",
+					"Cache-Control": "no-cache",
+				},
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to cast vote");
+			}
+
+			return response.json();
+		},
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: ["activity", eventId, activityId] }),
+	});
+};
 
 const useDummyActivities = (eventId: string, count = 30) => {
 	return useQuery({
@@ -178,60 +201,109 @@ const useDummyActivity = (eventId: string, activityId: string) => {
 		staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchOnWindowFocus: true,
 	});
-}
-
+};
 
 /*
  * Articles API
  */
 
 const _fetchArticles = async (): Promise<Article[]> => {
-  const response = await fetch(`${config.API_BASE_URL}/articles`, {
-    headers: {
-      "Cache-Control": "max-age=1800", // 30 minutes
-    },
-  });
+	const response = await fetch(`${config.API_BASE_URL}/articles`, {
+		headers: {
+			"Cache-Control": "max-age=1800", // 30 minutes
+		},
+	});
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch articles");
-  }
+	if (!response.ok) {
+		throw new Error("Failed to fetch articles");
+	}
 
-  const data: any = await response.json();
-  return data.map((article: any) => Article.parse(article));
+	const data: any = await response.json();
+	return data.map((article: any) => Article.parse(article));
 };
 
 export const useArticles = () => {
-//   return useDummyArticles(20); // Use dummy articles for now while testing
-  
-  return useQuery({
-    queryKey: ["articles"],
-    queryFn: _fetchArticles,
-    staleTime: 1000 * 60 * 30, // 30 minutes
-    refetchOnWindowFocus: false,
-  });
-}
+	//   return useDummyArticles(20); // Use dummy articles for now while testing
+
+	return useQuery({
+		queryKey: ["articles"],
+		queryFn: _fetchArticles,
+		staleTime: 1000 * 60 * 30, // 30 minutes
+		refetchOnWindowFocus: false,
+	});
+};
 
 export const useArticle = (articleId: string) => {
-  const articlesQuery = useArticles();
+	const articlesQuery = useArticles();
 
-  return useQuery({
-	queryKey: ["article", articleId],
-	queryFn: async () => articlesQuery.data?.find((a) => a.id === articleId),
-	staleTime: 1000 * 60 * 30, // 30 minutes
-	enabled: !articlesQuery.isLoading,
-  });
-}
+	return useQuery({
+		queryKey: ["article", articleId],
+		queryFn: async () => articlesQuery.data?.find((a) => a.id === articleId),
+		staleTime: 1000 * 60 * 30, // 30 minutes
+		enabled: !articlesQuery.isLoading,
+	});
+};
 
 const useDummyArticles = (count = 30) => {
-  return useQuery({
-    queryKey: ["dummy_articles", count],
-    queryFn: async () => {
-      return fetch("/dummy_articles.json")
-        .then((res) => res.json())
-        .then((data) => parseArticles(data).slice(0, count)) // Limit to the first `count` articles
-        .then((it) => new Promise<typeof it>((resolve) => setTimeout(() => resolve(it), 1000))); // Simulate network delay
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnWindowFocus: false,
-  });
-}
+	return useQuery({
+		queryKey: ["dummy_articles", count],
+		queryFn: async () => {
+			return fetch("/dummy_articles.json")
+				.then((res) => res.json())
+				.then((data) => parseArticles(data).slice(0, count)) // Limit to the first `count` articles
+				.then((it) => new Promise<typeof it>((resolve) => setTimeout(() => resolve(it), 1000))); // Simulate network delay
+		},
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: false,
+	});
+};
+
+// Custom hook to update article view count
+export const useUpdateArticleViewCount = () => {
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const STORAGE_KEY = "articleViews";
+
+	const getArticleViews = (): Record<string, number> => {
+		const item = localStorage.getItem(STORAGE_KEY);
+		try { return item ? JSON.parse(item) : {} }
+		catch { return {} }
+	};
+
+	const setArticleViews = (views: Record<string, number>) =>
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(views));
+
+	useEffect(() => () => {
+		if (timeoutRef.current) clearTimeout(timeoutRef.current);
+	}, []);
+
+	const updateViewCount = (articleId: string) => {
+		if (!articleId) return;
+
+		const views = getArticleViews();
+		const lastViewed = views[articleId];
+
+		if (lastViewed && lastViewed > Date.now() - 30 * 60 * 1000) {
+			console.log("updateViewCount: Article already viewed.");
+			return;
+		}
+
+		if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+		timeoutRef.current = setTimeout(async () => {
+			try {
+				await fetch(`${config.API_BASE_URL}/articles/${articleId}/view`, {
+					method: "POST",
+				});
+				console.log("View count updated for article:", articleId);
+
+				setArticleViews({ ...getArticleViews(), [articleId]: Date.now() });
+			} catch (error) {
+				console.error("Failed to update article view count:", error);
+			} finally {
+				timeoutRef.current = null;
+			}
+		}, 10000);
+	};
+
+	return { updateViewCount };
+};

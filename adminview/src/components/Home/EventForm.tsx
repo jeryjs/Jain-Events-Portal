@@ -21,6 +21,7 @@ import dayjs from 'dayjs';
 import { EventType } from '@common/constants';
 import { Event } from '@common/models';
 import { ActivityButton } from './ActivityButton';
+import { getAllBaseEventTypes } from '@common/utils';
 
 const EventTypeInput = styled(Box)`
   position: absolute; bottom: 0; left: 0;
@@ -31,9 +32,10 @@ interface EventFormProps {
   event?: Event;
   isCreating: boolean;
   onSave: (eventData: Partial<Event>) => Promise<void>;
+  onDelete: (eventId: string) => Promise<void>;
 }
 
-export function EventForm({ event, isCreating, onSave }: EventFormProps) {
+export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProps) {
   // Default States for form fields
   const [formData, setFormData] = useState<Partial<Event>>({
     ...Event.parse({}).toJSON(),
@@ -68,11 +70,13 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
     if (!formData.name?.trim()) errors.name = 'Name is required';
     if (!formData.venue?.trim()) errors.venue = 'Venue is required';
     if (!formData.description?.trim()) errors.description = 'Description is required';
+    if (!formData.type?.toString().trim()) errors.type = 'Event type is required';
     if (formData.timings.length < 2 || formData.timings[1] <= formData.timings[0]) {
       errors.timings = 'End time must be after start time';
     }
 
-    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) setFormErrors(errors);
+    alert(JSON.stringify(errors, null, 2)); // For debugging purposes
     return Object.keys(errors).length === 0;
   };
 
@@ -98,6 +102,13 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
       console.error('Failed to save event:', error);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // handle event deletion
+  const handleDelete = async () => {
+    if (event && window.confirm('Are you sure you want to delete this event?')) {
+      await onDelete(event.id);
     }
   };
 
@@ -168,6 +179,7 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
           {/* Event Type Tag */}
           <EventTypeInput>
             <Select
+              required
               variant='filled'
               value={formData.type}
               onChange={(e) => editFormData('type', e.target.value)}
@@ -184,11 +196,15 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
                 },
               }}
             >
-              <MenuItem value={EventType.GENERAL}>General</MenuItem>
-              <MenuItem value={EventType.SPORTS}>Sports</MenuItem>
-              <MenuItem value={EventType.CULTURAL}>Cultural</MenuItem>
-              <MenuItem value={EventType.TECH}>Tech</MenuItem>
+              {getAllBaseEventTypes().map((type) => (
+                <MenuItem key={type} value={type}>{EventType[type]}</MenuItem>
+              ))}
             </Select>
+            {formErrors.type && (
+              <Typography variant="caption" color="error">
+                {formErrors.type}
+              </Typography>
+            )}
           </EventTypeInput>
 
           {/* Image Edit Overlay */}
@@ -334,7 +350,7 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
             </Typography>
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
+              <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
                 <DateTimePicker
                   label="Start Time"
                   value={dayjs(formData.timings[0])}
@@ -358,7 +374,7 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
                   }}
                   slotProps={{ textField: { error: !!formErrors.timings, helperText: formErrors.timings } }}
                 />
-                </Box>
+              </Box>
             </LocalizationProvider>
           </Box>
 
@@ -423,7 +439,7 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
             />
           </Box>
 
-          {/* Google Drive Link Section */}
+          {/* Gallery Link Section */}
           <Box sx={{ mb: 4 }}>
             <TextField
               label="imgur link"
@@ -431,13 +447,13 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
               fullWidth
               margin="normal"
               value={formData.galleryLink}
-              onChange={(e) => editFormData('googleDriveLink', e.target.value)}
+              onChange={(e) => editFormData('galleryLink', e.target.value)}
               sx={{ mb: 4 }}
             />
           </Box>
 
-          {/* Save Button */}
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+          {/* Save and Delete Buttons */}
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
             <Button
               variant="contained"
               size="large"
@@ -468,6 +484,26 @@ export function EventForm({ event, isCreating, onSave }: EventFormProps) {
                 <CheckCircleIcon sx={{ color: 'white', animation: 'checkmark 0.3s ease-out' }} />
               )}
             </Button>
+
+            {event && (
+              <Button
+                variant="contained"
+                size="large"
+                color="error"
+                onClick={handleDelete}
+                disabled={isSaving}
+                sx={{
+                  minWidth: 120,
+                  fontWeight: 'bold',
+                  boxShadow: 3,
+                  '&:hover': {
+                    boxShadow: 6,
+                  },
+                }}
+              >
+                Delete Event
+              </Button>
+            )}
           </Box>
 
           {event && <ActivityButton eventId={event.id} />}

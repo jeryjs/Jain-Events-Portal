@@ -57,10 +57,9 @@ const HeroContent = styled(Box)(({ theme }) => ({
 interface ArticleHeroProps {
   article: any;
   onBack: () => void;
-  isDarkMode: boolean;
 }
 
-const ArticleHero: React.FC<ArticleHeroProps> = ({ article, onBack, isDarkMode }) => {
+const ArticleHero: React.FC<ArticleHeroProps> = ({ article, onBack }) => {
   return (
     <HeroSection>
       <HeroBackground sx={{ backgroundImage: `url(${article.image.url})`, ...(article.imageStyles || {}) }} />

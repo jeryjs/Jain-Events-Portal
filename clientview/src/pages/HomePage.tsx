@@ -15,6 +15,7 @@ import { pascalCase } from '@utils/utils';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import PhotoGallery from '@components/shared/PhotoGallery';
+import HighlightsCarousel from '@components/Event/HighlightsCarousel';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -66,7 +67,7 @@ function HomePage() {
 
   const { data: events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
-  const { data: imgur, isLoading: imgurLoading } = useImgur('https://imgur.com/a/infinty-2025-FQ1Q1gF');
+  const { data: imgur, isLoading: imgurLoading } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
 
   const [catTabId, setTabId] = useState([0, -1]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
@@ -181,10 +182,25 @@ function HomePage() {
   }, [events, catTabId]);
 
 
+  // temp - hardcode infinity 2025 highlights
+  const highlights = [
+    'https://i.imgur.com/hnY5dx2l.jpeg',
+    'https://i.imgur.com/toE2tOFl.jpeg',
+    'https://i.imgur.com/2W2fEIYl.jpeg'
+  ];
+
+
   return (
     <PageTransition>
       <Container maxWidth="lg">
         <HomeHeader tabValue={catTabId[0]} onTabChange={handleTabChange} />
+
+        {/* Highlights Section */}
+        {highlights && (
+          <Section title='Infinity 2025 Highlights' moreLink='/infinity-2025'>
+            <HighlightsCarousel images={highlights} />
+          </Section>
+        )}
 
         {/* Dynamically render the Events section with more events first (past tries to be last) */}
         {sortedSections.map(section => (

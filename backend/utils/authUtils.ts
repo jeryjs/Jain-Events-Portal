@@ -37,4 +37,27 @@ const verifyToken = (token: string): JwtPayload | null => {
   }
 };
 
-export { generateToken, verifyToken };
+/**
+ * Extract user information from a JWT token
+ */
+const getUserFromToken = (token: string) => {
+  try {
+    // Verify and decode the token
+    const decoded = jwt.verify(token, JWT_SECRET) as { 
+      username: string,
+      role: string
+    };
+    
+    if (!decoded) return null;
+    
+    return {
+      username: decoded.username,
+      role: decoded.role
+    };
+  } catch (error) {
+    console.error('Error decoding token:', error);
+    return null;
+  }
+};
+
+export { generateToken, verifyToken, getUserFromToken };

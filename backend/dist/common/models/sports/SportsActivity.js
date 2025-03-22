@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OtherSport = exports.Athletics = exports.Basketball = exports.Football = exports.Cricket = void 0;
+exports.OtherSport = exports.Athletics = exports.Throwball = exports.Volleyball = exports.Basketball = exports.Football = exports.Cricket = void 0;
 const constants_1 = require("../../constants");
 const Activity_1 = __importDefault(require("../Activity"));
 const SportsPlayer_1 = __importDefault(require("./SportsPlayer"));
@@ -212,6 +212,117 @@ class Basketball {
     }
 }
 exports.Basketball = Basketball;
+class Volleyball {
+    constructor() {
+        this.sets = [];
+    }
+    getTotalPoints(teamId) {
+        if (teamId) {
+            return this.sets.reduce((total, s) => { var _a, _b; return total + ((_b = ((_a = s.points.find((p) => p.teamId === teamId)) === null || _a === void 0 ? void 0 : _a.points)) !== null && _b !== void 0 ? _b : 0); }, 0);
+        }
+        return this.sets.reduce((total, s) => total + s.points.reduce((total, p) => total + p.points, 0), 0);
+    }
+    getScore(teamId) {
+        const numSets = this.sets.length;
+        let result = 0;
+        const isSetCompleteStandard = (set) => {
+            if (set.points.length < 2)
+                return false;
+            const [teamA, teamB] = set.points;
+            const diff = Math.abs(teamA.points - teamB.points);
+            return ((teamA.points >= 25 || teamB.points >= 25) && diff >= 2);
+        };
+        for (let i = 0; i < numSets; i++) {
+            const set = this.sets[i];
+            let setWinner;
+            if (i < numSets - 1) {
+                // Any set that is not the last one is considered ended,
+                // even if it doesn't meet the 25-point criteria.
+                setWinner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+            }
+            else {
+                // Last set
+                if (numSets >= 3) {
+                    // For the final set of 3 or more, pick the highest score bearer regardless of the completion criteria.
+                    setWinner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+                }
+                else {
+                    // For less than 3 sets, follow the usual 25-point completion criteria.
+                    if (!isSetCompleteStandard(set))
+                        continue;
+                    setWinner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+                }
+            }
+            if (teamId) {
+                if (setWinner && setWinner.teamId === teamId)
+                    result++;
+            }
+            else {
+                // If no teamId is provided, sum up total points from the completed set.
+                result += set.points.reduce((sum, p) => sum + p.points, 0);
+            }
+        }
+        return result;
+    }
+}
+exports.Volleyball = Volleyball;
+class Throwball {
+    constructor() {
+        this.sets = [];
+    }
+    getTotalPoints(teamId) {
+        if (teamId) {
+            return this.sets.reduce((total, s) => { var _a, _b; return total + ((_b = ((_a = s.points.find((p) => p.teamId === teamId)) === null || _a === void 0 ? void 0 : _a.points)) !== null && _b !== void 0 ? _b : 0); }, 0);
+        }
+        return this.sets.reduce((total, s) => total + s.points.reduce((total, p) => total + p.points, 0), 0);
+    }
+    getScore(teamId) {
+        const threshold = 25;
+        let wins = 0;
+        let totalPoints = 0;
+        const totalSets = this.sets.length;
+        this.sets.forEach((set, idx) => {
+            // Skip sets that don't have both teams
+            if (set.points.length < 2)
+                return;
+            let complete = false;
+            let winner = null;
+            // If there's a set after the current one, this set has ended
+            if (idx < totalSets - 1) {
+                complete = true;
+                winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+            }
+            else {
+                // Last (current) set
+                if (totalSets >= 3) {
+                    // Final set (3 or more): choose highest scorer regardless of the 25 point rule
+                    complete = true;
+                    winner = set.points.reduce((prev, curr) => (curr.points > prev.points ? curr : prev));
+                }
+                else {
+                    // Use the threshold criteria if fewer than 3 sets
+                    const [teamA, teamB] = set.points;
+                    const diff = Math.abs(teamA.points - teamB.points);
+                    if ((teamA.points >= threshold || teamB.points >= threshold) && diff >= 2) {
+                        complete = true;
+                        winner = teamA.points > teamB.points ? teamA : teamB;
+                    }
+                }
+            }
+            if (complete) {
+                if (teamId) {
+                    if (winner && winner.teamId === teamId)
+                        wins++;
+                }
+                else {
+                    totalPoints += set.points.reduce((sum, p) => sum + p.points, 0);
+                }
+            }
+        });
+        return teamId ? wins : totalPoints;
+    }
+}
+exports.Throwball = Throwball;
 class Athletics {
     constructor() {
         this.heats = [];
@@ -284,6 +395,12 @@ class SportsActivity extends Activity_1.default {
             case constants_1.EventType.BASKETBALL:
                 gameType = new Basketball();
                 break;
+            case constants_1.EventType.VOLLEYBALL:
+                gameType = new Volleyball();
+                break;
+            case constants_1.EventType.THROWBALL:
+                gameType = new Throwball();
+                break;
             case constants_1.EventType.ATHLETICS:
                 gameType = new Athletics();
                 break;
@@ -320,6 +437,10 @@ class SportsActivity extends Activity_1.default {
             return this.game.getTotalGoals(teamId);
         if (this.game instanceof Basketball)
             return this.game.getTotalPoints(teamId);
+        if (this.game instanceof Volleyball)
+            return this.game.getScore(teamId);
+        if (this.game instanceof Throwball)
+            return this.game.getScore(teamId);
         if (this.game instanceof OtherSport)
             return ((_a = this.game.points.find((p) => p.teamId === teamId)) === null || _a === void 0 ? void 0 : _a.points) || 0;
         return 0;
@@ -360,6 +481,24 @@ class SportsActivity extends Activity_1.default {
             return { isDraw: true, isOngoing: false };
         }
         if (this.game instanceof Basketball) {
+            const points1 = this.game.getTotalPoints(team1Id);
+            const points2 = this.game.getTotalPoints(team2Id);
+            if (points1 > points2)
+                return { winner: team1Id, isDraw: false, isOngoing: false };
+            if (points2 > points1)
+                return { winner: team2Id, isDraw: false, isOngoing: false };
+            return { isDraw: true, isOngoing: false };
+        }
+        if (this.game instanceof Volleyball || this.game instanceof Throwball) {
+            const points1 = this.game.getScore(team1Id);
+            const points2 = this.game.getScore(team2Id);
+            if (points1 > points2)
+                return { winner: team1Id, isDraw: false, isOngoing: false };
+            if (points2 > points1)
+                return { winner: team2Id, isDraw: false, isOngoing: false };
+            return { isDraw: true, isOngoing: false };
+        }
+        if (this.game instanceof OtherSport) {
             const points1 = this.game.getTotalPoints(team1Id);
             const points2 = this.game.getTotalPoints(team2Id);
             if (points1 > points2)

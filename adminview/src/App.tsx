@@ -67,7 +67,7 @@ const App = () => {
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <BrowserRouter basename="/admin">
+          <BrowserRouter>
             <Suspense fallback={<div>Loading admin view...</div>}>
               <Routes>
                 {/* Public route - Login */}
@@ -81,7 +81,6 @@ const App = () => {
                   
                   {/* Activities routes */}
                   <Route path="events/:eventId/activities" element={<ActivitiesPage />} />
-                  <Route path="events/:eventId/activities/create" element={<ActivitiesPage />} />
                   <Route path="events/:eventId/activities/:activityId" element={<ActivitiesPage />} />
 
                   {/* Articles routes */}

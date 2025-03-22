@@ -5,10 +5,23 @@ import {
     createArticle, 
     updateArticle, 
     deleteArticle,
+    updateArticleViewCount,
+    invalidateArticlesCache,
 } from "@services/articles";
 import { adminMiddleware } from '@middlewares/auth';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
+
+// Rate limiter to prevent abuse (1 request per minute per article)
+const viewCountLimiter = rateLimit({
+  windowMs: 30 * 60 * 1000, // 30 minutes
+  max: 1,
+  message: 'Article already marked as read!',
+  keyGenerator: function (req: Request, res: Response) {
+    return req.ip + '-' + req.params.articleId; // Unique key per IP and article ID
+  },
+});
 
 /**
  * Article Routes
@@ -74,6 +87,33 @@ router.delete('/articles/:articleId', adminMiddleware, async (req: Request, res:
     } catch (error) {
         console.error('Error deleting article:', error);
         res.status(500).json({ message: 'Error deleting article', details: error });
+    }
+});
+
+// Update article view count
+router.post('/articles/:articleId/view', viewCountLimiter, async (req: Request, res: Response) => {
+  try {
+    const articleId = req.params.articleId;
+    const article = await updateArticleViewCount(articleId);
+    if (article) {
+      res.json({ message: 'View count updated successfully' });
+    } else {
+      res.status(404).json({ message: 'Article not found' });
+    }
+  } catch (error) {
+    console.error('Error updating article view count:', error);
+    res.status(500).json({ message: 'Error updating article view count', details: error });
+  }
+});
+
+// Invalidate cache for articles
+router.post('/articles/invalidate-cache', adminMiddleware, async (req: Request, res: Response) => {
+    try {
+        const message = await invalidateArticlesCache();
+        res.json({ message });
+    } catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache', details: error });
     }
 });
 

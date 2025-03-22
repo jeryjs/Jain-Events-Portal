@@ -1,15 +1,23 @@
 // Workaround for module-alias in vercel deployment.
-if (process.env.VERCEL == "1" || __filename.endsWith(".js")) {
-	const tsConfig = require("../../tsconfig.json");
-    // Manually append dirname to path aliases to turn them into absolute paths
-	const resolvedPaths = Object.entries(tsConfig.compilerOptions.paths).reduce<Record<string, string[]>>((acc, [key, paths]) => {
-		acc[key] = (paths as string[]).map((path: string) => (path.startsWith("./") || path.startsWith("../") ? __dirname + "/" + path : path));
-		return acc;
-	}, {});
-
-	require("tsconfig-paths").register({ baseUrl: ".", paths: resolvedPaths });
-} else {
-	require("module-alias/register");
+if (process.env.VERCEL == '1' || __filename.endsWith('.js')) {
+    // Workaround for tsconfig-paths in vercel deployment.
+    const tsConfigPaths = require("../../tsconfig.json").compilerOptions.paths;
+    const resolvedPaths: Record<string, string[]> = {};
+    for (const key in tsConfigPaths) {
+        resolvedPaths[key] = tsConfigPaths[key].map((path: string) => {
+            // Prepend __dirname only if the path is relative
+            if (path.startsWith("./") || path.startsWith("../"))
+                return __dirname + "/" + path;
+            return path; // Keep absolute paths as is
+        });
+    }
+    require('tsconfig-paths').register({
+        baseUrl: '.',
+        paths: resolvedPaths
+    });
+}
+else {
+    require('module-alias/register');
 }
 
 import "dotenv/config";
@@ -22,6 +30,7 @@ import activityRoutes from "@routes/activityRoutes";
 import articleRoutes from "@routes/articleRoutes";
 import authRoutes from "@routes/authRoutes";
 
+const os = require('os');
 const app = express();
 
 // Middlewares to use only in production
@@ -46,8 +55,14 @@ app.listen(PORT, "0.0.0.0", () => {
     const serverUrl = `http://localhost:${PORT}`;
     console.log(`✅ API server running successfully!`);
     console.log(`📡 Listening on port ${PORT} (${serverUrl})`);
-    console.log(`🚀 API endpoints available at ${serverUrl}/api`);
-    console.log(`📚 Routes loaded: events, activities, user, admin`);
+    const nets = os.networkInterfaces();
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]!) {
+            if (net.family === 'IPv4' && !net.internal) {
+                console.log(`🖧 Accessible on ${name}: http://${net.address}:${PORT}`);
+            }
+        }
+    }
     console.log(`💻 Environment: ${process.env.NODE_ENV || 'development'}`);
 }).on('error', (err) => {
     console.error(`❌ Failed to start server: ${err.message}`);

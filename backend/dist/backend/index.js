@@ -51,6 +51,7 @@ const eventRoutes_1 = __importDefault(require("@routes/eventRoutes"));
 const activityRoutes_1 = __importDefault(require("@routes/activityRoutes"));
 const articleRoutes_1 = __importDefault(require("@routes/articleRoutes"));
 const authRoutes_1 = __importDefault(require("@routes/authRoutes"));
+const os = require('os');
 const app = (0, express_1.default)();
 // Middlewares to use only in production
 if (process.env.NODE_ENV !== 'development') {
@@ -70,8 +71,14 @@ app.listen(PORT, "0.0.0.0", () => {
     const serverUrl = `http://localhost:${PORT}`;
     console.log(`✅ API server running successfully!`);
     console.log(`📡 Listening on port ${PORT} (${serverUrl})`);
-    console.log(`🚀 API endpoints available at ${serverUrl}/api`);
-    console.log(`📚 Routes loaded: events, activities, user, admin`);
+    const nets = os.networkInterfaces();
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            if (net.family === 'IPv4' && !net.internal) {
+                console.log(`🖧 Accessible on ${name}: http://${net.address}:${PORT}`);
+            }
+        }
+    }
     console.log(`💻 Environment: ${process.env.NODE_ENV || 'development'}`);
 }).on('error', (err) => {
     console.error(`❌ Failed to start server: ${err.message}`);

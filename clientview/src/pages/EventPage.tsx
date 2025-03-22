@@ -1,24 +1,35 @@
-import { Suspense, useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper,
-  Accordion, AccordionSummary, AccordionDetails, alpha,
-  Dialog
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { motion } from 'framer-motion';
-import { useActivities, useEvent } from '../hooks/useApi';
-import ActivityCard from '@components/Event/ActivityCard';
-import PhotoGallery from '../components/shared/PhotoGallery';
-import PageTransition from '../components/shared/PageTransition';
 import { EventType } from '@common/constants';
 import { getBaseEventType } from '@common/utils';
-import { generateColorFromString } from '@utils/utils';
+import ActivityCard from '@components/Event/ActivityCard';
+import HighlightsCarousel from '@components/Event/HighlightsCarousel';
 import useImgur from '@hooks/useImgur';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  alpha,
+  Box,
+  Chip,
+  Container,
+  Dialog,
+  Divider,
+  IconButton,
+  Paper,
+  Skeleton,
+  Typography
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { generateColorFromString } from '@utils/utils';
+import { motion } from 'framer-motion';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import PageTransition from '../components/shared/PageTransition';
+import PhotoGallery from '../components/shared/PhotoGallery';
+import { useActivities, useEvent } from '../hooks/useApi';
 
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
@@ -211,21 +222,31 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
     );
   }
 
-  // Group activities by event type
-  const groupedActivities = activities.reduce((acc, activity) => {
-    const activityType = activity.eventType;
-    if (!acc[activityType]) {
-      acc[activityType] = [];
-    }
-    acc[activityType].push(activity);
-    return acc;
-  }, {} as Record<number, any[]>);
+  // Separate info activities from other activities
+  const infoActivities = activities.filter(activity => getBaseEventType(activity.eventType) === EventType.INFO);
+  const nonInfoActivities = activities.filter(activity => getBaseEventType(activity.eventType) !== EventType.INFO);
 
-  // Sort the groups by event type (so they appear in a consistent order)
+  // Group activities by event type
+  const groupedActivities: Record<number, any[]> = {};
+
+  // First handle INFO activities if they exist
+  if (infoActivities.length > 0) {
+    groupedActivities[EventType.INFO] = infoActivities;
+  }
+
+  // Then handle the rest of activity types
+  nonInfoActivities.forEach(activity => {
+    const activityType = activity.eventType;
+    if (!groupedActivities[activityType]) {
+      groupedActivities[activityType] = [];
+    }
+    groupedActivities[activityType].push(activity);
+  });
+
+  // Return the activities, now with INFO guaranteed to be first if it exists
   return (
     <Box>
       {Object.entries(groupedActivities)
-        .sort(([typeA], [typeB]) => Number(typeA) - Number(typeB))
         .map(([type, acts]) => (
           <ActivityAccordion
             key={type}
@@ -244,7 +265,7 @@ function EventPage() {
   const navigate = useNavigate();
 
   const { data: event, isLoading: eventLoading } = useEvent(eventId);
-  const { data: imgur, isLoading: imgurLoading } = useImgur("https://imgur.com/a/infinty-2025-FQ1Q1gF");
+  const { data: imgur, isLoading: imgurLoading } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
@@ -310,6 +331,13 @@ function EventPage() {
       </PageTransition>
     );
   }
+
+  // temp for ininity: Hardcode the highlights-
+  const highlights = eventId === "infinity-2025" ? [
+    'https://i.imgur.com/hnY5dx2l.jpeg',
+    'https://i.imgur.com/toE2tOFl.jpeg',
+    'https://i.imgur.com/2W2fEIYl.jpeg'
+  ] : [];
 
   return (
     <Suspense fallback={null}>
@@ -424,6 +452,15 @@ function EventPage() {
               </>
             )}
           </ContentSection>
+
+          {/*  Temp Infinity Highlights section */}
+          {highlights && <Box>
+            <Divider sx={{ my: 3 }} />
+            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 1 }}>
+              Highlights
+            </Typography>
+            <HighlightsCarousel images={highlights} />
+          </Box>}
 
           <Divider sx={{ my: 3 }} />
 
