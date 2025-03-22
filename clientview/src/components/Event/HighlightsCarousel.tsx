@@ -257,11 +257,11 @@ export default function HighlightsCarousel({
                                     width: current === index ? 24 : 12,
                                     height: 12,
                                     borderRadius: 6,
-                                    bgcolor: current === index ? 'primary.main' : 'rgba(0,0,0,0.2)',
+                                    bgcolor: current === index ? 'secondary.main' : 'primary.main',
                                     transition: 'all 0.3s ease',
                                     cursor: 'pointer',
                                     '&:hover': {
-                                        bgcolor: current === index ? 'primary.main' : 'rgba(0,0,0,0.4)'
+                                        bgcolor: current === index ? 'secondary.main' : 'primary.main'
                                     }
                                 }}
                             />
