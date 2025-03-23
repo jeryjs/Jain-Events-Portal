@@ -21,7 +21,7 @@ const router = express_1.default.Router();
  * Activity Routes
  */
 // Get all activities for an event
-router.get('/activities/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const activities = yield (0, activities_1.getActivities)(req.params.eventId);
         res.json(activities || []);
@@ -32,7 +32,7 @@ router.get('/activities/:eventId', (req, res) => __awaiter(void 0, void 0, void 
     }
 }));
 // Get specific activity by ID
-router.get('/activities/:eventId/:activityId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/:eventId/:activityId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const activity = yield (0, activities_1.getActivityById)(req.params.eventId, req.params.activityId);
         if (activity) {
@@ -48,7 +48,7 @@ router.get('/activities/:eventId/:activityId', (req, res) => __awaiter(void 0, v
     }
 }));
 // Create new activity
-router.post('/activities/:eventId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/:eventId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newActivity = yield (0, activities_1.createActivity)(req.params.eventId, req.body);
         res.status(201).json(newActivity);
@@ -59,7 +59,7 @@ router.post('/activities/:eventId', auth_1.managerMiddleware, (req, res) => __aw
     }
 }));
 // Update activity
-router.patch('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updatedActivity = yield (0, activities_1.updateActivity)(req.params.eventId, req.params.activityId, req.body);
         if (updatedActivity) {
@@ -75,7 +75,7 @@ router.patch('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req,
     }
 }));
 // Delete activity
-router.delete('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, activities_1.deleteActivity)(req.params.eventId, req.params.activityId);
         if (result) {
@@ -91,7 +91,7 @@ router.delete('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req
     }
 }));
 // Invalidate cache for activities
-router.post('/activities/invalidate-cache', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/invalidate-cache', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, activities_1.invalidateActivitiesCache)();
         res.json({ message: result });
@@ -102,7 +102,7 @@ router.post('/activities/invalidate-cache', auth_1.adminMiddleware, (req, res) =
     }
 }));
 // Get poll results for an activity
-router.get('/activities/:eventId/:activityId/poll', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/:eventId/:activityId/poll', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const results = yield (0, activities_1.getPollResults)(req.params.eventId, req.params.activityId);
         res.json(results);
@@ -113,7 +113,7 @@ router.get('/activities/:eventId/:activityId/poll', (req, res) => __awaiter(void
     }
 }));
 // Cast a vote for a participant
-router.post('/activities/:eventId/:activityId/vote/:teamId', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/:eventId/:activityId/vote/:teamId', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userdata = (0, authUtils_1.getUserFromToken)(req.headers.authorization || '');
         if (!userdata) {

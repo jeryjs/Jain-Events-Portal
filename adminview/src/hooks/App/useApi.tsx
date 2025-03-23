@@ -160,7 +160,7 @@ export const ArticlesApi = {
 // Auth API endpoints
 export const AuthApi = {
   login: async (username: string, password: string) => {
-    const response = await fetch(`${API_BASE_URL}/auth/admin/authenticate`, {
+    const response = await fetch(`${API_BASE_URL}/user/admin/authenticate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -51,10 +51,10 @@ const eventRoutes_1 = __importDefault(require("@routes/eventRoutes"));
 const activityRoutes_1 = __importDefault(require("@routes/activityRoutes"));
 const articleRoutes_1 = __importDefault(require("@routes/articleRoutes"));
 const authRoutes_1 = __importDefault(require("@routes/authRoutes"));
-const os = require('os');
+const os = require("os");
 const app = (0, express_1.default)();
 // Middlewares to use only in production
-if (process.env.NODE_ENV !== 'development') {
+if (process.env.NODE_ENV !== "development") {
     app.use((0, cors_1.default)());
     app.use((0, helmet_1.default)());
 }
@@ -62,10 +62,10 @@ app.use(express_1.default.json());
 app.get("/api", (req, res) => {
     res.send("API Server is running successfully!!");
 });
-app.use("/api", eventRoutes_1.default);
-app.use("/api", activityRoutes_1.default);
-app.use("/api", articleRoutes_1.default);
-app.use("/api/auth", authRoutes_1.default);
+app.use("/api/events", eventRoutes_1.default);
+app.use("/api/activities", activityRoutes_1.default);
+app.use("/api/articles", articleRoutes_1.default);
+app.use("/api/user", authRoutes_1.default);
 const PORT = (process.env.PORT || 3000);
 app.listen(PORT, "0.0.0.0", () => {
     const serverUrl = `http://localhost:${PORT}`;
@@ -74,13 +74,14 @@ app.listen(PORT, "0.0.0.0", () => {
     const nets = os.networkInterfaces();
     for (const name of Object.keys(nets)) {
         for (const net of nets[name]) {
-            if (net.family === 'IPv4' && !net.internal) {
+            if (net.family === "IPv4" && !net.internal) {
                 console.log(`🖧 Accessible on ${name}: http://${net.address}:${PORT}`);
             }
         }
     }
-    console.log(`💻 Environment: ${process.env.NODE_ENV || 'development'}`);
-}).on('error', (err) => {
+    console.log(`💻 Environment: ${process.env.NODE_ENV || "development"}`);
+})
+    .on("error", (err) => {
     console.error(`❌ Failed to start server: ${err.message}`);
     process.exit(1);
 });

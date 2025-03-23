@@ -28,7 +28,7 @@ const viewCountLimiter = rateLimit({
  */
 
 // Get all articles
-router.get('/articles', async (_: Request, res: Response) => {
+router.get('/', async (_: Request, res: Response) => {
     try {
         const articles = await getArticles();
         res.json(articles);
@@ -39,7 +39,7 @@ router.get('/articles', async (_: Request, res: Response) => {
 });
 
 // Get article by ID
-router.get('/articles/:articleId', async (req: Request, res: Response) => {
+router.get('/:articleId', async (req: Request, res: Response) => {
     try {
         const article = await getArticleById(req.params.articleId);
         if (article) {
@@ -54,7 +54,7 @@ router.get('/articles/:articleId', async (req: Request, res: Response) => {
 });
 
 // Create new article
-router.post('/articles', adminMiddleware, async (req: Request, res: Response) => {
+router.post('', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const newArticle = await createArticle(req.body);
         res.status(201).json(newArticle);
@@ -65,7 +65,7 @@ router.post('/articles', adminMiddleware, async (req: Request, res: Response) =>
 });
 
 // Update article
-router.patch('/articles/:articleId', adminMiddleware, async (req: Request, res: Response) => {
+router.patch('/:articleId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const updatedArticle = await updateArticle(req.params.articleId, req.body);
         res.json(updatedArticle);
@@ -76,7 +76,7 @@ router.patch('/articles/:articleId', adminMiddleware, async (req: Request, res: 
 });
 
 // Delete article
-router.delete('/articles/:articleId', adminMiddleware, async (req: Request, res: Response) => {
+router.delete('/:articleId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const result = await deleteArticle(req.params.articleId);
         if (result) {
@@ -91,7 +91,7 @@ router.delete('/articles/:articleId', adminMiddleware, async (req: Request, res:
 });
 
 // Update article view count
-router.post('/articles/:articleId/view', viewCountLimiter, async (req: Request, res: Response) => {
+router.post('/:articleId/view', viewCountLimiter, async (req: Request, res: Response) => {
   try {
     const articleId = req.params.articleId;
     const article = await updateArticleViewCount(articleId);
@@ -107,7 +107,7 @@ router.post('/articles/:articleId/view', viewCountLimiter, async (req: Request, 
 });
 
 // Invalidate cache for articles
-router.post('/articles/invalidate-cache', adminMiddleware, async (req: Request, res: Response) => {
+router.post('/invalidate-cache', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const message = await invalidateArticlesCache();
         res.json({ message });

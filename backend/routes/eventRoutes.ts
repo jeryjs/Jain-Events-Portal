@@ -17,7 +17,7 @@ const router = Router();
  */
 
 // Get all events
-router.get('/events', async (_: Request, res: Response) => {
+router.get('/', async (_: Request, res: Response) => {
     try {
         const events = await getEvents();
         res.json(events);
@@ -28,7 +28,7 @@ router.get('/events', async (_: Request, res: Response) => {
 });
 
 // Get event by ID
-router.get('/events/:eventId', async (req: Request, res: Response) => {
+router.get('/:eventId', async (req: Request, res: Response) => {
     try {
         const event = await getEventById(req.params.eventId);
         if (event) {
@@ -43,7 +43,7 @@ router.get('/events/:eventId', async (req: Request, res: Response) => {
 });
 
 // Create new event
-router.post('/events', adminMiddleware, async (req: Request, res: Response) => {
+router.post('/', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const newEvent = await createEvent(req.body);
         res.status(201).json(newEvent);
@@ -54,7 +54,7 @@ router.post('/events', adminMiddleware, async (req: Request, res: Response) => {
 });
 
 // Update event
-router.patch('/events/:eventId', adminMiddleware, async (req: Request, res: Response) => {
+router.patch('/:eventId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const updatedEvent = await updateEvent(req.params.eventId, req.body);
         res.json(updatedEvent);
@@ -65,7 +65,7 @@ router.patch('/events/:eventId', adminMiddleware, async (req: Request, res: Resp
 });
 
 // Delete event
-router.delete('/events/:eventId', adminMiddleware, async (req: Request, res: Response) => {
+router.delete('/:eventId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const result = await deleteEvent(req.params.eventId);
         if (result) {
@@ -80,7 +80,7 @@ router.delete('/events/:eventId', adminMiddleware, async (req: Request, res: Res
 });
 
 // Invalidate cache for all events
-router.post('/events/invalidate-cache', adminMiddleware, async (_: Request, res: Response) => {
+router.post('/invalidate-cache', adminMiddleware, async (_: Request, res: Response) => {
     try {
         const message = await invalidateEventsCache();
         res.json({ message });

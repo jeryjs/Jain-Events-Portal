@@ -1,7 +1,7 @@
 import Event from '@common/models/Event';
 import { parseEvents } from '@common/utils';
 import { cache, TTL } from '@config/cache';
-import db from '@config/firebase';
+import { db, sendPushNotificationToAllUsers } from '@config/firebase';
 import { 
   getCachedItem, 
   getCachedCollection, 
@@ -49,6 +49,8 @@ export const getEventById = async (eventId: string) => {
  */
 export const createEvent = async (eventData: any) => {
   const event = Event.parse(eventData);
+
+  sendPushNotificationToAllUsers(`New Event: ${event.name}`, `Check out the new event: ${event.name}`);
   
   return createCachedItem<Event>({
     item: event,

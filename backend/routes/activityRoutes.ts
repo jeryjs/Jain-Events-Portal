@@ -19,7 +19,7 @@ const router = express.Router();
  */
 
 // Get all activities for an event
-router.get('/activities/:eventId', async (req: Request, res: Response) => {
+router.get('/:eventId', async (req: Request, res: Response) => {
     try {
         const activities = await getActivities(req.params.eventId);
         res.json(activities || []);
@@ -30,7 +30,7 @@ router.get('/activities/:eventId', async (req: Request, res: Response) => {
 });
 
 // Get specific activity by ID
-router.get('/activities/:eventId/:activityId', async (req: Request, res: Response) => {
+router.get('/:eventId/:activityId', async (req: Request, res: Response) => {
     try {
         const activity = await getActivityById(req.params.eventId, req.params.activityId);
         if (activity) {
@@ -45,7 +45,7 @@ router.get('/activities/:eventId/:activityId', async (req: Request, res: Respons
 });
 
 // Create new activity
-router.post('/activities/:eventId', managerMiddleware, async (req: Request, res: Response) => {
+router.post('/:eventId', managerMiddleware, async (req: Request, res: Response) => {
     try {
         const newActivity = await createActivity(req.params.eventId, req.body);
         res.status(201).json(newActivity);
@@ -56,7 +56,7 @@ router.post('/activities/:eventId', managerMiddleware, async (req: Request, res:
 });
 
 // Update activity
-router.patch('/activities/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
+router.patch('/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
     try {
         const updatedActivity = await updateActivity(
             req.params.eventId, 
@@ -75,7 +75,7 @@ router.patch('/activities/:eventId/:activityId', managerMiddleware, async (req: 
 });
 
 // Delete activity
-router.delete('/activities/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
+router.delete('/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
     try {
         const result = await deleteActivity(req.params.eventId, req.params.activityId);
         if (result) {
@@ -90,7 +90,7 @@ router.delete('/activities/:eventId/:activityId', managerMiddleware, async (req:
 });
 
 // Invalidate cache for activities
-router.post('/activities/invalidate-cache', adminMiddleware, async (req: Request, res: Response) => {
+router.post('/invalidate-cache', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const result = await invalidateActivitiesCache();
         res.json({ message: result });
@@ -101,7 +101,7 @@ router.post('/activities/invalidate-cache', adminMiddleware, async (req: Request
 });
 
 // Get poll results for an activity
-router.get('/activities/:eventId/:activityId/poll', async (req: Request, res: Response) => {
+router.get('/:eventId/:activityId/poll', async (req: Request, res: Response) => {
     try {
         const results = await getPollResults(req.params.eventId, req.params.activityId);
         res.json(results);
@@ -112,7 +112,7 @@ router.get('/activities/:eventId/:activityId/poll', async (req: Request, res: Re
 });
 
 // Cast a vote for a participant
-router.post('/activities/:eventId/:activityId/vote/:teamId', authMiddleware, async (req: Request, res: Response) => {
+router.post('/:eventId/:activityId/vote/:teamId', authMiddleware, async (req: Request, res: Response) => {
     try {
         const userdata = getUserFromToken(req.headers.authorization || '');
         if (!userdata) {

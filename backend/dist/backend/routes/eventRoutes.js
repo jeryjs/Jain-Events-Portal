@@ -18,7 +18,7 @@ const router = (0, express_1.Router)();
  * Event Routes
  */
 // Get all events
-router.get('/events', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const events = yield (0, events_1.getEvents)();
         res.json(events);
@@ -29,7 +29,7 @@ router.get('/events', (_, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 }));
 // Get event by ID
-router.get('/events/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const event = yield (0, events_1.getEventById)(req.params.eventId);
         if (event) {
@@ -45,7 +45,7 @@ router.get('/events/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 }));
 // Create new event
-router.post('/events', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newEvent = yield (0, events_1.createEvent)(req.body);
         res.status(201).json(newEvent);
@@ -56,7 +56,7 @@ router.post('/events', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, v
     }
 }));
 // Update event
-router.patch('/events/:eventId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/:eventId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updatedEvent = yield (0, events_1.updateEvent)(req.params.eventId, req.body);
         res.json(updatedEvent);
@@ -67,7 +67,7 @@ router.patch('/events/:eventId', auth_1.adminMiddleware, (req, res) => __awaiter
     }
 }));
 // Delete event
-router.delete('/events/:eventId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/:eventId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, events_1.deleteEvent)(req.params.eventId);
         if (result) {
@@ -83,7 +83,7 @@ router.delete('/events/:eventId', auth_1.adminMiddleware, (req, res) => __awaite
     }
 }));
 // Invalidate cache for all events
-router.post('/events/invalidate-cache', auth_1.adminMiddleware, (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/invalidate-cache', auth_1.adminMiddleware, (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const message = yield (0, events_1.invalidateEventsCache)();
         res.json({ message });

@@ -30,7 +30,7 @@ const viewCountLimiter = (0, express_rate_limit_1.default)({
  * Article Routes
  */
 // Get all articles
-router.get('/articles', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const articles = yield (0, articles_1.getArticles)();
         res.json(articles);
@@ -41,7 +41,7 @@ router.get('/articles', (_, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 }));
 // Get article by ID
-router.get('/articles/:articleId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/:articleId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const article = yield (0, articles_1.getArticleById)(req.params.articleId);
         if (article) {
@@ -57,7 +57,7 @@ router.get('/articles/:articleId', (req, res) => __awaiter(void 0, void 0, void 
     }
 }));
 // Create new article
-router.post('/articles', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newArticle = yield (0, articles_1.createArticle)(req.body);
         res.status(201).json(newArticle);
@@ -68,7 +68,7 @@ router.post('/articles', auth_1.adminMiddleware, (req, res) => __awaiter(void 0,
     }
 }));
 // Update article
-router.patch('/articles/:articleId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/:articleId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updatedArticle = yield (0, articles_1.updateArticle)(req.params.articleId, req.body);
         res.json(updatedArticle);
@@ -79,7 +79,7 @@ router.patch('/articles/:articleId', auth_1.adminMiddleware, (req, res) => __awa
     }
 }));
 // Delete article
-router.delete('/articles/:articleId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/:articleId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, articles_1.deleteArticle)(req.params.articleId);
         if (result) {
@@ -95,7 +95,7 @@ router.delete('/articles/:articleId', auth_1.adminMiddleware, (req, res) => __aw
     }
 }));
 // Update article view count
-router.post('/articles/:articleId/view', viewCountLimiter, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/:articleId/view', viewCountLimiter, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const articleId = req.params.articleId;
         const article = yield (0, articles_1.updateArticleViewCount)(articleId);
@@ -112,7 +112,7 @@ router.post('/articles/:articleId/view', viewCountLimiter, (req, res) => __await
     }
 }));
 // Invalidate cache for articles
-router.post('/articles/invalidate-cache', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/invalidate-cache', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const message = yield (0, articles_1.invalidateArticlesCache)();
         res.json({ message });

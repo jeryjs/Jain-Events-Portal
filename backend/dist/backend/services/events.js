@@ -16,10 +16,10 @@ exports.invalidateEventsCache = exports.deleteEvent = exports.updateEvent = expo
 const Event_1 = __importDefault(require("@common/models/Event"));
 const utils_1 = require("@common/utils");
 const cache_1 = require("@config/cache");
-const firebase_1 = __importDefault(require("@config/firebase"));
+const firebase_1 = require("@config/firebase");
 const cacheUtils_1 = require("@utils/cacheUtils");
 // Collection references
-const eventsCollection = firebase_1.default.collection('events');
+const eventsCollection = firebase_1.db.collection('events');
 const COLLECTION_KEY = "events";
 const ITEM_KEY_PREFIX = "events";
 /**
@@ -57,6 +57,7 @@ exports.getEventById = getEventById;
  */
 const createEvent = (eventData) => __awaiter(void 0, void 0, void 0, function* () {
     const event = Event_1.default.parse(eventData);
+    (0, firebase_1.sendPushNotificationToAllUsers)(`New Event: ${event.name}`, `Check out the new event: ${event.name}`);
     return (0, cacheUtils_1.createCachedItem)({
         item: event,
         collectionKey: COLLECTION_KEY,
@@ -99,7 +100,7 @@ const deleteEvent = (eventId) => __awaiter(void 0, void 0, void 0, function* () 
         deleteFn: () => __awaiter(void 0, void 0, void 0, function* () {
             // Delete all activities/subCollections first
             const eventSubCollections = yield eventDoc.listCollections();
-            const batch = firebase_1.default.batch();
+            const batch = firebase_1.db.batch();
             yield Promise.all(eventSubCollections.map((collection) => __awaiter(void 0, void 0, void 0, function* () {
                 console.log(`🔥 Database: Deleting subcollection from event with ID: ${eventId}`);
                 const collectionDocs = yield collection.get();
