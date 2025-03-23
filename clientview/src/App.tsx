@@ -1,5 +1,7 @@
+import InstallPrompt from '@components/shared/InstallPrompt';
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useMemo } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import ActivityPage from './pages/ActivityPage';
@@ -10,7 +12,6 @@ import HomePage from './pages/HomePage';
 import TimelinePage from './pages/TimelinePage';
 import { ColorModeContext, useColorMode } from './utils/ColorMode';
 import queryClient from './utils/QueryClient';
-import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const colorMode = useColorMode();
@@ -46,7 +47,12 @@ function App() {
               <Route path="/:eventId" element={<EventPage />} />
               <Route path="/" element={<HomePage />} />
             </Routes>
-            <Analytics />
+            
+            {/* Show prompt to install PWA */}
+            <InstallPrompt />
+
+            {/* Vercel Analytics */}
+            <SpeedInsights />
           </BrowserRouter>
         </ThemeProvider>
       </ColorModeContext.Provider>

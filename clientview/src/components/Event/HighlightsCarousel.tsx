@@ -86,7 +86,7 @@ export default function HighlightsCarousel({
             position: 'relative',
             height,
             my: 2,
-            overflow: 'visible'
+            overflow: 'hidden'
         }}>
             {/* Main carousel container */}
             <Box
