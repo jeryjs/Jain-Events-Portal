@@ -1,4 +1,5 @@
 import { EventType } from '@common/constants';
+import NotificationPrompt from '@components/shared/NotificationPrompt';
 import ThemeSwitcher from '@components/shared/ThemeSwitcher';
 import { Box, Button, Tab, Tabs, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -64,6 +65,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ tabValue, onTabChange }) => {
               Timeline
             </Button>
             <ThemeSwitcher />
+            <NotificationPrompt className="notification-bell" />
           </Box>
         </HeaderWrapper>
       </AppHeader>

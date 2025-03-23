@@ -1,9 +1,10 @@
-import InstallPrompt from '@components/shared/InstallPrompt';
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useMemo } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import InstallPrompt from '@components/shared/InstallPrompt';
 import ActivityPage from './pages/ActivityPage';
 import ArticlePage from './pages/ArticlePage';
 import ArticlesPage from './pages/ArticlesPage';
@@ -47,7 +48,7 @@ function App() {
               <Route path="/:eventId" element={<EventPage />} />
               <Route path="/" element={<HomePage />} />
             </Routes>
-            
+
             {/* Show prompt to install PWA */}
             <InstallPrompt />
 
