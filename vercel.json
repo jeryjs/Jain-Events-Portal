@@ -23,7 +23,7 @@
         },
         {
             "src": "/(.*)",
-            "dest": "/clientview/$1"
+            "dest": "/clientview/"
         }
     ]
 }
