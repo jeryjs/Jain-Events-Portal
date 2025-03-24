@@ -7,6 +7,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {
   Avatar,
   Box, Button,
+  CircularProgress,
   Grow,
   IconButton,
   Paper,
@@ -17,6 +18,7 @@ import {
 import { keyframes, styled } from '@mui/system';
 import { useEffect, useState } from 'react';
 import { initializeMessaging } from '../../firebaseConfig';
+import InstallPrompt from './InstallPrompt';
 
 const pulse = keyframes`
   0% { transform: scale(1); }
@@ -342,14 +344,11 @@ const NotificationPrompt = ({ className }) => {
                 )}
 
                 {permissionStatus === 'granted' && loading && (
-                  <Box sx={{ py: 1.5, display: 'flex', justifyContent: 'center' }}>
-                    <Typography variant="body2" color="primary" fontWeight="medium">
-                      Almost there...
-                    </Typography>
+                  <Box sx={{ py: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+                    <CircularProgress size={20} /> {/* Adjust size as needed */}
+                    <Typography variant="body2" color="primary" fontWeight="medium">Almost there...</Typography>
                   </Box>
                 )}
-
-                {console.log(`Notification Permission status: ${permissionStatus}, isSubscribed: ${subscribedToNotifications}`)}
 
                 {permissionStatus === 'granted' && !loading && subscribedToNotifications && (
                   <Box sx={{ textAlign: 'center', py: 1 }}>
@@ -434,6 +433,7 @@ const NotificationPrompt = ({ className }) => {
                 </Button>
               </>
             )}
+            <InstallPrompt showAsComponent={true} />
           </StyledPaper>
         </Grow>
       </Popover>

@@ -1,13 +1,18 @@
-import { useState, useEffect } from 'react';
-import {
-    Box, Button, Slide, Paper, Typography,
-    IconButton, useMediaQuery, useTheme, Grow,
-    Avatar, Divider
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import AppShortcutIcon from '@mui/icons-material/AppShortcut';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { styled, keyframes } from '@mui/system';
+import CloseIcon from '@mui/icons-material/Close';
+import {
+    Avatar,
+    Box, Button,
+    Grow,
+    IconButton,
+    Paper,
+    Slide,
+    Typography,
+    useMediaQuery, useTheme
+} from '@mui/material';
+import { keyframes, styled } from '@mui/system';
+import { useEffect, useState } from 'react';
 
 const pulse = keyframes`
     0% { transform: scale(1); }
@@ -66,61 +71,113 @@ const IconContainer = styled(Avatar)(({ theme }) => ({
     boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
 }));
 
-const InstallPrompt = () => {
-    const [showPrompt, setShowPrompt] = useState(false);
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+// Create a global module-level variable to store the prompt
+let globalDeferredPrompt: any = null;
+
+// Listen for beforeinstallprompt at module level (outside component)
+if (typeof window !== 'undefined') {
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent default browser install prompt
+        e.preventDefault();
+        // Store the event for later use
+        globalDeferredPrompt = e;
+        console.log('Captured install prompt at global level');
+    });
+}
+
+interface InstallPromptProps {
+    showAsComponent?: boolean;
+}
+
+const InstallPrompt = ({ showAsComponent = false }: InstallPromptProps) => {
+    const [showPrompt, setShowPrompt] = useState(showAsComponent);
     const [installing, setInstalling] = useState(false);
-    const [animateIn, setAnimateIn] = useState(false);
+    const [animateIn, setAnimateIn] = useState(showAsComponent);
     const theme = useTheme();
     const isWideScreen = useMediaQuery('(min-width:768px)');
+    const isStandalone = typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches;
 
     useEffect(() => {
-        // Check if user previously dismissed the prompt
-        const lastDismissed = localStorage.getItem('installPromptDismissed');
-        const isDismissed = lastDismissed && (Date.now() - parseInt(lastDismissed) < 24 * 60 * 60 * 1000);
+        // For standalone mode
+        if (!showAsComponent) {
+            // Check if user previously dismissed the prompt
+            const lastDismissed = localStorage.getItem('installPromptDismissed');
+            const isDismissed = lastDismissed && (Date.now() - parseInt(lastDismissed) < 24 * 60 * 60 * 1000);
 
-        if (isDismissed) return;
+            if (isDismissed || isStandalone) {
+                setShowPrompt(false);
+                return;
+            }
 
-        // Listen for beforeinstallprompt event
-        const handleBeforeInstallPrompt = (e: Event) => {
-            setDeferredPrompt(e);
-            setShowPrompt(true);
+            // If we already have a prompt captured, show standalone prompt
+            if (globalDeferredPrompt) {
+                console.log("Using previously captured prompt for standalone");
+                setShowPrompt(true);
+                setTimeout(() => setAnimateIn(true), 100);
+            }
 
-            // Add slight delay before animation for better effect
-            setTimeout(() => setAnimateIn(true), 100);
-        };
+            // Re-register for the event in case it hasn't fired yet
+            const handleBeforeInstallPrompt = (e: Event) => {
+                e.preventDefault();
+                globalDeferredPrompt = e;
+                console.log("Install prompt event captured in component");
 
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+                setShowPrompt(true);
+                setTimeout(() => setAnimateIn(true), 100);
+            };
 
-        // Check if app is already installed
-        if (window.matchMedia('(display-mode: standalone)').matches) {
-            setShowPrompt(false);
+            window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+            return () => {
+                window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            };
         }
-
-        return () => {
-            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-        };
-    }, []);
+    }, [isStandalone, showAsComponent]);
 
     const handleInstall = async () => {
-        if (!deferredPrompt) return;
+        // Always use the global captured prompt
+        if (!globalDeferredPrompt) {
+            console.log("No install prompt available");
+
+            // Show device-specific instructions
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+            if (isIOS && isSafari) {
+                alert("To install: tap the Share icon then 'Add to Home Screen'");
+            } else if (isMobile) {
+                alert("To install: tap on your browser's menu and select 'Add to Home Screen'");
+            } else {
+                alert("Installation not supported in this browser session");
+            }
+
+            return;
+        }
+
         setInstalling(true);
 
-        // Show the install prompt
-        deferredPrompt.prompt();
+        try {
+            // Show the install prompt
+            globalDeferredPrompt.prompt();
 
-        // Wait for the user to respond to the prompt
-        const choiceResult = await deferredPrompt.userChoice;
+            // Wait for the user to respond to the prompt
+            const choiceResult = await globalDeferredPrompt.userChoice;
 
-        // Reset state
-        setDeferredPrompt(null);
+            // Clear the saved prompt
+            globalDeferredPrompt = null;
 
-        if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-            // Wait briefly to show success state before dismissing
-            setTimeout(() => setShowPrompt(false), 1500);
-        } else {
-            console.log('User dismissed the install prompt');
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+                // Wait briefly to show success state before dismissing
+                setTimeout(() => setShowPrompt(false), 1500);
+            } else {
+                console.log('User dismissed the install prompt');
+                setInstalling(false);
+            }
+        } catch (error) {
+            console.error("Error during installation:", error);
+            alert("Installation encountered an error. Please try again later.");
             setInstalling(false);
         }
     };
@@ -131,8 +188,61 @@ const InstallPrompt = () => {
         localStorage.setItem('installPromptDismissed', Date.now().toString());
     };
 
-    if (!showPrompt) return null;
+    // Don't render standalone prompt if it shouldn't be shown
+    if (!showPrompt && !showAsComponent) return null;
 
+    // When used as a component inside NotificationPrompt
+    if (showAsComponent) {
+        const installAvailable = !!globalDeferredPrompt;
+
+        return (
+            <Box sx={{
+                width: '100%',
+                mt: 3,
+                animation: `${slideIn} 0.5s ease-out`,
+                borderRadius: '12px',
+                border: `1px solid ${theme.palette.divider}`,
+                padding: theme.spacing(2),
+            }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                    <IconContainer sx={{ width: 40, height: 40, boxShadow: 'none' }}>
+                        <AppShortcutIcon color="primary" sx={{ fontSize: 24 }} />
+                    </IconContainer>
+                    <Typography variant="h6" fontWeight="600">
+                        Install FET Hub App
+                    </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {installAvailable
+                        ? "Add to your home screen for quick access and a better experience."
+                        : isStandalone
+                            ? "You're already using the installed app!"
+                            : "For the best experience, install our web app on your device."}
+                </Typography>
+
+                {isStandalone ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CheckCircleOutlineIcon color="success" />
+                        <Typography variant="body2" color="success.main" fontWeight="medium">
+                            App installed successfully
+                        </Typography>
+                    </Box>
+                ) : (
+                    <InstallButton
+                        variant="contained"
+                        onClick={handleInstall}
+                        disabled={installing || isStandalone}
+                        startIcon={installing ? <CheckCircleOutlineIcon /> : <AppShortcutIcon />}
+                        sx={{ width: '100%' }}
+                    >
+                        {installing ? "Installing..." : "Add to Home Screen"}
+                    </InstallButton>
+                )}
+            </Box>
+        );
+    }
+
+    // Original standalone floating prompt - keep existing implementation
     return (
         <Slide direction={isWideScreen ? "left" : "up"} in={showPrompt} mountOnEnter unmountOnExit>
             <Box sx={{
@@ -143,6 +253,7 @@ const InstallPrompt = () => {
             }}>
                 <Grow in={animateIn} timeout={500}>
                     <StyledPaper elevation={6}>
+                        {/* Keep your existing implementation here */}
                         {/* Background decoration */}
                         <Box sx={{
                             position: 'absolute',
