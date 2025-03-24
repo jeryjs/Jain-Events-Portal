@@ -34,7 +34,6 @@ import eventRoutes from "@routes/eventRoutes";
 import activityRoutes from "@routes/activityRoutes";
 import articleRoutes from "@routes/articleRoutes";
 import authRoutes from "@routes/authRoutes";
-import { messaging } from "@config/firebase";
 
 const os = require("os");
 const app = express();
