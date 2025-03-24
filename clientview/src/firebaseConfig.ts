@@ -8,23 +8,25 @@ const firebaseConfig = JSON.parse(import.meta.env.VITE_FIREBASE_CLIENT_CONFIG_JS
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+let messaging = null;
 
 // Initialize FCM only if supported and already granted
-const initializeMessaging = async () => {
+export const initializeMessaging = async () => {
 	try {
 		// Check if messaging is supported in this environment
 		if (await isSupported()) {
-			const messaging = getMessaging(app);
-
 			// Only attempt to get token if permission is already granted
 			if (Notification.permission === "granted") {
-				getToken(messaging, { vapidKey: import.meta.env.VITE_FCM_PUBLIC_KEY })
-					.then((currentToken) => {
+				messaging = getMessaging(app);
+				await getToken(messaging, { vapidKey: import.meta.env.VITE_FCM_PUBLIC_KEY })
+					.then(async (currentToken) => {
 						if (currentToken) {
 							const subscribedToken = localStorage.getItem("subscribedToken");
 							if (subscribedToken !== currentToken) {
+								console.log("New token received. Subscribing to topic...");
+
 								// Subscribe to the 'all-users' topic
-								fetch(`${config.API_BASE_URL}/user/subscribe`, {
+								await fetch(`${config.API_BASE_URL}/user/subscribe`, {
 									method: "POST",
 									headers: {
 										"Content-Type": "application/json",
@@ -33,39 +35,41 @@ const initializeMessaging = async () => {
 								})
 									.then((response) => {
 										if (response.ok) {
+											console.log("Subscribed to topic successfully");
 											localStorage.setItem("subscribedToken", currentToken);
 										} else {
 											console.error("Failed to subscribe to topic");
+											return null;
 										}
 									})
 									.catch((err) => {
 										console.error("An error occurred while subscribing to topic. ", err);
+										return null;
 									});
 							}
 						}
 					})
 					.catch((err) => {
 						console.error("An error occurred while retrieving token. ", err);
+						return null;
 					});
+
+				// Handle incoming messages
+				onMessage(messaging, (payload) => {
+					console.log("Message received. ", payload);
+
+					// Customize notification handling here
+					if (Notification.permission === "granted") {
+						const notificationOptions = {
+							body: payload.notification.body,
+							icon: payload.notification.image,
+						};
+						new Notification(payload.notification.title, notificationOptions);
+					}
+				});
+				return messaging;
 			}
 
-			// Handle incoming messages
-			onMessage(messaging, (payload) => {
-				console.log("Message received. ", payload);
-
-				// Customize notification handling here
-				if (Notification.permission === "granted") {
-					const notificationOptions = {
-						body: payload.notification.body,
-						icon: payload.notification.image,
-					};
-
-					new Notification(payload.notification.title, notificationOptions);
-				}
-			});
-
-			return messaging;
-		} else {
 			console.log("Firebase messaging is not supported in this environment");
 			return null;
 		}
@@ -76,10 +80,8 @@ const initializeMessaging = async () => {
 };
 
 // Initialize messaging and export
-let messaging = null;
 initializeMessaging().then((result) => {
 	messaging = result;
 });
 
 export { analytics, app, messaging };
-

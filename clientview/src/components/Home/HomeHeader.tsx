@@ -56,14 +56,8 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ tabValue, onTabChange }) => {
             <Typography variant="h4" fontWeight="bold">Jain FET-Hub</Typography>
             <Typography variant="subtitle1" color="text.secondary">The Pulse of Jain FET</Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button 
-              component={Link} 
-              to="/timeline"
-              sx={{ mr: 2 }}
-            >
-              Timeline
-            </Button>
+          <Box sx={{ display: 'flex', gap: { xs: 0, sm: 1, md: 2 }, alignItems: 'center' }}>
+            <Button component={Link} to="/timeline">Timeline</Button>
             <ThemeSwitcher />
             <NotificationPrompt className="notification-bell" />
           </Box>

@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Box, Button, Popover, Typography, IconButton, 
-  useTheme, useMediaQuery, Avatar, Paper, Grow
-} from '@mui/material';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CloseIcon from '@mui/icons-material/Close';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import CloseIcon from '@mui/icons-material/Close';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { styled, keyframes } from '@mui/system';
-import { getMessaging, getToken, isSupported } from "firebase/messaging";
-import { app } from '../../firebaseConfig';
-import config from '../../config';
+import {
+  Avatar,
+  Box, Button,
+  Grow,
+  IconButton,
+  Paper,
+  Popover, Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import { keyframes, styled } from '@mui/system';
+import { useEffect, useState } from 'react';
+import { initializeMessaging } from '../../firebaseConfig';
 
 const pulse = keyframes`
   0% { transform: scale(1); }
@@ -31,17 +35,18 @@ const glowPulse = keyframes`
   100% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0); }
 `;
 
-const NotificationButton = styled(IconButton)(({ theme }) => ({
-  background: theme.palette.mode === 'light' 
-    ? 'linear-gradient(145deg, #ffffff, #f0f0f0)' 
+const NotificationButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== 'isSubscribed',
+})<{ isSubscribed?: boolean }>(({ theme, isSubscribed }) => ({
+  background: theme.palette.mode === 'light'
+    ? 'linear-gradient(145deg, #ffffff, #f0f0f0)'
     : 'linear-gradient(145deg, #2d3748, #252d3b)',
-  boxShadow: theme.palette.mode === 'light'
-    ? '5px 5px 10px #d9d9d9, -5px -5px 10px #ffffff'
-    : '5px 5px 10px #1a202c, -5px -5px 10px #2d3748',
-  width: 48,
-  height: 48,
+  // boxShadow: theme.palette.mode === 'light'
+  //   ? '5px 5px 10px #d9d9d9, -5px -5px 10px #ffffff'
+  //   : '5px 5px 10px #1a202c, -5px -5px 10px #2d3748',
+  width: 36,
   borderRadius: '50%',
-  animation: `${glowPulse} 2s infinite`,
+  animation: isSubscribed ? null : `${glowPulse} 2s infinite`,
   '&:hover': {
     background: theme.palette.mode === 'light'
       ? 'linear-gradient(145deg, #f0f0f0, #ffffff)'
@@ -104,8 +109,8 @@ const NotificationIconContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: theme.spacing(2),
-  background: theme.palette.mode === 'light' 
-    ? 'linear-gradient(135deg, #e3f2fd, #bbdefb)' 
+  background: theme.palette.mode === 'light'
+    ? 'linear-gradient(135deg, #e3f2fd, #bbdefb)'
     : 'linear-gradient(135deg, #4b6cb7, #182848)',
   boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
   animation: `${float} 3s ease infinite`,
@@ -122,14 +127,14 @@ const NotificationPrompt = ({ className }) => {
 
   useEffect(() => {
     // Check if already subscribed to notifications
-    const isSubscribed = localStorage.getItem('notificationsEnabled') === 'true';
+    const isSubscribed = localStorage.getItem('subscribedToken') != null;
     setSubscribedToNotifications(isSubscribed);
-    
+
     // Check current notification permission status
     if ('Notification' in window) {
       setPermissionStatus(Notification.permission);
     }
-  }, []);
+  }, [localStorage.subscribedToken]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -143,15 +148,16 @@ const NotificationPrompt = ({ className }) => {
 
   const handleEnableNotifications = async () => {
     setLoading(true);
-    
+
     try {
       // Only request permission when user clicks the button
       if ('Notification' in window) {
         const permission = await Notification.requestPermission();
         setPermissionStatus(permission);
-        
+
         if (permission === 'granted') {
-          await subscribeToNotifications();
+          const messaging = await initializeMessaging();
+          setSubscribedToNotifications(!!messaging);
         } else if (permission === 'denied') {
           // Show instructions to reset permissions
           setShowSettings(true);
@@ -164,51 +170,11 @@ const NotificationPrompt = ({ className }) => {
     }
   };
 
-  const subscribeToNotifications = async () => {
-    try {
-      // Check if messaging is supported
-      if (await isSupported()) {
-        const messaging = getMessaging(app);
-        
-        // Get FCM token
-        const token = await getToken(messaging, { 
-          vapidKey: import.meta.env.VITE_FCM_PUBLIC_KEY 
-        });
-        
-        if (token) {
-          // Subscribe to the 'all-users' topic
-          const response = await fetch(`${config.API_BASE_URL}/user/subscribe`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token, topic: "all-users" }),
-          });
-          
-          if (response.ok) {
-            localStorage.setItem("subscribedToken", token);
-            localStorage.setItem("notificationsEnabled", "true");
-            setSubscribedToNotifications(true);
-            
-            // Show success message briefly before closing
-            setTimeout(() => {
-              handleClose();
-            }, 1500);
-            
-            return true;
-          }
-        }
-      }
-      return false;
-    } catch (error) {
-      console.error("Error subscribing to notifications:", error);
-      return false;
-    }
-  };
-  
   const openBrowserSettings = () => {
     // Open instructions in a new tab based on browser
     const userAgent = navigator.userAgent.toLowerCase();
     let settingsUrl = '';
-    
+
     if (userAgent.indexOf("chrome") > -1) {
       settingsUrl = 'chrome://settings/content/notifications';
     } else if (userAgent.indexOf("firefox") > -1) {
@@ -218,7 +184,7 @@ const NotificationPrompt = ({ className }) => {
     } else if (userAgent.indexOf("edge") > -1) {
       settingsUrl = 'edge://settings/content/notifications';
     }
-    
+
     // For Chrome-like browsers, we can try to open the settings directly
     if (settingsUrl.startsWith('chrome://') || settingsUrl.startsWith('edge://')) {
       try {
@@ -243,22 +209,23 @@ const NotificationPrompt = ({ className }) => {
     if (userAgent.indexOf("edge") > -1) return "Edge";
     return "your browser";
   };
-  
+
   const open = Boolean(anchorEl);
-  
+
   return (
     <>
-      <NotificationButton 
+      <NotificationButton
         onClick={handleClick}
         className={className}
+        isSubscribed={subscribedToNotifications}
         color={subscribedToNotifications ? "primary" : "default"}
       >
-        {subscribedToNotifications 
-          ? <NotificationsActiveIcon color="primary" /> 
+        {subscribedToNotifications
+          ? <NotificationsActiveIcon color="primary" />
           : <NotificationsIcon />
         }
       </NotificationButton>
-      
+
       <Popover
         open={open}
         anchorEl={anchorEl}
@@ -272,7 +239,7 @@ const NotificationPrompt = ({ className }) => {
           horizontal: isMobile ? 'center' : 'right',
         }}
         PaperProps={{
-          style: { 
+          style: {
             backgroundColor: 'transparent',
             boxShadow: 'none',
             overflow: 'visible'
@@ -293,7 +260,7 @@ const NotificationPrompt = ({ className }) => {
               opacity: 0.06,
               zIndex: -1
             }} />
-            
+
             <Box sx={{
               position: 'absolute',
               bottom: -20,
@@ -305,7 +272,7 @@ const NotificationPrompt = ({ className }) => {
               opacity: 0.05,
               zIndex: -1
             }} />
-            
+
             {/* Close button */}
             <IconButton
               onClick={handleClose}
@@ -320,37 +287,37 @@ const NotificationPrompt = ({ className }) => {
             >
               <CloseIcon fontSize="small" />
             </IconButton>
-            
+
             {/* Main content */}
             {!showSettings ? (
               // Default view - enable notifications
               <>
                 <NotificationIconContainer>
-                  <NotificationsActiveIcon 
-                    sx={{ 
-                      fontSize: 40, 
+                  <NotificationsActiveIcon
+                    sx={{
+                      fontSize: 40,
                       color: theme.palette.primary.main,
                       animation: `${pulse} 2s infinite ease-in-out`
-                    }} 
+                    }}
                   />
                 </NotificationIconContainer>
-                
+
                 <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
                   {loading ? "Setting Up Notifications..." : "Never Miss an Event!"}
                 </Typography>
-                
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
-                  textAlign="center" 
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  textAlign="center"
                   sx={{ mb: 3, px: 1 }}
                 >
-                  {loading 
+                  {loading
                     ? "Preparing your personalized event notifications..."
                     : "Get instant updates about upcoming events, shrine timings and important announcements directly to your device."
                   }
                 </Typography>
-                
+
                 {permissionStatus !== 'granted' && !loading && !subscribedToNotifications && (
                   <EnableButton
                     variant="contained"
@@ -362,7 +329,7 @@ const NotificationPrompt = ({ className }) => {
                     Enable Notifications
                   </EnableButton>
                 )}
-                
+
                 {permissionStatus === 'denied' && !showSettings && (
                   <SecondaryButton
                     variant="outlined"
@@ -373,7 +340,7 @@ const NotificationPrompt = ({ className }) => {
                     Having trouble?
                   </SecondaryButton>
                 )}
-                
+
                 {permissionStatus === 'granted' && loading && (
                   <Box sx={{ py: 1.5, display: 'flex', justifyContent: 'center' }}>
                     <Typography variant="body2" color="primary" fontWeight="medium">
@@ -381,11 +348,13 @@ const NotificationPrompt = ({ className }) => {
                     </Typography>
                   </Box>
                 )}
-                
+
+                {console.log(`Notification Permission status: ${permissionStatus}, isSubscribed: ${subscribedToNotifications}`)}
+
                 {permissionStatus === 'granted' && !loading && subscribedToNotifications && (
                   <Box sx={{ textAlign: 'center', py: 1 }}>
                     <Avatar
-                      sx={{ 
+                      sx={{
                         bgcolor: 'success.light',
                         margin: '0 auto',
                         mb: 1
@@ -398,11 +367,11 @@ const NotificationPrompt = ({ className }) => {
                     </Typography>
                   </Box>
                 )}
-                
-                <Typography 
-                  variant="caption" 
-                  color="text.secondary" 
-                  textAlign="center" 
+
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  textAlign="center"
                   sx={{ mt: 2, opacity: 0.7 }}
                 >
                   You can change notification settings anytime
@@ -416,21 +385,21 @@ const NotificationPrompt = ({ className }) => {
                     <ErrorOutlineIcon sx={{ fontSize: 32, color: theme.palette.warning.dark }} />
                   </Avatar>
                 </Box>
-                
+
                 <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
                   Permission Required
                 </Typography>
-                
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
-                  textAlign="center" 
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  textAlign="center"
                   sx={{ mb: 3, px: 1 }}
                 >
                   Notifications have been blocked in {getBrowserName()}. To enable them:
                 </Typography>
-                
-                <Box sx={{ 
+
+                <Box sx={{
                   backgroundColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
                   borderRadius: 2,
                   p: 2,
@@ -444,7 +413,7 @@ const NotificationPrompt = ({ className }) => {
                     <li>Return to this page and try again</li>
                   </Typography>
                 </Box>
-                
+
                 <Button
                   variant="contained"
                   color="primary"
@@ -455,7 +424,7 @@ const NotificationPrompt = ({ className }) => {
                 >
                   Open Browser Settings
                 </Button>
-                
+
                 <Button
                   variant="text"
                   size="small"

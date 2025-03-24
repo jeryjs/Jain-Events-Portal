@@ -23,3 +23,15 @@ messaging.onBackgroundMessage((payload) => {
 
 	self.registration.showNotification(payload.notification.title, notificationOptions);
 });
+
+// Make sure the service worker is properly initialized
+self.addEventListener('install', (event) => {
+    console.log('Firebase messaging service worker installed');
+    self.skipWaiting(); // Ensure the service worker activates immediately
+});
+
+self.addEventListener('activate', (event) => {
+    console.log('Firebase messaging service worker activated');
+    // Take control of all clients immediately
+    event.waitUntil(clients.claim());
+});
