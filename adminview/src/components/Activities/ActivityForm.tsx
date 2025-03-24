@@ -1,5 +1,5 @@
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Box, Button, CircularProgress, FormControl, Grid2 as Grid, IconButton, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, FormControl, Grid2 as Grid, IconButton, InputLabel, ListSubheader, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
 import { ClearIcon, renderTimeViewClock } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -10,7 +10,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { EventType } from '@common/constants';
 import { Activity, CulturalActivity, InfoActivity, SportsActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
-import { getActivityTypes, getBaseEventType } from '@common/utils';
+import { getActivityTypes, getAllBaseEventTypes, getBaseEventType } from '@common/utils';
 
 import { CulturalsView } from './CulturalsView';
 import { GeneralView } from './GeneralView';
@@ -137,7 +137,11 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
             default: return <MemoizedGeneralView formData={formData} setFormData={setFormData} />;
         }
     }, [formData]);
-    const eventTypes = Object.entries(EventType).map(([key, value]) => ({ key, value }));
+    
+    const groupedActivityTypes = getAllBaseEventTypes().reduce((acc, type) => {
+        acc[getBaseEventType(type)] = getActivityTypes(type);
+        return acc;
+    }, {} as Record<EventType, EventType[]>);
 
     return (
         <Paper elevation={3} sx={{ p: 3 }}>
@@ -168,9 +172,43 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                             label="Activity Type"
                             onChange={(e) => handleChange('type', e.target.value)}
                         >
-                            {eventTypes.map(({ key, value }) => (
-                                Number(value) && <MenuItem key={key} value={value}>{key}</MenuItem>
-                            ))}
+                            {(() => {
+                                const [activeGroup, setActiveGroup] = useState<string | null>(null);
+                                
+                                return Object.entries(groupedActivityTypes).flatMap(([baseType, subTypes]) => {
+                                    const groupId = `group-${baseType}`;
+                                    
+                                    return [
+                                        <MenuItem value={baseType} data-group-id={groupId} onMouseEnter={() => setActiveGroup(groupId)}
+                                            onMouseLeave={(e) => {
+                                                // Only hide if not moving to another element with the same group ID
+                                                if (!e.relatedTarget || !(e.relatedTarget as Element).closest(`[data-group-id="${groupId}"]`)) {
+                                                    setActiveGroup(null);
+                                                }
+                                            }}
+                                        >
+                                            {pascalCase(EventType[baseType])}
+                                        </MenuItem>,
+                                        ...subTypes.map(subType => (
+                                            <MenuItem value={subType} data-group-id={groupId} onMouseEnter={() => setActiveGroup(groupId)}
+                                                onMouseLeave={(e) => {
+                                                    if (!e.relatedTarget || !(e.relatedTarget as Element).closest(`[data-group-id="${groupId}"]`)) {
+                                                        setActiveGroup(null);
+                                                    }
+                                                }}
+                                                sx={{ 
+                                                    maxHeight: activeGroup === groupId ? '32px' : '0px',
+                                                    opacity: activeGroup === groupId ? 1 : 0,
+                                                    padding: activeGroup === groupId ? '6px 40px' : '0px 40px',
+                                                    transition: 'max-height 300ms ease, opacity 300ms ease, padding 300ms ease',
+                                                }}
+                                            >
+                                                {pascalCase(EventType[subType])}
+                                            </MenuItem>
+                                        ))
+                                    ];
+                                });
+                            })()}
                         </Select>
                         {errors.type && <Typography color="error">{errors.type}</Typography>}
                     </FormControl>
