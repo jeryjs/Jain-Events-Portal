@@ -337,7 +337,7 @@ function EventPage() {
     'https://i.imgur.com/hnY5dx2l.jpeg',
     'https://i.imgur.com/toE2tOFl.jpeg',
     'https://i.imgur.com/2W2fEIYl.jpeg'
-  ] : [];
+  ] : null;
 
   return (
     <Suspense fallback={null}>
