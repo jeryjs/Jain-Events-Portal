@@ -1,14 +1,13 @@
 "use strict";
-
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-try{
+// Workaround for module-alias in vercel deployment.
+try {
     // Workaround for module-alias in vercel deployment.
     if (process.env.VERCEL == '1' || __filename.endsWith('.js')) {
         console.log("Registering tsconfig-paths");
-
         // Workaround for tsconfig-paths in vercel deployment.
         const tsConfigPaths = require("../../tsconfig.json").compilerOptions.paths;
         const resolvedPaths = {};
@@ -24,14 +23,15 @@ try{
             baseUrl: '.',
             paths: resolvedPaths
         });
-        console.log("BaseURL tsconfig-paths: "+ __dirname);
-        console.log("Original tsconfig-paths: "+ JSON.stringify(tsConfigPaths));
-        console.log("Registered tsconfig-paths: "+ JSON.stringify(resolvedPaths));
+        console.log("BaseURL tsconfig-paths: " + __dirname);
+        console.log("Original tsconfig-paths: " + JSON.stringify(tsConfigPaths));
+        console.log("Registered tsconfig-paths: " + JSON.stringify(resolvedPaths));
     }
     else {
         require('module-alias/register');
     }
-} catch(e) {
+}
+catch (e) {
     console.log("Error occurred during startup:", e);
     console.log("Current working directory:", process.cwd());
     console.log("Environment variables:", process.env);
@@ -39,7 +39,7 @@ try{
     console.log("dirname:", __dirname);
     console.log("VERCEL:", process.env.VERCEL);
     console.log("require test: ", require("@routes/eventRoutes"));
-    require('fs').readdirSync(__dirname).forEach(file => {
+    require('fs').readdirSync(__dirname).forEach((file) => {
         console.log(file);
     });
 }

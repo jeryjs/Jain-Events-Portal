@@ -377,8 +377,8 @@ class OtherSport {
 }
 exports.OtherSport = OtherSport;
 class SportsActivity extends Activity_1.default {
-    constructor(id, name, startTime, endTime, eventType, teams, participants, game) {
-        super(id, name, startTime, endTime, participants, eventType);
+    constructor(id, name, startTime, endTime, type, teams, participants, game) {
+        super(id, name, startTime, endTime, participants, type);
         this.teams = teams;
         this.participants = participants;
         this.game = game;
@@ -408,7 +408,7 @@ class SportsActivity extends Activity_1.default {
         }
         const participants = data.participants.map((p) => SportsPlayer_1.default.parse(p));
         const game = Object.assign(gameType, data.game);
-        return new SportsActivity(data.id, data.name, data.startTime, data.endTime, data.eventType, data.teams, participants, game);
+        return new SportsActivity(data.id, data.name, data.startTime, data.endTime, data.type || data.eventType, data.teams, participants, game);
     }
     // Get winning team details
     get winningTeam() {

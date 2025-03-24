@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CulturalActivity = exports.SportsPlayer = exports.OtherSport = exports.Basketball = exports.Football = exports.Cricket = exports.SportsActivity = exports.InfoActivity = exports.Article = exports.Participant = exports.Event = exports.Activity = exports.UserData = void 0;
+exports.Judge = exports.CulturalActivity = exports.SportsPlayer = exports.OtherSport = exports.Basketball = exports.Football = exports.Cricket = exports.SportsActivity = exports.InfoActivity = exports.Article = exports.Participant = exports.Event = exports.Activity = exports.UserData = void 0;
 // Export base models
 var UserData_1 = require("./UserData");
 Object.defineProperty(exports, "UserData", { enumerable: true, get: function () { return __importDefault(UserData_1).default; } });
@@ -30,3 +30,5 @@ Object.defineProperty(exports, "SportsPlayer", { enumerable: true, get: function
 // Export culturals models
 var CulturalActivity_1 = require("./culturals/CulturalActivity");
 Object.defineProperty(exports, "CulturalActivity", { enumerable: true, get: function () { return __importDefault(CulturalActivity_1).default; } });
+var Judge_1 = require("./culturals/Judge");
+Object.defineProperty(exports, "Judge", { enumerable: true, get: function () { return __importDefault(Judge_1).default; } });

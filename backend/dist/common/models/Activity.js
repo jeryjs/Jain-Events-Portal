@@ -9,13 +9,13 @@ const utils_1 = require("@common/utils");
 const models_1 = require("@common/models");
 class Activity {
     constructor(id, name, startTime, endTime, // can be null until the activity ends
-    participants, eventType) {
+    participants, type) {
         this.id = id;
         this.name = name;
         this.startTime = startTime;
         this.endTime = endTime;
         this.participants = participants;
-        this.eventType = eventType;
+        this.type = type;
         if (!this.startTime)
             this.startTime = new Date(); // TODO: Remove this line once testing is done.
         // Convert Timestamp-like objects (from firestore) to Date
@@ -25,15 +25,20 @@ class Activity {
             this.endTime = new Date(this.endTime);
     }
     static parse(data) {
+        // if data contains eventType, convert it to type
+        if (data.eventType) {
+            data.type = data.eventType;
+            delete data.eventType;
+        }
         // Determine the type of activity based on eventType
-        switch ((0, utils_1.getBaseEventType)(data.eventType)) {
+        switch ((0, utils_1.getBaseEventType)(data.type)) {
             case constants_1.EventType.SPORTS: return models_1.SportsActivity.parse(data);
             case constants_1.EventType.CULTURAL: return models_1.CulturalActivity.parse(data);
             case constants_1.EventType.INFO: return models_1.InfoActivity.parse(data);
             default:
                 // Default Activity parsing logic
                 const participants = data.participants.map((p) => Participant_1.default.parse(p));
-                return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.eventType);
+                return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.type);
         }
     }
     get isOngoing() {

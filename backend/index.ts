@@ -1,25 +1,28 @@
 // Workaround for module-alias in vercel deployment.
-try {
-	if (process.env.VERCEL == "1" || __filename.endsWith(".js")) {
-		// Workaround for tsconfig-paths in vercel deployment.
-		const tsConfigPaths = require("../../tsconfig.json").compilerOptions.paths;
-		const resolvedPaths: Record<string, string[]> = {};
-		for (const key in tsConfigPaths) {
-			resolvedPaths[key] = tsConfigPaths[key].map((path: string) => {
-				// Prepend __dirname only if the path is relative
-				if (path.startsWith("./") || path.startsWith("../")) return __dirname + "/" + path;
-				return path; // Keep absolute paths as is
-			});
-		}
-		require("tsconfig-paths").register({
-			baseUrl: ".",
-			paths: resolvedPaths,
+if (process.env.VERCEL == '1' || __filename.endsWith('.js')) {
+	console.log("Registering tsconfig-paths");
+
+	// Workaround for tsconfig-paths in vercel deployment.
+	const tsConfigPaths = require("../../tsconfig.json").compilerOptions.paths as Record<string, string[]>;
+	const resolvedPaths: Record<string, string[]> = {};
+	for (const key in tsConfigPaths) {
+		resolvedPaths[key] = tsConfigPaths[key].map(path => {
+			// Prepend __dirname only if the path is relative
+			if (path.startsWith("./") || path.startsWith("../"))
+				return __dirname + "/" + path;
+			return path; // Keep absolute paths as is
 		});
-	} else {
-		require("module-alias/register");
 	}
-} catch (e) {
-	console.error("Error in module-alias workaround:", e);
+	require('tsconfig-paths').register({
+		baseUrl: '.',
+		paths: resolvedPaths
+	});
+	console.log("BaseURL tsconfig-paths: "+ __dirname);
+	console.log("Original tsconfig-paths: "+ JSON.stringify(tsConfigPaths));
+	console.log("Registered tsconfig-paths: "+ JSON.stringify(resolvedPaths));
+}
+else {
+	require('module-alias/register');
 }
 
 import "dotenv/config";

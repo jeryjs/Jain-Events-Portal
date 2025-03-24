@@ -36,7 +36,7 @@ const getBaseEventType = (it) => {
         return constants_1.EventType.CULTURAL;
     if (it >= constants_1.EventType.SPORTS)
         return constants_1.EventType.SPORTS;
-    if (it >= constants_1.EventType.INFO)
+    if (it == constants_1.EventType.INFO)
         return constants_1.EventType.INFO;
     return constants_1.EventType.GENERAL;
 };
