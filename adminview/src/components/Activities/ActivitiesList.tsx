@@ -125,7 +125,7 @@ const ActivityItem = memo(({
 
   // Get additional details based on activity type - memoized
   const activityDetails = useMemo(() => {
-    const baseType = getBaseEventType(activity.eventType);
+    const baseType = getBaseEventType(activity.type);
 
     if (baseType === EventType.SPORTS && activity instanceof SportsActivity) {
       const teamsCount = activity.teams?.length || 0;
@@ -183,7 +183,7 @@ const ActivityItem = memo(({
             </Box>
           </Tooltip>
 
-          <ActivityTypeChip type={activity.eventType} />
+          <ActivityTypeChip type={activity.type} />
         </Stack>
         {activityDetails}
       </ActivityCard>
@@ -269,7 +269,7 @@ export const ActivitiesList = ({ eventId, selectedActivityId, onSelectActivity, 
   const filteredActivities = useMemo(() =>
     filter === undefined
       ? activities
-      : activities.filter(activity => activity.eventType === filter),
+      : activities.filter(activity => activity.type === filter),
     [activities, filter]
   );
 
@@ -354,7 +354,7 @@ export const ActivitiesList = ({ eventId, selectedActivityId, onSelectActivity, 
 
   // Create unique event types list - memoized
   const uniqueEventTypes = useMemo(() =>
-    Array.from(new Set(activities.map(activity => activity.eventType))),
+    Array.from(new Set(activities.map(activity => activity.type))),
     [activities]
   );
 
@@ -443,9 +443,9 @@ export const ActivitiesList = ({ eventId, selectedActivityId, onSelectActivity, 
             onChange={handleFilterChange}
           >
             <ToggleButton value={undefined}>All</ToggleButton>
-            {uniqueEventTypes.map(eventType => (
-              <ToggleButton key={eventType} value={eventType}>
-                {EventType[eventType]}
+            {uniqueEventTypes.map(type => (
+              <ToggleButton key={type} value={type}>
+                {EventType[type]}
               </ToggleButton>
             ))}
           </ToggleButtonGroup>

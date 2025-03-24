@@ -10,7 +10,7 @@ export default class Activity {
         public startTime: Date,
         public endTime: Date,   // can be null until the activity ends
         public participants: Participant[],
-        public eventType: EventType
+        public type: EventType
     ) {
         if(!this.startTime) this.startTime = new Date();  // TODO: Remove this line once testing is done.
 
@@ -20,15 +20,21 @@ export default class Activity {
     }
     
     static parse(data: any): Activity {
+        // if data contains eventType, convert it to type
+        if (data.eventType) {
+            data.type = data.eventType;
+            delete data.eventType;
+        }
+
         // Determine the type of activity based on eventType
-        switch (getBaseEventType(data.eventType)) { 
+        switch (getBaseEventType(data.type)) { 
             case EventType.SPORTS: return SportsActivity.parse(data);
             case EventType.CULTURAL: return CulturalActivity.parse(data);
             case EventType.INFO: return InfoActivity.parse(data);
             default:
                 // Default Activity parsing logic
                 const participants = data.participants.map((p: any) => Participant.parse(p));
-                return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.eventType);
+                return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.type);
         }
     }
 

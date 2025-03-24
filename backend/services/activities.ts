@@ -10,7 +10,6 @@ import {
   updateCachedItem, 
   deleteCachedItem 
 } from '@utils/cacheUtils';
-import { getUserFromToken } from '@utils/authUtils';
 
 // Collection references
 const eventsCollection = db.collection('events');

@@ -27,7 +27,7 @@ export const SportsView = ({ activity }: { activity: SportsActivity<Sport> }) =>
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const renderSportsContent = () => {
-        switch (activity.eventType) {
+        switch (activity.type) {
             case EventType.CRICKET: return <CricketView activity={activity} />;
             case EventType.BASKETBALL: return <BasketballView activity={activity} />;
             case EventType.FOOTBALL: return <FootballView activity={activity} />;

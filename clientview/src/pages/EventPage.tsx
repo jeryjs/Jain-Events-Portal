@@ -110,15 +110,15 @@ const getEventTypeInfo = (type: EventType) => {
 
 // Activity Accordion Component
 interface ActivityAccordionProps {
-  eventType: EventType;
+  activityType: EventType;
   activities: any[];
   eventId: string;
 }
 
-const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activities, eventId }) => {
+const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, activities, eventId }) => {
   const [expanded, setExpanded] = useState(activities.length <= 3);
   const [fixtureDialog, setFixtureDialog] = useState<string | Record<string, string> | null>(null);
-  const { text: activityType, color } = getEventTypeInfo(eventType);
+  const { text: activityTypeText, color } = getEventTypeInfo(activityType);
 
   /// Hardcoding the fixture data for the sportastica-2025 event temporarily
   const fixtures = eventId === "sportastica-2025" && {
@@ -131,7 +131,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
 
   const handleFixtureClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const fixture = fixtures[eventType];
+    const fixture = fixtures[activityType];
     fixture && setFixtureDialog(fixture);
   };
 
@@ -139,7 +139,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
     !fixtureDialog ? null : typeof fixtureDialog === "string" ? (
       <motion.img
         src={fixtureDialog}
-        alt={`Fixture for ${activityType}`}
+        alt={`Fixture for ${activityTypeText}`}
         style={{ width: "100%" }}
       />
     ) : (
@@ -149,7 +149,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
             <Typography variant="subtitle2">{key}</Typography>
             <motion.img
               src={url}
-              alt={`Fixture ${key} for ${activityType}`}
+              alt={`Fixture ${key} for ${activityTypeText}`}
               style={{ width: "100%" }}
             />
           </Box>
@@ -169,13 +169,13 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
         }}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ backgroundColor: alpha(color, 0.1), "& .MuiAccordionSummary-content": { alignItems: "center" } }}>
-          <Chip label={activityType} size="small" sx={{ backgroundColor: alpha(color, 0.3), fontWeight: "medium", mr: 2 }} />
+          <Chip label={activityTypeText} size="small" sx={{ backgroundColor: alpha(color, 0.3), fontWeight: "medium", mr: 2 }} />
 
           <Typography variant="subtitle1" sx={{ fontWeight: "medium" }}>
-            {activities.length}{" "} {getBaseEventType(eventType) === EventType.SPORTS ? "Matches" : activities.length === 1 ? "Activity" : "Activities"}
+            {activities.length}{" "} {getBaseEventType(activityType) === EventType.SPORTS ? "Matches" : activities.length === 1 ? "Activity" : "Activities"}
           </Typography>
 
-          {fixtures[eventType] && (<IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
+          {fixtures[activityType] && (<IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
             <Typography variant="caption">Fixtures</Typography>
           </IconButton>)}
         </AccordionSummary>
@@ -223,8 +223,8 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
   }
 
   // Separate info activities from other activities
-  const infoActivities = activities.filter(activity => getBaseEventType(activity.eventType) === EventType.INFO);
-  const nonInfoActivities = activities.filter(activity => getBaseEventType(activity.eventType) !== EventType.INFO);
+  const infoActivities = activities.filter(activity => getBaseEventType(activity.type) === EventType.INFO);
+  const nonInfoActivities = activities.filter(activity => getBaseEventType(activity.type) !== EventType.INFO);
 
   // Group activities by event type
   const groupedActivities: Record<number, any[]> = {};
@@ -236,7 +236,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
 
   // Then handle the rest of activity types
   nonInfoActivities.forEach(activity => {
-    const activityType = activity.eventType;
+    const activityType = activity.type;
     if (!groupedActivities[activityType]) {
       groupedActivities[activityType] = [];
     }
@@ -250,7 +250,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
         .map(([type, acts]) => (
           <ActivityAccordion
             key={type}
-            eventType={Number(type) as EventType}
+            activityType={Number(type) as EventType}
             activities={acts}
             eventId={eventId}
           />

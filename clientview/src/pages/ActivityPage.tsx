@@ -13,7 +13,7 @@ import { alpha, styled } from '@mui/material/styles';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { EventType } from '@common/constants';
-import { InfoActivity, SportsActivity } from '@common/models';
+import { Activity, InfoActivity, SportsActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getBaseEventType } from '@common/utils';
 import { ActivitySkeleton, CulturalsView, GeneralView, InfoView, SportsView, TechView } from '@components/Activity';
@@ -69,8 +69,8 @@ function ActivityPage() {
     navigate(`/${eventId}`);
   };
 
-  // Determine activity type based on eventType enum
-  const baseType = getBaseEventType(activity.eventType);
+  // Determine activity type based on EventType enum
+  const baseType = getBaseEventType(activity.type);
 
   return (
     <PageTransition>
@@ -95,9 +95,9 @@ function ActivityPage() {
 }
 
 // Activity Header Component
-const ActivityHero = ({ activity, baseType, handleBack }) => {
+const ActivityHero = ({ activity, baseType, handleBack }: { activity: Activity; baseType: EventType; handleBack: () => void; }) => {
   // Get appropriate background color based on activity type
-  const getBgColor = (type) => {
+  const getBgColor = (type: EventType) => {
     switch (type) {
       case EventType.SPORTS: return 'primary.main';
       case EventType.CULTURAL: return 'secondary.main';
@@ -107,7 +107,7 @@ const ActivityHero = ({ activity, baseType, handleBack }) => {
   };
 
   // Get activity type label
-  const getActivityTypeLabel = (type) => {
+  const getActivityTypeLabel = (type: EventType) => {
     return pascalCase(EventType[type]) + " Activity";
   };
 
@@ -143,7 +143,7 @@ const ActivityHero = ({ activity, baseType, handleBack }) => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
           <HeaderChip
-            label={getActivityTypeLabel(activity.eventType)}
+            label={getActivityTypeLabel(activity.type)}
             sx={{
               bgcolor: (theme) => theme.palette.background.paper,
               color: getBgColor(baseType),

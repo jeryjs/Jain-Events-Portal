@@ -56,7 +56,7 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
 
   // Render sport-specific form based on selected sport type
   const renderSportSpecificForm = useCallback(() => {
-    switch (formData.eventType) {
+    switch (formData.type) {
       case EventType.CRICKET: return <CricketForm formData={formData as SportsActivity<Cricket>} setFormData={setFormData} />;
       case EventType.BASKETBALL: return <BasketballForm formData={formData as SportsActivity<Basketball>} setFormData={setFormData} />;
       case EventType.FOOTBALL: return <FootballForm formData={formData as SportsActivity<Football>} setFormData={setFormData} />;

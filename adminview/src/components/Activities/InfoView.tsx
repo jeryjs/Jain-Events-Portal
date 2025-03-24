@@ -39,16 +39,20 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
   
   // Initialize editor with content when component mounts or content changes
   useEffect(() => {
-    if (!formData.content) {
-      editor.replaceBlocks(editor.document, []);
-      return;
-    }
-    
-    // Only parse to BlockNote if it's markdown content
-    if (contentType === 'markdown') {
-      editor.tryParseMarkdownToBlocks(formData.content).then((blocks) => {
-        editor.replaceBlocks(editor.document, blocks);
-      });
+    try{
+      if (!formData.content) {
+        editor.replaceBlocks(editor.document, []);
+        return;
+      }
+      
+      // Only parse to BlockNote if it's markdown content
+      if (contentType === 'markdown') {
+        editor.tryParseMarkdownToBlocks(formData.content).then((blocks) => {
+          editor.replaceBlocks(editor.document, blocks);
+        });
+      }
+    } catch (error) {
+      console.error('Error initializing editor:', error);
     }
   }, [formData.id, contentType]); // Reinitialize when activity ID or content type changes
   

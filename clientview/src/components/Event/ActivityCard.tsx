@@ -142,8 +142,8 @@ interface ActivityCardProps {
 // Helper functions
 const getActivityType = (type: EventType): string => EventType[type] || 'Activity';
 const getChipColor = (type: EventType): string => generateColorFromString(getActivityType(type));
-const isSportsActivity = (activity: Activity): boolean => getBaseEventType(activity.eventType) === EventType.SPORTS;
-const isInfoActivity = (activity: Activity): boolean => getBaseEventType(activity.eventType) === EventType.INFO;
+const isSportsActivity = (activity: Activity): boolean => getBaseEventType(activity.type) === EventType.SPORTS;
+const isInfoActivity = (activity: Activity): boolean => getBaseEventType(activity.type) === EventType.INFO;
 
 const getActivityStatus = (activity: Activity): 'upcoming' | 'ongoing' | 'completed' => {
   const now = new Date();
@@ -183,8 +183,8 @@ const MotionLink = styled(motion.div)`
 `;
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 0 }) => {
-  const activityType = getActivityType(activity.eventType);
-  const chipColor = getChipColor(activity.eventType);
+  const activityType = getActivityType(activity.type);
+  const chipColor = getChipColor(activity.type);
   const participantCount = activity.participants?.length || 0;
   const isSports = isSportsActivity(activity);
   const isInfo = isInfoActivity(activity);
@@ -499,7 +499,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
   // Sports Card Component
   const SportsCard = ({ sportActivity, status, eventId }: { sportActivity: SportsActivity<Sport>, status: 'upcoming' | 'ongoing' | 'completed', eventId: string }) => {
     const matchResult = sportActivity.getMatchResult();
-    const sportIcon = getSportIcon(activity.eventType);
+    const sportIcon = getSportIcon(activity.type);
 
     // Get teams
     const team1 = sportActivity.teams?.[0];
@@ -728,7 +728,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
     return <InfoCard activity={activity as InfoActivity} chipColor={chipColor} eventId={eventId} />;
   } else if (isSports) {
     const sportActivity = activity as SportsActivity<Sport>;
-    if (activity.eventType === EventType.ATHLETICS) {
+    if (activity.type === EventType.ATHLETICS) {
       return <AthleticsCard sportActivity={sportActivity} status={status} eventId={eventId} />;
     }
     return <SportsCard sportActivity={sportActivity} status={status} eventId={eventId} />;

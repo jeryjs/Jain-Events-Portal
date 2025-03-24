@@ -430,12 +430,12 @@ class SportsActivity<T extends Sport> extends Activity {
 		name: string,
 		startTime: Date,
 		endTime: Date,
-		eventType: EventType,
+		type: EventType,
 		public teams: { id: string; name: string }[],
 		public participants: SportsPlayer[],
 		public game: T
 	) {
-		super(id, name, startTime, endTime, participants, eventType);
+		super(id, name, startTime, endTime, participants, type);
 	}
 
 	static parse(data: any): SportsActivity<Sport> {
@@ -452,7 +452,7 @@ class SportsActivity<T extends Sport> extends Activity {
 
 		const participants = data.participants.map((p: any) => SportsPlayer.parse(p));
 		const game = Object.assign(gameType, data.game);
-		return new SportsActivity<typeof gameType>(data.id, data.name, data.startTime, data.endTime, data.eventType, data.teams, participants, game);
+		return new SportsActivity<typeof gameType>(data.id, data.name, data.startTime, data.endTime, data.type || data.eventType, data.teams, participants, game);
 	}
 	
 	// Get winning team details

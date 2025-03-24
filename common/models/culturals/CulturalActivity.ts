@@ -6,6 +6,7 @@ class CulturalActivity extends Activity {
     name: string, 
     startTime: Date,
     endTime: Date,
+    type: EventType,
     participants: Participant[],
     public judges: Judge[] = [],
     public teams: {id: string, name: string}[] = [],
@@ -14,13 +15,13 @@ class CulturalActivity extends Activity {
     public winners: {teamId: string, rank: number}[] = [],  // for solo events, teamId is the participant's usn
     public stats: any[] = [],
   ) {
-    super(id, name, startTime, endTime, participants, EventType.CULTURAL);
+    super(id, name, startTime, endTime, participants, type);
   }
 
   static parse(data: any): CulturalActivity {
-    const s = super.parse({...data, eventType: 0});  // set type to 0 to avoid circular reference
+    const s = super.parse({...data, type: 0});  // set type to 0 to avoid circular reference
     const judges = data.judges?.map((j: any) => Participant.parse(j));
-    return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, data.stats);
+    return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, data.type || data.eventType, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, data.stats);
   }
 
   get isSoloPerformance() {

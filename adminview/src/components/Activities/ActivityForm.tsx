@@ -10,12 +10,13 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import { EventType } from '@common/constants';
 import { Activity, CulturalActivity, InfoActivity, SportsActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
-import { getBaseEventType } from '@common/utils';
+import { getActivityTypes, getBaseEventType } from '@common/utils';
 
 import { CulturalsView } from './CulturalsView';
 import { GeneralView } from './GeneralView';
 import { InfoView } from './InfoView';
 import { SportsView } from './SportsView';
+import { pascalCase } from '@utils/utils';
 
 interface ActivityFormProps {
     eventId?: string;
@@ -34,7 +35,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
     const [formData, setFormData] = useState<Partial<Activity>>({
         id: '',
         name: '',
-        eventType: EventType.GENERAL,
+        type: EventType.GENERAL,
         startTime: new Date(),
         endTime: undefined,  // Add endTime field with default undefined
         participants: []
@@ -53,7 +54,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
             setFormData(Activity.parse({
                 id: '',
                 name: '',
-                eventType: EventType.GENERAL,
+                type: EventType.GENERAL,
                 startTime: new Date(),
                 endTime: undefined,
                 participants: [],
@@ -66,7 +67,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
     }, [activity]);
 
     // Handle form field changes
-    const handleChange = useCallback((field: string, value: any) => {
+    const handleChange = useCallback((field: keyof Activity, value: any) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -81,13 +82,13 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
             newErrors.name = 'Activity name is required';
         }
 
-        if (!formData.eventType) {
-            newErrors.eventType = 'Activity type is required';
+        if (!formData.type) {
+            newErrors.type = 'Activity type is required';
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
-    }, [formData.name, formData.eventType]);
+    }, [formData.name, formData.type]);
 
     // Handle form submission
     const handleSubmit = useCallback(async () => {
@@ -128,7 +129,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
 
     // Render different view based on activity type - memoized
     const renderActivityTypeSpecificView = useCallback(() => {
-        switch (getBaseEventType(formData.eventType)) {
+        switch (getBaseEventType(formData.type)) {
             case EventType.INFO: return <MemoizedInfoView formData={formData as InfoActivity} setFormData={setFormData} />;
             case EventType.SPORTS: return <MemoizedSportsView formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
             case EventType.CULTURAL: return <MemoizedCulturalsView formData={formData as CulturalActivity} setFormData={setFormData} />;
@@ -160,18 +161,18 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                         required
                     />
 
-                    <FormControl fullWidth margin="normal" error={!!errors.eventType}>
+                    <FormControl fullWidth margin="normal" error={!!errors.type}>
                         <InputLabel>Activity Type</InputLabel>
                         <Select
-                            value={formData.eventType || ''}
+                            value={formData.type || ''}
                             label="Activity Type"
-                            onChange={(e) => handleChange('eventType', e.target.value)}
+                            onChange={(e) => handleChange('type', e.target.value)}
                         >
                             {eventTypes.map(({ key, value }) => (
                                 Number(value) && <MenuItem key={key} value={value}>{key}</MenuItem>
                             ))}
                         </Select>
-                        {errors.eventType && <Typography color="error">{errors.eventType}</Typography>}
+                        {errors.type && <Typography color="error">{errors.type}</Typography>}
                     </FormControl>
                     <Grid container spacing={2} sx={{ mt: 1 }}>
                         <Grid size={{xs:12, md:6}} display="flex" alignItems="center">
