@@ -23,7 +23,14 @@
         },
         {
             "src": "/(.*)",
-            "dest": "/clientview/"
+            "dest": "/clientview/$1"
+        },
+        {
+            "handle": "filesystem"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/clientview/index.html"
         }
     ]
 }
