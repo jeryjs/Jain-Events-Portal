@@ -96,6 +96,7 @@ const SwipeThumb = styled(motion.div)(({ theme }) => ({
 const SwipeText = styled(motion(Typography))(({ theme }) => ({
   position: 'absolute',
   width: '100%',
+  marginTop: '16px',
   textAlign: 'center',
   fontWeight: 600,
   fontSize: '0.875rem',

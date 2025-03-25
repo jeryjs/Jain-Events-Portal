@@ -93,9 +93,6 @@ export const CulturalsView = ({
 
   const isEmptyJudges = !activity.judges || activity.judges.length === 0;
 
-  console.log(selectedJudge);
-  
-
   return (
     <Box>
       {/* Judges Section */}

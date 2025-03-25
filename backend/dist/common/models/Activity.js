@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TeamActivity = void 0;
 const Participant_1 = __importDefault(require("./Participant"));
 const constants_1 = require("../constants");
 const utils_1 = require("@common/utils");
@@ -35,7 +36,10 @@ class Activity {
             case constants_1.EventType.SPORTS: return models_1.SportsActivity.parse(data);
             case constants_1.EventType.CULTURAL: return models_1.CulturalActivity.parse(data);
             case constants_1.EventType.INFO: return models_1.InfoActivity.parse(data);
+            case constants_1.EventType.TECH: return TeamActivity.parse(data);
             default:
+                if (data.teams)
+                    return TeamActivity.parse(data);
                 // Default Activity parsing logic
                 const participants = data.participants.map((p) => Participant_1.default.parse(p));
                 return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.type);
@@ -51,3 +55,13 @@ class Activity {
     }
 }
 exports.default = Activity;
+class TeamActivity extends Activity {
+    constructor(id, name, startTime, endTime, type, participants, teams = []) {
+        super(id, name, startTime, endTime, participants, type);
+        this.teams = teams;
+    }
+    static parse(data) {
+        return new TeamActivity(data.id, data.name, data.startTime, data.endTime, data.type || data.eventType, data.participants.map((p) => Participant_1.default.parse(p)), data.teams);
+    }
+}
+exports.TeamActivity = TeamActivity;

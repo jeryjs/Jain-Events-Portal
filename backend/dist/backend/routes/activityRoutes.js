@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const activities_1 = require("@services/activities");
 const auth_1 = require("@middlewares/auth");
-const authUtils_1 = require("@utils/authUtils");
 const router = express_1.default.Router();
 /**
  * Activity Routes
@@ -115,7 +114,7 @@ router.get('/:eventId/:activityId/poll', (req, res) => __awaiter(void 0, void 0,
 // Cast a vote for a participant
 router.post('/:eventId/:activityId/vote/:teamId', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userdata = (0, authUtils_1.getUserFromToken)(req.headers.authorization || '');
+        const userdata = 'user' in req ? req.user : null;
         if (!userdata) {
             res.status(400).json({ message: 'User data missing from token' });
             return;

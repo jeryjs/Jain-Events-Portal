@@ -33,7 +33,7 @@ const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunc
     }
     
     // Attach user data to request
-    req.user = decoded as UserData;
+    req.user = UserData.parse(decoded);
     next();
   } catch (error) {
     // Handle specific token errors

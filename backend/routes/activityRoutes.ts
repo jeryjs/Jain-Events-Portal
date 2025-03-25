@@ -11,6 +11,7 @@ import {
 } from '@services/activities';
 import { adminMiddleware, authMiddleware, managerMiddleware } from '@middlewares/auth';
 import { getUserFromToken } from '@utils/authUtils';
+import { UserData } from '@common/models';
 
 const router = express.Router();
 
@@ -114,7 +115,7 @@ router.get('/:eventId/:activityId/poll', async (req: Request, res: Response) => 
 // Cast a vote for a participant
 router.post('/:eventId/:activityId/vote/:teamId', authMiddleware, async (req: Request, res: Response) => {
     try {
-        const userdata = getUserFromToken(req.headers.authorization || '');
+        const userdata = 'user' in req ? req.user as UserData : null;
         if (!userdata) {
             res.status(400).json({ message: 'User data missing from token' });
             return;

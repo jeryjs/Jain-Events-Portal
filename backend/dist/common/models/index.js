@@ -3,12 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Judge = exports.CulturalActivity = exports.SportsPlayer = exports.OtherSport = exports.Basketball = exports.Football = exports.Cricket = exports.SportsActivity = exports.InfoActivity = exports.Article = exports.TeamParticipant = exports.Participant = exports.Event = exports.Activity = exports.UserData = void 0;
+exports.Judge = exports.CulturalActivity = exports.SportsPlayer = exports.OtherSport = exports.Basketball = exports.Football = exports.Cricket = exports.SportsActivity = exports.InfoActivity = exports.Article = exports.TeamParticipant = exports.Participant = exports.Event = exports.TeamActivity = exports.Activity = exports.UserData = void 0;
 // Export base models
 var UserData_1 = require("./UserData");
 Object.defineProperty(exports, "UserData", { enumerable: true, get: function () { return __importDefault(UserData_1).default; } });
 var Activity_1 = require("./Activity");
 Object.defineProperty(exports, "Activity", { enumerable: true, get: function () { return __importDefault(Activity_1).default; } });
+Object.defineProperty(exports, "TeamActivity", { enumerable: true, get: function () { return Activity_1.TeamActivity; } });
 var Event_1 = require("./Event");
 Object.defineProperty(exports, "Event", { enumerable: true, get: function () { return __importDefault(Event_1).default; } });
 var Participant_1 = require("./Participant");

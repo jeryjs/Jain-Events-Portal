@@ -62,22 +62,18 @@
             }
         ],
         "teams": [
-            { "id": "teamA", "name": "A-Team" },
-            { "id": "teamB", "name": "B-Force" }
+            { "usn": "dancer1", "name": "Alice Dancer" },
+            { "usn": "dancer2", "name": "Bob Dancer" },
+            { "usn": "dancer3", "name": "Charlie Dancer" }
         ],
         "pollData": [
-            { "teamId": "teamA", "votes": ["voter1", "voter2"] },
-            { "teamId": "teamB", "votes": ["voter3", "voter4", "voter5"] }
+            { "teamId": "dancer1", "votes": ["voter1", "voter2"] },
+            { "teamId": "dancer2", "votes": ["voter3", "voter4", "voter5"] }
         ],
         "showPoll": true,
         "winners": [
-            { "teamId": "teamB", "rank": 1 },
-            { "teamId": "teamA", "rank": 2 }
-        ],
-        "stats": [
-            { "name": "Total Votes", "value": 5 },
-            { "name": "Team A Votes", "value": 2 },
-            { "name": "Team B Votes", "value": 3 }
+            { "teamId": "dancer2", "rank": 1 },
+            { "teamId": "dancer1", "rank": 2 }
         ],
         "type": 2001,
         "performanceDetails": "An energetic dance performance featuring a blend of traditional and contemporary choreography by top local dance troupes. Venue: Main Auditorium. The event promises vibrant costumes, dynamic lighting, and an engaging narrative."

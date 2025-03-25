@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.hasMinimumRole = exports.isAuthenticated = exports.managerMiddleware = exports.adminMiddleware = exports.authMiddleware = void 0;
 const authUtils_1 = require("@utils/authUtils");
 const constants_1 = require("@common/constants");
+const models_1 = require("@common/models");
 /**
  * @description Middleware to authenticate user based on JWT token.
  */
@@ -25,7 +26,7 @@ const authMiddleware = (req, res, next) => {
             return;
         }
         // Attach user data to request
-        req.user = decoded;
+        req.user = models_1.UserData.parse(decoded);
         next();
     }
     catch (error) {
