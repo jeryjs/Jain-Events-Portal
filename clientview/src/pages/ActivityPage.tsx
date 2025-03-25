@@ -13,7 +13,7 @@ import { alpha, styled } from '@mui/material/styles';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { EventType } from '@common/constants';
-import { Activity, InfoActivity, SportsActivity } from '@common/models';
+import { Activity, CulturalActivity, InfoActivity, SportsActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getBaseEventType } from '@common/utils';
 import { ActivitySkeleton, CulturalsView, GeneralView, InfoView, SportsView, TechView } from '@components/Activity';
@@ -84,7 +84,7 @@ function ActivityPage() {
             case EventType.GENERAL: return <GeneralView activity={activity} />;
             case EventType.INFO: return <InfoView activity={activity as InfoActivity} />;
             case EventType.SPORTS: return <SportsView activity={activity as SportsActivity<Sport>} />;
-            case EventType.CULTURAL: return <CulturalsView eventId={eventId} activity={activity} />;
+            case EventType.CULTURAL: return <CulturalsView eventId={eventId} activity={activity as CulturalActivity} />;
             case EventType.TECH: return <TechView activity={activity} />;
             default: return null;
           }
