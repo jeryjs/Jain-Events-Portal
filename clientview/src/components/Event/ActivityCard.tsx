@@ -653,9 +653,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                 </Box>
               </Box>
               <Divider sx={{ mt: 0.5 }} />
-              <Box sx={{ bgcolor: 'background.default', p: 1.5, borderRadius: 1, position: 'relative', overflow: 'hidden', '&::after': { content: '""', position: 'absolute', bottom: 0, left: 0, right: 0, height: '20px' } }}>
+              <Card sx={{ p: 1.5, borderRadius: 1, position: 'relative', overflow: 'hidden', '&::after': { content: '""', position: 'absolute', bottom: 0, left: 0, right: 0, height: '20px' } }}>
                 <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.4, display: '-webkit-box', overflow: 'hidden', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}>{contentPreview}</Typography>
-              </Box>
+              </Card>
               <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="caption" color="text.secondary">
                   {new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
