@@ -31,7 +31,9 @@ export default class Activity {
             case EventType.SPORTS: return SportsActivity.parse(data);
             case EventType.CULTURAL: return CulturalActivity.parse(data);
             case EventType.INFO: return InfoActivity.parse(data);
+            case EventType.TECH: return TeamActivity.parse(data);
             default:
+                if (data.teams) return TeamActivity.parse(data);
                 // Default Activity parsing logic
                 const participants = data.participants.map((p: any) => Participant.parse(p));
                 return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.type);
@@ -44,4 +46,30 @@ export default class Activity {
         if (this.startTime > now && !this.endTime) return true;
         return this.startTime >= now && now < this.endTime;
     }
+}
+
+export class TeamActivity extends Activity {
+  constructor(
+    id: string,
+    name: string,
+    startTime: Date,
+    endTime: Date,
+    type: EventType,
+    participants: Participant[],
+    public teams: { id: string; name: string }[] = []
+  ) {
+    super(id, name, startTime, endTime, participants, type);
+  }
+
+  static parse(data: any): TeamActivity {
+    return new TeamActivity(
+      data.id,
+      data.name,
+      data.startTime,
+      data.endTime,
+      data.type || data.eventType,
+      data.participants.map((p: any) => Participant.parse(p)),
+      data.teams
+    );
+  }
 }

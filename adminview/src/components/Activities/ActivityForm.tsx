@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { memo, useCallback, useEffect, useState } from 'react';
 
 import { EventType } from '@common/constants';
-import { Activity, CulturalActivity, InfoActivity, SportsActivity } from '@common/models';
+import { Activity, CulturalActivity, InfoActivity, SportsActivity, TeamActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getActivityTypes, getAllBaseEventTypes, getBaseEventType } from '@common/utils';
 
@@ -16,6 +16,7 @@ import { CulturalsView } from './CulturalsView';
 import { GeneralView } from './GeneralView';
 import { InfoView } from './InfoView';
 import { SportsView } from './SportsView';
+import { TechnicalView } from './TechnicalView';
 import { pascalCase } from '@utils/utils';
 
 interface ActivityFormProps {
@@ -30,6 +31,7 @@ const MemoizedSportsView = memo(SportsView);
 const MemoizedCulturalsView = memo(CulturalsView);
 const MemoizedGeneralView = memo(GeneralView);
 const MemoizedInfoView = memo(InfoView);
+const MemoizedTechnicalView = memo(TechnicalView);
 
 export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }: ActivityFormProps) => {
     const [formData, setFormData] = useState<Partial<Activity>>({
@@ -133,7 +135,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
             case EventType.INFO: return <MemoizedInfoView formData={formData as InfoActivity} setFormData={setFormData} />;
             case EventType.SPORTS: return <MemoizedSportsView formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
             case EventType.CULTURAL: return <MemoizedCulturalsView formData={formData as CulturalActivity} setFormData={setFormData} />;
-            case EventType.TECH: return <MemoizedGeneralView formData={formData} setFormData={setFormData} />; // Use GeneralView for Tech for now
+            case EventType.TECH: return <MemoizedTechnicalView formData={formData as TeamActivity} setFormData={setFormData} />;
             default: return <MemoizedGeneralView formData={formData} setFormData={setFormData} />;
         }
     }, [formData]);
