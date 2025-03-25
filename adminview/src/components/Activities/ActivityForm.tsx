@@ -179,7 +179,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                                     const groupId = `group-${baseType}`;
                                     
                                     return [
-                                        <MenuItem value={baseType} data-group-id={groupId} onMouseEnter={() => setActiveGroup(groupId)}
+                                        <MenuItem key={baseType} value={baseType} data-group-id={groupId} onMouseEnter={() => setActiveGroup(groupId)}
                                             onMouseLeave={(e) => {
                                                 // Only hide if not moving to another element with the same group ID
                                                 if (!e.relatedTarget || !(e.relatedTarget as Element).closest(`[data-group-id="${groupId}"]`)) {
@@ -190,7 +190,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                                             {pascalCase(EventType[baseType])}
                                         </MenuItem>,
                                         ...subTypes.map(subType => (
-                                            <MenuItem value={subType} data-group-id={groupId} onMouseEnter={() => setActiveGroup(groupId)}
+                                            <MenuItem key={subType} value={subType} data-group-id={groupId} onMouseEnter={() => setActiveGroup(groupId)}
                                                 onMouseLeave={(e) => {
                                                     if (!e.relatedTarget || !(e.relatedTarget as Element).closest(`[data-group-id="${groupId}"]`)) {
                                                         setActiveGroup(null);

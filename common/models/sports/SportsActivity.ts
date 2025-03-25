@@ -1,5 +1,6 @@
 import { EventType } from "../../constants";
 import Activity from "../Activity";
+import { TeamParticipant } from "../Participant";
 import SportsPlayer from "./SportsPlayer";
 
 export class Cricket {
@@ -432,7 +433,7 @@ class SportsActivity<T extends Sport> extends Activity {
 		endTime: Date,
 		type: EventType,
 		public teams: { id: string; name: string }[],
-		public participants: SportsPlayer[],
+		public participants: TeamParticipant[],
 		public game: T
 	) {
 		super(id, name, startTime, endTime, participants, type);
@@ -466,11 +467,11 @@ class SportsActivity<T extends Sport> extends Activity {
 		return this.teams.find((t) => t.id === teamId) || null;
 	}
 
-	getPlayer(playerId: string): SportsPlayer | null {
+	getPlayer(playerId: string): TeamParticipant | null {
 		return this.participants.find((p) => p.usn === playerId) || null;
 	}
 
-	getTeamPlayers(teamId: string): SportsPlayer[] {
+	getTeamPlayers(teamId: string): TeamParticipant[] {
 		return this.participants.filter((p) => p.teamId === teamId);
 	}
 

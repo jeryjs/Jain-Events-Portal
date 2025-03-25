@@ -25,7 +25,7 @@ class CulturalActivity extends Activity {
   }
 
   get isSoloPerformance() {
-    return this.teams.length === 0 || this.teams.every(team => team.id.split(';').length <= 1); // check if all teams have only one participant
+    return this.teams.length === 0 || (this.teams.length > 0 && this.participants.length > 0 && this.teams.every(team => this.participants.filter(p => p.usn === team.id).length === 1)); // check if all teams have only one participant
   }
 }
 
