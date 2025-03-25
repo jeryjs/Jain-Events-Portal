@@ -13,7 +13,8 @@ class Judge extends Participant {
     }
 
     static parse(data: any): Judge {
-        return new Judge(data.id, data.name, data.profilePic || `https://eu.ui-avatars.com/api/?name=${data.name}`, data.description, data.portfolio);
+        const defaultProfilePic = `https://eu.ui-avatars.com/api/?name=${data.name}`;
+        return new Judge(data.id, data.name, data.profilePic || defaultProfilePic, data.description, data.portfolio);
     }
 }
 

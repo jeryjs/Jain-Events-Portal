@@ -46,8 +46,20 @@
             { "usn": "dancer3", "name": "Charlie Dancer" }
         ],
         "judges": [
-            { "usn": "judge1", "name": "Judge Judy" },
-            { "usn": "judge2", "name": "Simon Cowell" }
+            {
+                "id": "judge1",
+                "name": "Judge Judy",
+                "profilePic": "https://eu.ui-avatars.com/api/?name=Judge%20Judy",
+                "description": "",
+                "portfolio": ""
+            },
+            {
+                "id": "judge2",
+                "name": "Simon Cowell",
+                "profilePic": "https://eu.ui-avatars.com/api/?name=Simon%20Cowell",
+                "description": "",
+                "portfolio": ""
+            }
         ],
         "teams": [
             { "id": "teamA", "name": "A-Team" },
