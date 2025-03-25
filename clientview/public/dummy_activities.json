@@ -47,18 +47,18 @@
         ],
         "judges": [
             {
-                "id": "judge1",
-                "name": "Judge Judy",
-                "profilePic": "https://eu.ui-avatars.com/api/?name=Judge%20Judy",
-                "description": "",
-                "portfolio": ""
+            "id": "judge1",
+            "name": "Dr. Eleanor Vance",
+            "profilePic": "https://images.unsplash.com/photo-1537368910025-7003465a3edc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8d29tYW4lMjBwcm9mZXNzaW9uYWx8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
+            "description": "A renowned choreographer and dance historian with over 20 years of experience in classical and contemporary dance forms. Dr. Vance has judged numerous international dance competitions and is known for her sharp eye and constructive criticism.",
+            "portfolio": "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'><h2 style='color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px;'>Dr. Eleanor Vance - Choreographer & Dance Historian</h2><p style='line-height: 1.6; color: #555;'>Welcome to my portfolio! With two decades immersed in the art of dance, I've had the privilege of shaping dancers and performances worldwide. My expertise spans classical ballet to avant-garde contemporary, always seeking to push the boundaries of movement and expression.</p><h3 style='color: #444; margin-top: 20px;'>Featured Works</h3><ul style='list-style: none; padding: 0;'><li style='margin-bottom: 10px;'><a href='#' style='color: #007bff; text-decoration: none;'>Swan Lake - Modern Interpretation</a></li><li style='margin-bottom: 10px;'><a href='#' style='color: #007bff; text-decoration: none;'>Urban Rhythms - A Contemporary Fusion</a></li></ul><p style='color: #777; font-size: 0.9em;'>Contact: eleanor.vance@example.com</p></div>"
             },
             {
-                "id": "judge2",
-                "name": "Simon Cowell",
-                "profilePic": "https://eu.ui-avatars.com/api/?name=Simon%20Cowell",
-                "description": "",
-                "portfolio": ""
+            "id": "judge2",
+            "name": "Mr. Marcus Thorne",
+            "profilePic": "https://images.unsplash.com/photo-1617168717733-52b41152e4cc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fG1hbiUyMHByb2Zlc3Npb25hbHxlbnwwfHwwfHx8&auto=format&fit=crop&w=500&q=60",
+            "description": "A celebrated music producer and talent scout, Mr. Thorne has discovered and mentored some of the biggest names in the music industry. His expertise lies in identifying raw talent and nurturing it to its full potential.",
+            "portfolio": "<div style='font-family: sans-serif; max-width: 600px; margin: 20px auto; background: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow: hidden;'><div style='background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; padding: 20px; text-align: center;'><h2 style='margin: 0; font-size: 24px;'>Marcus Thorne - Music Producer</h2><p style='font-size: 16px;'>Discovering and shaping the future of music.</p></div><div style='padding: 20px;'><p style='line-height: 1.6; color: #333;'>With over 15 years in the music industry, I've had the pleasure of working with incredible artists, helping them achieve their dreams. My approach combines technical expertise with a deep understanding of artistic expression.</p><h3 style='color: #555; margin-top: 20px;'>Notable Projects</h3><ul style='list-style: none; padding: 0;'><li style='margin-bottom: 10px;'><a href='#' style='color: #007bff; text-decoration: none;'>Album: 'Echoes of Tomorrow' - Platinum Record</a></li><li><a href='#' style='color: #007bff; text-decoration: none;'>Single: 'Midnight Dreams' - Chart Topper</a></li></ul><p style='color: #777; font-size: 0.9em; margin-top: 20px;'>Contact: marcus.thorne@example.com</p></div></div>"
             }
         ],
         "teams": [

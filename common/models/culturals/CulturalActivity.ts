@@ -20,7 +20,7 @@ class CulturalActivity extends Activity {
 
   static parse(data: any): CulturalActivity {
     const s = super.parse({...data, type: 0});  // set type to 0 to avoid circular reference
-    const judges = data.judges?.map((j: any) => Participant.parse(j));
+    const judges = data.judges?.map((j: any) => Judge.parse(j));
     return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, data.type || data.eventType, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, data.stats);
   }
 
