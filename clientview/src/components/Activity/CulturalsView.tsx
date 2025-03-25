@@ -6,7 +6,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { PollingForm } from "./CulturalsView/PollingForm";
 import { useState } from "react";
-import { CulturalActivity } from "@common/models";
+import { CulturalActivity, Judge } from "@common/models";
 import { motion } from "framer-motion";
 
 const Section = styled(Box)(({ theme }) => ({
@@ -19,9 +19,12 @@ const JudgeCard = styled(motion.div)(({ theme }) => ({
   textAlign: "center",
   cursor: "pointer",
   transition: "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
-  background: `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
+  background: theme.palette.mode === 'dark' 
+    ? `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.8)} 0%, ${alpha(theme.palette.background.paper, 0.4)} 100%)`
+    : `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
   overflow: "hidden",
   position: "relative",
+  border: `1px solid ${alpha(theme.palette.divider, theme.palette.mode === 'dark' ? 0.2 : 0.05)}`,
   "&::before": {
     content: '""',
     position: "absolute",
@@ -35,7 +38,9 @@ const JudgeCard = styled(motion.div)(({ theme }) => ({
   },
   "&:hover": {
     transform: "translateY(-8px)",
-    boxShadow: "0 12px 28px rgba(0, 0, 0, 0.15)",
+    boxShadow: theme.palette.mode === 'dark' 
+      ? `0 12px 28px ${alpha(theme.palette.common.black, 0.4)}`
+      : `0 12px 28px ${alpha(theme.palette.common.black, 0.15)}`,
     "&::before": {
       opacity: 1,
     },
@@ -46,14 +51,18 @@ const JudgeAvatar = styled(Avatar)(({ theme }) => ({
   width: 80,
   height: 80,
   margin: "0 auto 12px",
-  border: `4px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.12)",
+  border: `4px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.2 : 0.1)}`,
+  boxShadow: theme.palette.mode === 'dark' 
+    ? `0 8px 20px ${alpha(theme.palette.common.black, 0.25)}`
+    : `0 8px 20px ${alpha(theme.palette.common.black, 0.12)}`,
   transition: "all 0.3s ease",
 }));
 
 const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
   padding: theme.spacing(4),
-  background: `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.grey[50], 0.9)} 100%)`,
+  background: theme.palette.mode === 'dark'
+    ? `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 1)} 0%, ${alpha(theme.palette.background.paper, 0.7)} 100%)`
+    : `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.grey[50], 0.9)} 100%)`,
   overflowX: "hidden",
 }));
 
@@ -65,12 +74,13 @@ export const CulturalsView = ({
   eventId: string;
   activity: CulturalActivity;
 }) => {
-  const [selectedJudge, setSelectedJudge] = useState(null);
+  const [selectedJudge, setSelectedJudge] = useState<Judge>(null);
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isDarkMode = theme.palette.mode === 'dark';
 
-  const handleOpenDialog = (judge) => {
+  const handleOpenDialog = (judge: Judge) => {
     setLoading(true);
     setSelectedJudge(judge);
     // Simulate loading the judge's full profile
@@ -82,6 +92,9 @@ export const CulturalsView = ({
   };
 
   const isEmptyJudges = !activity.judges || activity.judges.length === 0;
+
+  console.log(selectedJudge);
+  
 
   return (
     <Box>
@@ -116,8 +129,9 @@ export const CulturalsView = ({
               textAlign: "center", 
               py: 6, 
               px: 2, 
-              background: alpha(theme.palette.background.paper, 0.6),
+              background: alpha(theme.palette.background.paper, isDarkMode ? 0.4 : 0.6),
               borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.1 : 0.05)}`,
             }}
           >
             <Typography variant="subtitle1" color="text.secondary" fontStyle="italic">
@@ -214,9 +228,13 @@ export const CulturalsView = ({
             sx: {
               borderRadius: 3,
               overflow: "hidden",
+              bgcolor: theme.palette.background.paper,
+              border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
+              margin: isMobile ? 2 : 'auto',
+              maxHeight: isMobile ? 'calc(100% - 32px)' : '90vh',
+              width: isMobile ? 'calc(100% - 32px)' : '100%',
             }
           }}
-          fullScreen={isMobile}
         >
           {selectedJudge && (
             <>
@@ -233,15 +251,25 @@ export const CulturalsView = ({
                 <IconButton 
                   onClick={handleCloseDialog}
                   sx={{ 
-                    bgcolor: "rgba(255,255,255,0.8)",
-                    "&:hover": { bgcolor: "rgba(255,255,255,0.95)" },
+                    bgcolor: isDarkMode 
+                      ? alpha(theme.palette.background.paper, 0.7) 
+                      : "rgba(255,255,255,0.8)",
+                    "&:hover": { 
+                      bgcolor: isDarkMode 
+                        ? alpha(theme.palette.background.paper, 0.9) 
+                        : "rgba(255,255,255,0.95)" 
+                    },
                   }}
                 >
                   <CloseIcon />
                 </IconButton>
               </Box>
               
-              <StyledDialogContent>
+              <StyledDialogContent sx={{ 
+                pt: { xs: 5, sm: 4 },
+                px: { xs: 2, sm: 4 },
+                pb: { xs: 3, sm: 4 }
+              }}>
                 <Box 
                   sx={{
                     textAlign: "center",
@@ -250,7 +278,7 @@ export const CulturalsView = ({
                     "&::before": {
                       content: '""',
                       position: "absolute",
-                      background: `radial-gradient(circle, ${alpha(theme.palette.primary.light, 0.15)} 0%, transparent 70%)`,
+                      background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, isDarkMode ? 0.1 : 0.15)} 0%, transparent 70%)`,
                       width: 240,
                       height: 240,
                       left: "50%",
@@ -264,8 +292,8 @@ export const CulturalsView = ({
                   <Zoom in={!loading} style={{ transitionDelay: loading ? '250ms' : '0ms' }}>
                     <Avatar
                       sx={{
-                        width: 160,
-                        height: 160,
+                        width: isMobile ? 120 : 160,
+                        height: isMobile ? 120 : 160,
                         mx: "auto",
                         mb: 2,
                         border: `6px solid ${alpha(theme.palette.background.paper, 0.9)}`,
@@ -285,7 +313,7 @@ export const CulturalsView = ({
                   ) : (
                     <Fade in={!loading} timeout={500}>
                       <Typography 
-                        variant="h4" 
+                        variant={isMobile ? "h5" : "h4"} 
                         component="h3" 
                         fontWeight="bold"
                         sx={{ mb: 1 }}
@@ -306,7 +334,13 @@ export const CulturalsView = ({
                           fontStyle: "italic", 
                           maxWidth: "600px",
                           mx: "auto",
-                          mb: 3
+                          mb: 3,
+                          display: "-webkit-box",
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          lineHeight: 1.5
                         }}
                       >
                         "{selectedJudge.description}"
@@ -315,47 +349,51 @@ export const CulturalsView = ({
                   ) : null}
                 </Box>
                 
-                {selectedJudge.portfolio && (
-                  <Box sx={{ position: "relative" }}>
-                    {loading ? (
-                      <Box sx={{ pt: 2 }}>
-                        <Skeleton variant="rectangular" height={100} />
-                        <Skeleton variant="text" sx={{ mt: 1 }} />
-                        <Skeleton variant="text" />
-                      </Box>
-                    ) : (
-                      <Fade in={!loading} timeout={900}>
-                        <Paper
-                          elevation={0}
-                          sx={{
-                            mt: 3,
-                            p: { xs: 2, sm: 3 },
-                            bgcolor: alpha(theme.palette.background.paper, 0.7),
-                            borderRadius: 2,
-                            border: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-                            "& img": {
-                              maxWidth: "100%",
-                              height: "auto",
-                              borderRadius: "4px",
-                              boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.1)}`,
+                {/* Portfolio/HTML Content Section */}
+                <Box sx={{ position: "relative" }}>
+                  {loading ? (
+                    <Box sx={{ pt: 2 }}>
+                      <Skeleton variant="rectangular" height={100} />
+                      <Skeleton variant="text" sx={{ mt: 1 }} />
+                      <Skeleton variant="text" />
+                    </Box>
+                  ) : (
+                    <Fade in={!loading} timeout={900}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          mt: 1,
+                          p: { xs: 2, sm: 3 },
+                          bgcolor: isDarkMode 
+                            ? alpha(theme.palette.background.default, 0.4)
+                            : alpha(theme.palette.background.paper, 0.7),
+                          borderRadius: 2,
+                          border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.2 : 0.5)}`,
+                          "& img": {
+                            maxWidth: "100%",
+                            height: "auto",
+                            borderRadius: "4px",
+                            boxShadow: isDarkMode
+                              ? `0 2px 12px ${alpha(theme.palette.common.black, 0.3)}`
+                              : `0 2px 12px ${alpha(theme.palette.common.black, 0.1)}`,
+                          },
+                          "& a": {
+                            color: theme.palette.primary.main,
+                            textDecoration: "none",
+                            fontWeight: 500,
+                            "&:hover": {
+                              textDecoration: "underline",
                             },
-                            "& a": {
-                              color: theme.palette.primary.main,
-                              textDecoration: "none",
-                              fontWeight: 500,
-                              "&:hover": {
-                                textDecoration: "underline",
-                              },
-                            },
-                            maxHeight: isMobile ? "calc(60vh - 200px)" : 400,
-                            overflowY: "auto",
-                          }}
-                          dangerouslySetInnerHTML={{ __html: selectedJudge.portfolio }}
-                        />
-                      </Fade>
-                    )}
-                  </Box>
-                )}
+                          },
+                          minHeight: 100,
+                          maxHeight: isMobile ? "calc(50vh - 180px)" : 500,
+                          overflowY: "auto",
+                        }}
+                        dangerouslySetInnerHTML={{ __html: selectedJudge.portfolio || '<p>No additional information available for this judge.</p>' }}
+                      />
+                    </Fade>
+                  )}
+                </Box>
               </StyledDialogContent>
             </>
           )}
@@ -388,6 +426,8 @@ export const CulturalsView = ({
                 p: 2,
                 borderRadius: 1,
                 textAlign: "center",
+                bgcolor: isDarkMode ? alpha(theme.palette.background.paper, 0.6) : theme.palette.background.paper,
+                border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
               }}
             >
               <Avatar
@@ -396,6 +436,9 @@ export const CulturalsView = ({
                   height: 70,
                   mb: 1,
                   mx: "auto",
+                  border: isDarkMode 
+                    ? `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
+                    : 'none',
                 }}
                 alt={participant.name}
                 src={`https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
