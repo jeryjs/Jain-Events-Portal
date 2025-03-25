@@ -1,7 +1,7 @@
 import { useState, useCallback, memo } from 'react';
 import { Box, Button, Dialog, Typography, Paper } from '@mui/material';
-import { TeamsForm } from './SportsView/TeamsForm';
-import { ParticipantsForm } from './ParticipantsForm';
+import { TeamsForm } from './shared/TeamsForm';
+import { ParticipantsForm } from './shared/ParticipantsForm';
 import { CricketForm } from './SportsView/Cricket';
 import { GenericSport } from './SportsView/GenericSport';
 import { SportsActivity, SportsPlayer } from '@common/models';
