@@ -2,10 +2,11 @@ import { Article } from "@common/models";
 import Activity from "@common/models/Activity";
 import Event from "@common/models/Event";
 import { parseActivities, parseArticles, parseEvents } from "@common/utils";
+import { useLogin } from "@components/shared";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import queryClient from "@utils/QueryClient";
 import { useEffect, useRef } from "react";
 import config from "../config";
-import queryClient from "@utils/QueryClient";
 
 /*
  * Events API
@@ -161,20 +162,27 @@ export const useActivity = (eventId: string, activityId: string) => {
 };
 
 export const useCastVote = (eventId: string, activityId: string) => {
+	const { token } = useLogin();
+
 	return useMutation({
 		mutationKey: ["castVote", eventId, activityId],
 		mutationFn: async (teamId: string) => {
+			if (!token) {
+				throw new Error("You must be signed in to vote");
+			}
+
 			const response = await fetch(`${config.API_BASE_URL}/activities/${eventId}/${activityId}/vote/${teamId}`, {
 				method: "POST",
 				headers: {
-					"Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+					"Authorization": `Bearer ${token}`,
 					"Content-Type": "application/json",
 					"Cache-Control": "no-cache",
 				},
 			});
 
 			if (!response.ok) {
-				throw new Error("Failed to cast vote");
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(errorData?.message || "Failed to cast vote");
 			}
 
 			return response.json();

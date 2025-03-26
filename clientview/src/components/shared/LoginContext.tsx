@@ -1,27 +1,31 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { 
-  getAuth, 
-  signInWithPopup, 
-  GoogleAuthProvider, 
+import { Role } from '@common/constants';
+import { UserData } from '@common/models';
+import CloseIcon from '@mui/icons-material/Close';
+import GoogleIcon from '@mui/icons-material/Google';
+import LogoutIcon from '@mui/icons-material/Logout';
+import {
+  alpha,
+  Avatar,
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  IconButton,
+  Typography,
+  useTheme
+} from '@mui/material';
+import {
+  getAuth,
+  GoogleAuthProvider,
   onAuthStateChanged,
+  signInWithPopup,
   signOut,
   User
 } from 'firebase/auth';
-import { 
-  Dialog, 
-  DialogContent, 
-  Button, 
-  Typography, 
-  Box, 
-  useTheme, 
-  alpha,
-  IconButton,
-  CircularProgress,
-  Avatar
-} from '@mui/material';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { app } from '../../firebaseConfig';
-import GoogleIcon from '@mui/icons-material/Google';
-import CloseIcon from '@mui/icons-material/Close';
 
 // Initialize Firebase auth
 const auth = getAuth(app);
@@ -29,10 +33,12 @@ const googleProvider = new GoogleAuthProvider();
 
 // Context type definition
 interface LoginContextType {
-  user: User | null;
+  userData: UserData | null;
+  username: string | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  loginWithGoogle: () => Promise<User | null>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   openLoginPrompt: () => void;
   closeLoginPrompt: () => void;
@@ -44,22 +50,23 @@ const LoginContext = createContext<LoginContextType | undefined>(undefined);
 
 // Login Dialog Component
 const LoginDialog = () => {
-  const { isLoginPromptOpen, closeLoginPrompt, loginWithGoogle, isLoading } = useContext(LoginContext) as LoginContextType;
+  const { isLoginPromptOpen, closeLoginPrompt, loginWithGoogle, isLoading } = useLogin();
   const [loginInProgress, setLoginInProgress] = useState(false);
   const theme = useTheme();
-  
+
   const handleGoogleLogin = async () => {
     setLoginInProgress(true);
     try {
       await loginWithGoogle();
+      closeLoginPrompt();
     } finally {
       setLoginInProgress(false);
     }
   };
 
   return (
-    <Dialog 
-      open={isLoginPromptOpen} 
+    <Dialog
+      open={isLoginPromptOpen}
       onClose={!loginInProgress ? closeLoginPrompt : undefined}
       maxWidth="xs"
       fullWidth
@@ -73,43 +80,20 @@ const LoginDialog = () => {
         }
       }}
     >
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          justifyContent: 'flex-end',
-          pt: 2, 
-          px: 2
-        }}
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2, px: 2 }}>
         {!loginInProgress && (
-          <IconButton 
-            color="inherit" 
-            onClick={closeLoginPrompt}
-            size="small"
-          >
+          <IconButton color="inherit" onClick={closeLoginPrompt} size="small">
             <CloseIcon fontSize="small" />
           </IconButton>
         )}
       </Box>
-      
+
       <DialogContent sx={{ pt: 0, pb: 4 }}>
-        <Box 
-          display="flex" 
-          flexDirection="column"
-          alignItems="center"
-          gap={3}
-        >
-          <Avatar
-            sx={{
-              width: 56,
-              height: 56,
-              bgcolor: theme.palette.primary.main,
-              mb: 1
-            }}
-          >
+        <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+          <Avatar sx={{ width: 56, height: 56, bgcolor: theme.palette.primary.main, mb: 1 }}>
             <GoogleIcon sx={{ fontSize: 28 }} />
           </Avatar>
-          
+
           <Box textAlign="center">
             <Typography variant="h5" fontWeight="500" gutterBottom>
               Sign In
@@ -118,9 +102,9 @@ const LoginDialog = () => {
               Sign in to cast your vote and participate in events
             </Typography>
           </Box>
-          
+
           <Button
-            variant="contained" 
+            variant="contained"
             fullWidth
             startIcon={loginInProgress ? <CircularProgress size={20} color="inherit" /> : <GoogleIcon />}
             onClick={handleGoogleLogin}
@@ -130,14 +114,14 @@ const LoginDialog = () => {
               borderRadius: 2,
               textTransform: 'none',
               fontWeight: 500,
-              boxShadow: theme.palette.mode === 'dark' 
+              boxShadow: theme.palette.mode === 'dark'
                 ? `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`
                 : `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`
             }}
           >
             {loginInProgress ? 'Signing in...' : 'Continue with Google'}
           </Button>
-          
+
           <Typography variant="caption" color="text.secondary" align="center">
             By signing in, you agree to our Terms of Service and Privacy Policy
           </Typography>
@@ -147,38 +131,122 @@ const LoginDialog = () => {
   );
 };
 
+// Sign Out Button Component for testing
+export const SignOutButton = () => {
+  const { logout, isAuthenticated, userData } = useLogin();
+  const theme = useTheme();
+
+  if (!isAuthenticated || !userData) return null;
+
+  return (
+    <Chip
+      icon={<LogoutIcon fontSize="small" />}
+      label="Sign Out"
+      onClick={logout}
+      color="secondary"
+      variant="outlined"
+      sx={{
+        position: 'fixed',
+        bottom: 16,
+        right: 16,
+        zIndex: 1000,
+        borderColor: alpha(theme.palette.error.main, 0.5),
+        color: theme.palette.error.main,
+        '&:hover': {
+          backgroundColor: alpha(theme.palette.error.main, 0.1),
+          borderColor: theme.palette.error.main,
+        }
+      }}
+    />
+  );
+};
+
 // Provider component
 export const LoginProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
 
-  // Check for existing authentication on mount
+  // Convert Firebase User to UserData
+  const createUserDataFromFirebase = (user: User): UserData => {
+    return UserData.parse({
+      name: user.displayName || user.email?.split('@')[0] || 'User',
+      username: user.email || '',  // Using email as username
+      role: Role.USER,
+      profilePic: user.photoURL || undefined
+    });
+  };
+
+  // Generate token and store user data
+  const processUserLogin = (user: User): void => {
+    try {
+      // Create UserData from Firebase user
+      const userData = createUserDataFromFirebase(user);
+      const userEmail = user.email || '';
+
+      // Create token using UserData
+      const tokenVal = btoa(JSON.stringify(userData));
+
+      // Store in localStorage
+      localStorage.setItem('auth_token', tokenVal);
+      localStorage.setItem('auth_user', JSON.stringify(userData));
+      localStorage.setItem('auth_username', userEmail);
+
+      // Update state
+      setUserData(userData);
+      setToken(tokenVal);
+    } catch (error) {
+      console.error('Error processing login:', error);
+    }
+  };
+
+  // Initialize auth state
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    // Try to restore user from localStorage first for faster UI loading
+    const storedUser = localStorage.getItem('auth_user');
+    const storedToken = localStorage.getItem('auth_token');
+
+    if (storedUser && storedToken) {
+      try {
+        setUserData(UserData.parse(storedUser));
+        setToken(storedToken);
+      } catch (e) {
+        localStorage.removeItem('auth_user');
+        localStorage.removeItem('auth_token');
+      }
+    }
+
+    // Listen for Firebase auth state changes
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      if (user) {
+        processUserLogin(user);
+      } else {
+        // Clear user data on logout
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        setUserData(null);
+        setToken(null);
+      }
       setIsLoading(false);
     });
-    
+
     return () => unsubscribe();
   }, []);
 
-  const loginWithGoogle = async (): Promise<User | null> => {
+  const loginWithGoogle = async (): Promise<void> => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      setUser(result.user);
-      closeLoginPrompt();
-      return result.user;
+      processUserLogin(result.user);
     } catch (error) {
       console.error('Login error:', error);
-      return null;
     }
   };
 
   const logout = async (): Promise<void> => {
     try {
       await signOut(auth);
-      setUser(null);
+      // Auth state listener will handle clearing user data
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -188,10 +256,12 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
   const closeLoginPrompt = () => setIsLoginPromptOpen(false);
 
   return (
-    <LoginContext.Provider 
+    <LoginContext.Provider
       value={{
-        user,
-        isAuthenticated: !!user,
+        userData,
+        username: userData?.username,
+        token,
+        isAuthenticated: !!userData,
         isLoading,
         loginWithGoogle,
         logout,
@@ -202,6 +272,7 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     >
       {children}
       <LoginDialog />
+      <SignOutButton />
     </LoginContext.Provider>
   );
 };
@@ -215,13 +286,13 @@ export const useLogin = () => {
   return context;
 };
 
-// Hook for login prompt functionality
+// Convenient hook for auth prompts
 export const useLoginPrompt = () => {
-  const { openLoginPrompt, isAuthenticated, user } = useLogin();
-  
+  const { openLoginPrompt, isAuthenticated, userData } = useLogin();
+
   return {
     promptLogin: openLoginPrompt,
     isAuthenticated,
-    user
+    userData
   };
 };

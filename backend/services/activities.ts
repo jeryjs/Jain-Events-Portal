@@ -179,7 +179,7 @@ export const castVote = async (eventId: string, activityId: string, teamId: stri
     item: activity,
     collectionKey: `activities-${eventId}`,
     itemKeyPrefix: `activities-${eventId}`,
-    updateFn: async (item) => await activityDoc.update({...item}),
+    updateFn: async (item) => await activityDoc.update(JSON.parse(JSON.stringify(item))),
     ttl: TTL.ACTIVITIES
   });
   

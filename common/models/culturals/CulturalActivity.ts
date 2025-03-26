@@ -26,6 +26,10 @@ class CulturalActivity extends Activity {
     return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, data.type || data.eventType, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, data.isSoloPerformance);
   }
 
+  get canVote(): boolean {
+    return this.showPoll && this.startTime <= new Date() && (!this.endTime || this.endTime >= new Date());
+  }
+
   getParticipantTeam(usn: string) {
     return this.teams.find(team => team.id === usn);
   }

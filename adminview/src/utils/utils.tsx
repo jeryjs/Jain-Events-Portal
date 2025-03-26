@@ -42,7 +42,7 @@ export const pascalCase = (input: string, replaceUnderscore: boolean = true): st
     const processedInput = replaceUnderscore ? input.replace(/_/g, ' ') : input;
 
     // Find all alphanumeric word segments
-    const words = processedInput.match(/[A-Za-z0-9]+/g);
+    const words = processedInput.trim().match(/[A-Za-z0-9]+/g);
     if (!words) return '';
     
     return words

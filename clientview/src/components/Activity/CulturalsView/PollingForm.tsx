@@ -1,5 +1,5 @@
-import { CulturalActivity, TeamParticipant } from '@common/models';
-import { useLoginPrompt } from '@components/shared';
+import { CulturalActivity } from '@common/models';
+import { useLogin, useLoginPrompt } from '@components/shared';
 import { useCastVote } from '@hooks/useApi';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
@@ -117,7 +117,8 @@ interface PollingFormProps {
 export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps) => {
     const theme = useTheme();
     const castVoteMutation = useCastVote(eventId, activityId);
-    const { isAuthenticated, promptLogin } = useLoginPrompt();
+    const { promptLogin } = useLoginPrompt();
+    const { isAuthenticated, username, token } = useLogin();
 
     const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
     const [userVoted, setUserVoted] = useState<string | null>(null);
@@ -190,38 +191,45 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
 
     // Check user vote
     useEffect(() => {
-        const userUsername = "admin"; // Replace with actual auth
-
-        if (pollData.length > 0 && userUsername) {
-            const userVote = pollData.find(poll => poll.votes.includes(userUsername));
+        if (pollData.length > 0 && username) {
+            const userVote = pollData.find(poll => poll.votes.includes(username));
             if (userVote) setUserVoted(userVote.teamId);
+        } else {
+            setUserVoted(null);
         }
-    }, [pollData]);
+    }, [pollData, username]);
 
     // Handle selecting a team
     const handleSelectTeam = (teamId: string) => {
-        if (!userVoted && isAuthenticated) {
+        if (!userVoted && isAuthenticated && activity.canVote) {
             setSelectedTeam(teamId === selectedTeam ? null : teamId);
+        } else if (!isAuthenticated && activity.canVote) {
+            promptLogin();
         }
     };
 
     // Process vote when thumb is dragged to end
-    const handleDragEnd = () => {
+    const handleDragEnd = async () => {
         const currentPercentage = dragPercentage.get();
 
-        if (currentPercentage > 90 && selectedTeam) {
+        if (currentPercentage > 90 && selectedTeam && token) {
             castVoteMutation.mutate(selectedTeam, {
                 onSuccess: () => {
                     setUserVoted(selectedTeam);
                     setError(null);
                     setTimeout(() => x.set(0), 300);
                 },
-                onError: () => {
-                    setError('Failed to submit vote. Please try again.');
+                onError: (err: any) => {
+                    const errorMessage = err?.message || 'Failed to submit vote. Please try again.';
+                    setError(errorMessage);
                     setTimeout(() => x.set(0), 300);
                 },
                 onSettled: () => setTimeout(() => x.set(0), 10),
             });
+        } else if (currentPercentage > 90 && selectedTeam && !token) {
+            // If we somehow don't have a token but the user is authenticated
+            setError("Authentication error. Please sign in again.");
+            promptLogin();
         }
         setTimeout(() => x.set(0), 10);
     };
@@ -245,6 +253,13 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
     };
 
     if (!showPoll || (isSoloPerformance ? participants.length === 0 : teams.length === 0)) return null;
+
+    console.log(`Poll data: ${JSON.stringify(pollData)}`);
+    console.log(`User voted: ${userVoted}`);
+    console.log(`User voted: ${teams.find(t => t.id == userVoted)}`);
+    console.log(`Selected team: ${selectedTeam}`);
+    console.log(`Team Data: ${JSON.stringify(teams)}`);
+
 
     return (
         <PollContainer>
@@ -272,10 +287,10 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                     </Tooltip>
                 )}
             </Box>
-                
-            {/* note */}
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.7rem' }}>
-                <span style={{ opacity: 0.8 }}>* Audience vote contributes 10% to final result</span>
+
+            {/* Contribution note */}
+            <Typography variant="caption" color="text.secondary">
+                <span>* Audience vote contributes 10% to final result</span>
             </Typography>
 
             {/* Participant/Team Options */}
@@ -469,10 +484,10 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                             color: theme.palette.primary.main
                         }
                     }}
-                    onClick={promptLogin}
+                    onClick={activity.canVote ? promptLogin : null}
                 >
                     <LockIcon sx={{ fontSize: 16 }} />
-                    Sign in to cast your vote
+                    {activity.canVote ? "Sign in to cast your vote!" : activity.startTime > new Date() ? `Voting starts ${activity.relativeStartTime}` : "Voting is closed!"}
                 </Typography>
             )}
         </PollContainer>
