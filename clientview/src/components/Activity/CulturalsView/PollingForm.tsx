@@ -44,7 +44,7 @@ const OptionCard = styled(motion.div)<{ selected?: boolean, userVote?: boolean }
             : `0 2px 8px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.2 : 0.08)}`,
 }));
 
-const ProgressBar = styled('div')<{ width: number }>(({ theme, width }) => ({
+const ProgressBar = styled(motion.div)<{ width: number }>(({ theme, width }) => ({
     position: 'absolute',
     top: 0,
     left: 0,
@@ -52,7 +52,6 @@ const ProgressBar = styled('div')<{ width: number }>(({ theme, width }) => ({
     width: `${width}%`,
     background: alpha(theme.palette.mode === 'dark' ? theme.palette.primary.dark : theme.palette.primary.main,
         theme.palette.mode === 'dark' ? 0.2 : 0.1),
-    transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
     zIndex: 0,
 }));
 
@@ -254,13 +253,6 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
 
     if (!showPoll || (isSoloPerformance ? participants.length === 0 : teams.length === 0)) return null;
 
-    console.log(`Poll data: ${JSON.stringify(pollData)}`);
-    console.log(`User voted: ${userVoted}`);
-    console.log(`User voted: ${teams.find(t => t.id == userVoted)}`);
-    console.log(`Selected team: ${selectedTeam}`);
-    console.log(`Team Data: ${JSON.stringify(teams)}`);
-
-
     return (
         <PollContainer>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, justifyContent: 'space-between' }}>
@@ -317,7 +309,16 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                             whileHover={!userVoted ? { scale: 1.01 } : undefined}
                             whileTap={!userVoted ? { scale: 0.99 } : undefined}
                         >
-                            <ProgressBar width={percentage} />
+                            <ProgressBar 
+                                width={percentage}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${percentage}%` }}
+                                transition={{ 
+                                    duration: 1.2, 
+                                    delay: 0.3,
+                                    ease: [0, 0.71, 0.2, 1.01] 
+                                }}
+                            />
 
                             <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', zIndex: 1 }}>
                                 {isSoloPerformance ? (
