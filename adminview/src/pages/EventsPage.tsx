@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton } from '@mui/material';
+import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton, Button } from '@mui/material';
 
 import { EventForm } from '../components/Home/EventForm';
 import { EventsList, ActivityButton } from '../components/Home';
@@ -68,9 +68,14 @@ const EventsPage = () => {
           Event Management
         </Typography>
 
-        <IconButton component={Link} to="/articles">
-          go to articles
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton component={Link} to="/send-notifications">
+            Send Notifications
+          </IconButton>
+          <IconButton component={Link} to="/articles">
+            Go to Articles
+          </IconButton>
+        </Box>
       </Card>
 
       <Grid container spacing={3} sx={{ height: '-webkit-fill-available', width: '100%' }}>
