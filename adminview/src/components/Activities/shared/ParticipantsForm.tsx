@@ -11,9 +11,10 @@ interface ParticipantsFormProps {
     participants: Participant[];
     setParticipants: (participants: Participant[]) => void;
     teams?: { id: string, name: string }[];
+    defaultTeam?: string;
 }
 
-export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: ParticipantsFormProps) => {
+export const ParticipantsForm = ({ participants, setParticipants, teams = [], defaultTeam }: ParticipantsFormProps) => {
     const [open, setOpen] = useState(false);
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [formValues, setFormValues] = useState<Participant | null>(null);
@@ -129,6 +130,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
     };
 
     const handleDeleteParticipant = (index: number) => {
+        if(!confirm("Are you sure you want to delete participant: " + participants[index].name)) return
         const newParticipants = [...participants];
         newParticipants.splice(index, 1);
         setParticipants(newParticipants);
@@ -246,7 +248,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                         <List>
                             {participants.map((p, index) => (
                                 <ListItem
-                                    key={p.usn || index}
+                                    key={`${p.usn || `participant-${index}`}${('teamId' in p && p.teamId) ? '-' + p.teamId : ''}`}
                                     divider
                                     secondaryAction={
                                         <Box>
@@ -334,7 +336,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                                         <Select
                                             labelId="team-select-label"
                                             id="team-select"
-                                            value={(formValues as any).teamId || ''}
+                                            value={(formValues as any).teamId || defaultTeam || ''}
                                             label="Team"
                                             onChange={(e) => handleChange('teamId', e.target.value)}
                                             required

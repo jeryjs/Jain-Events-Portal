@@ -1,28 +1,14 @@
 import { CulturalActivity, Judge, Participant } from '@common/models';
-import { Box, FormControlLabel, Paper, Switch, Typography, Alert, Card, CardContent, Divider } from '@mui/material';
-import { memo, useState } from 'react';
-import { ParticipantsForm } from '.';
+import { Alert, Box, Card, CardContent, FormControlLabel, Paper, Switch, Typography } from '@mui/material';
 import { JudgesForm } from './CulturalsView/JudgesForm';
-import { TeamsForm } from './shared/TeamsForm';
+import ManageTeamsForm from './shared/ManageTeamsForm';
 
 interface CulturalsViewProps {
   formData: CulturalActivity;
   setFormData: (data: CulturalActivity) => void;
 }
 
-// Summary section to avoid re-renders
-const SummarySection = memo<{ label: string, count: number }>(({ label, count }) => (
-  <Typography>
-    {count === 0
-      ? `No ${label} configured yet`
-      : `${count} ${label}${count > 1 ? 's' : ''} configured`}
-  </Typography>
-));
-
 export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => {
-  // UI state for solo performance toggle - default to isSoloPerformance from formData or true
-  const [isSoloPerformanceUI, setIsSoloPerformanceUI] = useState<boolean>(formData.isSoloPerformance ?? true);
-
   // Extract directly from formData
   const teams = formData.teams || [];
   const participants = formData.participants || [];
@@ -36,63 +22,8 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
     }));
   };
 
-  const handleSoloPerformanceToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newIsSoloPerformance = event.target.checked;
-    setIsSoloPerformanceUI(newIsSoloPerformance);
-
-    if (newIsSoloPerformance) {
-      // In solo mode, create teams from participants
-      const soloTeams = participants.map(p => ({
-        id: p.usn || `participant-${p.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
-        name: p.name
-      }));
-
-      // Keep existing teams and add solo teams without duplicates
-      const existingTeamNames = new Set(teams.map(t => t.name));
-      const uniqueSoloTeams = soloTeams.filter(t => !existingTeamNames.has(t.name));
-      const mergedTeams = [...teams, ...uniqueSoloTeams];
-
-      // Update form data with merged teams and solo flag
-      setFormData(CulturalActivity.parse({
-        ...formData,
-        teams: mergedTeams,
-        isSoloPerformance: true
-      }));
-    } else {
-      // Just update the solo flag, keep teams intact
-      setFormData(CulturalActivity.parse({
-        ...formData,
-        isSoloPerformance: false
-      }));
-    }
-  };
-
   const handleParticipantsChange = (newParticipants: Participant[]) => {
-    // In solo mode, we need to update teams at the same time as participants
-    // to avoid race conditions between state updates
-    if (isSoloPerformanceUI) {
-      const soloTeams = newParticipants.map(p => ({
-        id: p.usn || `participant-${p.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
-        name: p.name
-      }));
-
-      // Non-destructive update - preserve teams that don't represent participants
-      const existingNonSoloTeams = teams.filter(team =>
-        !participants.some(p => p.name === team.name)
-      );
-
-      const mergedTeams = [...existingNonSoloTeams, ...soloTeams];
-
-      // Update both participants and teams in one operation to avoid race conditions
-      setFormData(CulturalActivity.parse({
-        ...formData,
-        participants: newParticipants,
-        teams: mergedTeams
-      }));
-    } else {
-      // Not in solo mode, just update participants
-      handleChange('participants', newParticipants);
-    }
+    handleChange('participants', newParticipants);
   };
 
   const handleTeamsChange = (newTeams: { id: string, name: string }[]) => {
@@ -112,8 +43,8 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
           <FormControlLabel
             control={
               <Switch
-                checked={isSoloPerformanceUI}
-                onChange={handleSoloPerformanceToggle}
+                checked={formData.isSoloPerformance}
+                onChange={(e) => handleChange('isSoloPerformance', e.target.checked)}
                 color="primary"
               />
             }
@@ -121,7 +52,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
               <Box>
                 <Typography fontWeight="medium">Solo Performance Mode</Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {isSoloPerformanceUI
+                  {formData.isSoloPerformance
                     ? "Each participant is treated as an individual entry (team of 1)"
                     : "Participants compete as teams"}
                 </Typography>
@@ -129,7 +60,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
             }
           />
 
-          {isSoloPerformanceUI && (
+          {formData.isSoloPerformance && (
             <Alert severity="info" sx={{ mt: 2 }}>
               In solo mode, each participant competes as an individual entry.
               Teams will be automatically created for each participant.
@@ -141,25 +72,13 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
       {/* Judges Section */}
       <JudgesForm judges={judges} setJudges={handleJudgesChange} />
 
-      {/* Participants and Teams Section - Unified for both modes */}
-      {/* Show TeamsForm only in team mode */}
-      {!isSoloPerformanceUI && (
-        <>
-          <TeamsForm teams={teams} setTeams={handleTeamsChange} />
-          <Divider sx={{ my: 3 }} />
-          {teams.length === 0 ? (
-            <Alert severity="warning" sx={{ mb: 3 }}>
-              Please create at least one team before adding participants.
-            </Alert>
-          ) : null}
-        </>
-      )}
-
-      {/* ParticipantsForm for both modes */}
-      <ParticipantsForm
+      {/* Manage Teams and Participants Section */}
+      <ManageTeamsForm
+        teams={teams}
+        setTeams={handleTeamsChange}
         participants={participants}
         setParticipants={handleParticipantsChange}
-        teams={isSoloPerformanceUI ? [] : teams}
+        isSoloPerformance={formData.isSoloPerformance}
       />
 
       {/* Audience Polling Section */}
@@ -178,7 +97,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
         />
 
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 2 }}>
-          When enabled, users will be able to vote for their favorite {isSoloPerformanceUI ? "participants" : "teams"} in this activity.
+          When enabled, users will be able to vote for their favorite {formData.isSoloPerformance ? "participants" : "teams"} in this activity.
           Voting results will be visible in real-time to the audience.
         </Typography>
 

@@ -78,6 +78,6 @@ export class TeamParticipant extends Participant {
   }
   
   get detailsString() {
-    return `USN: ${this.usn} • Team: ${this.teamId} • Position: ${this.position}`;
+    return `ID: ${this.usn} • College: ${this.college} • Team: ${this.teamId} • Position: ${this.position}`;
   }
 }

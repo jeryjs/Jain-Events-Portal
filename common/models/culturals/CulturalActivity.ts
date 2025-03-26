@@ -13,19 +13,17 @@ class CulturalActivity extends Activity {
     public pollData: {teamId: string, votes: string[]}[] = [],
     public showPoll: boolean = false,
     public winners: {teamId: string, rank: number}[] = [],  // for solo events, teamId is the participant's usn
-    public stats: any[] = [],
+    public isSoloPerformance: boolean,
   ) {
     super(id, name, startTime, endTime, participants, type);
+
+    this.isSoloPerformance = this.isSoloPerformance ?? (this.teams.length === 0 || this.teams.every(t => this.getTeamParticipants(t.id).length <= 1));
   }
 
   static parse(data: any): CulturalActivity {
     const s = super.parse({...data, type: 0});  // set type to 0 to avoid circular reference
     const judges = data.judges?.map((j: any) => Judge.parse(j));
-    return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, data.type || data.eventType, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, data.stats);
-  }
-
-  get isSoloPerformance() {
-    return this.teams.length === 0 || (this.teams.length > 0 && this.participants.length > 0 && this.teams.every(team => this.participants.filter(p => p.usn === team.id).length === 1)); // check if all teams have only one participant
+    return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, data.type || data.eventType, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, data.isSoloPerformance);
   }
 
   getParticipantTeam(usn: string) {

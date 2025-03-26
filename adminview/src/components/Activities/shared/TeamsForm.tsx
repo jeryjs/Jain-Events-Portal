@@ -28,6 +28,7 @@ export const TeamsForm = ({ teams: initialTeams = [], setTeams }: TeamsFormProps
   };
 
   const handleDeleteTeam = (index: number) => {
+    if(!confirm("Are you sure you want to delete team: " + teams[index].name)) return
     const newTeams = [...teams];
     newTeams.splice(index, 1);
     setLocalTeams(newTeams);
@@ -56,16 +57,12 @@ export const TeamsForm = ({ teams: initialTeams = [], setTeams }: TeamsFormProps
         {teams.map((team, index) => (
           <ListItem key={index} divider>
             <TextField
-              label="Team Name"
+              label={`Team ${index+1} -- ${team.id}`}
               value={team.name}
               onChange={(e) => handleNameChange(index, e.target.value)}
               fullWidth
               error={isTeamNameTaken(team.name, index)}
               helperText={isTeamNameTaken(team.name, index) ? "Team name already exists" : ""}
-            />
-            <ListItemText
-              secondary={`ID: ${team.id}`}
-              sx={{ pl: 2 }}
             />
             <ListItemSecondaryAction>
               <IconButton edge="end" onClick={() => handleDeleteTeam(index)} size="small">
