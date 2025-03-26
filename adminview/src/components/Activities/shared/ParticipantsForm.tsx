@@ -29,6 +29,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
 
     // Create initial form values
     const createInitialFormValues = () => {
+        if (defaultTeam) return TeamParticipant.parse({ teamId: defaultTeam });
         return Participant.parse({});
     };
 
@@ -336,7 +337,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                                         <Select
                                             labelId="team-select-label"
                                             id="team-select"
-                                            value={(formValues as any).teamId || defaultTeam || ''}
+                                            value={(formValues as any).teamId || ''}
                                             label="Team"
                                             onChange={(e) => handleChange('teamId', e.target.value)}
                                             required
@@ -376,7 +377,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                     <Button
                         onClick={handleSave}
                         variant="contained"
-                        disabled={!formValues?.name?.trim() || !formValues?.usn?.trim() || (teams.length > 0 && 'teamId' in formValues && !formValues?.teamId)}
+                        disabled={!formValues?.name?.trim() || !formValues?.usn?.trim()}
                     >
                         Save
                     </Button>
