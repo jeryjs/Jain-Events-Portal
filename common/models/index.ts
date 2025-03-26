@@ -9,7 +9,7 @@ export { default as Article } from "./Article";
 export { default as InfoActivity } from "./info/InfoActivity";
 
 // Export sports models
-export { default as SportsActivity, Cricket, Football, Basketball, OtherSport } from "./sports/SportsActivity";
+export { default as SportsActivity, Cricket, Football, Basketball, Athletics, OtherSport } from "./sports/SportsActivity";
 export { default as SportsPlayer } from "./sports/SportsPlayer";
 
 // Export culturals models
