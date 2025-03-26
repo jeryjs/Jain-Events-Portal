@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField, Tooltip, Typography, Alert, Avatar } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, List, ListItem, ListItemAvatar, ListItemText, Paper, TextField, Tooltip, Typography, Alert, Avatar, Collapse } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -7,6 +7,10 @@ import CodeIcon from '@mui/icons-material/Code';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import PersonIcon from '@mui/icons-material/Person';
 import Judge from '@common/models/culturals/Judge';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 interface JudgesFormProps {
     judges: Judge[];
@@ -21,6 +25,8 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
     const [isJsonMode, setIsJsonMode] = useState(false);
     const [jsonValue, setJsonValue] = useState('');
     const [jsonError, setJsonError] = useState('');
+    const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
+    const [isPortfolioExpanded, setIsPortfolioExpanded] = useState(false); // State for portfolio expand
 
     // Debounce timer for JSON updates
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -97,16 +103,22 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
         setEditIndex(null);
         setError('');
         setIsDialogOpen(true);
+        setIsPreviewExpanded(false); // Collapse preview when opening dialog
+        setIsPortfolioExpanded(false); // Reset portfolio expand state
     };
 
     const handleClose = () => {
         setIsDialogOpen(false);
+        setIsPreviewExpanded(false); // Collapse preview when closing dialog
+        setIsPortfolioExpanded(false); // Reset portfolio expand state
     };
 
     const handleEdit = (index: number) => {
         setEditIndex(index);
         setFormValues(judges[index]);
         setIsDialogOpen(true);
+        setIsPreviewExpanded(false); // Collapse preview when opening dialog for edit
+        setIsPortfolioExpanded(false); // Reset portfolio expand state
     };
 
     const handleDeleteJudge = (index: number) => {
@@ -149,6 +161,15 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
         setJudges(updatedJudges);
         handleClose();
     };
+
+    const togglePreview = () => {
+        setIsPreviewExpanded(!isPreviewExpanded);
+    };
+
+    const togglePortfolioExpand = () => {
+        setIsPortfolioExpanded(!isPortfolioExpanded);
+    };
+
 
     return (
         <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
@@ -281,17 +302,44 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
-                                label="Portfolio (HTML)"
-                                value={formValues.portfolio || ''}
-                                onChange={(e) => handleChange('portfolio', e.target.value)}
-                                fullWidth
-                                multiline
-                                rows={3}
-                                placeholder="<iframe src='https://www.instagram.com/p/YOUR_POST_ID/embed'></iframe><br/>
-                                    <iframe src='https://www.youtube.com/embed/YOUR_VIDEO_ID' allowfullscreen></iframe>"
-                                helperText="Design a portfolio for the judge with embeds and other content"
-                            />
+                            <Box display="flex" flexDirection="column"> {/* Changed to column flex direction */}
+                                <Box display="flex" alignItems="center"> {/* Box to keep expand icon inline */}
+                                    <TextField
+                                        label="Portfolio (HTML)"
+                                        value={formValues.portfolio || ''}
+                                        onChange={(e) => handleChange('portfolio', e.target.value)}
+                                        fullWidth
+                                        multiline
+                                        rows={isPortfolioExpanded ? 10 : 3} // Expand rows when expanded
+                                        placeholder="<iframe src='https://www.instagram.com/p/YOUR_POST_ID/embed'></iframe><br/>
+                                            <iframe src='https://www.youtube.com/embed/YOUR_VIDEO_ID' allowfullscreen></iframe>"
+                                        helperText="Design a portfolio for the judge with embeds and other content"
+                                        sx={{
+                                            '& textarea': {
+                                                resize: 'vertical', // Enable vertical resizing
+                                            },
+                                        }}
+                                    />
+                                    <Tooltip title={isPortfolioExpanded ? "Collapse Portfolio" : "Expand Portfolio"}>
+                                        <IconButton onClick={togglePortfolioExpand} size="large">
+                                            {isPortfolioExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                        </IconButton>
+                                    </Tooltip>
+                                </Box>
+                                <Button
+                                    onClick={togglePreview}
+                                    startIcon={isPreviewExpanded ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                    sx={{ mt: 1, alignSelf: 'start' }} // Align button to start
+                                >
+                                    {isPreviewExpanded ? "Hide Preview" : "Live Preview"}
+                                </Button>
+                            </Box>
+                            <Collapse in={isPreviewExpanded} timeout="auto" unmountOnExit>
+                                <Box sx={{ mt: 2, border: '1px solid #ccc', p: 1, borderRadius: 1, backgroundColor: '#f9f9f9' }}>
+                                    <Typography variant="subtitle2">Portfolio Preview</Typography>
+                                    <div dangerouslySetInnerHTML={{ __html: formValues.portfolio || '' }} />
+                                </Box>
+                            </Collapse>
                         </Grid>
                     </Grid>
                 </DialogContent>
