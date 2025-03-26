@@ -30,7 +30,8 @@ import {
 } from '@mui/material';
 import { keyframes, styled } from '@mui/system';
 import { useEffect, useState } from 'react';
-import { initializeMessaging, onMessageListener, getNotificationHistory, markNotificationAsRead } from '../../firebaseConfig';
+import { initializeMessaging } from '../../firebaseConfig';
+import useNotifications from '../../hooks/useNotifications';
 import InstallPrompt from './InstallPrompt';
 
 const pulse = keyframes`
@@ -56,9 +57,6 @@ const NotificationButton = styled(IconButton, {
   background: theme.palette.mode === 'light'
     ? 'linear-gradient(145deg, #ffffff, #f0f0f0)'
     : 'linear-gradient(145deg, #2d3748, #252d3b)',
-  // boxShadow: theme.palette.mode === 'light'
-  //   ? '5px 5px 10px #d9d9d9, -5px -5px 10px #ffffff'
-  //   : '5px 5px 10px #1a202c, -5px -5px 10px #2d3748',
   width: 36,
   borderRadius: '50%',
   animation: isSubscribed ? null : `${glowPulse} 2s infinite`,
@@ -166,26 +164,32 @@ const NotificationPrompt = ({ className }) => {
   const [subscribedToNotifications, setSubscribedToNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [notificationHistory, setNotificationHistory] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
+  // Use our custom hook instead of direct localStorage access
+  const { 
+    notifications, 
+    unreadCount, 
+    loading: notificationsLoading, 
+    markAsRead,
+    markAllAsRead,
+    refreshNotifications
+  } = useNotifications();
 
   useEffect(() => {
     // Check if already subscribed to notifications
     const isSubscribed = localStorage.getItem('subscribedToken') != null;
     setSubscribedToNotifications(isSubscribed);
+    
+    // If subscribed, set history tab (1) as default
+    if (isSubscribed) {
+      setActiveTab(1);
+    }
 
     // Check current notification permission status
     if ('Notification' in window) {
       setPermissionStatus(Notification.permission);
-    }
-
-    // Load notification history
-    if (isSubscribed) {
-      const history = getNotificationHistory();
-      setNotificationHistory(history);
-      setUnreadCount(history.filter(n => !n.read).length);
     }
   }, [localStorage.subscribedToken]);
 
@@ -193,6 +197,14 @@ const NotificationPrompt = ({ className }) => {
     setAnchorEl(event.currentTarget);
     // Reset settings view when opening
     setShowSettings(false);
+    
+    // Refresh notifications when opening the popover
+    refreshNotifications();
+    
+    // Set active tab to history (1) if subscribed
+    if (subscribedToNotifications) {
+      setActiveTab(1);
+    }
   };
 
   const handleClose = () => {
@@ -205,21 +217,8 @@ const NotificationPrompt = ({ className }) => {
 
   const handleNotificationClick = (notification) => {
     if (!notification.read) {
-      markNotificationAsRead(notification.id);
-      
-      // Update local state
-      setNotificationHistory(prev => 
-        prev.map(item => item.id === notification.id ? { ...item, read: true } : item)
-      );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      markAsRead(notification.id);
     }
-  };
-
-  const handleMarkAllAsRead = () => {
-    const updatedHistory = notificationHistory.map(item => ({ ...item, read: true }));
-    localStorage.setItem('notification_history', JSON.stringify(updatedHistory));
-    setNotificationHistory(updatedHistory);
-    setUnreadCount(0);
   };
 
   const formatTimestamp = (timestamp) => {
@@ -505,12 +504,21 @@ const NotificationPrompt = ({ className }) => {
                 >
                   You can change notification settings anytime
                 </Typography>
+
+                <Divider />
+
+                {/* Install as PWA component */}
+                <InstallPrompt showAsComponent={true} />
               </>
             ) : activeTab === 1 && subscribedToNotifications && !showSettings ? (
               // History view
               <>
                 <Box sx={{ width: '100%', height: 300, overflowY: 'auto', px: 1 }}>
-                  {notificationHistory.length > 0 ? (
+                  {notificationsLoading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                      <CircularProgress size={32} />
+                    </Box>
+                  ) : notifications.length > 0 ? (
                     <>
                       <Box 
                         sx={{ 
@@ -518,15 +526,15 @@ const NotificationPrompt = ({ className }) => {
                           justifyContent: 'flex-end', 
                           mb: 1, 
                           mt: 0.5,
-                          opacity: notificationHistory.some(n => !n.read) ? 1 : 0.5
+                          opacity: notifications.some(n => !n.read) ? 1 : 0.5
                         }}
                       >
                         <Tooltip title="Mark all as read">
                           <Button
                             size="small"
                             startIcon={<DoneAllIcon fontSize="small" />}
-                            onClick={handleMarkAllAsRead}
-                            disabled={!notificationHistory.some(n => !n.read)}
+                            onClick={markAllAsRead}
+                            disabled={!notifications.some(n => !n.read)}
                             sx={{ textTransform: 'none', fontWeight: 500 }}
                           >
                             Mark all read
@@ -535,7 +543,7 @@ const NotificationPrompt = ({ className }) => {
                       </Box>
                       
                       <List disablePadding>
-                        {notificationHistory.map((notification, index) => (
+                        {notifications.map((notification) => (
                           <StyledListItem 
                             key={notification.id} 
                             alignItems="flex-start"
@@ -673,7 +681,6 @@ const NotificationPrompt = ({ className }) => {
                 </Button>
               </>
             )}
-            <InstallPrompt showAsComponent={true} />
           </StyledPaper>
         </Grow>
       </Popover>

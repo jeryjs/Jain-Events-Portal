@@ -16,7 +16,11 @@ import {
   Grid,
   IconButton,
   Avatar,
-  CircularProgress
+  CircularProgress,
+  FormControlLabel,
+  Switch,
+  Tooltip,
+  Divider
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useSendNotification } from '../hooks/App';
@@ -24,6 +28,8 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ImageIcon from '@mui/icons-material/Image';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import StorageIcon from '@mui/icons-material/Storage';
 import { Link } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -57,6 +63,18 @@ const NotificationPreview = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
 }));
 
+const OptionBox = styled(Box)(({ theme }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: theme.shape.borderRadius,
+  padding: theme.spacing(1.5),
+  marginTop: theme.spacing(3),
+  backgroundColor: theme.palette.background.paper,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  position: 'relative',
+}));
+
 const SendNotificationsPage = () => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -64,6 +82,7 @@ const SendNotificationsPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [saveToDatabase, setSaveToDatabase] = useState(true);
 
   const { mutate: sendNotification, isPending, error } = useSendNotification();
 
@@ -194,6 +213,35 @@ const SendNotificationsPage = () => {
                 </Box>
               </NotificationPreview>
             )}
+            
+            <OptionBox>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <StorageIcon color="primary" sx={{ mr: 1.5 }} />
+                <Box>
+                  <Typography variant="subtitle2">
+                    Save to device history
+                    <Tooltip title="When enabled, this notification will be saved to users' device notification history even if they were offline when it was sent">
+                      <IconButton size="small" sx={{ ml: 0.5 }}>
+                        <InfoOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Save to users' notification history for later viewing
+                  </Typography>
+                </Box>
+              </Box>
+              <FormControlLabel
+                control={
+                  <Switch 
+                    checked={saveToDatabase}
+                    onChange={(e) => setSaveToDatabase(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label=""
+              />
+            </OptionBox>
 
             <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
               <Button
@@ -232,6 +280,13 @@ const SendNotificationsPage = () => {
                 With image: {imageUrl}
               </Typography>
             )}
+            <Divider sx={{ my: 1 }} />
+            <Typography variant="caption" display="block">
+              <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <StorageIcon fontSize="small" />
+                {saveToDatabase ? 'Will be saved to device history' : 'Not saved to device history'}
+              </Box>
+            </Typography>
           </Box>
         </DialogContent>
         <DialogActions>

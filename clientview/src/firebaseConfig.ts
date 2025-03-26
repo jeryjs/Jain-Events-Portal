@@ -2,6 +2,7 @@ import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
 import config from "./config";
+import { addNotification } from "./utils/notificationUtils";
 
 const firebaseConfig = JSON.parse(import.meta.env.VITE_FIREBASE_CLIENT_CONFIG_JSON as string);
 
@@ -9,71 +10,6 @@ const firebaseConfig = JSON.parse(import.meta.env.VITE_FIREBASE_CLIENT_CONFIG_JS
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 let messaging = null;
-
-// Type interface for a notification in history
-export interface NotificationHistoryItem {
-  id: string;
-  title: string;
-  body: string;
-  imageUrl?: string;
-  timestamp: number;
-  read: boolean;
-}
-
-// Get notification history from local storage
-export const getNotificationHistory = (): NotificationHistoryItem[] => {
-  try {
-    const history = localStorage.getItem('notification_history');
-    return history ? JSON.parse(history) : [];
-  } catch (error) {
-    console.error('Error retrieving notification history:', error);
-    return [];
-  }
-};
-
-// Save a notification to history
-export const saveNotificationToHistory = (notification: { title: string; body: string; imageUrl?: string }) => {
-  try {
-    const history = getNotificationHistory();
-    const newNotification: NotificationHistoryItem = {
-      id: `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      title: notification.title,
-      body: notification.body,
-      imageUrl: notification.imageUrl,
-      timestamp: Date.now(),
-      read: false,
-    };
-    
-    // Add new notification to the beginning of the array (newest first)
-    const updatedHistory = [newNotification, ...history];
-    
-    // Limit history to 50 notifications to prevent local storage overflow
-    const limitedHistory = updatedHistory.slice(0, 50);
-    
-    localStorage.setItem('notification_history', JSON.stringify(limitedHistory));
-    return newNotification;
-  } catch (error) {
-    console.error('Error saving notification to history:', error);
-    return null;
-  }
-};
-
-// Mark notification as read
-export const markNotificationAsRead = (notificationId: string) => {
-  try {
-    const history = getNotificationHistory();
-    const updatedHistory = history.map(item => {
-      if (item.id === notificationId) {
-        return { ...item, read: true };
-      }
-      return item;
-    });
-    
-    localStorage.setItem('notification_history', JSON.stringify(updatedHistory));
-  } catch (error) {
-    console.error('Error marking notification as read:', error);
-  }
-};
 
 // Initialize FCM only if supported and already granted
 export const initializeMessaging = async () => {
@@ -119,7 +55,7 @@ export const initializeMessaging = async () => {
 						return null;
 					});
 
-				// Handle foreground messages and save to history
+				// Handle foreground messages
 				onMessageListener();
 				return messaging;
 			}
@@ -138,21 +74,17 @@ initializeMessaging().then((result) => {
 	messaging = result;
 });
 
-// Handle foreground messages and save to history
-export const onMessageListener = () => {
-  if (!messaging) return () => {};
-  
-  return onMessage(messaging, (payload) => {
-    console.log("Message received. ", payload);
+// Process and save incoming notification
+const processNotification = (payload: any) => {
+  console.log("Notification received: ", payload);
 
-    // Save notification to history
-    if (payload.notification) {
-      saveNotificationToHistory({
-        title: payload.notification.title,
-        body: payload.notification.body,
-        imageUrl: payload.notification.image,
-      });
-    }
+  if (payload.notification) {
+    // Save notification to IndexedDB
+    addNotification({
+      title: payload.notification.title,
+      body: payload.notification.body,
+      imageUrl: payload.notification.image,
+    }).catch(err => console.error("Error saving notification:", err));
 
     // Display notification if permission is granted
     if (Notification.permission === "granted") {
@@ -162,7 +94,34 @@ export const onMessageListener = () => {
       };
       new Notification(payload.notification.title, notificationOptions);
     }
-  });
+  }
 };
+
+// Handle foreground messages
+export const onMessageListener = () => {
+  if (!messaging) return () => {};
+  return onMessage(messaging, processNotification);
+};
+
+// Handle background messages
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.ready.then((registration) => {
+    if (registration.active) {
+      registration.active.postMessage({ type: 'ENABLE_BG_MESSAGES' });
+    }
+  });
+  
+  // Listen for messages from service worker 
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'NOTIFICATION_CLICKED') {
+      console.log('Notification clicked:', event.data.notificationId);
+      
+      // Handle notification click actions if needed
+      if (event.data.url && event.data.url !== '/') {
+        window.location.href = event.data.url;
+      }
+    }
+  });
+}
 
 export { analytics, app, messaging };
