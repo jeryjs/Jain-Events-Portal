@@ -11,7 +11,11 @@ export default class Participant {
     public event: EventType,
     public college: string = 'FET, JU',
     public profilePic: string = '',
-  ) {}
+  ) {
+    if (this.profilePic === 'https://eu.ui-avatars.com/api/?name=undefined') {
+      this.profilePic = (this.name ? `https://eu.ui-avatars.com/api/?name=${this.name}` : '');
+    }
+  }
 
   /**
    * Parses the provided data to create a Participant instance.
@@ -31,10 +35,14 @@ export default class Participant {
       data.branch || '',
       data.event || EventType.GENERAL,
       data.college || 'FET, JU',
-      data.profilePic || `https://eu.ui-avatars.com/api/?name=${data.name}`
+      data.profilePic || (data.name ? `https://eu.ui-avatars.com/api/?name=${data.name}` : '')
     );
   }
 
+  get id() {
+    return this.usn;
+  }
+  
   get detailsString() {
     return `USN: ${this.usn} • Phone: ${this.phone} • Email: ${this.email} • Branch: ${this.branch} • College: ${this.college}`;
   }
@@ -66,7 +74,6 @@ export class TeamParticipant extends Participant {
       data.position || "playing",
     );
   }
-  
   
   get isParticipating() {
     return this.position != "substitute";

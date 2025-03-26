@@ -12,7 +12,7 @@ class CulturalActivity extends Activity {
     public teams: {id: string, name: string}[] = [],
     public pollData: {teamId: string, votes: string[]}[] = [],
     public showPoll: boolean = false,
-    public winners: {teamId: string, rank: number}[] = [],  // for solo events, teamId is the participant's usn
+    public winners: { teamId: string, rank: number }[] = [],  // for solo events, teamId is the participant's usn
     public isSoloPerformance: boolean,
   ) {
     super(id, name, startTime, endTime, participants, type);

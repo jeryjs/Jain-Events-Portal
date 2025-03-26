@@ -246,6 +246,135 @@ const PerformerDialogContent = styled(DialogContent)(({ theme }) => ({
   },
 }));
 
+// Updated Winners styled components - convert to list view style
+const WinnerSection = styled(Box)(({ theme }) => ({
+  position: "relative",
+  padding: theme.spacing(0.5),
+  marginBottom: theme.spacing(3),
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "100%",
+    background: theme.palette.mode === "dark"
+      ? `radial-gradient(ellipse at top, ${alpha(theme.palette.warning.dark, 0.1)}, transparent 80%)`
+      : `radial-gradient(ellipse at top, ${alpha(theme.palette.warning.light, 0.1)}, transparent 80%)`,
+    zIndex: -1,
+    pointerEvents: "none",
+    borderRadius: theme.spacing(2),
+  }
+}));
+
+const WinnerCard = styled(motion.div)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderRadius: theme.spacing(2),
+  transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+  background: theme.palette.mode === "dark"
+    ? `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.9)} 0%, ${alpha(theme.palette.background.paper, 0.6)} 100%)`
+    : `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`,
+  overflow: "hidden",
+  position: "relative",
+  border: `1px solid ${alpha(theme.palette.divider, theme.palette.mode === "dark" ? 0.1 : 0.05)}`,
+  boxShadow: theme.shadows[3],
+  marginBottom: theme.spacing(2),
+  display: "flex",
+  alignItems: "center",
+  "&:last-child": {
+    marginBottom: 0,
+  },
+}));
+
+const WinnerAvatarContainer = styled(motion.div)(({ theme }) => ({
+  position: "relative",
+  marginRight: theme.spacing(2),
+}));
+
+const WinnerCrown = styled(Box)<{ show: boolean }>(({ show }) => ({
+  position: "absolute",
+  top: -16,
+  left: "50%",
+  transform: "translateX(-50%)",
+  width: 32,
+  height: 32,
+  backgroundImage: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSIjZmZjMTA3Ij48cGF0aCBkPSJNMjU2IDIyLjcxNkwyMDguNjUgMTkwLjgxYy0xLjA1MiAzLjc0OS0zLjk5IDYuNTc0LTcuNzcyIDcuNDhsLTE3OC45IDQyLjk2OCA3NS41MjUgMTI5LjQ0YzEuOTI1IDMuMjk3IDEuOTI1IDcuMzgxIDAgMTAuNjc5bC0yNC41NDUgNDIuMDM1aDM2Ni4wOWwtMjQuNTQ1LTQyLjAzNWMtMS45MjUtMy4yOTctMS45MjUtNy4zODEgMC0xMC42NzlMNDkwLjAyIDI0MS4yNiAzMTEuMTIyIDE5OC4yOWMtMy43ODItLjkwNi02LjcyLTMuNzMxLTcuNzcyLTcuNDhMMjU2IDIyLjcxNnoiLz48cGF0aCBmaWxsPSIjZmZkYjRkIiBkPSJNMTYyLjA2MSAzMjAuNjI5bC0zOC4yOC04MC44NzVjLS43MzItMS41NDktLjUxNS0zLjM3Ni41NjktNC43NEwxODMuMDMgMTY4LjgybDI2LjI5NyA4OC45MWMuNDM3IDEuNDc4LjE3NCAzLjA3OC0uNzE0IDQuMzYtLjg4OSAxLjI4MS0yLjMzOSAyLjA4Mi0zLjg3NyAyLjA0MmgtMzYuNzgyYy0zLjA1NiAwLTUuNTU1IDIuMzg1LTUuNzUgNS40MzNsLTIuNTQ2IDM5LjcyYy0uMTI3IDEuOTgzLTEuMTUzIDMuNzktMi43OTIgNC45MjMtMS42MzggMS4xMzQtMy43MDYgMS40NzctNS42MzYuOTM3bC0xOC4xNC01LjA3Yy0zLjAyNC0uODQ2LTYuMTU2LjkxNy03LjAyOCAzLjk0M2wtNi4wNjQgMTkuODg2Yy0uNTgzIDEuOTE0LTEuOTcxIDMuNDQyLTMuODExIDQuMTk1LTEuODM5Ljc1My0zLjkyNi42MzgtNS43Mi0uMzE1bC0xLjYxNi0uODU5Yy0xLjM0NS0uNzE0LTIuMTg1LTIuMTEzLTIuMTg1LTMuNjF2LTIuNzc2YzAtMS4wMDMtLjM2NC0xLjk3LTEuMDIzLTIuNzI0LS43NzQtLjg4OS0xLjkwNC0xLjM3OS0zLS4zNzlsLTMuMTgtMy40N2MtMi4wODYtMi4yODQtNS4yNTQtMy4yMTUtOC4xOTUtMi40MTdoMHoiLz48cGF0aCBmaWxsPSIjZmZkYjRkIiBkPSJNMzQ5LjIxNCAzMjAuNjI5bDM4LjI4LTgwLjg3NWMuNzMyLTEuNTQ5LjUxNS0zLjM3Ni0uNTY5LTQuNzRMMzI4LjI0NSAxNjguODJsLTI2LjI5NyA4OC45MWMtLjQzNyAxLjQ3OC0uMTc0IDMuMDc4LjcxNCA0LjM2Ljg4OSAxLjI4MSAyLjMzOSAyLjA4MiAzLjg3NyAyLjA0MmgzNi43ODJjMy4wNTYgMCA1LjU1NSAyLjM4NSA1Ljc1IDUuNDMzbDIuNTQ2IDM5LjcyYy4xMjcgMS45ODMgMS4xNTMgMy43OSAyLjc5MiA0LjkyMyAxLjYzOCAxLjEzNCAzLjcwNiAxLjQ3NyA1LjYzNi45MzdsMTguMTQtNS4wN2MzLjAyNC0uODQ2IDYuMTU2LjkxNyA3LjAyOCAzLjk0M2w2LjA2NCAxOS44ODZjLjU4MyAxLjkxNCAxLjk3MSAzLjQ0MiAzLjgxMSA0LjE5NSAxLjgzOS43NTMgMy45MjYuNjM4IDUuNzItLjMxNWwxLjYxNi0uODU5YzEuMzQ1LS43MTQgMi4xODUtMi4xMTMgMi4xODUtMy42MXYtMi43NzZjMC0xLjAwMy4zNjQtMS45NyAxLjAyMy0yLjcyNC43NzQtLjg4OSAxLjkwNC0xLjM3OSAzLS4zNzlsMy4xOC0zLjQ3YzIuMDg2LTIuMjg0IDUuMjU0LTMuMjE1IDguMTk1LTIuNDJoMHoiLz48L3N2Zz4=')",
+  backgroundSize: "contain",
+  backgroundRepeat: "no-repeat",
+  opacity: show ? 1 : 0,
+  transition: "transform 0.3s ease, opacity 0.3s ease",
+  zIndex: 5,
+  filter: "drop-shadow(0px 3px 4px rgba(0,0,0,0.2))",
+}));
+
+const WinnerAvatar = styled(Avatar)<{ position: string }>(({ position }) => ({
+  width: position === "winner" ? 70 : 60,
+  height: position === "winner" ? 70 : 60,
+  margin: "0 auto",
+  border: position === "winner"
+    ? `3px solid ${alpha('#FFD700', 0.9)}`
+    : `3px solid ${alpha('#C0C0C0', 0.9)}`,
+  boxShadow: position === "winner"
+    ? `0 6px 15px ${alpha('#FFA500', 0.35)}`
+    : `0 5px 15px ${alpha('#A9A9A9', 0.35)}`,
+  transition: "all 0.3s ease",
+}));
+
+const WinnerTeamBadge = styled(Box)<{ placed: string }>(({ theme, placed }) => ({
+  width: placed === "winner" ? 70 : 60,
+  height: placed === "winner" ? 70 : 60,
+  margin: "0 auto",
+  borderRadius: "50%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: placed === "winner" 
+    ? `linear-gradient(135deg, ${alpha('#FFD700', 0.9)}, ${alpha('#FFA500', 0.9)})`
+    : `linear-gradient(135deg, ${alpha('#C0C0C0', 0.9)}, ${alpha('#A9A9A9', 0.9)})`,
+  boxShadow: placed === "winner"
+    ? `0 6px 15px ${alpha(theme.palette.warning.main, 0.4)}, inset 0 -3px 6px ${alpha(theme.palette.common.black, 0.15)}, inset 0 3px 6px ${alpha(theme.palette.common.white, 0.15)}`
+    : `0 5px 15px ${alpha(theme.palette.common.black, 0.2)}, inset 0 -3px 6px ${alpha(theme.palette.common.black, 0.1)}, inset 0 3px 6px ${alpha(theme.palette.common.white, 0.1)}`,
+  border: placed === "winner"
+    ? `2px solid ${alpha('#FFD700', 0.9)}`
+    : `2px solid ${alpha('#C0C0C0', 0.9)}`,
+  position: "relative",
+  "&::after": placed === "winner" ? {
+    content: '""',
+    position: "absolute",
+    inset: 0,
+    borderRadius: "50%",
+    background: `radial-gradient(circle at 30% 30%, ${alpha(theme.palette.common.white, 0.3)}, transparent 50%)`,
+    zIndex: 1,
+  } : {},
+}));
+
+const WinnerPosition = styled(Box)<{ placed: string }>(({ theme, placed }) => ({
+  position: "absolute",
+  top: 0,
+  right: 0,
+  background: placed === "winner" 
+    ? `linear-gradient(45deg, ${alpha('#FFD700', 0.9)}, ${alpha('#FFA500', 0.9)})`
+    : `linear-gradient(45deg, ${alpha('#C0C0C0', 0.9)}, ${alpha('#A9A9A9', 0.9)})`,
+  color: placed === "winner" ? "#000" : "#fff",
+  padding: theme.spacing(0.3, 1),
+  borderRadius: `0 ${theme.shape.borderRadius}px 0 ${theme.shape.borderRadius}px`,
+  fontSize: "0.7rem",
+  fontWeight: "bold",
+  textTransform: "uppercase",
+  letterSpacing: "0.5px",
+  zIndex: 2,
+  boxShadow: `0 2px 4px ${alpha(theme.palette.common.black, 0.15)}`,
+}));
+
+const CompactChip = styled(Chip)(({ theme, color }) => ({
+  height: 24,
+  fontSize: '0.7rem',
+  fontWeight: 'bold',
+  "& .MuiChip-label": {
+    padding: theme.spacing(0, 1),
+  }
+}));
+
 // Cultural Activity View
 export const CulturalsView = ({
   eventId,
@@ -581,6 +710,166 @@ export const CulturalsView = ({
           )}
         </Dialog>
       </Section>
+
+      {/* Winners Section */}
+      {activity.winners && activity.winners.length > 0 && (
+        <Section>
+          <Typography 
+            variant="h5" 
+            component="h2" 
+            fontWeight="bold"
+            sx={{ 
+              mb: 3,
+              position: "relative",
+              display: "inline-block",
+              "&:after": {
+                content: '""',
+                position: "absolute",
+                width: "60%",
+                height: "4px",
+                bottom: "-8px",
+                left: 0,
+                backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
+                borderRadius: "2px"
+              }
+            }}
+          >
+            Winners
+          </Typography>
+
+          <WinnerSection>
+            <Box
+              component={motion.div}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {activity.winners
+                .sort((a, b) => a.rank - b.rank) // Sort by rank
+                .slice(0, 2) // Only show winner and runner-up
+                .map((winner, idx) => {
+                  const position = idx === 0 ? "winner" : "runnerup";
+                  
+                  // Get team or participant info based on teamId
+                  const team = activity.teams?.find(t => t.id === winner.teamId);
+                  const participants = activity.getTeamParticipants(winner.teamId);
+                  const participant = participants?.length > 0 ? participants[0] : null;
+                  
+                  const isTeam = team && participants?.length > 1;
+                  const displayName = isTeam ? team.name : (participant?.name || "Unknown Participant");
+                  
+                  const positionLabels = {
+                    "winner": "Winner",
+                    "runnerup": "Runner Up"
+                  };
+                  
+                  return (
+                    <WinnerCard
+                      key={winner.teamId || idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ 
+                        duration: 0.4, 
+                        delay: idx * 0.1,
+                        type: "spring",
+                        stiffness: 100
+                      }}
+                      whileHover={{ 
+                        y: -5, 
+                        boxShadow: theme.shadows[position === "winner" ? 8 : 5],
+                        transition: { duration: 0.2 }
+                      }}
+                    >
+                      <WinnerPosition placed={position}>
+                        {idx === 0 ? "1st" : "2nd"}
+                      </WinnerPosition>
+                      
+                      <WinnerAvatarContainer
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <WinnerCrown show={position === "winner"} />
+                        
+                        {isTeam ? (
+                          <WinnerTeamBadge placed={position}>
+                            <Typography 
+                              variant="h6" 
+                              sx={{ 
+                                fontWeight: "bold",
+                                color: "#fff",
+                                textShadow: "0 1px 3px rgba(0,0,0,0.4)",
+                                position: "relative",
+                                zIndex: 2,
+                              }}
+                            >
+                              {team.name.substring(0, 2).toUpperCase()}
+                            </Typography>
+                          </WinnerTeamBadge>
+                        ) : (
+                          <WinnerAvatar
+                            alt={participant?.name || "Winner"}
+                            src={participant?.profilePic}
+                            position={position}
+                          />
+                        )}
+                      </WinnerAvatarContainer>
+                      
+                      <Box sx={{ flex: 1 }}>
+                        <Typography 
+                          variant="subtitle1" 
+                          sx={{ 
+                            fontWeight: 600,
+                            fontSize: { xs: '0.95rem', sm: '1rem' },
+                            color: position === "winner" 
+                              ? theme.palette.mode === "dark" ? alpha('#FFD700', 0.9) : theme.palette.warning.dark
+                              : theme.palette.text.primary,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: "vertical",
+                          }}
+                        >
+                          {displayName}
+                        </Typography>
+                        
+                        {participant?.college && (
+                          <Typography 
+                            variant="caption" 
+                            color="text.secondary"
+                            sx={{
+                              fontSize: '0.7rem',
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 1,
+                              WebkitBoxOrient: "vertical",
+                            }}
+                          >
+                            {participant.college}
+                          </Typography>
+                        )}
+                      </Box>
+                      
+                      <CompactChip 
+                        label={positionLabels[position]} 
+                        color={position === "winner" ? "warning" : "default"}
+                        sx={{ 
+                          bgcolor: position === "winner" 
+                            ? theme.palette.mode === 'dark' ? alpha('#FFD700', 0.2) : alpha('#FFD700', 0.7)
+                            : theme.palette.mode === 'dark' ? alpha('#C0C0C0', 0.2) : alpha('#C0C0C0', 0.7),
+                          color: position === "winner" 
+                            ? theme.palette.mode === 'dark' ? alpha('#FFD700', 0.9) : "rgba(0,0,0,0.8)"
+                            : theme.palette.text.primary,
+                        }} 
+                      />
+                    </WinnerCard>
+                  );
+                })}
+            </Box>
+          </WinnerSection>
+        </Section>
+      )}
 
       {/* Poll Section */}
       <Section>

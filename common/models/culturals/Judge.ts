@@ -3,7 +3,7 @@ import Participant from "../Participant";
 
 class Judge extends Participant {
     constructor(
-        public id: string,
+        id: string,
         public name: string,
         public profilePic: string,
         public description: string,
