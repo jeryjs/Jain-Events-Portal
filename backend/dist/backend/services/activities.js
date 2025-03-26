@@ -175,7 +175,7 @@ const castVote = (eventId, activityId, teamId, username) => __awaiter(void 0, vo
         item: activity,
         collectionKey: `activities-${eventId}`,
         itemKeyPrefix: `activities-${eventId}`,
-        updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () { return yield activityDoc.update(Object.assign({}, item)); }),
+        updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () { return yield activityDoc.update(JSON.parse(JSON.stringify(item))); }),
         ttl: cache_1.TTL.ACTIVITIES
     });
     return {

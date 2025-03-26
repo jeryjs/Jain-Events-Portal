@@ -8,14 +8,13 @@ const Participant_1 = __importDefault(require("../Participant"));
 class Judge extends Participant_1.default {
     constructor(id, name, profilePic, description, portfolio) {
         super(id, name, constants_1.Gender.OTHER, '', '', '', constants_1.EventType.GENERAL, '', profilePic);
-        this.id = id;
         this.name = name;
         this.profilePic = profilePic;
         this.description = description;
         this.portfolio = portfolio;
     }
     static parse(data) {
-        const defaultProfilePic = `https://eu.ui-avatars.com/api/?name=${data.name}`;
+        const defaultProfilePic = `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(data.name || "Judge")}&size=120&background=random&color=fff`;
         return new Judge(data.id, data.name, data.profilePic || defaultProfilePic, data.description, data.portfolio);
     }
 }

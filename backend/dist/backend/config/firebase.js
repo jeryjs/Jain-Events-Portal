@@ -23,11 +23,19 @@ exports.db.settings({ ignoreUndefinedProperties: true });
 /**
  * Send push notification to all users
  */
-const sendPushNotificationToAllUsers = (title, body) => __awaiter(void 0, void 0, void 0, function* () {
+const sendPushNotificationToAllUsers = (title, body, imageUrl, options) => __awaiter(void 0, void 0, void 0, function* () {
     const message = {
         notification: {
             title,
             body,
+            imageUrl,
+        },
+        data: {
+            // Add data for handling in the service worker
+            saveToDatabase: (options === null || options === void 0 ? void 0 : options.saveToDatabase) ? 'true' : 'false',
+            clickAction: (options === null || options === void 0 ? void 0 : options.clickAction) || '/',
+            timestamp: Date.now().toString(),
+            // Add any other metadata needed
         },
         topic: 'all-users', // You can use a topic to send to all users
     };

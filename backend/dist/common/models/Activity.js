@@ -53,6 +53,25 @@ class Activity {
             return true;
         return this.startTime >= now && now < this.endTime;
     }
+    get relativeStartTime() {
+        const diff = this.startTime.getTime() - Date.now();
+        const m = Math.round(diff / 60000);
+        if (m < 1)
+            return "now";
+        if (m < 60)
+            return `in ${m}m`;
+        const h = Math.round(m / 60);
+        if (h < 24)
+            return `in ${h}h`;
+        const d = Math.round(h / 24);
+        return d <= 7 ? `in ${d}d` : 'on ' + this.startTime.toLocaleDateString(undefined, {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+        });
+    }
 }
 exports.default = Activity;
 class TeamActivity extends Activity {

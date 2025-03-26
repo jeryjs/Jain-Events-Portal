@@ -13,6 +13,9 @@ class Participant {
         this.event = event;
         this.college = college;
         this.profilePic = profilePic;
+        if (this.profilePic === 'https://eu.ui-avatars.com/api/?name=undefined') {
+            this.profilePic = (this.name ? `https://eu.ui-avatars.com/api/?name=${this.name}` : '');
+        }
     }
     /**
      * Parses the provided data to create a Participant instance.
@@ -23,7 +26,10 @@ class Participant {
     static parse(data, force = false) {
         if (!force && data.teamId)
             return TeamParticipant.parse(data); // for backward compatibility
-        return new Participant(data.usn || '', data.name || '', data.gender || constants_1.Gender.OTHER, data.email || '', data.phone || '', data.branch || '', data.event || constants_1.EventType.GENERAL, data.college || 'FET, JU', data.profilePic || `https://eu.ui-avatars.com/api/?name=${data.name}`);
+        return new Participant(data.usn || '', data.name || '', data.gender || constants_1.Gender.OTHER, data.email || '', data.phone || '', data.branch || '', data.event || constants_1.EventType.GENERAL, data.college || 'FET, JU', data.profilePic || (data.name ? `https://eu.ui-avatars.com/api/?name=${data.name}` : ''));
+    }
+    get id() {
+        return this.usn;
     }
     get detailsString() {
         return `USN: ${this.usn} • Phone: ${this.phone} • Email: ${this.email} • Branch: ${this.branch} • College: ${this.college}`;

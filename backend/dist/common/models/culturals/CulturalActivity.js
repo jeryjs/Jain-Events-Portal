@@ -20,6 +20,9 @@ class CulturalActivity extends models_1.Activity {
         const judges = (_a = data.judges) === null || _a === void 0 ? void 0 : _a.map((j) => models_1.Judge.parse(j));
         return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, data.type || data.eventType, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, data.isSoloPerformance);
     }
+    get canVote() {
+        return this.showPoll && this.startTime <= new Date() && (!this.endTime || this.endTime >= new Date());
+    }
     getParticipantTeam(usn) {
         return this.teams.find(team => team.id === usn);
     }
