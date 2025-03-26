@@ -1,4 +1,4 @@
-import { Activity, Judge, Participant } from '@common/models';
+import { Activity, Judge, Participant, TeamParticipant } from '@common/models';
 import { EventType } from '@common/constants';
 class CulturalActivity extends Activity {
   constructor(
@@ -7,7 +7,7 @@ class CulturalActivity extends Activity {
     startTime: Date,
     endTime: Date,
     type: EventType,
-    participants: Participant[],
+    participants: Participant[] | TeamParticipant[],
     public judges: Judge[] = [],
     public teams: {id: string, name: string}[] = [],
     public pollData: {teamId: string, votes: string[]}[] = [],
@@ -30,6 +30,27 @@ class CulturalActivity extends Activity {
 
   getParticipantTeam(usn: string) {
     return this.teams.find(team => team.id === usn);
+  }
+
+  getTeamParticipants(teamId: string) {
+    // Type guard to check if a participant is a TeamParticipant
+    const isTeamParticipant = (participant: Participant | TeamParticipant): participant is TeamParticipant =>
+      (participant as TeamParticipant).teamId !== undefined;
+
+    // If participants include team participants, filter them by teamId
+    if (this.participants.some(isTeamParticipant)) {
+      return (this.participants.filter(isTeamParticipant) as TeamParticipant[]).filter(
+        p => p.teamId === teamId,
+      );
+    }
+
+    // For solo performances, filter participants by their usn
+    if (this.isSoloPerformance) {
+      return this.participants.filter(p => p.usn === teamId);
+    }
+
+    // Fallback in case no matching participants are found
+    return [];
   }
 }
 
