@@ -376,9 +376,7 @@ export const CulturalsView = ({
                 >
                   <JudgeAvatar
                     alt={judge.name}
-                    src={`https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
-                      judge.name || "Judge"
-                    )}&size=160&background=random&color=fff`}
+                    src={judge.profilePic}
                   />
                 </Box>
                 <Typography 
@@ -497,9 +495,7 @@ export const CulturalsView = ({
                         zIndex: 1
                       }}
                       alt={selectedJudge.name}
-                      src={`https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
-                        selectedJudge.name || "Judge"
-                      )}&size=320&background=random&color=fff`}
+                      src={selectedJudge.profilePic}
                     />
                   </Zoom>
                   

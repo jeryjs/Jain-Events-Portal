@@ -13,7 +13,7 @@ class Judge extends Participant {
     }
 
     static parse(data: any): Judge {
-        const defaultProfilePic = `https://eu.ui-avatars.com/api/?name=${data.name}`;
+        const defaultProfilePic = `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(data.name || "Judge")}&size=120&background=random&color=fff`;
         return new Judge(data.id, data.name, data.profilePic || defaultProfilePic, data.description, data.portfolio);
     }
 }
