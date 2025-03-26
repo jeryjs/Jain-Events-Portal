@@ -1,5 +1,5 @@
 import { EventType } from '@common/constants';
-import { InfoActivity } from '@common/models';
+import { CulturalActivity, InfoActivity } from '@common/models';
 import Activity from '@common/models/Activity';
 import SportsActivity, { Athletics, Sport } from '@common/models/sports/SportsActivity';
 import { getBaseEventType } from '@common/utils';
@@ -14,6 +14,7 @@ import SportsBasketballIcon from '@mui/icons-material/SportsBasketball';
 import SportsCricketIcon from '@mui/icons-material/SportsCricket';
 import SportsSharpIcon from '@mui/icons-material/SportsSharp';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
+import PersonIcon from '@mui/icons-material/Person';
 import { Avatar, Badge, Box, Card, CardContent, Chip, Divider, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { generateColorFromString } from '@utils/utils';
@@ -671,6 +672,88 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
     );
   };
 
+  // Culturals Card Component
+  const CulturalsCard = ({ activity, status }: { activity: CulturalActivity, status: 'upcoming' | 'ongoing' | 'completed' }) => {
+    const hasWinners = activity.winners && activity.winners.length > 0;
+    const winnerTeams = useMemo(() => {
+      if (!hasWinners) return [];
+      return activity.winners.sort((a, b) => a.rank - b.rank).slice(0, 3).map(winner => {
+        const team = activity.teams.find(t => t.id === winner.teamId);
+        const participants = activity.isSoloPerformance ? activity.participants.filter(p => p.usn === winner.teamId) : activity.getTeamParticipants(winner.teamId);
+        return { rank: winner.rank, teamId: winner.teamId, teamName: team?.name || activity.participants.find(p => p.usn === winner.teamId)?.name || 'Unknown', participants };
+      });
+    }, [activity.winners, activity.teams, activity.participants, activity.isSoloPerformance]);
+    const medalColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+    const hasJudges = activity.judges && activity.judges.length > 0;
+    return (
+      <MotionLink variants={cardVariants} initial="hidden" animate="visible" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        <Link to={`/${eventId}/${activity.id}`} style={{ textDecoration: 'none' }}>
+          <StyledCard sx={{ overflow: 'hidden', position: 'relative' }}>
+            <MatchStatus status={status}>
+              {getStatusIcon(status)}
+              <Typography>{status}</Typography>
+            </MatchStatus>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Avatar sx={{ bgcolor: `${chipColor}22`, color: chipColor, width: 36, height: 36, mr: 1.5 }}><EmojiEventsIcon /></Avatar>
+                <Box><Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2, fontSize: '1.1rem' }}>{activity.name}</Typography></Box>
+              </Box>
+              <Divider sx={{ my: 1.5 }} />
+              {status === 'upcoming' ? (
+                <Box sx={{ mt: 1.5 }}><Typography variant="body2" color="text.secondary" align="center">{new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} • {new Date(activity.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Typography></Box>
+              ) : (
+                <>
+                { status === 'ongoing' && (
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                    <Chip icon={activity.isSoloPerformance ? <PersonIcon sx={{ fontSize: '0.85rem !important' }} /> : <Badge sx={{ '& .MuiBadge-badge': { position: 'static', transform: 'none', fontSize: '0.7rem', height: '16px', minWidth: '16px', padding: 0 } }} badgeContent={activity.teams?.length || 0} color="primary" />} label={activity.isSoloPerformance ? "Solo" : "Teams"} size="small" sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', '& .MuiChip-label': { px: 1, py: 0.5 }, '& .MuiChip-icon': { ml: 0.5 } }} />
+                    {hasJudges && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>Judges:</Typography>
+                        <Box sx={{ display: 'flex', flexGrow: 1 }}>
+                          {activity.judges.slice(0, 3).map((judge, idx) => (
+                            <Avatar key={judge.id || idx} src={judge.profilePic} alt={judge.name} sx={{ width: 20, height: 20, fontSize: '0.75rem', ml: idx > 0 ? -0.5 : 0, border: '1px solid', borderColor: 'background.paper' }} />
+                          ))}
+                          {activity.judges.length > 3 && (
+                            <Avatar sx={{ width: 20, height: 20, fontSize: '0.65rem', ml: -0.5, border: '1px solid', borderColor: 'background.paper', bgcolor: 'action.selected' }}>+{activity.judges.length - 3}</Avatar>
+                          )}
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+                )}
+                  {status === 'completed' && hasWinners ? (
+                    <>
+                      <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', mb: 1, color: 'primary.main', fontWeight: 600 }}><EmojiEventsIcon sx={{ mr: 0.5, fontSize: '1rem' }} />Winners</Typography>
+                      <Box sx={{ borderRadius: 1, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+                        {winnerTeams.map((winner, idx) => (
+                          <Box key={winner.teamId} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, bgcolor: idx % 2 === 0 ? 'rgba(0, 0, 0, 0.02)' : 'transparent', borderBottom: idx < winnerTeams.length - 1 ? '1px solid' : 'none', borderColor: 'divider', position: 'relative', overflow: 'hidden', '&:after': idx < 3 ? { content: '""', position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', backgroundColor: medalColors[idx] } : {} }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', maxWidth: '70%' }}>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 'bold', minWidth: '18px' }}>{winner.rank}</Typography>
+                              <Avatar sx={{ width: 24, height: 24, fontSize: '0.8rem', bgcolor: idx < 3 ? `${medalColors[idx]}33` : 'grey.300', color: idx < 3 ? medalColors[idx] : 'text.secondary', mr: 1, ml: 0.5 }}>{winner.teamName.charAt(0)}</Avatar>
+                              <Typography variant="body2" sx={{ fontWeight: idx === 0 ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {winner.teamName}
+                                {winner.participants.length > 0 && (
+                                  <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>({winner.participants.map(p => p.name).join(', ')})</Typography>
+                                )}
+                              </Typography>
+                            </Box>
+                            <Chip label={winner.rank === 1 ? 'WINNER' : 'RUNNER-UP'} size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 'bold', bgcolor: idx < 3 ? `${medalColors[idx]}22` : 'grey.100', color: idx < 3 ? medalColors[idx] : 'text.secondary', border: `1px solid ${idx < 3 ? medalColors[idx] : 'grey.300'}` }} />
+                          </Box>
+                        ))}
+                      </Box>
+                    </>
+                  ) : status === 'completed' ? (
+                    <Box sx={{ textAlign: 'center', py: 2, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider', borderRadius: 1 }}><Typography color="text.secondary" variant="body2">Winners to be announced</Typography></Box>
+                  ) : null}
+                </>
+              )}
+            </CardContent>
+          </StyledCard>
+        </Link>
+      </MotionLink>
+    );
+  };
+
   // Standard Card Component
   const StandardCard = ({ activity, activityType, chipColor, participantCount, status, eventId }: { activity: Activity, activityType: string, chipColor: string, participantCount: number, status: 'upcoming' | 'ongoing' | 'completed', eventId: string }) => (
     <MotionLink
@@ -713,7 +796,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
             {status === 'upcoming' && (
               <Box sx={{ mt: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
-                  Starts {new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                  Starts {activity.relativeStartTime}
                 </Typography>
               </Box>
             )}
@@ -732,6 +815,8 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
       return <AthleticsCard sportActivity={sportActivity} status={status} eventId={eventId} />;
     }
     return <SportsCard sportActivity={sportActivity} status={status} eventId={eventId} />;
+  } else if ([EventType.CULTURAL, EventType.TECH].includes(getBaseEventType(activity.type))) {
+    return <CulturalsCard activity={activity as CulturalActivity} status={status} />;
   }
 
   return (
