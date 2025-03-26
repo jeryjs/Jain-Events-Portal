@@ -339,6 +339,9 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                                 <Typography variant="subtitle1" fontWeight="bold">
                                   {athlete.name}
                                 </Typography>
+                                <Typography variant="caption" color="text.secondary" display="block">
+                                  {athlete.playerId}
+                                </Typography>
                                 <Typography variant="caption" color="text.secondary">
                                   {athlete.teamName}
                                 </Typography>
@@ -444,10 +447,15 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                               >
                                 {athlete.name.charAt(0)}
                               </Avatar>
-                              <Typography variant="body2" fontWeight={athlete.rank === 1 ? 'bold' : 'normal'}>
-                                {athlete.name}
-                                {athlete.rank === 1 && ' 🏆'}
-                              </Typography>
+                              <Box>
+                                <Typography variant="body2" fontWeight={athlete.rank === 1 ? 'bold' : 'normal'}>
+                                  {athlete.name}
+                                  {athlete.rank === 1 && ' 🏆'}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  {athlete.playerId}
+                                </Typography>
+                              </Box>
                             </Box>
                           </TableCell>
                           {!isRelay && (
@@ -488,9 +496,14 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                                   <Avatar sx={{ width: 24, height: 24, mr: 1, opacity: 0.5 }}>
                                     {athlete.name.charAt(0)}
                                   </Avatar>
-                                  <Typography variant="body2" color="text.secondary">
-                                    {athlete.name}
-                                  </Typography>
+                                  <Box>
+                                    <Typography variant="body2" color="text.secondary">
+                                      {athlete.name}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {athlete.playerId}
+                                    </Typography>
+                                  </Box>
                                 </Box>
                               </TableCell>
                               {!isRelay && (

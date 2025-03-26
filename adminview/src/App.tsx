@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import EventsPage from './pages/EventsPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import ArticlesPage from './pages/ArticlesPage';
+import SendNotificationsPage from './pages/SendNotificationsPage';
 import { AuthProvider } from './hooks/AuthContext';
 import { ProtectedLayout } from './components/Auth';
 import { Role } from '@common/constants';
@@ -86,6 +87,9 @@ const App = () => {
                   {/* Articles routes */}
                   <Route path="articles" element={<ArticlesPage />} />
                   <Route path="articles/:articleId" element={<ArticlesPage />} />
+
+                  {/* Send Notifications route */}
+                  <Route path="/send-notifications" element={<SendNotificationsPage />} />
                 </Route>
 
                 {/* Redirect all other paths to home */}

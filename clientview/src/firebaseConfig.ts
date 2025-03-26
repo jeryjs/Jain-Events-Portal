@@ -10,6 +10,71 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 let messaging = null;
 
+// Type interface for a notification in history
+export interface NotificationHistoryItem {
+  id: string;
+  title: string;
+  body: string;
+  imageUrl?: string;
+  timestamp: number;
+  read: boolean;
+}
+
+// Get notification history from local storage
+export const getNotificationHistory = (): NotificationHistoryItem[] => {
+  try {
+    const history = localStorage.getItem('notification_history');
+    return history ? JSON.parse(history) : [];
+  } catch (error) {
+    console.error('Error retrieving notification history:', error);
+    return [];
+  }
+};
+
+// Save a notification to history
+export const saveNotificationToHistory = (notification: { title: string; body: string; imageUrl?: string }) => {
+  try {
+    const history = getNotificationHistory();
+    const newNotification: NotificationHistoryItem = {
+      id: `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      title: notification.title,
+      body: notification.body,
+      imageUrl: notification.imageUrl,
+      timestamp: Date.now(),
+      read: false,
+    };
+    
+    // Add new notification to the beginning of the array (newest first)
+    const updatedHistory = [newNotification, ...history];
+    
+    // Limit history to 50 notifications to prevent local storage overflow
+    const limitedHistory = updatedHistory.slice(0, 50);
+    
+    localStorage.setItem('notification_history', JSON.stringify(limitedHistory));
+    return newNotification;
+  } catch (error) {
+    console.error('Error saving notification to history:', error);
+    return null;
+  }
+};
+
+// Mark notification as read
+export const markNotificationAsRead = (notificationId: string) => {
+  try {
+    const history = getNotificationHistory();
+    const updatedHistory = history.map(item => {
+      if (item.id === notificationId) {
+        return { ...item, read: true };
+      }
+      return item;
+    });
+    
+    localStorage.setItem('notification_history', JSON.stringify(updatedHistory));
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+  }
+};
+
 // Initialize FCM only if supported and already granted
 export const initializeMessaging = async () => {
 	try {
@@ -54,19 +119,8 @@ export const initializeMessaging = async () => {
 						return null;
 					});
 
-				// Handle incoming messages
-				onMessage(messaging, (payload) => {
-					console.log("Message received. ", payload);
-
-					// Customize notification handling here
-					if (Notification.permission === "granted") {
-						const notificationOptions = {
-							body: payload.notification.body,
-							icon: payload.notification.image,
-						};
-						new Notification(payload.notification.title, notificationOptions);
-					}
-				});
+				// Handle foreground messages and save to history
+				onMessageListener();
 				return messaging;
 			}
 
@@ -83,5 +137,32 @@ export const initializeMessaging = async () => {
 initializeMessaging().then((result) => {
 	messaging = result;
 });
+
+// Handle foreground messages and save to history
+export const onMessageListener = () => {
+  if (!messaging) return () => {};
+  
+  return onMessage(messaging, (payload) => {
+    console.log("Message received. ", payload);
+
+    // Save notification to history
+    if (payload.notification) {
+      saveNotificationToHistory({
+        title: payload.notification.title,
+        body: payload.notification.body,
+        imageUrl: payload.notification.image,
+      });
+    }
+
+    // Display notification if permission is granted
+    if (Notification.permission === "granted") {
+      const notificationOptions = {
+        body: payload.notification.body,
+        icon: payload.notification.image,
+      };
+      new Notification(payload.notification.title, notificationOptions);
+    }
+  });
+};
 
 export { analytics, app, messaging };

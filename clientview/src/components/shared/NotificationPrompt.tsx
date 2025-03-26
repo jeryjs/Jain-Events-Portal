@@ -1,9 +1,12 @@
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import HistoryIcon from '@mui/icons-material/History';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import {
   Avatar,
   Box, Button,
@@ -13,11 +16,21 @@ import {
   Paper,
   Popover, Typography,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Divider,
+  Badge,
+  Tooltip,
+  Chip
 } from '@mui/material';
 import { keyframes, styled } from '@mui/system';
 import { useEffect, useState } from 'react';
-import { initializeMessaging } from '../../firebaseConfig';
+import { initializeMessaging, onMessageListener, getNotificationHistory, markNotificationAsRead } from '../../firebaseConfig';
 import InstallPrompt from './InstallPrompt';
 
 const pulse = keyframes`
@@ -118,12 +131,43 @@ const NotificationIconContainer = styled(Box)(({ theme }) => ({
   animation: `${float} 3s ease infinite`,
 }));
 
+const NoNotificationsBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: theme.spacing(4),
+  color: theme.palette.text.secondary,
+  height: 260,
+}));
+
+const StyledListItem = styled(ListItem)(({ theme }) => ({
+  borderRadius: 12,
+  marginBottom: theme.spacing(1),
+  transition: 'all 0.2s ease',
+  '&:hover': {
+    backgroundColor: theme.palette.mode === 'light' 
+      ? 'rgba(0, 0, 0, 0.04)' 
+      : 'rgba(255, 255, 255, 0.04)',
+  },
+}));
+
+const NotificationTimestamp = styled(Typography)(({ theme }) => ({
+  fontSize: '0.7rem',
+  color: theme.palette.text.secondary,
+  display: 'block',
+  marginTop: 2,
+}));
+
 const NotificationPrompt = ({ className }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [permissionStatus, setPermissionStatus] = useState('default');
   const [loading, setLoading] = useState(false);
   const [subscribedToNotifications, setSubscribedToNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [notificationHistory, setNotificationHistory] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -136,6 +180,13 @@ const NotificationPrompt = ({ className }) => {
     if ('Notification' in window) {
       setPermissionStatus(Notification.permission);
     }
+
+    // Load notification history
+    if (isSubscribed) {
+      const history = getNotificationHistory();
+      setNotificationHistory(history);
+      setUnreadCount(history.filter(n => !n.read).length);
+    }
   }, [localStorage.subscribedToken]);
 
   const handleClick = (event) => {
@@ -146,6 +197,56 @@ const NotificationPrompt = ({ className }) => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
+  const handleNotificationClick = (notification) => {
+    if (!notification.read) {
+      markNotificationAsRead(notification.id);
+      
+      // Update local state
+      setNotificationHistory(prev => 
+        prev.map(item => item.id === notification.id ? { ...item, read: true } : item)
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    }
+  };
+
+  const handleMarkAllAsRead = () => {
+    const updatedHistory = notificationHistory.map(item => ({ ...item, read: true }));
+    localStorage.setItem('notification_history', JSON.stringify(updatedHistory));
+    setNotificationHistory(updatedHistory);
+    setUnreadCount(0);
+  };
+
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    
+    // Today
+    if (date.toDateString() === now.toDateString()) {
+      return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    // Yesterday
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+      return `Yesterday at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    // Within last 7 days
+    const oneWeekAgo = new Date(now);
+    oneWeekAgo.setDate(now.getDate() - 7);
+    if (date > oneWeekAgo) {
+      return `${date.toLocaleDateString([], { weekday: 'long' })} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    // Older
+    return date.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   const handleEnableNotifications = async () => {
@@ -216,17 +317,25 @@ const NotificationPrompt = ({ className }) => {
 
   return (
     <>
-      <NotificationButton
-        onClick={handleClick}
-        className={className}
-        isSubscribed={subscribedToNotifications}
-        color={subscribedToNotifications ? "primary" : "default"}
+      <Badge 
+        badgeContent={unreadCount} 
+        color="error"
+        invisible={unreadCount === 0 || !subscribedToNotifications}
+        overlap="circular"
+        sx={{ '& .MuiBadge-badge': { fontSize: '0.6rem' } }}
       >
-        {subscribedToNotifications
-          ? <NotificationsActiveIcon color="primary" />
-          : <NotificationsIcon />
-        }
-      </NotificationButton>
+        <NotificationButton
+          onClick={handleClick}
+          className={className}
+          isSubscribed={subscribedToNotifications}
+          color={subscribedToNotifications ? "primary" : "default"}
+        >
+          {subscribedToNotifications
+            ? <NotificationsActiveIcon color="primary" />
+            : <NotificationsIcon />
+          }
+        </NotificationButton>
+      </Badge>
 
       <Popover
         open={open}
@@ -290,8 +399,29 @@ const NotificationPrompt = ({ className }) => {
               <CloseIcon fontSize="small" />
             </IconButton>
 
+            {/* Tab Navigation */}
+            {subscribedToNotifications && (
+              <Tabs 
+                value={activeTab} 
+                onChange={handleTabChange}
+                variant="fullWidth" 
+                sx={{ width: '100%', mb: 2, borderBottom: 1, borderColor: 'divider' }}
+              >
+                <Tab 
+                  label="Notifications" 
+                  icon={<NotificationsIcon />} 
+                  iconPosition="start"
+                />
+                <Tab 
+                  label="History" 
+                  icon={<HistoryIcon />} 
+                  iconPosition="start"
+                />
+              </Tabs>
+            )}
+
             {/* Main content */}
-            {!showSettings ? (
+            {(activeTab === 0 || !subscribedToNotifications) && !showSettings ? (
               // Default view - enable notifications
               <>
                 <NotificationIconContainer>
@@ -345,7 +475,7 @@ const NotificationPrompt = ({ className }) => {
 
                 {permissionStatus === 'granted' && loading && (
                   <Box sx={{ py: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
-                    <CircularProgress size={20} /> {/* Adjust size as needed */}
+                    <CircularProgress size={20} />
                     <Typography variant="body2" color="primary" fontWeight="medium">Almost there...</Typography>
                   </Box>
                 )}
@@ -375,6 +505,116 @@ const NotificationPrompt = ({ className }) => {
                 >
                   You can change notification settings anytime
                 </Typography>
+              </>
+            ) : activeTab === 1 && subscribedToNotifications && !showSettings ? (
+              // History view
+              <>
+                <Box sx={{ width: '100%', height: 300, overflowY: 'auto', px: 1 }}>
+                  {notificationHistory.length > 0 ? (
+                    <>
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          justifyContent: 'flex-end', 
+                          mb: 1, 
+                          mt: 0.5,
+                          opacity: notificationHistory.some(n => !n.read) ? 1 : 0.5
+                        }}
+                      >
+                        <Tooltip title="Mark all as read">
+                          <Button
+                            size="small"
+                            startIcon={<DoneAllIcon fontSize="small" />}
+                            onClick={handleMarkAllAsRead}
+                            disabled={!notificationHistory.some(n => !n.read)}
+                            sx={{ textTransform: 'none', fontWeight: 500 }}
+                          >
+                            Mark all read
+                          </Button>
+                        </Tooltip>
+                      </Box>
+                      
+                      <List disablePadding>
+                        {notificationHistory.map((notification, index) => (
+                          <StyledListItem 
+                            key={notification.id} 
+                            alignItems="flex-start"
+                            onClick={() => handleNotificationClick(notification)}
+                            sx={{ 
+                              backgroundColor: !notification.read ? 
+                                (theme.palette.mode === 'light' ? 'rgba(25, 118, 210, 0.05)' : 'rgba(66, 165, 245, 0.05)') : 
+                                'transparent',
+                              cursor: 'pointer',
+                              border: !notification.read ? 
+                                `1px solid ${theme.palette.mode === 'light' ? 'rgba(25, 118, 210, 0.1)' : 'rgba(66, 165, 245, 0.1)'}` : 
+                                '1px solid transparent'
+                            }}
+                          >
+                            <ListItemAvatar>
+                              <Avatar 
+                                sx={{ 
+                                  bgcolor: notification.read ? 
+                                    (theme.palette.mode === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)') : 
+                                    'primary.light'
+                                }}
+                              >
+                                {!notification.read ? 
+                                  <NotificationsActiveIcon color="primary" /> : 
+                                  <NotificationsIcon color="action" />
+                                }
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                  <Typography variant="subtitle2" component="span" fontWeight={notification.read ? 400 : 600}>
+                                    {notification.title}
+                                  </Typography>
+                                  {!notification.read && (
+                                    <Chip 
+                                      label="New" 
+                                      size="small" 
+                                      color="primary" 
+                                      sx={{ height: 20, fontSize: '0.6rem', ml: 1 }}
+                                    />
+                                  )}
+                                </Box>
+                              }
+                              secondary={
+                                <>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.primary"
+                                    sx={{ 
+                                      display: 'block',
+                                      fontWeight: notification.read ? 'normal' : 500,
+                                      opacity: notification.read ? 0.9 : 1
+                                    }}
+                                  >
+                                    {notification.body}
+                                  </Typography>
+                                  <NotificationTimestamp>
+                                    {formatTimestamp(notification.timestamp)}
+                                  </NotificationTimestamp>
+                                </>
+                              }
+                            />
+                          </StyledListItem>
+                        ))}
+                      </List>
+                    </>
+                  ) : (
+                    <NoNotificationsBox>
+                      <NotificationsOffIcon sx={{ fontSize: 40, mb: 2, opacity: 0.5 }} />
+                      <Typography variant="subtitle1" gutterBottom>
+                        No notifications yet
+                      </Typography>
+                      <Typography variant="body2" align="center">
+                        You'll see notifications about events and announcements here once you receive them.
+                      </Typography>
+                    </NoNotificationsBox>
+                  )}
+                </Box>
               </>
             ) : (
               // Settings view - instructions for rejected permissions

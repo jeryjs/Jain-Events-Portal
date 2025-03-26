@@ -180,10 +180,21 @@ export const AuthApi = {
   }
 };
 
+// Notifications API endpoints
+export const NotificationsApi = {
+  // Send notification to all users
+  sendToAll: (data: { title: string; message: string; imageUrl?: string }) => 
+    apiFetch<{ message: string }>('/user/sendNotificationToAll', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
 // Export all API endpoints
 export default {
   events: EventsApi,
   activities: ActivitiesApi,
   articles: ArticlesApi,
   auth: AuthApi,
+  notifications: NotificationsApi,
 };
