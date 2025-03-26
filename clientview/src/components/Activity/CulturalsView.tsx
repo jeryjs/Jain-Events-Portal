@@ -1,14 +1,11 @@
-
-import { 
-  Box, Typography, Paper, Avatar, Chip, styled, Dialog, DialogContent,
+import { useState } from "react";
+import { CulturalActivity, Judge, Participant, TeamParticipant } from "@common/models";
+import { motion, AnimatePresence } from "framer-motion";
+import { Box, Typography, Paper, Avatar, Chip, styled, Dialog, DialogContent,
   Fade, Zoom, useTheme, useMediaQuery, IconButton, alpha, Skeleton
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { PollingForm } from "./CulturalsView/PollingForm";
-import { useState } from "react";
-import { CulturalActivity, Judge, TeamParticipant } from "@common/models";
-import { motion } from "framer-motion";
-import { Participant } from "@common/models";
 
 const Section = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -226,6 +223,29 @@ const PerformerInfo = styled(Box)(({ theme }) => ({
   overflow: "hidden",
 }));
 
+// Performers styled components
+const PerformerDialogContent = styled(DialogContent)(({ theme }) => ({
+  padding: theme.spacing(4),
+  background: theme.palette.mode === 'dark'
+    ? `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 1)} 0%, ${alpha(theme.palette.background.paper, 0.7)} 100%)`
+    : `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.grey[50], 0.9)} 100%)`,
+  overflowX: "hidden",
+  position: "relative",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "100%",
+    background: theme.palette.mode === 'dark'
+      ? `radial-gradient(circle at top right, ${alpha(theme.palette.primary.dark, 0.15)}, transparent 70%)`
+      : `radial-gradient(circle at top right, ${alpha(theme.palette.primary.light, 0.15)}, transparent 70%)`,
+    zIndex: 0,
+    pointerEvents: "none",
+  },
+}));
+
 // Cultural Activity View
 export const CulturalsView = ({
   eventId,
@@ -235,6 +255,8 @@ export const CulturalsView = ({
   activity: CulturalActivity;
 }) => {
   const [selectedJudge, setSelectedJudge] = useState<Judge>(null);
+  const [selectedPerformer, setSelectedPerformer] = useState<Participant | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<{id: string, name: string} | null>(null);
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -253,10 +275,20 @@ export const CulturalsView = ({
 
   const isEmptyJudges = !activity.judges || activity.judges.length === 0;
 
-  console.log(selectedJudge);
+  const handleClosePerformer = () => {
+    setSelectedPerformer(null);
+  };
 
-  const handleTeamClick = (team: any) => {
-    console.log('Team clicked:', team);
+  const handleCloseTeam = () => {
+    setSelectedTeam(null);
+  };
+
+  const handlePerformerClick = (performer: Participant) => {
+    setSelectedPerformer(performer);
+  };
+
+  const handleTeamClick = (team: {id: string, name: string}) => {
+    setSelectedTeam(team);
   };
   
   return (
@@ -621,7 +653,7 @@ export const CulturalsView = ({
             maxWidth: "100%",
           }}>
             {/* Teams section - only display if there are teams */}
-            {activity.teams && activity.teams.length > 0 && (
+            {activity.teams && activity.teams.length > 0 ? (
               <Box sx={{ mb: 4 }}>
                 <Typography 
                   variant="h6" 
@@ -691,74 +723,537 @@ export const CulturalsView = ({
                   </TeamCard>
                 ))}
               </Box>
-            )}
-            
-            {/* Individual performers - always show if there are participants without teams */}
-            {activity.participants.some(p => !activity.getParticipantTeam(p.usn)) && (
+            ) : (
+              /* Individual performers - only show if there are no teams */
               <Box>
-                {/* Only show section title if there are also teams */}
-                {activity.teams && activity.teams.length > 0 && (
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      mb: 2, 
-                      color: theme.palette.mode === "dark" 
-                        ? alpha(theme.palette.primary.light, 0.9) 
-                        : theme.palette.primary.main,
-                      fontWeight: 600,
+                {activity.participants.map((participant, idx) => (
+                  <PerformerCard
+                    key={participant.usn || idx}
+                    onClick={() => handlePerformerClick(participant)}
+                    whileHover={{ x: 5 }}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ 
+                      duration: 0.4, 
+                      delay: idx * 0.1,
+                      type: "spring",
+                      stiffness: 100,
                     }}
+                    sx={{ cursor: "pointer" }}
                   >
-                    Individual Performers
-                  </Typography>
-                )}
-                
-                {activity.participants
-                  .filter(participant => !activity.getParticipantTeam(participant.usn))
-                  .map((participant, idx) => (
-                    <PerformerCard
-                      key={participant.usn || idx}
-                      whileHover={{ x: 5 }}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ 
-                        duration: 0.4, 
-                        delay: idx * 0.1,
-                        type: "spring",
-                        stiffness: 100,
-                      }}
-                    >
-                      <PerformerAvatar
-                        alt={participant.name}
-                        src={participant.profilePic}
-                      />
+                    <PerformerAvatar
+                      alt={participant.name}
+                      src={participant.profilePic}
+                    />
+                    
+                    <PerformerInfo>
+                      <Typography 
+                        variant="subtitle1" 
+                        sx={{ 
+                          fontWeight: 600,
+                          mb: 0.5,
+                        }}
+                      >
+                        {participant.name}
+                      </Typography>
                       
-                      <PerformerInfo>
-                        <Typography 
-                          variant="subtitle1" 
-                          sx={{ 
-                            fontWeight: 600,
-                            mb: 0.5,
-                          }}
-                        >
-                          {participant.name}
-                        </Typography>
-                        
-                        <Typography 
-                          variant="caption" 
-                          color="text.secondary"
-                          sx={{ 
-                            display: "block",
-                          }}
-                        >
-                          {participant.college || "Jain University"}
-                        </Typography>
-                      </PerformerInfo>
-                    </PerformerCard>
-                  ))}
+                      <Typography 
+                        variant="caption" 
+                        color="text.secondary"
+                        sx={{ 
+                          display: "block",
+                        }}
+                      >
+                        {participant.college || "Jain University"}
+                      </Typography>
+                    </PerformerInfo>
+                  </PerformerCard>
+                ))}
               </Box>
             )}
           </Box>
         )}
+
+        {/* Performer Detail Slide Panel */}
+        <AnimatePresence>
+          {selectedPerformer && (
+            <Dialog
+              open={selectedPerformer !== null}
+              onClose={handleClosePerformer}
+              TransitionComponent={Fade}
+              TransitionProps={{ timeout: 500 }}
+              maxWidth="sm"
+              fullWidth
+              PaperProps={{
+                elevation: 24,
+                sx: {
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  bgcolor: theme.palette.background.paper,
+                  border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
+                  margin: isMobile ? 2 : 'auto',
+                  maxHeight: isMobile ? 'calc(100% - 32px)' : '90vh',
+                  width: isMobile ? 'calc(100% - 32px)' : '100%',
+                }
+              }}
+            >
+              <Box 
+                sx={{ 
+                  display: "flex", 
+                  justifyContent: "flex-end", 
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  zIndex: 10
+                }}
+              >
+                <IconButton 
+                  onClick={handleClosePerformer}
+                  sx={{ 
+                    bgcolor: isDarkMode 
+                      ? alpha(theme.palette.background.paper, 0.7) 
+                      : "rgba(255,255,255,0.8)",
+                    "&:hover": { 
+                      bgcolor: isDarkMode 
+                        ? alpha(theme.palette.background.paper, 0.9) 
+                        : "rgba(255,255,255,0.95)" 
+                    },
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+              
+              <PerformerDialogContent sx={{ 
+                pt: { xs: 5, sm: 4 },
+                px: { xs: 2, sm: 4 },
+                pb: { xs: 3, sm: 4 }
+              }}>
+                <Box 
+                  sx={{
+                    textAlign: "center",
+                    position: "relative",
+                    mb: 4,
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, isDarkMode ? 0.1 : 0.15)} 0%, transparent 70%)`,
+                      width: 240,
+                      height: 240,
+                      left: "50%",
+                      top: 0,
+                      transform: "translateX(-50%)",
+                      borderRadius: "50%",
+                      zIndex: 0
+                    }
+                  }}
+                >
+                  <Zoom in={true} style={{ transitionDelay: '100ms' }}>
+                    <Avatar
+                      src={selectedPerformer.profilePic}
+                      alt={selectedPerformer.name}
+                      sx={{ 
+                        width: 140, 
+                        height: 140, 
+                        mx: "auto", 
+                        mb: 2,
+                        border: `5px solid ${alpha(theme.palette.background.paper, 0.9)}`,
+                        boxShadow: `0 16px 40px ${alpha(theme.palette.common.black, 0.25)}`,
+                        position: "relative",
+                        zIndex: 1
+                      }}
+                    />
+                  </Zoom>
+                  
+                  <Fade in={true} timeout={600}>
+                    <Typography 
+                      variant={isMobile ? "h5" : "h4"} 
+                      component="h3" 
+                      fontWeight="bold"
+                      sx={{ mb: 1 }}
+                    >
+                      {selectedPerformer.name}
+                    </Typography>
+                  </Fade>
+                  
+                  <Fade in={true} timeout={700}>
+                    <Typography 
+                      variant="subtitle1" 
+                      color="text.secondary"
+                      sx={{ 
+                        maxWidth: "80%",
+                        mx: "auto",
+                        mb: 2,
+                      }}
+                    >
+                      {selectedPerformer.college || "Jain University"}
+                    </Typography>
+                  </Fade>
+                </Box>
+                
+                <Fade in={true} timeout={800}>
+                  <Box sx={{ position: "relative" }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        mb: 2, 
+                        fontWeight: 600,
+                        position: "relative",
+                        display: "inline-block",
+                        "&::after": {
+                          content: '""',
+                          position: "absolute",
+                          width: "50%",
+                          height: "3px",
+                          bottom: "-4px",
+                          left: 0,
+                          background: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
+                          borderRadius: "1px"
+                        }
+                      }}
+                    >
+                      Performer Details
+                    </Typography>
+                    
+                    <Box 
+                      component={motion.div}
+                      sx={{ mb: 3 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.3 }}
+                    >
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          p: 3,
+                          bgcolor: isDarkMode 
+                            ? alpha(theme.palette.background.default, 0.4)
+                            : alpha(theme.palette.background.paper, 0.7),
+                          borderRadius: 2,
+                          border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.2 : 0.1)}`,
+                          boxShadow: isDarkMode
+                            ? `0 8px 30px ${alpha(theme.palette.common.black, 0.15)}`
+                            : `0 8px 30px ${alpha(theme.palette.common.black, 0.05)}`,
+                          mb: 3,
+                          overflow: "hidden",
+                          position: "relative",
+                          "&::after": {
+                            content: '""',
+                            position: "absolute",
+                            top: 0,
+                            right: 0,
+                            width: "30%",
+                            height: "100%",
+                            background: `linear-gradient(to left, ${alpha(theme.palette.primary.main, 0.03)}, transparent)`,
+                            zIndex: 0,
+                            pointerEvents: "none",
+                          }
+                        }}
+                      >
+                        <Box 
+                          sx={{ 
+                            display: "grid", 
+                            gridTemplateColumns: "auto 1fr",
+                            gap: { xs: 1.5, sm: 2 },
+                            "& > *:nth-of-type(odd)": {
+                              fontWeight: 600,
+                              color: isDarkMode 
+                                ? alpha(theme.palette.primary.light, 0.9)
+                                : theme.palette.primary.main,
+                            }
+                          }}
+                        >
+                          <Typography variant="body2">USN</Typography>
+                          <Typography variant="body2">{selectedPerformer.usn}</Typography>
+                          
+                          <Typography variant="body2">Branch</Typography>
+                          <Typography variant="body2">{selectedPerformer.branch || "Not specified"}</Typography>
+                          
+                          <Typography variant="body2">Email</Typography>
+                          <Typography variant="body2">{selectedPerformer.email}</Typography>
+                          
+                          <Typography variant="body2">Phone</Typography>
+                          <Typography variant="body2">{selectedPerformer.phone}</Typography>
+                        </Box>
+                      </Paper>
+                      
+                      {selectedPerformer.event && (
+                        <Paper
+                          elevation={0}
+                          sx={{
+                            p: 3,
+                            bgcolor: isDarkMode 
+                              ? alpha(theme.palette.background.default, 0.4)
+                              : alpha(theme.palette.background.paper, 0.7),
+                            borderRadius: 2,
+                            border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.2 : 0.1)}`,
+                            boxShadow: isDarkMode
+                              ? `0 8px 30px ${alpha(theme.palette.common.black, 0.15)}`
+                              : `0 8px 30px ${alpha(theme.palette.common.black, 0.05)}`,
+                          }}
+                        >
+                          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+                            Event Details
+                          </Typography>
+                          <Typography variant="body2">
+                            {`Participating in ${selectedPerformer.event}`}
+                          </Typography>
+                        </Paper>
+                      )}
+                    </Box>
+                  </Box>
+                </Fade>
+                
+                <Typography 
+                  variant="caption" 
+                  color="text.secondary" 
+                  sx={{ 
+                    textAlign: "center", 
+                    mt: 3, 
+                    display: "block",
+                    opacity: 0.7
+                  }}
+                >
+                  Performer details are visible only to event organizers and administrators.
+                </Typography>
+              </PerformerDialogContent>
+            </Dialog>
+          )}
+        </AnimatePresence>
+        
+        {/* Team Detail Dialog */}
+        <AnimatePresence>
+          {selectedTeam && (
+            <Dialog
+              open={selectedTeam !== null}
+              onClose={handleCloseTeam}
+              TransitionComponent={Fade}
+              TransitionProps={{ timeout: 500 }}
+              maxWidth="sm"
+              fullWidth
+              PaperProps={{
+                elevation: 24,
+                sx: {
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  bgcolor: theme.palette.background.paper,
+                  border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
+                  margin: isMobile ? 2 : 'auto',
+                  maxHeight: isMobile ? 'calc(100% - 32px)' : '90vh',
+                  width: isMobile ? 'calc(100% - 32px)' : '100%',
+                }
+              }}
+            >
+              <Box 
+                sx={{ 
+                  display: "flex", 
+                  justifyContent: "flex-end", 
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  zIndex: 10
+                }}
+              >
+                <IconButton 
+                  onClick={handleCloseTeam}
+                  sx={{ 
+                    bgcolor: isDarkMode 
+                      ? alpha(theme.palette.background.paper, 0.7) 
+                      : "rgba(255,255,255,0.8)",
+                    "&:hover": { 
+                      bgcolor: isDarkMode 
+                        ? alpha(theme.palette.background.paper, 0.9) 
+                        : "rgba(255,255,255,0.95)" 
+                    },
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+              
+              <PerformerDialogContent sx={{ 
+                pt: { xs: 5, sm: 4 },
+                px: { xs: 2, sm: 4 },
+                pb: { xs: 3, sm: 4 }
+              }}>
+                <Box 
+                  sx={{
+                    textAlign: "center",
+                    position: "relative",
+                    mb: 4,
+                    "&::before": {
+                      content: '""',
+                      position: "absolute",
+                      background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, isDarkMode ? 0.1 : 0.15)} 0%, transparent 70%)`,
+                      width: 240,
+                      height: 240,
+                      left: "50%",
+                      top: 0,
+                      transform: "translateX(-50%)",
+                      borderRadius: "50%",
+                      zIndex: 0
+                    }
+                  }}
+                >
+                  <Zoom in={true} style={{ transitionDelay: '100ms' }}>
+                    <Box
+                      sx={{
+                        width: 120,
+                        height: 120,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        mx: "auto",
+                        mb: 2,
+                        boxShadow: `0 16px 40px ${alpha(theme.palette.common.black, 0.25)}`,
+                        position: "relative",
+                        zIndex: 1
+                      }}
+                    >
+                      <Typography variant="h3" sx={{ color: "#fff", fontWeight: "bold" }}>
+                        {selectedTeam.name.substring(0, 2).toUpperCase()}
+                      </Typography>
+                    </Box>
+                  </Zoom>
+                  
+                  <Fade in={true} timeout={600}>
+                    <Typography 
+                      variant={isMobile ? "h5" : "h4"} 
+                      component="h3" 
+                      fontWeight="bold"
+                      sx={{ mb: 1 }}
+                    >
+                      {selectedTeam.name}
+                    </Typography>
+                  </Fade>
+                </Box>
+                
+                <Fade in={true} timeout={800}>
+                  <Box sx={{ position: "relative" }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        mb: 2, 
+                        fontWeight: 600,
+                        position: "relative",
+                        display: "inline-block",
+                        "&::after": {
+                          content: '""',
+                          position: "absolute",
+                          width: "50%",
+                          height: "3px",
+                          bottom: "-4px",
+                          left: 0,
+                          background: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
+                          borderRadius: "1px"
+                        }
+                      }}
+                    >
+                      Team Members
+                    </Typography>
+                    
+                    <Box 
+                      component={motion.div}
+                      sx={{ mb: 3 }}
+                      initial="hidden"
+                      animate="visible"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                          opacity: 1,
+                          transition: {
+                            staggerChildren: 0.1
+                          }
+                        }
+                      }}
+                    >
+                      {activity.getTeamParticipants(selectedTeam.id).map((member, idx) => (
+                        <motion.div
+                          key={member.usn || idx}
+                          variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: { opacity: 1, y: 0 }
+                          }}
+                        >
+                          <Paper
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              p: 2,
+                              mb: 2,
+                              borderRadius: 2,
+                              bgcolor: isDarkMode 
+                                ? alpha(theme.palette.background.default, 0.4)
+                                : alpha(theme.palette.background.paper, 0.7),
+                              border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.2 : 0.1)}`,
+                              boxShadow: isDarkMode
+                                ? `0 4px 20px ${alpha(theme.palette.common.black, 0.2)}`
+                                : `0 4px 20px ${alpha(theme.palette.common.black, 0.05)}`,
+                              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                              "&:hover": {
+                                transform: "translateY(-4px)",
+                                boxShadow: isDarkMode
+                                  ? `0 8px 30px ${alpha(theme.palette.common.black, 0.3)}`
+                                  : `0 8px 30px ${alpha(theme.palette.common.black, 0.1)}`,
+                              }
+                            }}
+                          >
+                            <Avatar
+                              src={member.profilePic}
+                              alt={member.name}
+                              sx={{ 
+                                mr: 2, 
+                                width: 60, 
+                                height: 60,
+                                border: `3px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                              }}
+                            />
+                            <Box>
+                              <Typography variant="subtitle1" fontWeight={600}>
+                                {member.name}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {member.usn} • {member.branch || 'Department not specified'}
+                              </Typography>
+                              <Typography 
+                                variant="caption" 
+                                sx={{ 
+                                  display: "block", 
+                                  mt: 0.5,
+                                  color: theme.palette.primary.main,
+                                  fontWeight: 500
+                                }}
+                              >
+                                {member.college || "Jain University"}
+                              </Typography>
+                            </Box>
+                          </Paper>
+                        </motion.div>
+                      ))}
+                    </Box>
+                  </Box>
+                </Fade>
+                
+                <Box sx={{ flex: 1 }}></Box>
+                
+                <Typography 
+                  variant="caption" 
+                  color="text.secondary" 
+                  sx={{ 
+                    textAlign: "center", 
+                    mt: 3, 
+                    display: "block",
+                    opacity: 0.7
+                  }}
+                >
+                  Team details are visible only to event organizers and administrators.
+                </Typography>
+              </PerformerDialogContent>
+            </Dialog>
+          )}
+        </AnimatePresence>
       </PerformerSection>
     </Box>
   );
