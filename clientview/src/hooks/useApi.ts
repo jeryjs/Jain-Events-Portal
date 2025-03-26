@@ -42,7 +42,9 @@ const _fetchEvent = async (eventId: string): Promise<Event> => {
 };
 
 export const useEvents = () => {
-	// return useDummyEvents(20); // Use dummy events for now while testing
+	if (process.env.NODE_ENV === "development") {
+		// return useDummyEvents(20); // Use dummy events for now while testing
+	}
 
 	return useQuery({
 		queryKey: ["events"],
@@ -52,7 +54,9 @@ export const useEvents = () => {
 };
 
 export const useEvent = (eventId: string) => {
-	// const eventsQuery = useEvents();
+	if (process.env.NODE_ENV === "development") {
+		// const eventsQuery = useEvents();
+	}
 
 	return useQuery({
 		queryKey: ["event", eventId],
@@ -110,7 +114,9 @@ const _fetchActivity = async (eventId: string, activityId: string): Promise<Acti
 };
 
 export const useActivities = (eventId: string) => {
-	return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
+	if (process.env.NODE_ENV === "development") {
+		return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
+	}
 
 	return useQuery({
 		queryKey: ["activities", eventId],
@@ -131,7 +137,9 @@ export const useActivities = (eventId: string) => {
 };
 
 export const useActivity = (eventId: string, activityId: string) => {
-	return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
+	if (process.env.NODE_ENV === "development") {
+		return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
+	}
 	// const activitiesQuery = useActivities(eventId);
 
 	return useQuery({
@@ -223,7 +231,9 @@ const _fetchArticles = async (): Promise<Article[]> => {
 };
 
 export const useArticles = () => {
-	//   return useDummyArticles(20); // Use dummy articles for now while testing
+	if (process.env.NODE_ENV === "development") {
+		// return useDummyArticles(20); // Use dummy articles for now while testing
+	}
 
 	return useQuery({
 		queryKey: ["articles"],

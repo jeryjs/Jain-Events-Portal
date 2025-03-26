@@ -1,30 +1,45 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 // Workaround for module-alias in vercel deployment.
-if (process.env.VERCEL == '1' || __filename.endsWith('.js')) {
-	console.log("Registering tsconfig-paths");
-
-	// Workaround for tsconfig-paths in vercel deployment.
-	const tsConfigPaths = require("../../tsconfig.json").compilerOptions.paths as Record<string, string[]>;
-	const resolvedPaths: Record<string, string[]> = {};
-	for (const key in tsConfigPaths) {
-		resolvedPaths[key] = tsConfigPaths[key].map(path => {
-			// Prepend __dirname only if the path is relative
-			if (path.startsWith("./") || path.startsWith("../"))
-				return __dirname + "/" + path;
-			return path; // Keep absolute paths as is
+try {
+	// Workaround for module-alias in vercel deployment.
+	if (process.env.VERCEL == '1' || __filename.endsWith('.js')) {
+		console.log("Registering tsconfig-paths");
+		// Workaround for tsconfig-paths in vercel deployment.
+		const tsConfigPaths = require("../../tsconfig.json").compilerOptions.paths;
+		const resolvedPaths: { [key: string]: string[] } = {};
+		for (const key in tsConfigPaths) {
+			resolvedPaths[key] = tsConfigPaths[key].map((path: string) => {
+				// Prepend __dirname only if the path is relative
+				if (path.startsWith("./") || path.startsWith("../"))
+					return __dirname + "/" + path;
+				return path; // Keep absolute paths as is
+			});
+		}
+		require('tsconfig-paths').register({
+			baseUrl: '.',
+			paths: resolvedPaths
 		});
+		console.log("BaseURL tsconfig-paths: " + __dirname);
+		console.log("Original tsconfig-paths: " + JSON.stringify(tsConfigPaths));
+		console.log("Registered tsconfig-paths: " + JSON.stringify(resolvedPaths));
 	}
-	require('tsconfig-paths').register({
-		baseUrl: '.',
-		paths: resolvedPaths
+	else {
+		require('module-alias/register');
+	}
+}
+catch (e) {
+	console.log("Error occurred during startup:", e);
+	console.log("Current working directory:", process.cwd());
+	console.log("Environment variables:", process.env);
+	console.log("Filename:", __filename);
+	console.log("dirname:", __dirname);
+	console.log("VERCEL:", process.env.VERCEL);
+	console.log("require test: ", require("@routes/eventRoutes"));
+	require('fs').readdirSync(__dirname).forEach((file: any) => {
+		console.log(file);
 	});
-	console.log("BaseURL tsconfig-paths: "+ __dirname);
-	console.log("Original tsconfig-paths: "+ JSON.stringify(tsConfigPaths));
-	console.log("Registered tsconfig-paths: "+ JSON.stringify(resolvedPaths));
 }
-else {
-	require('module-alias/register');
-}
-
 import "dotenv/config";
 import express, { Request, Response } from "express";
 import cors from "cors";
