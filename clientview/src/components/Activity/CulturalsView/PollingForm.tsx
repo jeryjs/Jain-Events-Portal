@@ -8,6 +8,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { useCastVote } from '@hooks/useApi';
 import { CulturalActivity } from '@common/models';
+import { useLoginPrompt } from '@components/shared';
 
 const PollContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
@@ -116,7 +117,7 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
   const castVoteMutation = useCastVote(eventId, activityId);
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [userVoted, setUserVoted] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated, promptLogin, user } = useLoginPrompt();
   
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -147,7 +148,7 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
   useEffect(() => {
     // Mock authentication - replace with real implementation
     const token = "mock-token";
-    setIsAuthenticated(!!token);
+    // setIsAuthenticated(!!token);
     const userUsername = "admin"; 
 
     // Check if user has already voted
@@ -302,18 +303,29 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
       
       {!isAuthenticated && (
         <Typography 
-          variant="caption" 
-          color="primary" 
+          variant="body2"
+          color="text.secondary"
           sx={{ 
-            display: 'block', 
-            mt: 1, 
-            textAlign: 'center',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 0.5,
+            mt: 1,
+            p: 1.5,
+            borderRadius: 1,
+            bgcolor: alpha(theme.palette.primary.main, 0.05),
+            border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
             cursor: 'pointer',
-            '&:hover': { textDecoration: 'underline' }
+            transition: 'all 0.2s ease',
+            '&:hover': { 
+              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              color: theme.palette.primary.main
+            }
           }}
-          onClick={() => console.log('Login clicked')}
+          onClick={promptLogin}
         >
-          Log in to vote
+          <LockIcon sx={{ fontSize: 16 }} />
+          Sign in to cast your vote
         </Typography>
       )}
     </PollContainer>
