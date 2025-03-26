@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 // Workaround for module-alias in vercel deployment.
 try {
 	// Workaround for module-alias in vercel deployment.

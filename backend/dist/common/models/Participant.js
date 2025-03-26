@@ -48,7 +48,7 @@ class TeamParticipant extends Participant {
         return this.isParticipating;
     }
     get detailsString() {
-        return `USN: ${this.usn} • Team: ${this.teamId} • Position: ${this.position}`;
+        return `ID: ${this.usn} • College: ${this.college} • Team: ${this.teamId} • Position: ${this.position}`;
     }
 }
 exports.TeamParticipant = TeamParticipant;

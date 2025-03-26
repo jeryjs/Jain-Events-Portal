@@ -385,7 +385,12 @@ class SportsActivity extends Activity_1.default {
     }
     static parse(data) {
         let gameType;
-        switch (data.eventType) {
+        // if data contains eventType, convert it to type
+        if (data.eventType) {
+            data.type = data.eventType;
+            delete data.eventType;
+        }
+        switch (data.type) {
             case constants_1.EventType.CRICKET:
                 gameType = new Cricket();
                 break;
