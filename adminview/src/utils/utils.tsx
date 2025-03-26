@@ -35,7 +35,7 @@ const darkenColor = (hexColor: string, factor: number = 0.2): string => {
     return `#${newHexR}${newHexG}${newHexB}`;
 };
 
-export const pascalCase = (input: string, replaceUnderscore: boolean = false): string => {
+export const pascalCase = (input: string, replaceUnderscore: boolean = true): string => {
     if (!input) return '';
 
     // Replace underscores with spaces if specified

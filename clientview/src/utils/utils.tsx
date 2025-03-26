@@ -36,13 +36,17 @@ const darkenColor = (hexColor: string, factor: number = 0.2): string => {
     return `#${newHexR}${newHexG}${newHexB}`;
 };
 
-export const pascalCase = (input: string): string => {
+export const pascalCase = (input: string, replaceUnderscore: boolean = true): string => {
     if (!input) return '';
+
+    // Replace underscores with spaces if specified
+    const processedInput = replaceUnderscore ? input.replace(/_/g, ' ') : input;
+
     // Find all alphanumeric word segments
-    const words = input.match(/[A-Za-z0-9]+/g);
+    const words = processedInput.match(/[A-Za-z0-9]+/g);
     if (!words) return '';
     
     return words
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join('');
+        .join(' ');
 };
