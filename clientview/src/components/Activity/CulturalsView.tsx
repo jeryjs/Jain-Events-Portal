@@ -1,4 +1,4 @@
-import { Gender } from "@common/constants";
+
 import { 
   Box, Typography, Paper, Avatar, Chip, styled, Dialog, DialogContent,
   Fade, Zoom, useTheme, useMediaQuery, IconButton, alpha, Skeleton
@@ -6,8 +6,9 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { PollingForm } from "./CulturalsView/PollingForm";
 import { useState } from "react";
-import { CulturalActivity, Judge } from "@common/models";
+import { CulturalActivity, Judge, TeamParticipant } from "@common/models";
 import { motion } from "framer-motion";
+import { Participant } from "@common/models";
 
 const Section = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -66,6 +67,165 @@ const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
   overflowX: "hidden",
 }));
 
+const StyledCard = styled(motion.div)(({ theme }) => ({
+  padding: theme.spacing(3),
+  borderRadius: theme.spacing(2),
+  textAlign: "center",
+  cursor: "pointer",
+  transition: "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
+  background: theme.palette.mode === "dark"
+    ? `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.8)} 0%, ${alpha(theme.palette.background.paper, 0.4)} 100%)`
+    : `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
+  overflow: "hidden",
+  position: "relative",
+  border: `1px solid ${alpha(theme.palette.divider, theme.palette.mode === "dark" ? 0.2 : 0.05)}`,
+  boxShadow: theme.shadows[3],
+  "&:hover": {
+    transform: "translateY(-8px)",
+    boxShadow: theme.shadows[6],
+  },
+}));
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: 100,
+  height: 100,
+  margin: "0 auto 12px",
+  border: `4px solid ${alpha(theme.palette.primary.main, theme.palette.mode === "dark" ? 0.2 : 0.1)}`,
+  boxShadow: theme.palette.mode === "dark"
+    ? `0 8px 20px ${alpha(theme.palette.common.black, 0.25)}`
+    : `0 8px 20px ${alpha(theme.palette.common.black, 0.12)}`,
+  transition: "all 0.3s ease",
+}));
+
+// Performers styled components
+const PerformerSection = styled(motion.section)(({ theme }) => ({
+  marginTop: theme.spacing(6),
+  position: "relative",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "100%",
+    background: theme.palette.mode === "dark"
+      ? `linear-gradient(180deg, ${alpha(theme.palette.background.default, 0)} 0%, ${alpha(theme.palette.primary.dark, 0.05)} 50%, ${alpha(theme.palette.background.default, 0)} 100%)`
+      : `linear-gradient(180deg, ${alpha(theme.palette.background.default, 0)} 0%, ${alpha(theme.palette.primary.light, 0.06)} 50%, ${alpha(theme.palette.background.default, 0)} 100%)`,
+    zIndex: -1,
+    borderRadius: theme.spacing(3),
+  }
+}));
+
+const PerformerCard = styled(motion.div)(({ theme }) => ({
+  padding: theme.spacing(2, 3.5),
+  marginBottom: theme.spacing(2),
+  borderRadius: theme.spacing(2),
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(3),
+  backgroundColor: theme.palette.mode === "dark"
+    ? alpha(theme.palette.background.paper, 0.6)
+    : theme.palette.background.paper,
+  border: `1px solid ${alpha(theme.palette.divider, theme.palette.mode === "dark" ? 0.2 : 0.08)}`,
+  boxShadow: theme.palette.mode === "dark"
+    ? `0 8px 32px ${alpha(theme.palette.common.black, 0.25)}`
+    : `0 8px 32px ${alpha(theme.palette.common.black, 0.05)}`,
+  transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+  overflow: "hidden",
+  position: "relative",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: "4px",
+    background: `linear-gradient(to bottom, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    opacity: 0.7,
+    transition: "opacity 0.3s ease",
+  },
+  "&:hover": {
+    transform: "translateY(-5px)",
+    boxShadow: theme.palette.mode === "dark"
+      ? `0 14px 40px ${alpha(theme.palette.common.black, 0.35)}`
+      : `0 14px 40px ${alpha(theme.palette.common.black, 0.12)}`,
+    "&::before": {
+      opacity: 1,
+    },
+  },
+}));
+
+const TeamCard = styled(motion.div)(({ theme }) => ({
+  padding: theme.spacing(2.5, 3.5),
+  marginBottom: theme.spacing(3),
+  borderRadius: theme.spacing(2),
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(3),
+  backgroundColor: theme.palette.mode === "dark"
+    ? alpha(theme.palette.background.paper, 0.7)
+    : alpha(theme.palette.background.paper, 0.95),
+  border: `1px solid ${alpha(theme.palette.divider, theme.palette.mode === "dark" ? 0.2 : 0.08)}`,
+  boxShadow: theme.palette.mode === "dark"
+    ? `0 10px 40px ${alpha(theme.palette.common.black, 0.3)}`
+    : `0 10px 40px ${alpha(theme.palette.common.black, 0.08)}`,
+  transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+  cursor: "pointer",
+  overflow: "hidden",
+  position: "relative",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: "6px",
+    background: `linear-gradient(to bottom, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+    opacity: 0.6,
+    transition: "opacity 0.3s ease, width 0.3s ease",
+  },
+  "&:hover": {
+    transform: "translateY(-5px) scale(1.02)",
+    boxShadow: theme.palette.mode === "dark"
+      ? `0 20px 60px ${alpha(theme.palette.common.black, 0.4)}`
+      : `0 20px 60px ${alpha(theme.palette.common.black, 0.15)}`,
+    "&::before": {
+      opacity: 1,
+      width: "8px",
+    },
+  },
+}));
+
+const PerformerAvatar = styled(Avatar)(({ theme }) => ({
+  width: 65,
+  height: 65,
+  border: `3px solid ${alpha(theme.palette.background.paper, 0.9)}`,
+  boxShadow: theme.palette.mode === "dark"
+    ? `0 4px 14px ${alpha(theme.palette.common.black, 0.3)}`
+    : `0 4px 14px ${alpha(theme.palette.common.black, 0.1)}`,
+  transition: "all 0.3s ease",
+}));
+
+const TeamAvatar = styled(Box)(({ theme }) => ({
+  width: 70,
+  height: 70,
+  borderRadius: "50%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: theme.palette.mode === "dark"
+    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.8)}, ${alpha(theme.palette.secondary.dark, 0.8)})`
+    : `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.8)}, ${alpha(theme.palette.secondary.light, 0.8)})`,
+  boxShadow: theme.palette.mode === "dark"
+    ? `0 8px 20px ${alpha(theme.palette.common.black, 0.3)}`
+    : `0 8px 20px ${alpha(theme.palette.common.black, 0.1)}`,
+}));
+
+const PerformerInfo = styled(Box)(({ theme }) => ({
+  flex: 1,
+  overflow: "hidden",
+}));
+
 // Cultural Activity View
 export const CulturalsView = ({
   eventId,
@@ -93,6 +253,12 @@ export const CulturalsView = ({
 
   const isEmptyJudges = !activity.judges || activity.judges.length === 0;
 
+  console.log(selectedJudge);
+
+  const handleTeamClick = (team: any) => {
+    console.log('Team clicked:', team);
+  };
+  
   return (
     <Box>
       {/* Judges Section */}
@@ -404,62 +570,196 @@ export const CulturalsView = ({
         )}
       </Section>
 
-      {/* Performers Section */}
-      <Section>
-        <Typography variant="h5" component="h2" fontWeight="bold" sx={{ mb: 2 }}>
-          Performers
-        </Typography>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-            gap: 2,
+      {/* Performers Section with Column Layout */}
+      <PerformerSection
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <Typography 
+          variant="h5" 
+          component="h2" 
+          fontWeight="bold"
+          sx={{ 
+            mb: 4,
+            position: "relative",
+            display: "inline-block",
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              width: "60%",
+              height: "4px",
+              bottom: "-8px",
+              left: 0,
+              backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
+              borderRadius: "2px"
+            }
           }}
         >
-          {activity.participants?.map((participant, idx) => (
-            <Paper
-              key={participant.usn || idx}
-              sx={{
-                p: 2,
-                borderRadius: 1,
-                textAlign: "center",
-                bgcolor: isDarkMode ? alpha(theme.palette.background.paper, 0.6) : theme.palette.background.paper,
-                border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
-              }}
-            >
-              <Avatar
-                sx={{
-                  width: 70,
-                  height: 70,
-                  mb: 1,
-                  mx: "auto",
-                  border: isDarkMode 
-                    ? `2px solid ${alpha(theme.palette.primary.main, 0.2)}`
-                    : 'none',
-                }}
-                alt={participant.name}
-                src={`https://eu.ui-avatars.com/api/?name=${encodeURIComponent(
-                  participant.name
-                )}&size=70`}
-              />
-              <Typography variant="subtitle1" noWrap>
-                {participant.name}
-              </Typography>
-              <Chip
-                size="small"
-                label={
-                  participant.gender === Gender.MALE
-                    ? "Male"
-                    : participant.gender === Gender.FEMALE
-                    ? "Female"
-                    : "Other"
-                }
-                sx={{ mt: 1 }}
-              />
-            </Paper>
-          ))}
-        </Box>
-      </Section>
+          Performers
+        </Typography>
+
+        {(!activity.participants || activity.participants.length === 0) ? (
+          <Box 
+            sx={{ 
+              textAlign: "center", 
+              py: 6, 
+              px: 2, 
+              background: alpha(theme.palette.background.paper, isDarkMode ? 0.4 : 0.6),
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.1 : 0.05)}`,
+            }}
+          >
+            <Typography variant="subtitle1" color="text.secondary" fontStyle="italic">
+              Performers will be announced soon
+            </Typography>
+          </Box>
+        ) : (
+          <Box sx={{ 
+            display: "flex",
+            flexDirection: "column",
+            maxWidth: "100%",
+          }}>
+            {/* Teams section - only display if there are teams */}
+            {activity.teams && activity.teams.length > 0 && (
+              <Box sx={{ mb: 4 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 2, 
+                    color: theme.palette.mode === "dark" 
+                      ? alpha(theme.palette.primary.light, 0.9) 
+                      : theme.palette.primary.main,
+                    fontWeight: 600,
+                  }}
+                >
+                  Teams
+                </Typography>
+                
+                {activity.teams.map((team, idx) => (
+                  <TeamCard
+                    key={team.id || idx}
+                    onClick={() => handleTeamClick(team)}
+                    whileHover={{ x: 5 }}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ 
+                      duration: 0.4, 
+                      delay: idx * 0.1,
+                      type: "spring",
+                      stiffness: 100,
+                    }}
+                  >
+                    <TeamAvatar>
+                      <Typography 
+                        variant="h5" 
+                        sx={{ 
+                          fontWeight: "bold", 
+                          color: "#fff",
+                          textShadow: "0 2px 4px rgba(0,0,0,0.3)",
+                        }}
+                      >
+                        {team.name.substring(0, 2).toUpperCase()}
+                      </Typography>
+                    </TeamAvatar>
+                    
+                    <PerformerInfo>
+                      <Typography 
+                        variant="h6" 
+                        sx={{ 
+                          fontWeight: 600,
+                          mb: 0.5,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        {team.name}
+                      </Typography>
+                      
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ 
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5,
+                        }}
+                      >
+                        Click to view team members and details
+                      </Typography>
+                    </PerformerInfo>
+                  </TeamCard>
+                ))}
+              </Box>
+            )}
+            
+            {/* Individual performers - always show if there are participants without teams */}
+            {activity.participants.some(p => !activity.getParticipantTeam(p.usn)) && (
+              <Box>
+                {/* Only show section title if there are also teams */}
+                {activity.teams && activity.teams.length > 0 && (
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      mb: 2, 
+                      color: theme.palette.mode === "dark" 
+                        ? alpha(theme.palette.primary.light, 0.9) 
+                        : theme.palette.primary.main,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Individual Performers
+                  </Typography>
+                )}
+                
+                {activity.participants
+                  .filter(participant => !activity.getParticipantTeam(participant.usn))
+                  .map((participant, idx) => (
+                    <PerformerCard
+                      key={participant.usn || idx}
+                      whileHover={{ x: 5 }}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ 
+                        duration: 0.4, 
+                        delay: idx * 0.1,
+                        type: "spring",
+                        stiffness: 100,
+                      }}
+                    >
+                      <PerformerAvatar
+                        alt={participant.name}
+                        src={participant.profilePic}
+                      />
+                      
+                      <PerformerInfo>
+                        <Typography 
+                          variant="subtitle1" 
+                          sx={{ 
+                            fontWeight: 600,
+                            mb: 0.5,
+                          }}
+                        >
+                          {participant.name}
+                        </Typography>
+                        
+                        <Typography 
+                          variant="caption" 
+                          color="text.secondary"
+                          sx={{ 
+                            display: "block",
+                          }}
+                        >
+                          {participant.college || "Jain University"}
+                        </Typography>
+                      </PerformerInfo>
+                    </PerformerCard>
+                  ))}
+              </Box>
+            )}
+          </Box>
+        )}
+      </PerformerSection>
     </Box>
   );
 };
