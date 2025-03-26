@@ -440,8 +440,15 @@ class SportsActivity<T extends Sport> extends Activity {
 	}
 
 	static parse(data: any): SportsActivity<Sport> {
-		let gameType: Sport;
-		switch (data.eventType as EventType) {
+		let gameType: Sport; 
+		
+		// if data contains eventType, convert it to type
+        if (data.eventType) {
+            data.type = data.eventType;
+            delete data.eventType;
+        }
+
+		switch (data.type) {
 			case EventType.CRICKET: gameType = new Cricket(); break;
 			case EventType.FOOTBALL: gameType = new Football(); break;
 			case EventType.BASKETBALL: gameType = new Basketball(); break;
