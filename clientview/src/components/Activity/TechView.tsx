@@ -30,15 +30,13 @@ export const TechView = ({ activity }) => {
                 <TableRow>
                   <TableCell>Name</TableCell>
                   <TableCell>USN</TableCell>
-                  <TableCell>Project</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {activity.participants?.map((participant, idx) => (
                   <TableRow key={participant.usn || idx}>
                     <TableCell>{participant.name}</TableCell>
-                    <TableCell>{participant.usn}</TableCell>
-                    <TableCell>Project {idx + 1}</TableCell>
+                    <TableCell>{participant.usn.toUpperCase()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

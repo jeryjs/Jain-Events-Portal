@@ -401,7 +401,8 @@ export const CulturalsView = ({
     setSelectedJudge(null);
   };
 
-  const isEmptyJudges = !activity.judges || activity.judges.length === 0;
+  const hasJudges = activity.judges && activity.judges.length > 0;
+  const isEmptyJudges = !hasJudges;
 
   const handleCloseTeam = () => {
     setSelectedTeam(null);
@@ -413,87 +414,88 @@ export const CulturalsView = ({
   
   return (
     <Box>
-      {/* Judges Section */}
-      <Section>
-        <Typography 
-          variant="h5" 
-          component="h2" 
-          fontWeight="bold"
-          sx={{ 
-            mb: 3,
-            position: "relative",
-            display: "inline-block",
-            "&:after": {
-              content: '""',
-              position: "absolute",
-              width: "60%",
-              height: "4px",
-              bottom: "-8px",
-              left: 0,
-              backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
-              borderRadius: "2px"
-            }
-          }}
-        >
-          Judges
-        </Typography>
-
-        {isEmptyJudges ? (
-          <Box 
+      {/* Judges Section - Only render if judges data exists */}
+      {hasJudges && (
+        <Section>
+          <Typography 
+            variant="h5" 
+            component="h2" 
+            fontWeight="bold"
             sx={{ 
-              textAlign: "center", 
-              py: 6, 
-              px: 2, 
-              background: alpha(theme.palette.background.paper, isDarkMode ? 0.4 : 0.6),
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.1 : 0.05)}`,
-            }}
-          >
-            <Typography variant="subtitle1" color="text.secondary" fontStyle="italic">
-              Judges will be announced soon
-            </Typography>
-          </Box>
-        ) : (
-          <Box
-            component={motion.div}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, staggerChildren: 0.1 }}
-            sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "repeat(auto-fill, minmax(140px, 1fr))",
-                sm: "repeat(auto-fill, minmax(150px, 1fr))",
-                md: "repeat(auto-fill, minmax(170px, 1fr))",
-              },
-              gap: { xs: 2, sm: 3 },
+              mb: 3,
               position: "relative",
+              display: "inline-block",
+              "&:after": {
+                content: '""',
+                position: "absolute",
+                width: "60%",
+                height: "4px",
+                bottom: "-8px",
+                left: 0,
+                backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
+                borderRadius: "2px"
+              }
             }}
           >
-            {activity.judges.map((judge, idx) => (
-              <JudgeCard
-                key={judge.id || idx}
-                onClick={() => handleOpenDialog(judge)}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <motion.div>
-                  <Box 
-                    sx={{ 
-                    position: "relative",
-                    "&::before": {
-                      content: '""',
-                      position: "absolute",
-                      inset: 0,
-                      background: `radial-gradient(circle, ${alpha(theme.palette.primary.light, 0.1)} 0%, transparent 70%)`,
-                      opacity: 0,
-                      transition: "opacity 0.3s ease",
-                    },
-                    "&:hover::before": {
-                      opacity: 1,
-                    }
-                  }}
+            Judges
+          </Typography>
+
+          {isEmptyJudges ? (
+            <Box 
+              sx={{ 
+                textAlign: "center", 
+                py: 6, 
+                px: 2, 
+                background: alpha(theme.palette.background.paper, isDarkMode ? 0.4 : 0.6),
+                borderRadius: 2,
+                border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.1 : 0.05)}`,
+              }}
+            >
+              <Typography variant="subtitle1" color="text.secondary" fontStyle="italic">
+                Judges will be announced soon
+              </Typography>
+            </Box>
+          ) : (
+            <Box
+              component={motion.div}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, staggerChildren: 0.1 }}
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "repeat(auto-fill, minmax(140px, 1fr))",
+                  sm: "repeat(auto-fill, minmax(150px, 1fr))",
+                  md: "repeat(auto-fill, minmax(170px, 1fr))",
+                },
+                gap: { xs: 2, sm: 3 },
+                position: "relative",
+              }}
+            >
+              {activity.judges.map((judge, idx) => (
+                <JudgeCard
+                  key={judge.id || idx}
+                  onClick={() => handleOpenDialog(judge)}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
                 >
+                  <motion.div>
+                    <Box 
+                      sx={{ 
+                      position: "relative",
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        inset: 0,
+                        background: `radial-gradient(circle, ${alpha(theme.palette.primary.light, 0.1)} 0%, transparent 70%)`,
+                        opacity: 0,
+                        transition: "opacity 0.3s ease",
+                      },
+                      "&:hover::before": {
+                        opacity: 1,
+                      }
+                    }}
+                  >
                   <JudgeAvatar
                     alt={judge.name}
                     src={judge.profilePic}
@@ -710,6 +712,7 @@ export const CulturalsView = ({
           )}
         </Dialog>
       </Section>
+      )}
 
       {/* Winners Section */}
       {activity.winners && activity.winners.length > 0 && (
