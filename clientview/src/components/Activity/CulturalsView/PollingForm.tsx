@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
-import { Box, Typography, Avatar, useTheme, alpha, CircularProgress, Alert } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import HowToVoteIcon from '@mui/icons-material/HowToVote';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import SwipeIcon from '@mui/icons-material/SwipeRightAlt';
-import LockIcon from '@mui/icons-material/Lock';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { useCastVote } from '@hooks/useApi';
-import { CulturalActivity } from '@common/models';
+import { CulturalActivity, TeamParticipant } from '@common/models';
 import { useLoginPrompt } from '@components/shared';
+import { useCastVote } from '@hooks/useApi';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HowToVoteIcon from '@mui/icons-material/HowToVote';
+import LockIcon from '@mui/icons-material/Lock';
+import SwipeIcon from '@mui/icons-material/SwipeRightAlt';
+import { Alert, alpha, Avatar, AvatarGroup, Box, CircularProgress, Tooltip, Typography, useTheme } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 
 // Styled components with glassmorphism effects
 const PollContainer = styled(Box)(({ theme }) => ({
@@ -31,13 +31,17 @@ const OptionCard = styled(motion.div)<{ selected?: boolean, userVote?: boolean }
     overflow: 'hidden',
     cursor: userVote ? 'default' : 'pointer',
     backgroundColor: userVote
-        ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.15 : 0.08)
+        ? alpha(theme.palette.success.main, theme.palette.mode === 'dark' ? 0.2 : 0.1)
         : selected
-            ? alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.12 : 0.05)
-            : alpha(theme.palette.mode === 'dark' ? theme.palette.background.paper : theme.palette.background.default,
-                theme.palette.mode === 'dark' ? 0.4 : 0.7),
-    border: `1px solid ${alpha(userVote ? theme.palette.primary.main : theme.palette.divider, userVote ? 0.4 : 0.1)}`,
-    boxShadow: userVote ? `0 2px 12px ${alpha(theme.palette.primary.main, 0.15)}` : 'none',
+            ? alpha(theme.palette.success.light, theme.palette.mode === 'dark' ? 0.15 : 0.08)
+            : alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.7 : 0.6),
+    backdropFilter: 'blur(10px)',
+    border: `1px solid ${alpha(theme.palette.success.main, userVote ? 0.5 : selected ? 0.2 : 0.08)}`,
+    boxShadow: userVote
+        ? `0 4px 24px ${alpha(theme.palette.success.dark, 0.25)}`
+        : selected
+            ? `0 2px 12px ${alpha(theme.palette.success.main, 0.15)}`
+            : `0 2px 8px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.2 : 0.08)}`,
 }));
 
 const ProgressBar = styled('div')<{ width: number }>(({ theme, width }) => ({
@@ -93,9 +97,15 @@ const SwipeText = styled(motion(Typography))(({ theme }) => ({
     justifyContent: 'center',
     fontWeight: 600,
     fontSize: '0.875rem',
-    color: theme.palette.common.white,
     letterSpacing: 1,
     userSelect: 'none',
+}));
+
+const VoteIcon = styled(CheckCircleIcon)(({ theme }) => ({
+    marginLeft: 8,
+    color: theme.palette.primary.main,
+    transition: 'transform 0.3s ease',
+    animation: 'pulse 1.2s infinite',
 }));
 
 interface PollingFormProps {
@@ -116,7 +126,7 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
     const [isDragReady, setIsDragReady] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
-    const { participants, pollData = [], showPoll } = activity;
+    const { participants, pollData = [], showPoll, teams = [], isSoloPerformance } = activity;
 
     // Motion values for drag interactions
     const x = useMotionValue(0);
@@ -225,43 +235,79 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
         return { votes, percentage };
     };
 
-    if (!showPoll || participants.length === 0) return null;
+    // Get sorted entries for voting, either participants (solo) or teams
+    const getVotingEntries = () => {
+        if (isSoloPerformance) {
+            return participants.sort((a, b) => (getVoteData(b.usn).votes - getVoteData(a.usn).votes));
+        } else {
+            return teams.sort((a, b) => (getVoteData(b.id).votes - getVoteData(a.id).votes));
+        }
+    };
+
+    if (!showPoll || (isSoloPerformance ? participants.length === 0 : teams.length === 0)) return null;
 
     return (
         <PollContainer>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <HowToVoteIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" fontWeight="600">Audience Poll</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, justifyContent: 'space-between' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <HowToVoteIcon color="primary" sx={{ mr: 1 }} />
+                    <Typography variant="h6" fontWeight="600">Audience Poll</Typography>
+                </Box>
+                {userVoted && (
+                    <Tooltip title="You've already voted" enterTouchDelay={0}>
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            bgcolor: alpha(theme.palette.success.main, 0.1),
+                            color: theme.palette.success.main,
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: 16,
+                            fontSize: '0.75rem',
+                            fontWeight: 500
+                        }}>
+                            <CheckCircleIcon fontSize="small" sx={{ mr: 0.5, fontSize: '0.9rem' }} />
+                            Vote Recorded
+                        </Box>
+                    </Tooltip>
+                )}
             </Box>
+                
+            {/* note */}
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.7rem' }}>
+                <span style={{ opacity: 0.8 }}>* Audience vote contributes 10% to final result</span>
+            </Typography>
 
-            {/* Participant Options */}
+            {/* Participant/Team Options */}
             <AnimatePresence>
-                {participants
-                    .sort((a, b) => (getVoteData(b.usn).votes - getVoteData(a.usn).votes))
-                    .map((participant) => {
-                        const teamId = participant.usn;
-                        const isSelected = selectedTeam === teamId;
-                        const isUserVote = userVoted === teamId;
-                        const { votes, percentage } = getVoteData(teamId);
+                {getVotingEntries().map((entry) => {
+                    // Each entry can be a participant (solo) or a team
+                    const teamId = isSoloPerformance ? entry.usn : entry.id;
+                    const name = entry.name;
+                    const isSelected = selectedTeam === teamId;
+                    const isUserVote = userVoted === teamId;
+                    const { votes, percentage } = getVoteData(teamId);
+                    const teamMembers = !isSoloPerformance ? activity.getTeamParticipants(teamId) : [];
 
-                        return (
-                            <OptionCard
-                                key={teamId}
-                                selected={isSelected}
-                                userVote={isUserVote}
-                                onClick={() => handleSelectTeam(teamId)}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                                whileHover={!userVoted ? { scale: 1.01 } : undefined}
-                                whileTap={!userVoted ? { scale: 0.99 } : undefined}
-                            >
-                                <ProgressBar width={percentage} />
+                    return (
+                        <OptionCard
+                            key={teamId}
+                            selected={isSelected}
+                            userVote={isUserVote}
+                            onClick={() => handleSelectTeam(teamId)}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                            whileHover={!userVoted ? { scale: 1.01 } : undefined}
+                            whileTap={!userVoted ? { scale: 0.99 } : undefined}
+                        >
+                            <ProgressBar width={percentage} />
 
-                                <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', zIndex: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', zIndex: 1 }}>
+                                {isSoloPerformance ? (
                                     <Avatar
-                                        src={participant.profilePic || `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(participant.name)}`}
+                                        src={entry.profilePic || `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(name)}`}
                                         sx={{
                                             width: 40,
                                             height: 40,
@@ -269,31 +315,103 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                             border: isUserVote ? `2px solid ${theme.palette.primary.main}` : 'none',
                                         }}
                                     />
+                                ) : (
+                                    <AvatarGroup max={3} sx={{ mr: 1.5 }}>
+                                        {teamMembers.length > 0 ? (
+                                            teamMembers.map((member, idx) => (
+                                                <Tooltip key={idx} title={member.name}>
+                                                    <Avatar
+                                                        src={member.profilePic || `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(member.name)}`}
+                                                        sx={{ width: 32, height: 32, border: isUserVote ? `2px solid ${theme.palette.primary.main}` : 'none' }}
+                                                    />
+                                                </Tooltip>
+                                            ))
+                                        ) : (
+                                            <Avatar sx={{ width: 32, height: 32 }}>
+                                                {name.charAt(0)}
+                                            </Avatar>
+                                        )}
+                                    </AvatarGroup>
+                                )}
 
-                                    <Box sx={{ flexGrow: 1 }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Typography variant="body1" fontWeight={isUserVote ? 600 : 400}>
-                                            {participant.name}
-                                            {isUserVote && <CheckCircleIcon color="primary" sx={{ ml: 1, width: 16, height: 16 }} />}
+                                            {name}
                                         </Typography>
-
-                                        <Typography variant="caption" color="text.secondary">
-                                            {participant.college || 'FET, JU'}
-                                        </Typography>
+                                        {isUserVote && <VoteIcon fontSize="small" sx={{ ml: 1, width: 18, height: 18 }} />}
                                     </Box>
 
-                                    <Typography variant="body2" fontWeight={500} sx={{ minWidth: 32, textAlign: 'right' }}>
+                                    {!isSoloPerformance && teamMembers.length > 0 && (
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            sx={{
+                                                display: 'block',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                                maxWidth: '100%'
+                                            }}
+                                        >
+                                            {teamMembers.map(m => m.name).join(', ')}
+                                        </Typography>
+                                    )}
+
+                                    {isSoloPerformance && entry.college && (
+                                        <Typography variant="caption" color="text.secondary">
+                                            {entry.college || 'FET, JU'}
+                                        </Typography>
+                                    )}
+                                </Box>
+
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    minWidth: 40
+                                }}>
+                                    <Typography
+                                        variant="body1"
+                                        fontWeight={isUserVote ? 600 : 500}
+                                        color={isUserVote ? 'primary.main' : 'text.primary'}
+                                    >
                                         {votes}
                                     </Typography>
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        sx={{ fontSize: '0.675rem' }}
+                                    >
+                                        {percentage.toFixed(0)}%
+                                    </Typography>
                                 </Box>
-                            </OptionCard>
-                        );
-                    })}
+                            </Box>
+                        </OptionCard>
+                    );
+                })}
             </AnimatePresence>
+
+            {/* Summary and Authentication Info */}
+            {totalVotes > 0 && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right' }}>
+                    Total votes: <b>{totalVotes}</b>
+                </Typography>
+            )}
 
             {/* Swipe to Vote Button */}
             <AnimatePresence>
                 {selectedTeam && isAuthenticated && !userVoted && !castVoteMutation.isPending && (
                     <Box ref={containerRef} sx={{ width: '100%' }}>
+                        {error && (
+                            <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}>
+                                <Alert severity="error" sx={{ mt: 2, fontSize: '0.8rem' }} onClose={() => setError(null)}>
+                                    {error}
+                                </Alert>
+                            </motion.div>
+                        )}
+
                         <SwipeButton>
                             <SwipeText style={{ opacity: swipeOpacity }}>
                                 SWIPE TO VOTE
@@ -319,14 +437,6 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                         <Typography variant="caption" color="text.secondary" align="center" sx={{ display: 'block', mt: 1 }}>
                             Your vote cannot be changed once cast
                         </Typography>
-
-                        {error && (
-                            <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}>
-                                <Alert severity="error" sx={{ mt: 2, fontSize: '0.8rem' }} onClose={() => setError(null)}>
-                                    {error}
-                                </Alert>
-                            </motion.div>
-                        )}
                     </Box>
                 )}
 
@@ -337,13 +447,6 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                     </Box>
                 )}
             </AnimatePresence>
-
-            {/* Summary and Authentication Info */}
-            {totalVotes > 0 && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2, textAlign: 'right' }}>
-                    Total votes: <b>{totalVotes}</b>
-                </Typography>
-            )}
 
             {!isAuthenticated && (
                 <Typography
