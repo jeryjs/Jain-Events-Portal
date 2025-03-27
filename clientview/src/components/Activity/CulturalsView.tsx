@@ -398,7 +398,12 @@ const AudienceChoiceBadge = styled(Chip)(({ theme }) => ({
   fontSize: '0.7rem',
   "& .MuiChip-label": {
     padding: theme.spacing(0, 1),
-  }
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.6rem',
+    height: 20,
+    marginLeft: theme.spacing(0.5),
+  },
 }));
 
 // Cultural Activity View
@@ -817,9 +822,9 @@ export const CulturalsView = ({
                         transition: { duration: 0.2 }
                       }}
                     >
-                      <WinnerPosition placed={position}>
-                        {idx === 0 ? "1st" : "2nd"}
-                      </WinnerPosition>
+                        <WinnerPosition placed={position}>
+                        {position === "winner" ? "1st" : "2nd"}
+                        </WinnerPosition>
 
                       <WinnerAvatarContainer
                         whileHover={{ scale: 1.05 }}
@@ -868,12 +873,6 @@ export const CulturalsView = ({
                           }}
                         >
                           {displayName}
-                          {isAudienceChoice && (
-                            <AudienceChoiceBadge 
-                              label="Audience Choice" 
-                              size="small"
-                            />
-                          )}
                         </Typography>
 
                         {participant?.college && (
@@ -910,8 +909,8 @@ export const CulturalsView = ({
                   );
                 })}
 
-              {/* Audience Choice Card - only show if different from winner */}
-              {audienceChoice && !isAudienceChoiceSameAsWinner && (
+              {/* Audience Choice Card - always show as a separate item */}
+              {audienceChoice && (
                 <WinnerCard
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -931,9 +930,14 @@ export const CulturalsView = ({
                     background: `linear-gradient(to right, ${alpha(theme.palette.secondary.light, 0.1)}, transparent 50%)`,
                   }}
                 >
-                  <WinnerPosition placed="audience">
-                    Choice
-                  </WinnerPosition>
+                    <WinnerPosition placed="audience" sx={{
+                    background: theme.palette.mode === 'dark'
+                      ? `linear-gradient(45deg, ${alpha(theme.palette.secondary.dark, 0.9)}, ${alpha(theme.palette.secondary.main, 0.9)})`
+                      : `linear-gradient(45deg, ${alpha(theme.palette.secondary.light, 0.9)}, ${alpha(theme.palette.secondary.main, 0.9)})`,
+                    color: theme.palette.getContrastText(theme.palette.secondary.main),
+                    }}>
+                    Poll
+                    </WinnerPosition>
                   
                   <WinnerAvatarContainer
                     whileHover={{ scale: 1.05 }}
@@ -985,14 +989,18 @@ export const CulturalsView = ({
                         WebkitBoxOrient: "vertical",
                       }}
                     >
-                      {activity.audienceChoice.name}
+                      {(() => {
+                        const team = activity.teams?.find(t => t.id === audienceChoice);
+                        const participants = activity.getTeamParticipants(audienceChoice);
+                        const participant = participants?.length > 0 ? participants[0] : null;
+                        const isTeam = team && participants?.length > 1;
+                        return isTeam ? team.name : (participant?.name || "Unknown Participant");
+                      })()}
                     </Typography>
                     
                     {(() => {
-                      // Show college if it's a participant
                       const participants = activity.getTeamParticipants(audienceChoice);
                       const participant = participants?.length > 0 ? participants[0] : null;
-                      
                       return participant?.college ? (
                         <Typography 
                           variant="caption" 
