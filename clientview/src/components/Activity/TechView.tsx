@@ -71,11 +71,7 @@ const getRankColor = (theme, rank) => {
 };
 
 // Tech Activity View
-interface TechViewProps {
-  activity: TechnicalActivity;
-}
-
-export const TechView = ({ activity }: TechViewProps) => {
+export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
   const theme = useTheme();
   const winners = activity.winners || [];
   const hasWinners = winners.length > 0;
