@@ -1,38 +1,28 @@
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import CloseIcon from '@mui/icons-material/Close';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import HistoryIcon from '@mui/icons-material/History';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import DoneAllIcon from '@mui/icons-material/DoneAll';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {
   Avatar,
-  Box, Button,
+  Box,
+  Button,
+  Chip,
   CircularProgress,
-  Grow,
   IconButton,
-  Paper,
-  Popover, Typography,
-  useMediaQuery,
-  useTheme,
-  Tabs,
-  Tab,
   List,
   ListItem,
-  ListItemText,
   ListItemAvatar,
-  Divider,
-  Badge,
+  ListItemText,
   Tooltip,
-  Chip
+  Typography,
+  useTheme
 } from '@mui/material';
-import { keyframes, styled } from '@mui/system';
-import { useEffect, useState } from 'react';
-import { initializeMessaging } from '../../firebaseConfig';
+import { alpha, keyframes, styled } from '@mui/system';
+import { useState } from 'react';
 import useNotifications from '../../hooks/useNotifications';
-import InstallPrompt from './InstallPrompt';
 
 const pulse = keyframes`
   0% { transform: scale(1); }
@@ -44,46 +34,6 @@ const float = keyframes`
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-5px); }
 `;
-
-const glowPulse = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(66, 133, 244, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0); }
-`;
-
-const NotificationButton = styled(IconButton, {
-  shouldForwardProp: (prop) => prop !== 'isSubscribed',
-})<{ isSubscribed?: boolean }>(({ theme, isSubscribed }) => ({
-  background: theme.palette.mode === 'light'
-    ? 'linear-gradient(145deg, #ffffff, #f0f0f0)'
-    : 'linear-gradient(145deg, #2d3748, #252d3b)',
-  width: 36,
-  borderRadius: '50%',
-  animation: isSubscribed ? null : `${glowPulse} 2s infinite`,
-  '&:hover': {
-    background: theme.palette.mode === 'light'
-      ? 'linear-gradient(145deg, #f0f0f0, #ffffff)'
-      : 'linear-gradient(145deg, #252d3b, #2d3748)',
-  },
-}));
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-  borderRadius: '24px',
-  overflow: 'hidden',
-  position: 'relative',
-  minWidth: 300,
-  maxWidth: 360,
-  background: theme.palette.mode === 'light'
-    ? 'linear-gradient(135deg, #ffffff, #f8f9fa)'
-    : 'linear-gradient(135deg, #2D3748, #1A202C)',
-  border: `1px solid ${theme.palette.mode === 'light' ? 'rgba(227,242,253,0.7)' : 'rgba(255,255,255,0.05)'}`,
-  backdropFilter: 'blur(10px)',
-}));
 
 const EnableButton = styled(Button)(({ theme }) => ({
   fontWeight: 'bold',
@@ -125,7 +75,7 @@ const NotificationIconContainer = styled(Box)(({ theme }) => ({
   background: theme.palette.mode === 'light'
     ? 'linear-gradient(135deg, #e3f2fd, #bbdefb)'
     : 'linear-gradient(135deg, #4b6cb7, #182848)',
-  boxShadow: '0 10px 20px rgba(0,0,0,0.1)',
+  boxShadow: `0 12px 24px rgba(0,0,0,0.15)`,
   animation: `${float} 3s ease infinite`,
 }));
 
@@ -140,13 +90,27 @@ const NoNotificationsBox = styled(Box)(({ theme }) => ({
 }));
 
 const StyledListItem = styled(ListItem)(({ theme }) => ({
-  borderRadius: 12,
+  borderRadius: '12px',
   marginBottom: theme.spacing(1),
-  transition: 'all 0.2s ease',
+  padding: theme.spacing(1.5),
+  transition: 'background-color 0.2s ease',
+  position: 'relative',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'light' 
-      ? 'rgba(0, 0, 0, 0.04)' 
-      : 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: theme.palette.mode === 'light'
+      ? alpha(theme.palette.grey[100], 0.7)
+      : alpha(theme.palette.grey[800], 0.5),
+  },
+}));
+
+const MarkAsReadButton = styled(IconButton)(({ theme }) => ({
+  position: 'absolute',
+  top: 8,
+  right: 8,
+  padding: theme.spacing(0.5),
+  '&:hover': {
+    backgroundColor: theme.palette.mode === 'light'
+      ? alpha(theme.palette.primary.light, 0.1)
+      : alpha(theme.palette.primary.dark, 0.1),
   },
 }));
 
@@ -154,121 +118,57 @@ const NotificationTimestamp = styled(Typography)(({ theme }) => ({
   fontSize: '0.7rem',
   color: theme.palette.text.secondary,
   display: 'block',
-  marginTop: 2,
+  marginTop: theme.spacing(0.5),
 }));
 
-const NotificationPrompt = ({ className }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [permissionStatus, setPermissionStatus] = useState('default');
-  const [loading, setLoading] = useState(false);
-  const [subscribedToNotifications, setSubscribedToNotifications] = useState(false);
+const NotificationPrompt = () => {
   const [showSettings, setShowSettings] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
-  // Use our custom hook instead of direct localStorage access
-  const { 
-    notifications, 
-    unreadCount, 
-    loading: notificationsLoading, 
+
+  // Use our enhanced hook for notifications
+  const {
+    notifications,
+    loading: notificationsLoading,
     markAsRead,
     markAllAsRead,
-    refreshNotifications
+    isSubscribed,
+    isSubscribing,
+    permissionStatus,
+    subscribeToNotifications,
   } = useNotifications();
-
-  useEffect(() => {
-    // Check if already subscribed to notifications
-    const isSubscribed = localStorage.getItem('subscribedToken') != null;
-    setSubscribedToNotifications(isSubscribed);
-    
-    // If subscribed, set history tab (1) as default
-    if (isSubscribed) {
-      setActiveTab(1);
-    }
-
-    // Check current notification permission status
-    if ('Notification' in window) {
-      setPermissionStatus(Notification.permission);
-    }
-  }, [localStorage.subscribedToken]);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-    // Reset settings view when opening
-    setShowSettings(false);
-    
-    // Refresh notifications when opening the popover
-    refreshNotifications();
-    
-    // Set active tab to history (1) if subscribed
-    if (subscribedToNotifications) {
-      setActiveTab(1);
-    }
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
-
-  const handleNotificationClick = (notification) => {
-    if (!notification.read) {
-      markAsRead(notification.id);
-    }
-  };
 
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
-    
+
     // Today
     if (date.toDateString() === now.toDateString()) {
       return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
-    
+
     // Yesterday
     const yesterday = new Date(now);
     yesterday.setDate(now.getDate() - 1);
     if (date.toDateString() === yesterday.toDateString()) {
       return `Yesterday at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
-    
+
     // Within last 7 days
     const oneWeekAgo = new Date(now);
     oneWeekAgo.setDate(now.getDate() - 7);
     if (date > oneWeekAgo) {
       return `${date.toLocaleDateString([], { weekday: 'long' })} at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
-    
+
     // Older
     return date.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   const handleEnableNotifications = async () => {
-    setLoading(true);
-
-    try {
-      // Only request permission when user clicks the button
-      if ('Notification' in window) {
-        const permission = await Notification.requestPermission();
-        setPermissionStatus(permission);
-
-        if (permission === 'granted') {
-          const messaging = await initializeMessaging();
-          setSubscribedToNotifications(!!messaging);
-        } else if (permission === 'denied') {
-          // Show instructions to reset permissions
-          setShowSettings(true);
-        }
-      }
-    } catch (error) {
-      console.error("Error enabling notifications:", error);
-    } finally {
-      setLoading(false);
+    await subscribeToNotifications();
+    
+    if (permissionStatus === 'denied') {
+      setShowSettings(true);
     }
   };
 
@@ -312,380 +212,282 @@ const NotificationPrompt = ({ className }) => {
     return "your browser";
   };
 
-  const open = Boolean(anchorEl);
+  if (!isSubscribed && !showSettings) {
+    return (<>
+      <NotificationIconContainer>
+        <NotificationsActiveIcon
+          sx={{
+            fontSize: 40,
+            color: theme.palette.primary.main,
+            animation: `${pulse} 2s infinite ease-in-out`
+          }}
+        />
+      </NotificationIconContainer>
 
-  return (
-    <>
-      <Badge 
-        badgeContent={unreadCount} 
-        color="error"
-        invisible={unreadCount === 0 || !subscribedToNotifications}
-        overlap="circular"
-        sx={{ '& .MuiBadge-badge': { fontSize: '0.6rem' } }}
+      <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
+        {isSubscribing ? "Setting Up Notifications..." : "Never Miss an Event!"}
+      </Typography>
+
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        textAlign="center"
+        sx={{ mb: 3, px: 1 }}
       >
-        <NotificationButton
-          onClick={handleClick}
-          className={className}
-          isSubscribed={subscribedToNotifications}
-          color={subscribedToNotifications ? "primary" : "default"}
+        {isSubscribing
+          ? "Preparing your personalized event notifications..."
+          : "Get instant updates about upcoming events, shrine timings and important announcements directly to your device."
+        }
+      </Typography>
+
+      {permissionStatus !== 'granted' && !isSubscribing && !isSubscribed && (
+        <EnableButton
+          variant="contained"
+          onClick={handleEnableNotifications}
+          fullWidth
+          disableElevation
+          startIcon={<NotificationsActiveIcon />}
         >
-          {subscribedToNotifications
-            ? <NotificationsActiveIcon color="primary" />
-            : <NotificationsIcon />
-          }
-        </NotificationButton>
-      </Badge>
+          Enable Notifications
+        </EnableButton>
+      )}
 
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: isMobile ? 'bottom' : 'bottom',
-          horizontal: isMobile ? 'center' : 'left',
-        }}
-        transformOrigin={{
-          vertical: isMobile ? 'top' : 'top',
-          horizontal: isMobile ? 'center' : 'right',
-        }}
-        PaperProps={{
-          style: {
-            backgroundColor: 'transparent',
-            boxShadow: 'none',
-            overflow: 'visible'
-          }
-        }}
+      {permissionStatus === 'denied' && !showSettings && (
+        <SecondaryButton
+          variant="outlined"
+          onClick={() => setShowSettings(true)}
+          startIcon={<ErrorOutlineIcon />}
+          size="small"
+        >
+          Having trouble?
+        </SecondaryButton>
+      )}
+
+      {permissionStatus === 'granted' && isSubscribing && (
+        <Box sx={{ py: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+          <CircularProgress size={20} />
+          <Typography variant="body2" color="primary" fontWeight="medium">Almost there...</Typography>
+        </Box>
+      )}
+
+      {permissionStatus === 'granted' && !isSubscribing && isSubscribed && (
+        <Box sx={{ textAlign: 'center', py: 1 }}>
+          <Avatar
+            sx={{
+              bgcolor: 'success.light',
+              margin: '0 auto',
+              mb: 1
+            }}
+          >
+            <CheckCircleOutlineIcon />
+          </Avatar>
+          <Typography variant="body2" color="success.main" fontWeight="medium">
+            Push notifications enabled successfully!
+          </Typography>
+        </Box>
+      )}
+
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        textAlign="center"
+        sx={{ mt: 2, opacity: 0.7 }}
       >
-        <Grow in={open}>
-          <StyledPaper>
-            {/* Background decoration elements */}
-            <Box sx={{
-              position: 'absolute',
-              top: -30,
-              right: -30,
-              width: 120,
-              height: 120,
-              borderRadius: '50%',
-              background: theme.palette.primary.main,
-              opacity: 0.06,
-              zIndex: -1
-            }} />
+        You can change notification settings anytime
+      </Typography>
+    </>)
+  }
 
-            <Box sx={{
-              position: 'absolute',
-              bottom: -20,
-              left: -20,
-              width: 100,
-              height: 100,
-              borderRadius: '50%',
-              background: '#34A853',
-              opacity: 0.05,
-              zIndex: -1
-            }} />
+  // Settings view - instructions for rejected permissions
+  if (!isSubscribed && showSettings) {
+    return (<>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Avatar sx={{ bgcolor: theme.palette.warning.light, width: 56, height: 56 }}>
+          <ErrorOutlineIcon sx={{ fontSize: 32, color: theme.palette.warning.dark }} />
+        </Avatar>
+      </Box>
 
-            {/* Close button */}
-            <IconButton
-              onClick={handleClose}
-              sx={{
-                position: 'absolute',
-                top: 8,
-                right: 8,
-                opacity: 0.7,
-                '&:hover': { opacity: 1 }
-              }}
-              size="small"
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
+      <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
+        Permission Required
+      </Typography>
 
-            {/* Tab Navigation */}
-            {subscribedToNotifications && (
-              <Tabs 
-                value={activeTab} 
-                onChange={handleTabChange}
-                variant="fullWidth" 
-                sx={{ width: '100%', mb: 2, borderBottom: 1, borderColor: 'divider' }}
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        textAlign="center"
+        sx={{ mb: 3, px: 1 }}
+      >
+        Notifications have been blocked in {getBrowserName()}. To enable them:
+      </Typography>
+
+      <Box sx={{
+        backgroundColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
+        borderRadius: 2,
+        p: 2,
+        width: '100%',
+        mb: 2
+      }}>
+        <Typography variant="body2" component="ol" sx={{ pl: 2 }}>
+          <li>Click the button below to open {getBrowserName()} settings</li>
+          <li>Find "FET Hub" in the list of sites</li>
+          <li>Change notifications to "Allow"</li>
+          <li>Return to this page and try again</li>
+        </Typography>
+      </Box>
+
+      <Button
+        variant="contained"
+        color="primary"
+        fullWidth
+        onClick={openBrowserSettings}
+        startIcon={<OpenInNewIcon />}
+        sx={{ mb: 1.5 }}
+      >
+        Open Browser Settings
+      </Button>
+
+      <Button
+        variant="text"
+        size="small"
+        onClick={() => setShowSettings(false)}
+      >
+        Go back
+      </Button>
+    </>)
+  }
+
+  // Notifications list view
+  return (
+    <Box sx={{ width: '100%', height: 300, overflowY: 'auto' }}>
+      {notificationsLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <CircularProgress size={24} />
+        </Box>
+      ) : notifications.length > 0 ? (
+        <>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 1.5,
+              px: 1
+            }}
+          >
+            <Typography variant="subtitle2" fontWeight={600}>
+              Notification History
+            </Typography>
+            <Tooltip title="Mark all as read">
+              <span>
+                <Button
+                  size="small"
+                  startIcon={<DoneAllIcon fontSize="small" />}
+                  onClick={markAllAsRead}
+                  disabled={!notifications.some(n => !n.read)}
+                  sx={{ textTransform: 'none', fontWeight: 500 }}
+                >
+                  Mark all read
+                </Button>
+              </span>
+            </Tooltip>
+          </Box>
+
+          <List disablePadding>
+            {notifications.map((notification) => (
+              <StyledListItem
+                key={notification.id}
+                alignItems="flex-start"
+                sx={{
+                  backgroundColor: !notification.read ?
+                    (theme.palette.mode === 'light' ? alpha(theme.palette.primary.light, 0.05) : alpha(theme.palette.primary.dark, 0.08)) :
+                    'transparent',
+                  border: !notification.read ?
+                    `1px solid ${theme.palette.mode === 'light' ? alpha(theme.palette.primary.light, 0.2) : alpha(theme.palette.primary.dark, 0.2)}` :
+                    '1px solid transparent'
+                }}
               >
-                <Tab 
-                  label="Notifications" 
-                  icon={<NotificationsIcon />} 
-                  iconPosition="start"
-                />
-                <Tab 
-                  label="History" 
-                  icon={<HistoryIcon />} 
-                  iconPosition="start"
-                />
-              </Tabs>
-            )}
-
-            {/* Main content */}
-            {(activeTab === 0 || !subscribedToNotifications) && !showSettings ? (
-              // Default view - enable notifications
-              <>
-                <NotificationIconContainer>
-                  <NotificationsActiveIcon
+                <ListItemAvatar>
+                  <Avatar
                     sx={{
-                      fontSize: 40,
-                      color: theme.palette.primary.main,
-                      animation: `${pulse} 2s infinite ease-in-out`
+                      bgcolor: notification.read ?
+                        (theme.palette.mode === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)') :
+                        'primary.light'
                     }}
-                  />
-                </NotificationIconContainer>
-
-                <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
-                  {loading ? "Setting Up Notifications..." : "Never Miss an Event!"}
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  textAlign="center"
-                  sx={{ mb: 3, px: 1 }}
-                >
-                  {loading
-                    ? "Preparing your personalized event notifications..."
-                    : "Get instant updates about upcoming events, shrine timings and important announcements directly to your device."
-                  }
-                </Typography>
-
-                {permissionStatus !== 'granted' && !loading && !subscribedToNotifications && (
-                  <EnableButton
-                    variant="contained"
-                    onClick={handleEnableNotifications}
-                    fullWidth
-                    disableElevation
-                    startIcon={<NotificationsActiveIcon />}
                   >
-                    Enable Notifications
-                  </EnableButton>
-                )}
-
-                {permissionStatus === 'denied' && !showSettings && (
-                  <SecondaryButton
-                    variant="outlined"
-                    onClick={() => setShowSettings(true)}
-                    startIcon={<ErrorOutlineIcon />}
-                    size="small"
-                  >
-                    Having trouble?
-                  </SecondaryButton>
-                )}
-
-                {permissionStatus === 'granted' && loading && (
-                  <Box sx={{ py: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
-                    <CircularProgress size={20} />
-                    <Typography variant="body2" color="primary" fontWeight="medium">Almost there...</Typography>
-                  </Box>
-                )}
-
-                {permissionStatus === 'granted' && !loading && subscribedToNotifications && (
-                  <Box sx={{ textAlign: 'center', py: 1 }}>
-                    <Avatar
-                      sx={{
-                        bgcolor: 'success.light',
-                        margin: '0 auto',
-                        mb: 1
-                      }}
-                    >
-                      <CheckCircleOutlineIcon />
-                    </Avatar>
-                    <Typography variant="body2" color="success.main" fontWeight="medium">
-                      Push notifications enabled successfully!
-                    </Typography>
-                  </Box>
-                )}
-
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  textAlign="center"
-                  sx={{ mt: 2, opacity: 0.7 }}
-                >
-                  You can change notification settings anytime
-                </Typography>
-
-                <Divider />
-
-                {/* Install as PWA component */}
-                <InstallPrompt showAsComponent={true} />
-              </>
-            ) : activeTab === 1 && subscribedToNotifications && !showSettings ? (
-              // History view
-              <>
-                <Box sx={{ width: '100%', height: 300, overflowY: 'auto', px: 1 }}>
-                  {notificationsLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                      <CircularProgress size={32} />
+                    {!notification.read ?
+                      <NotificationsActiveIcon color="primary" /> :
+                      <NotificationsIcon color="action" />
+                    }
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: 'flex', pr: 4, alignItems: 'flex-start' }}>
+                      <Typography variant="subtitle2" component="span" fontWeight={notification.read ? 400 : 600}>
+                        {notification.title}
+                      </Typography>
+                      {!notification.read && (
+                        <Chip
+                          label="New"
+                          size="small"
+                          color="primary"
+                          sx={{ height: 20, fontSize: '0.6rem', ml: 1 }}
+                        />
+                      )}
                     </Box>
-                  ) : notifications.length > 0 ? (
+                  }
+                  secondary={
                     <>
-                      <Box 
-                        sx={{ 
-                          display: 'flex', 
-                          justifyContent: 'flex-end', 
-                          mb: 1, 
-                          mt: 0.5,
-                          opacity: notifications.some(n => !n.read) ? 1 : 0.5
+                      <Typography
+                        variant="body2"
+                        color="text.primary"
+                        sx={{
+                          display: 'block',
+                          fontWeight: notification.read ? 'normal' : 500,
+                          opacity: notification.read ? 0.9 : 1
                         }}
                       >
-                        <Tooltip title="Mark all as read">
-                          <Button
-                            size="small"
-                            startIcon={<DoneAllIcon fontSize="small" />}
-                            onClick={markAllAsRead}
-                            disabled={!notifications.some(n => !n.read)}
-                            sx={{ textTransform: 'none', fontWeight: 500 }}
-                          >
-                            Mark all read
-                          </Button>
-                        </Tooltip>
-                      </Box>
-                      
-                      <List disablePadding>
-                        {notifications.map((notification) => (
-                          <StyledListItem 
-                            key={notification.id} 
-                            alignItems="flex-start"
-                            onClick={() => handleNotificationClick(notification)}
-                            sx={{ 
-                              backgroundColor: !notification.read ? 
-                                (theme.palette.mode === 'light' ? 'rgba(25, 118, 210, 0.05)' : 'rgba(66, 165, 245, 0.05)') : 
-                                'transparent',
-                              cursor: 'pointer',
-                              border: !notification.read ? 
-                                `1px solid ${theme.palette.mode === 'light' ? 'rgba(25, 118, 210, 0.1)' : 'rgba(66, 165, 245, 0.1)'}` : 
-                                '1px solid transparent'
-                            }}
-                          >
-                            <ListItemAvatar>
-                              <Avatar 
-                                sx={{ 
-                                  bgcolor: notification.read ? 
-                                    (theme.palette.mode === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)') : 
-                                    'primary.light'
-                                }}
-                              >
-                                {!notification.read ? 
-                                  <NotificationsActiveIcon color="primary" /> : 
-                                  <NotificationsIcon color="action" />
-                                }
-                              </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                  <Typography variant="subtitle2" component="span" fontWeight={notification.read ? 400 : 600}>
-                                    {notification.title}
-                                  </Typography>
-                                  {!notification.read && (
-                                    <Chip 
-                                      label="New" 
-                                      size="small" 
-                                      color="primary" 
-                                      sx={{ height: 20, fontSize: '0.6rem', ml: 1 }}
-                                    />
-                                  )}
-                                </Box>
-                              }
-                              secondary={
-                                <>
-                                  <Typography
-                                    variant="body2"
-                                    color="text.primary"
-                                    sx={{ 
-                                      display: 'block',
-                                      fontWeight: notification.read ? 'normal' : 500,
-                                      opacity: notification.read ? 0.9 : 1
-                                    }}
-                                  >
-                                    {notification.body}
-                                  </Typography>
-                                  <NotificationTimestamp>
-                                    {formatTimestamp(notification.timestamp)}
-                                  </NotificationTimestamp>
-                                </>
-                              }
-                            />
-                          </StyledListItem>
-                        ))}
-                      </List>
+                        {notification.body}
+                      </Typography>
+                      <NotificationTimestamp>
+                        {formatTimestamp(notification.timestamp)}
+                      </NotificationTimestamp>
                     </>
-                  ) : (
-                    <NoNotificationsBox>
-                      <NotificationsOffIcon sx={{ fontSize: 40, mb: 2, opacity: 0.5 }} />
-                      <Typography variant="subtitle1" gutterBottom>
-                        No notifications yet
-                      </Typography>
-                      <Typography variant="body2" align="center">
-                        You'll see notifications about events and announcements here once you receive them.
-                      </Typography>
-                    </NoNotificationsBox>
-                  )}
-                </Box>
-              </>
-            ) : (
-              // Settings view - instructions for rejected permissions
-              <>
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                  <Avatar sx={{ bgcolor: theme.palette.warning.light, width: 56, height: 56 }}>
-                    <ErrorOutlineIcon sx={{ fontSize: 32, color: theme.palette.warning.dark }} />
-                  </Avatar>
-                </Box>
-
-                <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
-                  Permission Required
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  textAlign="center"
-                  sx={{ mb: 3, px: 1 }}
+                  }
+                />
+                <MarkAsReadButton 
+                  size="small" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!notification.read) markAsRead(notification.id);
+                  }}
+                  disabled={notification.read}
+                  aria-label="mark as read"
                 >
-                  Notifications have been blocked in {getBrowserName()}. To enable them:
-                </Typography>
-
-                <Box sx={{
-                  backgroundColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
-                  borderRadius: 2,
-                  p: 2,
-                  width: '100%',
-                  mb: 2
-                }}>
-                  <Typography variant="body2" component="ol" sx={{ pl: 2 }}>
-                    <li>Click the button below to open {getBrowserName()} settings</li>
-                    <li>Find "FET Hub" in the list of sites</li>
-                    <li>Change notifications to "Allow"</li>
-                    <li>Return to this page and try again</li>
-                  </Typography>
-                </Box>
-
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  onClick={openBrowserSettings}
-                  startIcon={<OpenInNewIcon />}
-                  sx={{ mb: 1.5 }}
-                >
-                  Open Browser Settings
-                </Button>
-
-                <Button
-                  variant="text"
-                  size="small"
-                  onClick={() => setShowSettings(false)}
-                >
-                  Go back
-                </Button>
-              </>
-            )}
-          </StyledPaper>
-        </Grow>
-      </Popover>
-    </>
+                  <Tooltip title="Mark as read">
+                    <CheckCircleOutlineIcon 
+                      fontSize="small" 
+                      color={notification.read ? 'disabled' : 'primary'} 
+                    />
+                  </Tooltip>
+                </MarkAsReadButton>
+              </StyledListItem>
+            ))}
+          </List>
+        </>
+      ) : (
+        <NoNotificationsBox>
+          <NotificationsOffIcon sx={{ fontSize: 40, mb: 2, opacity: 0.5 }} />
+          <Typography variant="subtitle1" gutterBottom>
+            No notifications yet
+          </Typography>
+          <Typography variant="body2" align="center">
+            You'll see notifications about events and announcements here once you receive them.
+          </Typography>
+        </NoNotificationsBox>
+      )}
+    </Box>
   );
-};
+}
 
 export default NotificationPrompt;

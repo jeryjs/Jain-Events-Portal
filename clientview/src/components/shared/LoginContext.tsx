@@ -131,36 +131,6 @@ const LoginDialog = () => {
   );
 };
 
-// Sign Out Button Component for testing
-export const SignOutButton = () => {
-  const { logout, isAuthenticated, userData } = useLogin();
-  const theme = useTheme();
-
-  if (!isAuthenticated || !userData) return null;
-
-  return (
-    <Chip
-      icon={<LogoutIcon fontSize="small" />}
-      label="Sign Out"
-      onClick={logout}
-      color="secondary"
-      variant="outlined"
-      sx={{
-        position: 'fixed',
-        bottom: 16,
-        right: 16,
-        zIndex: 1000,
-        borderColor: alpha(theme.palette.error.main, 0.5),
-        color: theme.palette.error.main,
-        '&:hover': {
-          backgroundColor: alpha(theme.palette.error.main, 0.1),
-          borderColor: theme.palette.error.main,
-        }
-      }}
-    />
-  );
-};
-
 // Provider component
 export const LoginProvider = ({ children }: { children: ReactNode }) => {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -272,7 +242,6 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     >
       {children}
       <LoginDialog />
-      <SignOutButton />
     </LoginContext.Provider>
   );
 };

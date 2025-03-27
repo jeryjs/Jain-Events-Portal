@@ -1,6 +1,5 @@
 import { EventType } from '@common/constants';
-import NotificationPrompt from '@components/shared/NotificationPrompt';
-import ThemeSwitcher from '@components/shared/ThemeSwitcher';
+import { ProfileButton } from '@components/shared';
 import { Box, Button, Tab, Tabs, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
@@ -58,8 +57,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ tabValue, onTabChange }) => {
           </Box>
           <Box sx={{ display: 'flex', gap: { xs: 0, sm: 1, md: 2 }, alignItems: 'center' }}>
             <Button component={Link} to="/timeline">Timeline</Button>
-            <ThemeSwitcher />
-            <NotificationPrompt className="notification-bell" />
+            <ProfileButton className="profile-button" />
           </Box>
         </HeaderWrapper>
       </AppHeader>
