@@ -1,15 +1,14 @@
 import { CulturalActivity } from '@common/models';
 import { useLogin, useLoginPrompt } from '@components/shared';
 import { useCastVote } from '@hooks/useApi';
-import PeopleIcon from '@mui/icons-material/People';
+import BadgeIcon from '@mui/icons-material/Badge';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import LockIcon from '@mui/icons-material/Lock';
-import SwipeIcon from '@mui/icons-material/SwipeRightAlt';
-import BadgeIcon from '@mui/icons-material/Badge';
-import CodeIcon from '@mui/icons-material/Code';
+import PeopleIcon from '@mui/icons-material/People';
 import SchoolIcon from '@mui/icons-material/School';
-import { Alert, alpha, Avatar, Badge, Box, CircularProgress, ListItemText, Tooltip, Typography, useTheme } from '@mui/material';
+import SwipeIcon from '@mui/icons-material/SwipeRightAlt';
+import { Alert, alpha, Avatar, Badge, Box, CircularProgress, Tooltip, Typography, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
@@ -325,33 +324,42 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                 }}
                             />
 
-                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', zIndex: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', zIndex: 1, gap: 2 }}>
                                 {isSoloPerformance ? (
                                     <Avatar
                                         src={entry.profilePic}
                                         sx={{
-                                            width: 40,
-                                            height: 40,
-                                            mr: 1.5,
-                                            border: isUserVote ? `2px solid ${theme.palette.primary.main}` : 'none'
+                                            width: 46,
+                                            height: 46,
+                                            mr: 1,
+                                            boxShadow: isUserVote ? `0 0 0 2px ${theme.palette.primary.main}, 0 0 0 4px ${alpha(theme.palette.primary.main, 0.3)}` : 'none',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     />
                                 ) : (
                                     <Badge
-                                        badgeContent={
-                                            <>
-                                                <PeopleIcon sx={{ fontSize: 'inherit' }} />
-                                                {teamMembers.length}
-                                            </>
-                                        }
-                                        sx={{ mr: 1.5 }}
+                                        badgeContent={teamMembers.length}
+                                        color="primary"
+                                        max={99}
+                                        overlap="circular"
+                                        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                                        sx={{
+                                            '& .MuiBadge-badge': {
+                                                fontWeight: 600,
+                                                fontSize: '0.75rem',
+                                                height: 22,
+                                                minWidth: 22,
+                                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                                            },
+                                        }}
                                     >
                                         <Avatar
                                             src={teamMembers.length > 0 ? teamMembers[0].profilePic : undefined}
                                             sx={{
-                                                width: 40,
-                                                height: 40,
-                                                border: isUserVote ? `2px solid ${theme.palette.primary.main}` : 'none'
+                                                width: 46,
+                                                height: 46,
+                                                boxShadow: isUserVote ? `0 0 0 2px ${theme.palette.primary.main}, 0 0 0 4px ${alpha(theme.palette.primary.main, 0.3)}` : 'none',
+                                                transition: 'all 0.2s ease'
                                             }}
                                         >
                                             {teamMembers.length === 0 && name.charAt(0)}
@@ -359,41 +367,59 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                     </Badge>
                                 )}
 
-                                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                    <Typography noWrap fontWeight={600} variant="body1" sx={{ lineHeight: 1.2 }}>
+                                        {entry.name}
+                                        {isUserVote && <VoteIcon fontSize="small" />}
+                                    </Typography>
 
-                                        <ListItemText
-                                            primary={entry.name}
-                                            secondary={
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                                                    {entry.usn && (
-                                                        <Typography variant="caption">
-                                                            <BadgeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
-                                                            {entry.usn.toUpperCase()}
-                                                        </Typography>
-                                                    )}
-                                                    {entry.college && (
-                                                        <Typography variant="caption" noWrap sx={{ maxWidth: '100%' }} title={entry.college}>
-                                                            <SchoolIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
-                                                            {entry.college}
-                                                        </Typography>
-                                                    )}
-                                                    {entry.branch && (
-                                                        <Typography variant="caption">
-                                                            <CodeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
-                                                            {entry.branch}
-                                                        </Typography>
-                                                    )}
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1.5,
+                                        flexWrap: 'nowrap',
+                                    }}>
+                                        {entry.usn && (
+                                            <Tooltip title="USN" arrow placement="top">
+                                                <Box component="span" sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                                                    borderRadius: 1,
+                                                    px: 0.75,
+                                                    py: 0.25,
+                                                }}>
+                                                    <BadgeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.7rem', color: theme.palette.primary.main }} />
+                                                    <Typography variant="caption" sx={{ fontWeight: 500, lineHeight: 1 }}>
+                                                        {entry.usn.toUpperCase()}
+                                                    </Typography>
                                                 </Box>
-                                            }
-                                            secondaryTypographyProps={{
-                                                component: 'div',
-                                            }}
-                                        />
+                                            </Tooltip>
+                                        )}
+
+                                        {entry.college && (
+                                            <Tooltip title={entry.college} arrow placement="top">
+                                                <Box component="span" sx={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    color: 'text.secondary',
+                                                    maxWidth: { xs: 100, sm: 150, md: 200 },
+                                                }}>
+                                                    <SchoolIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.7rem' }} />
+                                                    <Typography variant="caption" noWrap sx={{ lineHeight: 1 }}>
+                                                        {entry.college}
+                                                    </Typography>
+                                                </Box>
+                                            </Tooltip>
+                                        )}
                                     </Box>
 
                                     {!isSoloPerformance && teamMembers.length > 0 && (
-                                        <>
+                                        <Tooltip
+                                            title={teamMembers.map(m => m.name).join(', ')}
+                                            arrow
+                                            placement="bottom"
+                                        >
                                             <Typography
                                                 variant="caption"
                                                 color="text.secondary"
@@ -402,40 +428,56 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                                     overflow: 'hidden',
                                                     textOverflow: 'ellipsis',
                                                     whiteSpace: 'nowrap',
-                                                    minWidth: 0
+                                                    mt: 0.5
                                                 }}
                                             >
-                                                {teamMembers.map(m => m.name).join(', ')}
+                                                <PeopleIcon sx={{ fontSize: '0.7rem', mr: 0.5, verticalAlign: 'text-top' }} />
+                                                {teamMembers.length > 3
+                                                    ? `${teamMembers.slice(0, 2).map(m => m.name).join(', ')} +${teamMembers.length - 2} more`
+                                                    : teamMembers.map(m => m.name).join(', ')
+                                                }
                                             </Typography>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {entry.college || 'FET, JU'}
-                                            </Typography>
-                                        </>
+                                        </Tooltip>
                                     )}
                                 </Box>
 
                                 <Box sx={{
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    placeSelf: 'flex-end',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    minWidth: 40
+                                    minWidth: 50,
+                                    ml: 1
                                 }}>
                                     <Typography
                                         variant="body1"
-                                        fontWeight={isUserVote ? 600 : 500}
+                                        fontWeight={isUserVote ? 700 : 600}
                                         color={isUserVote ? 'primary.main' : 'text.primary'}
+                                        sx={{
+                                            fontSize: '1.1rem',
+                                            textShadow: isUserVote ? '0 0 8px rgba(25, 118, 210, 0.4)' : 'none'
+                                        }}
                                     >
                                         {votes}
                                     </Typography>
-                                    <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        sx={{ fontSize: '0.675rem' }}
-                                    >
-                                        {percentage.toFixed(0)}%
-                                    </Typography>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        backgroundColor: alpha(theme.palette.divider, 0.2),
+                                        borderRadius: 6,
+                                        px: 0.75,
+                                        py: 0.25,
+                                        minWidth: 36
+                                    }}>
+                                        <Typography
+                                            variant="caption"
+                                            fontWeight={500}
+                                            color={isUserVote ? 'primary' : 'text.secondary'}
+                                        >
+                                            {percentage.toFixed(0)}%
+                                        </Typography>
+                                    </Box>
                                 </Box>
                             </Box>
                         </OptionCard>
