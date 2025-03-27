@@ -42,7 +42,10 @@ class CulturalActivity extends Activity {
   }
 
   getParticipantTeam(usn: string) {
-    return this.teams.find(team => team.id === usn);
+    if (this.isSoloPerformance) {
+      return null;
+    }
+    return this.teams.find(t => this.getTeamParticipants(t.id).some(p => p.usn === usn)) || null;
   }
 
   getTeamParticipants(teamId: string) {

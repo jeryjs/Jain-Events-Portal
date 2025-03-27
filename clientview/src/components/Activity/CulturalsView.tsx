@@ -443,22 +443,6 @@ export const CulturalsView = ({
     setSelectedTeam(team);
   };
   
-  // Helper function to get the display name for a team or participant
-  const getDisplayName = (teamId: string) => {
-    if (!teamId) return "Unknown";
-    
-    // Get team or participant info based on teamId
-    const team = activity.teams?.find(t => t.id === teamId);
-    const participants = activity.getTeamParticipants(teamId);
-    const participant = participants?.length > 0 ? participants[0] : null;
-    
-    const isTeam = team && participants?.length > 1;
-    return isTeam ? team.name : (participant?.name || "Unknown Participant");
-  };
-
-  // Get display names
-  const audienceChoiceName = getDisplayName(audienceChoice);
-  
   return (
     <Box>
       {/* Judges Section - Only render if judges data exists */}
@@ -1001,7 +985,7 @@ export const CulturalsView = ({
                         WebkitBoxOrient: "vertical",
                       }}
                     >
-                      {audienceChoiceName}
+                      {activity.audienceChoice.name}
                     </Typography>
                     
                     {(() => {
