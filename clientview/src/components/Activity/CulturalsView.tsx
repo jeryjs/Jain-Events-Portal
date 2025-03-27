@@ -77,36 +77,6 @@ const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
   overflowX: "hidden",
 }));
 
-const StyledCard = styled(motion.div)(({ theme }) => ({
-  padding: theme.spacing(3),
-  borderRadius: theme.spacing(2),
-  textAlign: "center",
-  cursor: "pointer",
-  transition: "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
-  background: theme.palette.mode === "dark"
-    ? `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.8)} 0%, ${alpha(theme.palette.background.paper, 0.4)} 100%)`
-    : `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
-  overflow: "hidden",
-  position: "relative",
-  border: `1px solid ${alpha(theme.palette.divider, theme.palette.mode === "dark" ? 0.2 : 0.05)}`,
-  boxShadow: theme.shadows[3],
-  "&:hover": {
-    transform: "translateY(-8px)",
-    boxShadow: theme.shadows[6],
-  },
-}));
-
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  width: 100,
-  height: 100,
-  margin: "0 auto 12px",
-  border: `4px solid ${alpha(theme.palette.primary.main, theme.palette.mode === "dark" ? 0.2 : 0.1)}`,
-  boxShadow: theme.palette.mode === "dark"
-    ? `0 8px 20px ${alpha(theme.palette.common.black, 0.25)}`
-    : `0 8px 20px ${alpha(theme.palette.common.black, 0.12)}`,
-  transition: "all 0.3s ease",
-}));
-
 // Performers styled components
 const PerformerSection = styled(motion.section)(({ theme }) => ({
   marginTop: theme.spacing(6),
@@ -367,8 +337,14 @@ const WinnerPosition = styled(Box)<{ placed: string }>(({ theme, placed }) => ({
   right: 0,
   background: placed === "winner"
     ? `linear-gradient(45deg, ${alpha('#FFD700', 0.9)}, ${alpha('#FFA500', 0.9)})`
-    : `linear-gradient(45deg, ${alpha('#C0C0C0', 0.9)}, ${alpha('#A9A9A9', 0.9)})`,
-  color: placed === "winner" ? "#000" : "#fff",
+    : theme.palette.mode === 'dark'
+      ? `linear-gradient(45deg, ${alpha('#90A4AE', 0.8)}, ${alpha('#546E7A', 0.8)})`
+      : `linear-gradient(45deg, ${alpha('#B0BEC5', 0.9)}, ${alpha('#78909C', 0.9)})`,
+  color: placed === "winner"
+    ? "#000"
+    : theme.palette.mode === 'dark'
+      ? "#fff"
+      : "#424242",
   padding: theme.spacing(0.3, 1),
   borderRadius: `0 ${theme.shape.borderRadius}px 0 ${theme.shape.borderRadius}px`,
   fontSize: "0.7rem",
@@ -388,24 +364,6 @@ const CompactChip = styled(Chip)(({ theme, color }) => ({
   }
 }));
 
-// New styled component for audience choice badge
-const AudienceChoiceBadge = styled(Chip)(({ theme }) => ({
-  backgroundColor: alpha(theme.palette.secondary.main, 0.15),
-  color: theme.palette.secondary.main,
-  fontWeight: 'bold',
-  marginLeft: theme.spacing(1),
-  height: 24,
-  fontSize: '0.7rem',
-  "& .MuiChip-label": {
-    padding: theme.spacing(0, 1),
-  },
-  [theme.breakpoints.down('sm')]: {
-    fontSize: '0.6rem',
-    height: 20,
-    marginLeft: theme.spacing(0.5),
-  },
-}));
-
 // Cultural Activity View
 export const CulturalsView = ({
   eventId,
@@ -422,9 +380,7 @@ export const CulturalsView = ({
   const isDarkMode = theme.palette.mode === 'dark';
 
   // Determine if the winner and audience choice are the same
-  const winner = activity.winners?.find(w => w.rank === 1)?.teamId;
   const audienceChoice = activity.audienceChoice?.teamId;
-  const isAudienceChoiceSameAsWinner = winner && audienceChoice && winner === audienceChoice;
 
   const handleOpenDialog = (judge: Judge) => {
     setLoading(true);
@@ -447,7 +403,7 @@ export const CulturalsView = ({
   const handleTeamClick = (team: { id: string, name: string }) => {
     setSelectedTeam(team);
   };
-  
+
   return (
     <Box>
       {/* Judges Section - Only render if judges data exists */}
@@ -802,9 +758,6 @@ export const CulturalsView = ({
                     "runnerup": "Runner Up"
                   };
 
-                  // Check if this winner is also the audience choice
-                  const isAudienceChoice = idx === 0 && isAudienceChoiceSameAsWinner;
-                  
                   return (
                     <WinnerCard
                       key={winner.teamId || idx}
@@ -822,9 +775,9 @@ export const CulturalsView = ({
                         transition: { duration: 0.2 }
                       }}
                     >
-                        <WinnerPosition placed={position}>
+                      <WinnerPosition placed={position}>
                         {position === "winner" ? "1st" : "2nd"}
-                        </WinnerPosition>
+                      </WinnerPosition>
 
                       <WinnerAvatarContainer
                         whileHover={{ scale: 1.05 }}
@@ -914,14 +867,14 @@ export const CulturalsView = ({
                 <WinnerCard
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ 
-                    duration: 0.4, 
+                  transition={{
+                    duration: 0.4,
                     delay: 0.3,
                     type: "spring",
                     stiffness: 100
                   }}
-                  whileHover={{ 
-                    y: -5, 
+                  whileHover={{
+                    y: -5,
                     boxShadow: theme.shadows[6],
                     transition: { duration: 0.2 }
                   }}
@@ -930,31 +883,31 @@ export const CulturalsView = ({
                     background: `linear-gradient(to right, ${alpha(theme.palette.secondary.light, 0.1)}, transparent 50%)`,
                   }}
                 >
-                    <WinnerPosition placed="audience" sx={{
+                  <WinnerPosition placed="audience" sx={{
                     background: theme.palette.mode === 'dark'
                       ? `linear-gradient(45deg, ${alpha(theme.palette.secondary.dark, 0.9)}, ${alpha(theme.palette.secondary.main, 0.9)})`
                       : `linear-gradient(45deg, ${alpha(theme.palette.secondary.light, 0.9)}, ${alpha(theme.palette.secondary.main, 0.9)})`,
                     color: theme.palette.getContrastText(theme.palette.secondary.main),
-                    }}>
+                  }}>
                     Poll
-                    </WinnerPosition>
-                  
+                  </WinnerPosition>
+
                   <WinnerAvatarContainer
                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.2 }}
                   >
                     {(() => {
                       // Get team or participant info for audience choice
-                      const team = activity.teams?.find(t => t.id === audienceChoice);
+                      const team = activity.isSoloPerformance ? activity.participants.find(p => p.id.trim() === audienceChoice) : activity.teams?.find(t => t.id.trim() === audienceChoice);
                       const participants = activity.getTeamParticipants(audienceChoice);
                       const participant = participants?.length > 0 ? participants[0] : null;
                       const isTeam = team && participants?.length > 1;
-                      
+
                       return isTeam ? (
                         <WinnerTeamBadge placed="audience">
-                          <Typography 
-                            variant="h6" 
-                            sx={{ 
+                          <Typography
+                            variant="h6"
+                            sx={{
                               fontWeight: "bold",
                               color: "#fff",
                               textShadow: "0 1px 3px rgba(0,0,0,0.4)",
@@ -974,11 +927,11 @@ export const CulturalsView = ({
                       );
                     })()}
                   </WinnerAvatarContainer>
-                  
+
                   <Box sx={{ flex: 1 }}>
-                    <Typography 
-                      variant="subtitle1" 
-                      sx={{ 
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
                         fontWeight: 600,
                         fontSize: { xs: '0.95rem', sm: '1rem' },
                         color: theme.palette.secondary.main,
@@ -997,13 +950,13 @@ export const CulturalsView = ({
                         return isTeam ? team.name : (participant?.name || "Unknown Participant");
                       })()}
                     </Typography>
-                    
+
                     {(() => {
                       const participants = activity.getTeamParticipants(audienceChoice);
                       const participant = participants?.length > 0 ? participants[0] : null;
                       return participant?.college ? (
-                        <Typography 
-                          variant="caption" 
+                        <Typography
+                          variant="caption"
                           color="text.secondary"
                           sx={{
                             fontSize: '0.7rem',
@@ -1019,16 +972,16 @@ export const CulturalsView = ({
                       ) : null;
                     })()}
                   </Box>
-                  
-                  <CompactChip 
-                    label="Audience Choice" 
+
+                  <CompactChip
+                    label="Audience Choice"
                     color="secondary"
-                    sx={{ 
-                      bgcolor: theme.palette.mode === 'dark' 
-                        ? alpha(theme.palette.secondary.main, 0.2) 
+                    sx={{
+                      bgcolor: theme.palette.mode === 'dark'
+                        ? alpha(theme.palette.secondary.main, 0.2)
                         : alpha(theme.palette.secondary.light, 0.4),
                       color: theme.palette.secondary.main
-                    }} 
+                    }}
                   />
                 </WinnerCard>
               )}

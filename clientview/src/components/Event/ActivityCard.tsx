@@ -679,7 +679,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
       if (!hasWinners) return [];
       return activity.winners.sort((a, b) => a.rank - b.rank).slice(0, 3).map(winner => {
         const team = activity.teams.find(t => t.id === winner.teamId);
-        const participants = activity.isSoloPerformance ? activity.participants.filter(p => p.usn === winner.teamId) : activity.getTeamParticipants(winner.teamId);
+        const participants = activity.getTeamParticipants(winner.teamId);
         return { rank: winner.rank, teamId: winner.teamId, teamName: team?.name || activity.participants.find(p => p.usn === winner.teamId)?.name || 'Unknown', participants };
       });
     }, [activity.winners, activity.teams, activity.participants, activity.isSoloPerformance]);

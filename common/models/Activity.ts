@@ -1,7 +1,7 @@
 import Participant from './Participant';
 import { EventType } from '../constants';
 import { getBaseEventType } from '@common/utils';
-import { SportsActivity, CulturalActivity, InfoActivity } from '@common/models';
+import { SportsActivity, CulturalActivity, InfoActivity, TechnicalActivity } from '@common/models';
 
 export default class Activity {
   constructor(
@@ -30,8 +30,8 @@ export default class Activity {
       switch (getBaseEventType(data.type)) { 
           case EventType.SPORTS: return SportsActivity.parse(data);
           case EventType.CULTURAL: return CulturalActivity.parse(data);
+          case EventType.TECH: return TechnicalActivity.parse(data);
           case EventType.INFO: return InfoActivity.parse(data);
-          case EventType.TECH: return TeamActivity.parse(data);
           default:
               if (data.teams) return TeamActivity.parse(data);
               // Default Activity parsing logic

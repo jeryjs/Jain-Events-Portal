@@ -116,7 +116,7 @@ const _fetchActivity = async (eventId: string, activityId: string): Promise<Acti
 
 export const useActivities = (eventId: string) => {
 	if (process.env.NODE_ENV === "development") {
-		// return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
+		return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
 	}
 
 	return useQuery({
@@ -140,7 +140,7 @@ export const useActivities = (eventId: string) => {
 
 export const useActivity = (eventId: string, activityId: string) => {
 	if (process.env.NODE_ENV === "development") {
-		// return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
+		return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
 	}
 	// const activitiesQuery = useActivities(eventId);
 
