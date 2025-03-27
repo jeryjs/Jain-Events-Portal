@@ -30,6 +30,17 @@ class CulturalActivity extends Activity {
     return this.showPoll && this.startTime <= new Date() && (!this.endTime || this.endTime >= new Date());
   }
 
+  get audienceChoice(): {teamId: string, name: string} | null {
+    const best = this.pollData.reduce((prev, curr) => (curr.votes.length > prev.votes.length ? curr : prev), this.pollData[0] || {teamId: '', votes: []});
+    if (!best) return null;
+    if (this.isSoloPerformance) {
+      // For solo events, assume pollData.teamId represents the participant's usn; customize the name as needed.
+      return { teamId: best.teamId, name: this.participants.find(p => p.usn === best.teamId)?.name || "Unknown Participant" };
+    }
+    // For team events, look up the team by id and return its info; if not found, provide default values.
+    return { teamId: best.teamId, name: this.teams.find(t => t.id === best.teamId)?.name || "Unknown Team" };
+  }
+
   getParticipantTeam(usn: string) {
     return this.teams.find(team => team.id === usn);
   }
