@@ -1,8 +1,5 @@
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import { Role } from '@common/constants';
 import CloseIcon from '@mui/icons-material/Close';
-import LogoutIcon from '@mui/icons-material/Logout';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import PersonIcon from '@mui/icons-material/Person';
@@ -11,11 +8,9 @@ import {
     Badge,
     Box,
     Button,
-    Chip,
     Divider,
     Fade,
     IconButton,
-    List,
     Paper,
     Popover,
     Tab,
@@ -26,7 +21,6 @@ import {
     useTheme
 } from '@mui/material';
 import { alpha, keyframes, styled } from '@mui/system';
-import { Role } from '@common/constants';
 import { useState } from 'react';
 import useNotifications from '../../hooks/useNotifications';
 import InstallPrompt from './InstallPrompt';
@@ -66,7 +60,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     borderRadius: '16px',
     overflow: 'hidden',
     position: 'relative',
-    width: 340, // Fixed width to prevent resizing
+    width: 380,
     background: theme.palette.mode === 'light'
         ? 'linear-gradient(135deg, #ffffff, #f8f9fa)'
         : 'linear-gradient(135deg, #2D3748, #1A202C)',
@@ -87,39 +81,9 @@ const TabPanel = styled(Box)(({ theme }) => ({
     width: '100%',
 }));
 
-// Helper function to get role color and icon
-const getRoleInfo = (role: Role) => {
-    switch (role) {
-        case Role.ADMIN:
-            return {
-                color: 'error',
-                icon: <AdminPanelSettingsIcon fontSize="small" />,
-                label: 'Admin'
-            };
-        case Role.MANAGER:
-            return {
-                color: 'warning',
-                icon: <ManageAccountsIcon fontSize="small" />,
-                label: 'Manager'
-            };
-        case Role.USER:
-            return {
-                color: 'info',
-                icon: <PersonIcon fontSize="small" />,
-                label: 'User'
-            };
-        default:
-            return {
-                color: 'default',
-                icon: <AccountCircleIcon fontSize="small" />,
-                label: 'Guest'
-            };
-    }
-};
-
 const ProfileButton = ({ className }) => {
     const [anchorEl, setAnchorEl] = useState(null);
-    const [activeTab, setActiveTab] = useState(0);
+    const [activeTab, setActiveTab] = useState(parseInt(localStorage.getItem('last-active-profile-tab')) || 0);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -143,6 +107,7 @@ const ProfileButton = ({ className }) => {
 
     const handleTabChange = (event, newValue) => {
         setActiveTab(newValue);
+        localStorage.setItem('last-active-profile-tab', newValue)
     };
 
     const handleLogout = async () => {
@@ -368,7 +333,6 @@ const ProfileButton = ({ className }) => {
                             {/* Notifications Tab Content */}
                             <Fade in={activeTab === 1} timeout={{ enter: 500, exit: 300 }} style={{ 
                                 display: activeTab === 1 ? 'block' : 'none',
-                                height: 300,
                                 transitionProperty: 'opacity, transform',
                                 transform: activeTab === 1 ? 'translateY(0)' : 'translateY(10px)'
                             }}>

@@ -69,6 +69,7 @@ const NotificationIconContainer = styled(Box)(({ theme }) => ({
   height: 80,
   borderRadius: '50%',
   display: 'flex',
+  justifySelf: 'center',
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: theme.spacing(2),
@@ -92,7 +93,7 @@ const NoNotificationsBox = styled(Box)(({ theme }) => ({
 const StyledListItem = styled(ListItem)(({ theme }) => ({
   borderRadius: '12px',
   marginBottom: theme.spacing(1),
-  padding: theme.spacing(1.5),
+  // padding: theme.spacing(1.5),
   transition: 'background-color 0.2s ease',
   position: 'relative',
   '&:hover': {
@@ -358,7 +359,7 @@ const NotificationPrompt = () => {
 
   // Notifications list view
   return (
-    <Box sx={{ width: '100%', height: 300, overflowY: 'auto' }}>
+    <Box sx={{ width: '100%', minHeight: 400, maxHeight: '75vh', overflowY: 'auto' }}>
       {notificationsLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <CircularProgress size={24} />
