@@ -313,7 +313,6 @@ const ProfileButton = ({ className }) => {
                                 icon={<NotificationsIcon />}
                                 iconPosition="start"
                                 sx={{ minHeight: 48 }}
-                                disabled={!isSubscribed} // Disable Notifications tab if not subscribed
                             />
                         </Tabs>
 
