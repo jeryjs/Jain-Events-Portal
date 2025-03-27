@@ -73,7 +73,9 @@ export class TeamActivity extends Activity {
     endTime: Date,
     type: EventType,
     participants: Participant[],
-    public teams: { id: string; name: string }[] = []
+    public teams: { id: string; name: string }[] = [],
+    public winners: { id: string; name: string }[] = [],
+    
   ) {
     super(id, name, startTime, endTime, participants, type);
   }
@@ -86,7 +88,8 @@ export class TeamActivity extends Activity {
       data.endTime,
       data.type || data.eventType,
       data.participants.map((p: any) => Participant.parse(p)),
-      data.teams
+      data.teams,
+      data.winners,
     );
   }
 }
