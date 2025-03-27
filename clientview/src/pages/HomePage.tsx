@@ -185,7 +185,7 @@ function HomePage() {
   // temp - hardcode infinity 2025 highlights
   const highlights = [
     'https://i.imgur.com/hnY5dx2l.jpeg',
-    'https://i.imgur.com/toE2tOFl.jpeg',
+    'https://i.imgur.com/8oNrZuzl.jpeg',
     'https://i.imgur.com/2W2fEIYl.jpeg'
   ];
 
