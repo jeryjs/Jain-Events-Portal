@@ -298,7 +298,7 @@ const WinnerCrown = styled(Box)<{ show: boolean }>(({ show }) => ({
   transform: "translateX(-50%)",
   width: 32,
   height: 32,
-  backgroundImage: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSIjZmZjMTA3Ij48cGF0aCBkPSJNMjU2IDIyLjcxNkwyMDguNjUgMTkwLjgxYy0xLjA1MiAzLjc0OS0zLjk5IDYuNTc0LTcuNzcyIDcuNDhsLTE3OC45IDQyLjk2OCA3NS41MjUgMTI5LjQ0YzEuOTI1IDMuMjk3IDEuOTI1IDcuMzgxIDAgMTAuNjc5bC0yNC41NDUgNDIuMDM1aDM2Ni4wOWwtMjQuNTQ1LTQyLjAzNWMtMS45MjUtMy4yOTctMS45MjUtNy4zODEgMC0xMC42NzlMNDkwLjAyIDI0MS4yNiAzMTEuMTIyIDE5OC4yOWMtMy43ODItLjkwNi02LjcyLTMuNzMxLTcuNzcyLTcuNDhMMjU2IDIyLjcxNnoiLz48cGF0aCBmaWxsPSIjZmZkYjRkIiBkPSJNMTYyLjA2MSAzMjAuNjI5bC0zOC4yOC04MC44NzVjLS43MzItMS41NDktLjUxNS0zLjM3Ni41NjktNC43NEwxODMuMDMgMTY4LjgybDI2LjI5NyA4OC45MWMuNDM3IDEuNDc4LjE3NCAzLjA3OC0uNzE0IDQuMzYtLjg4OSAxLjI4MS0yLjMzOSAyLjA4Mi0zLjg3NyAyLjA0MmgtMzYuNzgyYy0zLjA1NiAwLTUuNTU1IDIuMzg1LTUuNzUgNS40MzNsLTIuNTQ2IDM5LjcyYy0uMTI3IDEuOTgzLTEuMTUzIDMuNzktMi43OTIgNC45MjMtMS42MzggMS4xMzQtMy43MDYgMS40NzctNS42MzYuOTM3bC0xOC4xNC01LjA3Yy0zLjAyNC0uODQ2LTYuMTU2LjkxNy03LjAyOCAzLjk0M2wtNi4wNjQgMTkuODg2Yy0uNTgzIDEuOTE0LTEuOTcxIDMuNDQyLTMuODExIDQuMTk1LTEuODM5Ljc1My0zLjkyNi42MzgtNS43Mi0uMzE1bC0xLjYxNi0uODU5Yy0xLjM0NS0uNzE0LTIuMTg1LTIuMTEzLTIuMTg1LTMuNjF2LTIuNzc2YzAtMS4wMDMtLjM2NC0xLjk3LTEuMDIzLTIuNzI0LS43NzQtLjg4OS0xLjkwNC0xLjM3OS0zLS4zNzlsLTMuMTgtMy40N2MtMi4wODYtMi4yODQtNS4yNTQtMy4yMTUtOC4xOTUtMi40MTdoMHoiLz48cGF0aCBmaWxsPSIjZmZkYjRkIiBkPSJNMzQ5LjIxNCAzMjAuNjI5bDM4LjI4LTgwLjg3NWMuNzMyLTEuNTQ5LjUxNS0zLjM3Ni0uNTY5LTQuNzRMMzI4LjI0NSAxNjguODJsLTI2LjI5NyA4OC45MWMtLjQzNyAxLjQ3OC0uMTc0IDMuMDc4LjcxNCA0LjM2Ljg4OSAxLjI4MSAyLjMzOSAyLjA4MiAzLjg3NyAyLjA0MmgzNi43ODJjMy4wNTYgMCA1LjU1NSAyLjM4NSA1Ljc1IDUuNDMzbDIuNTQ2IDM5LjcyYy4xMjcgMS45ODMgMS4xNTMgMy43OSAyLjc5MiA0LjkyMyAxLjYzOCAxLjEzNCAzLjcwNiAxLjQ3NyA1LjYzNi45MzdsMTguMTQtNS4wN2MzLjAyNC0uODQ2IDYuMTU2LjkxNyA3LjAyOCAzLjk0M2w2LjA2NCAxOS44ODZjLjU4MyAxLjkxNCAxLjk3MSAzLjQ0MiAzLjgxMSA0LjE5NSAxLjgzOS43NTMgMy45MjYuNjM4IDUuNzItLjMxNWwxLjYxNi0uODU5YzEuMzQ1LS43MTQgMi4xODUtMi4xMTMgMi4xODUtMy42MXYtMi43NzZjMC0xLjAwMy4zNjQtMS45NyAxLjAyMy0yLjcyNC43NzQtLjg4OSAxLjkwNC0xLjM3OSAzLS4zNzlsMy4xOC0zLjQ3YzIuMDg2LTIuMjg0IDUuMjU0LTMuMjE1IDguMTk1LTIuNDJoMHoiLz48L3N2Zz4=')",
+  backgroundImage: "url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSIjZmZjMTA3Ij48cGF0aCBkPSJNMjU2IDIyLjcxNkwyMDguNjUgMTkwLjgxYy0xLjA1MiAzLjc0OS0zLjk5IDYuNTc0LTcuNzcyIDcuNDhsLTE3OC45IDQyLjk2OCA3NS41MjUgMTI5LjQ0YzEuOTI1IDMuMjk3IDEuOTI1IDcuMzgxIDAgMTAuNjc5bC0yNC41NDUgNDIuMDM1aDM2Ni4wOWwtMjQuNTQ1LTQyLjAzNWMtMS45MjUtMy4yOTctMS45MjUtNy4zODEgMC0xMC42NzlMNDkwLjAyIDI0MS4yNiAzMTEuMTIyIDE5OC4yOWMtMy43ODItLjkwNi02LjcyLTMuNzMxLTcuNzcyLTcuNDhMMjU2IDIyLjcxNnoiLz48cGF0aCBmaWxsPSIjZmZkYjRkIiBkPSJNMjU2IDIyLjcxNkwyMDguNjUgMTkwLjgxYy0xLjA1MiAzLjc0OS0zLjk5IDYuNTc0LTcuNzcyIDcuNDhsLTE3OC45IDQyLjk2OCA3NS41MjUgMTI5LjQ0YzEuOTI1IDMuMjk3IDEuOTI1IDcuMzgxIDAgMTAuNjc5bC0yNC41NDUgNDIuMDM1aDM2Ni4wOWwtMjQuNTQ1LTQyLjAzNWMtMS45MjUtMy4yOTctMS45MjUtNy4zODEgMC0xMC42NzlMNDkwLjAyIDI0MS4yNiAzMTEuMTIyIDE5OC4yOWMtMy43ODItLjkwNi02LjcyLTMuNzMxLTcuNzcyLTcuNDhMMjU2IDIyLjcxNnoiLz48L3N2Zz4=')",
   backgroundSize: "contain",
   backgroundRepeat: "no-repeat",
   opacity: show ? 1 : 0,
@@ -375,6 +375,19 @@ const CompactChip = styled(Chip)(({ theme, color }) => ({
   }
 }));
 
+// New styled component for audience choice badge
+const AudienceChoiceBadge = styled(Chip)(({ theme }) => ({
+  backgroundColor: alpha(theme.palette.secondary.main, 0.15),
+  color: theme.palette.secondary.main,
+  fontWeight: 'bold',
+  marginLeft: theme.spacing(1),
+  height: 24,
+  fontSize: '0.7rem',
+  "& .MuiChip-label": {
+    padding: theme.spacing(0, 1),
+  }
+}));
+
 // Cultural Activity View
 export const CulturalsView = ({
   eventId,
@@ -389,6 +402,11 @@ export const CulturalsView = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isDarkMode = theme.palette.mode === 'dark';
+
+  // Determine if the winner and audience choice are the same
+  const winner = activity.winners?.find(w => w.rank === 1)?.teamId;
+  const audienceChoice = activity.audienceChoice?.teamId;
+  const isAudienceChoiceSameAsWinner = winner && audienceChoice && winner === audienceChoice;
 
   const handleOpenDialog = (judge: Judge) => {
     setLoading(true);
@@ -411,6 +429,22 @@ export const CulturalsView = ({
   const handleTeamClick = (team: {id: string, name: string}) => {
     setSelectedTeam(team);
   };
+  
+  // Helper function to get the display name for a team or participant
+  const getDisplayName = (teamId: string) => {
+    if (!teamId) return "Unknown";
+    
+    // Get team or participant info based on teamId
+    const team = activity.teams?.find(t => t.id === teamId);
+    const participants = activity.getTeamParticipants(teamId);
+    const participant = participants?.length > 0 ? participants[0] : null;
+    
+    const isTeam = team && participants?.length > 1;
+    return isTeam ? team.name : (participant?.name || "Unknown Participant");
+  };
+
+  // Get display names
+  const audienceChoiceName = getDisplayName(audienceChoice);
   
   return (
     <Box>
@@ -765,6 +799,9 @@ export const CulturalsView = ({
                     "winner": "Winner",
                     "runnerup": "Runner Up"
                   };
+
+                  // Check if this winner is also the audience choice
+                  const isAudienceChoice = idx === 0 && isAudienceChoiceSameAsWinner;
                   
                   return (
                     <WinnerCard
@@ -834,6 +871,12 @@ export const CulturalsView = ({
                           }}
                         >
                           {displayName}
+                          {isAudienceChoice && (
+                            <AudienceChoiceBadge 
+                              label="Audience Choice" 
+                              size="small"
+                            />
+                          )}
                         </Typography>
                         
                         {participant?.college && (
@@ -869,6 +912,121 @@ export const CulturalsView = ({
                     </WinnerCard>
                   );
                 })}
+
+              {/* Audience Choice Card - only show if different from winner */}
+              {audienceChoice && !isAudienceChoiceSameAsWinner && (
+                <WinnerCard
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    duration: 0.4, 
+                    delay: 0.3,
+                    type: "spring",
+                    stiffness: 100
+                  }}
+                  whileHover={{ 
+                    y: -5, 
+                    boxShadow: theme.shadows[6],
+                    transition: { duration: 0.2 }
+                  }}
+                  sx={{
+                    borderLeft: `5px solid ${theme.palette.secondary.main}`,
+                    background: `linear-gradient(to right, ${alpha(theme.palette.secondary.light, 0.1)}, transparent 50%)`,
+                  }}
+                >
+                  <WinnerPosition placed="audience">
+                    Choice
+                  </WinnerPosition>
+                  
+                  <WinnerAvatarContainer
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {(() => {
+                      // Get team or participant info for audience choice
+                      const team = activity.teams?.find(t => t.id === audienceChoice);
+                      const participants = activity.getTeamParticipants(audienceChoice);
+                      const participant = participants?.length > 0 ? participants[0] : null;
+                      const isTeam = team && participants?.length > 1;
+                      
+                      return isTeam ? (
+                        <WinnerTeamBadge placed="audience">
+                          <Typography 
+                            variant="h6" 
+                            sx={{ 
+                              fontWeight: "bold",
+                              color: "#fff",
+                              textShadow: "0 1px 3px rgba(0,0,0,0.4)",
+                              position: "relative",
+                              zIndex: 2,
+                            }}
+                          >
+                            {team.name.substring(0, 2).toUpperCase()}
+                          </Typography>
+                        </WinnerTeamBadge>
+                      ) : (
+                        <WinnerAvatar
+                          alt={participant?.name || "Audience Choice"}
+                          src={participant?.profilePic}
+                          position="audience"
+                        />
+                      );
+                    })()}
+                  </WinnerAvatarContainer>
+                  
+                  <Box sx={{ flex: 1 }}>
+                    <Typography 
+                      variant="subtitle1" 
+                      sx={{ 
+                        fontWeight: 600,
+                        fontSize: { xs: '0.95rem', sm: '1rem' },
+                        color: theme.palette.secondary.main,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 1,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {audienceChoiceName}
+                    </Typography>
+                    
+                    {(() => {
+                      // Show college if it's a participant
+                      const participants = activity.getTeamParticipants(audienceChoice);
+                      const participant = participants?.length > 0 ? participants[0] : null;
+                      
+                      return participant?.college ? (
+                        <Typography 
+                          variant="caption" 
+                          color="text.secondary"
+                          sx={{
+                            fontSize: '0.7rem',
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: "vertical",
+                          }}
+                        >
+                          {participant.college}
+                        </Typography>
+                      ) : null;
+                    })()}
+                  </Box>
+                  
+                  <CompactChip 
+                    label="Audience Choice" 
+                    color="secondary"
+                    sx={{ 
+                      bgcolor: theme.palette.mode === 'dark' 
+                        ? alpha(theme.palette.secondary.main, 0.2) 
+                        : alpha(theme.palette.secondary.light, 0.4),
+                      color: theme.palette.secondary.main
+                    }} 
+                  />
+                </WinnerCard>
+              )}
             </Box>
           </WinnerSection>
         </Section>

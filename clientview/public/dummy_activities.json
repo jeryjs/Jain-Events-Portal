@@ -41,9 +41,26 @@
         "startTime": "2025-03-25T18:00:00.000Z",
         "endTime": "2025-03-25T22:00:00.000Z",
         "participants": [
-            { "usn": "dancer1", "name": "Alice Dancer" },
-            { "usn": "dancer2", "name": "Bob Dancer" },
-            { "usn": "dancer3", "name": "Charlie Dancer" }
+            { "usn": "dancer1", "name": "Alice Dancer", "teamId": "team1" },
+            { "usn": "dancer2", "name": "Bob Dancer", "teamId": "team2" },
+            { "usn": "dancer3", "name": "Charlie Dancer", "teamId": "team3" },
+            { "usn": "dancer4", "name": "Diana Dancer", "teamId": "team4" },
+            { "usn": "dancer5", "name": "Ethan Dancer", "teamId": "team1" },
+            { "usn": "dancer6", "name": "Fiona Dancer", "teamId": "team2" },
+            { "usn": "dancer7", "name": "George Dancer", "teamId": "team3" },
+            { "usn": "dancer8", "name": "Hannah Dancer", "teamId": "team4" },
+            { "usn": "dancer9", "name": "Ian Dancer", "teamId": "team1" },
+            { "usn": "dancer10", "name": "Julia Dancer", "teamId": "team1" },
+            { "usn": "dancer11", "name": "Kevin Dancer", "teamId": "team2" },
+            { "usn": "dancer12", "name": "Linda Dancer", "teamId": "team3" },
+            { "usn": "dancer13", "name": "Mike Dancer", "teamId": "team4" },
+            { "usn": "dancer14", "name": "Nancy Dancer", "teamId": "team1" },
+            { "usn": "dancer15", "name": "Oliver Dancer", "teamId": "team2" },
+            { "usn": "dancer16", "name": "Peggy Dancer", "teamId": "team3" },
+            { "usn": "dancer17", "name": "Quentin Dancer", "teamId": "team4" },
+            { "usn": "dancer18", "name": "Rose Dancer", "teamId": "team1" },
+            { "usn": "dancer19", "name": "Steve Dancer", "teamId": "team2" },
+            { "usn": "dancer20", "name": "Tina Dancer", "teamId": "team3" }
         ],
         "judges": [
             {
@@ -62,22 +79,27 @@
             }
         ],
         "teams": [
-            { "usn": "dancer1", "name": "Alice Dancer" },
-            { "usn": "dancer2", "name": "Bob Dancer" },
-            { "usn": "dancer3", "name": "Charlie Dancer" }
+            { "teamId": "team1", "name": "Team A" },
+            { "teamId": "team2", "name": "Team B" },
+            { "teamId": "team3", "name": "Team C" },
+            { "teamId": "team4", "name": "Team D" }
         ],
         "pollData": [
-            { "teamId": "dancer1", "votes": ["voter1", "voter2"] },
-            { "teamId": "dancer2", "votes": ["voter3", "voter4", "voter5"] }
+            { "teamId": "team1", "votes": ["voter1", "voter2", "voter3", "voter4", "voter5", "voter6", "voter7", "voter8", "voter9", "voter10", "voter11", "voter12", "voter13", "voter14", "voter15"] },
+            { "teamId": "team2", "votes": ["voter16", "voter17", "voter18", "voter19", "voter20", "voter21", "voter22", "voter23", "voter24", "voter25", "voter26", "voter27"] },
+            { "teamId": "team3", "votes": ["voter28", "voter29", "voter30", "voter31", "voter32", "voter33", "voter34", "voter35", "voter36", "voter37", "voter38", "voter39"] },
+            { "teamId": "team4", "votes": ["voter40", "voter41", "voter42", "voter43", "voter44", "voter45", "voter46", "voter47", "voter48", "voter49", "voter50"] }
         ],
         "showPoll": true,
         "winners": [
-            { "teamId": "dancer2", "rank": 1 },
-            { "teamId": "dancer1", "rank": 2 }
+            { "teamId": "team2", "rank": 1 },
+            { "teamId": "team4", "rank": 2 }
         ],
         "type": 2001,
+        "isSoloPerformance": false,
         "performanceDetails": "An energetic dance performance featuring a blend of traditional and contemporary choreography by top local dance troupes. Venue: Main Auditorium. The event promises vibrant costumes, dynamic lighting, and an engaging narrative."
     },
+
     {
         "id": "activity_1742295000000",
         "name": "Melodic Evening - Singing Extravaganza",
