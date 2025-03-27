@@ -201,7 +201,8 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
 
     // Handle selecting a team
     const handleSelectTeam = (teamId: string) => {
-        if (!userVoted && isAuthenticated && activity.canVote) {
+        if (isAuthenticated && activity.canVote) {
+            // Allow users to change their vote by selecting a new team
             setSelectedTeam(teamId === selectedTeam ? null : teamId);
         } else if (!isAuthenticated && activity.canVote) {
             promptLogin();
@@ -424,7 +425,7 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
 
             {/* Swipe to Vote Button */}
             <AnimatePresence>
-                {selectedTeam && isAuthenticated && !userVoted && !castVoteMutation.isPending && (
+                {selectedTeam && isAuthenticated && !castVoteMutation.isPending && (
                     <Box ref={containerRef} sx={{ width: '100%' }}>
                         {error && (
                             <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}>
@@ -457,7 +458,7 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                         </SwipeButton>
 
                         <Typography variant="caption" color="text.secondary" align="center" sx={{ display: 'block', mt: 1 }}>
-                            Your vote cannot be changed once cast
+                            Swipe to confirm your vote
                         </Typography>
                     </Box>
                 )}

@@ -113,7 +113,7 @@ export const deleteActivity = async (eventId: string, activityId: string) => {
 /*
  * Invalidate cache for activities
  */
-export const invalidateActivitiesCache = async () => {
+export const invalidateActgivitiesCache = async () => {
   cache.keys().forEach(key => {
     if (key.startsWith('activities-')) {
       cache.del(key);
@@ -164,14 +164,22 @@ export const castVote = async (eventId: string, activityId: string, teamId: stri
   if (!activity.showPoll) throw new Error('Poll is not enabled for this activity');
 
   const pollData = activity.pollData;
+  
+  // First, remove the user's vote from any team they previously voted for
+  for (const poll of pollData) {
+    const voteIndex = poll.votes.indexOf(username);
+    if (voteIndex !== -1) {
+      poll.votes.splice(voteIndex, 1);
+    }
+  }
+  
+  // Then add the vote to the selected team
   let teamPoll = pollData.find(poll => poll.teamId === teamId);
   if (!teamPoll) {
     teamPoll = { teamId, votes: [] };
     pollData.push(teamPoll);
   }
   
-  if (teamPoll.votes.includes(username)) throw new Error('User has already voted for this team/participant');
-
   teamPoll.votes.push(username);
   activity.pollData = pollData;
 
