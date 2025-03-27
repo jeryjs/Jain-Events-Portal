@@ -75,12 +75,13 @@ class Activity {
 }
 exports.default = Activity;
 class TeamActivity extends Activity {
-    constructor(id, name, startTime, endTime, type, participants, teams = []) {
+    constructor(id, name, startTime, endTime, type, participants, teams = [], winners = []) {
         super(id, name, startTime, endTime, participants, type);
         this.teams = teams;
+        this.winners = winners;
     }
     static parse(data) {
-        return new TeamActivity(data.id, data.name, data.startTime, data.endTime, data.type || data.eventType, data.participants.map((p) => Participant_1.default.parse(p)), data.teams);
+        return new TeamActivity(data.id, data.name, data.startTime, data.endTime, data.type || data.eventType, data.participants.map((p) => Participant_1.default.parse(p)), data.teams, data.winners);
     }
 }
 exports.TeamActivity = TeamActivity;
