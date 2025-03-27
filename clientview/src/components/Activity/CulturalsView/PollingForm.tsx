@@ -239,7 +239,7 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
     const totalVotes = pollData.reduce((sum, team) => sum + team.votes.length, 0) || 0;
 
     const getVoteData = (teamId: string) => {
-        const votes = pollData.find(p => p.teamId === teamId)?.votes.length || 0;
+        const votes = pollData.find(p => p.teamId.trim() === teamId.trim())?.votes.length || 0;
         const percentage = totalVotes > 0 ? (votes / totalVotes) * 100 : 0;
         return { votes, percentage };
     };
