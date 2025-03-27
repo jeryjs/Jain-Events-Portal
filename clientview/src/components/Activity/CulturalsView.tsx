@@ -1118,7 +1118,7 @@ export const CulturalsView = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        {activity.canVote && (
+        {!activity.showPoll && (
           <Typography
             variant="h5"
             component="h2"
@@ -1239,7 +1239,7 @@ export const CulturalsView = ({
                   </TeamCard>
                 ))}
               </Box>
-            ) : activity.canVote && (
+            ) : !activity.showPoll && (
               /* Individual performers - only show if there are no teams */
               <Box>
                 {activity.participants.map((participant, idx) => (
