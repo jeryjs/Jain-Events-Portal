@@ -1,11 +1,12 @@
 import { CulturalActivity } from '@common/models';
 import { useLogin, useLoginPrompt } from '@components/shared';
 import { useCastVote } from '@hooks/useApi';
+import PeopleIcon from '@mui/icons-material/People';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import LockIcon from '@mui/icons-material/Lock';
 import SwipeIcon from '@mui/icons-material/SwipeRightAlt';
-import { Alert, alpha, Avatar, AvatarGroup, Box, CircularProgress, Tooltip, Typography, useTheme } from '@mui/material';
+import { Alert, alpha, Avatar, Badge, Box, CircularProgress, Tooltip, Typography, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
@@ -14,7 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 const PollContainer = styled(Box)(({ theme }) => ({
     position: 'relative',
     margin: theme.spacing(3, 0),
-    padding: theme.spacing(2),
+    paddingBlock: theme.spacing(2),
     borderRadius: theme.shape.borderRadius * 2,
     backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.7 : 0.6),
     backdropFilter: 'blur(10px)',
@@ -309,48 +310,52 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                             whileHover={!userVoted ? { scale: 1.01 } : undefined}
                             whileTap={!userVoted ? { scale: 0.99 } : undefined}
                         >
-                            <ProgressBar 
+                            <ProgressBar
                                 width={percentage}
                                 initial={{ width: 0 }}
                                 animate={{ width: `${percentage}%` }}
-                                transition={{ 
-                                    duration: 1.2, 
+                                transition={{
+                                    duration: 1.2,
                                     delay: 0.3,
-                                    ease: [0, 0.71, 0.2, 1.01] 
+                                    ease: [0, 0.71, 0.2, 1.01]
                                 }}
                             />
 
                             <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', zIndex: 1 }}>
                                 {isSoloPerformance ? (
                                     <Avatar
-                                        src={entry.profilePic || `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(name)}`}
+                                        src={entry.profilePic}
                                         sx={{
                                             width: 40,
                                             height: 40,
                                             mr: 1.5,
-                                            border: isUserVote ? `2px solid ${theme.palette.primary.main}` : 'none',
+                                            border: isUserVote ? `2px solid ${theme.palette.primary.main}` : 'none'
                                         }}
                                     />
                                 ) : (
-                                    <AvatarGroup max={3} sx={{ mr: 1.5 }}>
-                                        {teamMembers.length > 0 ? (
-                                            teamMembers.map((member, idx) => (
-                                                <Tooltip key={idx} title={member.name}>
-                                                    <Avatar
-                                                        src={member.profilePic || `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(member.name)}`}
-                                                        sx={{ width: 32, height: 32, border: isUserVote ? `2px solid ${theme.palette.primary.main}` : 'none' }}
-                                                    />
-                                                </Tooltip>
-                                            ))
-                                        ) : (
-                                            <Avatar sx={{ width: 32, height: 32 }}>
-                                                {name.charAt(0)}
-                                            </Avatar>
-                                        )}
-                                    </AvatarGroup>
+                                    <Badge
+                                        badgeContent={
+                                            <>
+                                                <PeopleIcon sx={{ fontSize: 'inherit' }} />
+                                                {teamMembers.length}
+                                            </>
+                                        }
+                                        sx={{ mr: 1.5 }}
+                                    >
+                                        <Avatar
+                                            src={teamMembers.length > 0 ? teamMembers[0].profilePic : undefined}
+                                            sx={{
+                                                width: 40,
+                                                height: 40,
+                                                border: isUserVote ? `2px solid ${theme.palette.primary.main}` : 'none'
+                                            }}
+                                        >
+                                            {teamMembers.length === 0 && name.charAt(0)}
+                                        </Avatar>
+                                    </Badge>
                                 )}
 
-                                <Box sx={{ flexGrow: 1 }}>
+                                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                         <Typography variant="body1" fontWeight={isUserVote ? 600 : 400}>
                                             {name}
@@ -367,7 +372,7 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis',
                                                 whiteSpace: 'nowrap',
-                                                maxWidth: '100%'
+                                                minWidth: 0
                                             }}
                                         >
                                             {teamMembers.map(m => m.name).join(', ')}
@@ -384,6 +389,7 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                 <Box sx={{
                                     display: 'flex',
                                     flexDirection: 'column',
+                                    placeSelf: 'flex-end',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     minWidth: 40
@@ -464,33 +470,36 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                 )}
             </AnimatePresence>
 
-            {!isAuthenticated && (
-                <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 0.5,
-                        mt: 1,
-                        p: 1.5,
-                        borderRadius: 1,
-                        bgcolor: alpha(theme.palette.primary.main, 0.05),
-                        border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
-                            color: theme.palette.primary.main
-                        }
-                    }}
-                    onClick={activity.canVote ? promptLogin : null}
-                >
-                    <LockIcon sx={{ fontSize: 16 }} />
-                    {activity.canVote ? "Sign in to cast your vote!" : activity.startTime > new Date() ? `Voting starts ${activity.relativeStartTime}` : "Voting is closed!"}
-                </Typography>
-            )}
+            {/* Authentication and Voting Info */}
+            <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 0.5,
+                    mt: 1,
+                    p: 1.5,
+                    borderRadius: 1,
+                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                    border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
+                    cursor: (!isAuthenticated && activity.canVote) ? 'pointer' : 'default',
+                    transition: 'all 0.2s ease',
+                    '&:hover': (!isAuthenticated && activity.canVote) ? {
+                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                        color: theme.palette.primary.main
+                    } : {}
+                }}
+                onClick={(!isAuthenticated && activity.canVote) ? promptLogin : undefined}
+            >
+                <LockIcon sx={{ fontSize: 16 }} />
+                {activity.canVote
+                    ? (!isAuthenticated ? "Sign in to cast your vote!" : "You can cast your vote")
+                    : activity.startTime > new Date()
+                        ? `Voting starts ${activity.relativeStartTime}`
+                        : "Voting is closed!"}
+            </Typography>
         </PollContainer>
     );
 };
