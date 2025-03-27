@@ -11,6 +11,7 @@ import {
   Button,
   Chip,
   CircularProgress,
+  Divider,
   IconButton,
   List,
   ListItem,
@@ -167,8 +168,8 @@ const NotificationPrompt = () => {
 
   const handleEnableNotifications = async () => {
     await subscribeToNotifications();
-    
-    if (permissionStatus === 'denied') {
+
+    if (permissionStatus != 'granted') {
       setShowSettings(true);
     }
   };
@@ -214,89 +215,93 @@ const NotificationPrompt = () => {
   };
 
   if (!isSubscribed && !showSettings) {
-    return (<>
-      <NotificationIconContainer>
-        <NotificationsActiveIcon
-          sx={{
-            fontSize: 40,
-            color: theme.palette.primary.main,
-            animation: `${pulse} 2s infinite ease-in-out`
-          }}
-        />
-      </NotificationIconContainer>
-
-      <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
-        {isSubscribing ? "Setting Up Notifications..." : "Never Miss an Event!"}
-      </Typography>
-
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        textAlign="center"
-        sx={{ mb: 3, px: 1 }}
-      >
-        {isSubscribing
-          ? "Preparing your personalized event notifications..."
-          : "Get instant updates about upcoming events, shrine timings and important announcements directly to your device."
-        }
-      </Typography>
-
-      {permissionStatus !== 'granted' && !isSubscribing && !isSubscribed && (
-        <EnableButton
-          variant="contained"
-          onClick={handleEnableNotifications}
-          fullWidth
-          disableElevation
-          startIcon={<NotificationsActiveIcon />}
-        >
-          Enable Notifications
-        </EnableButton>
-      )}
-
-      {permissionStatus === 'denied' && !showSettings && (
-        <SecondaryButton
-          variant="outlined"
-          onClick={() => setShowSettings(true)}
-          startIcon={<ErrorOutlineIcon />}
-          size="small"
-        >
-          Having trouble?
-        </SecondaryButton>
-      )}
-
-      {permissionStatus === 'granted' && isSubscribing && (
-        <Box sx={{ py: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
-          <CircularProgress size={20} />
-          <Typography variant="body2" color="primary" fontWeight="medium">Almost there...</Typography>
-        </Box>
-      )}
-
-      {permissionStatus === 'granted' && !isSubscribing && isSubscribed && (
-        <Box sx={{ textAlign: 'center', py: 1 }}>
-          <Avatar
+    return (
+      <Box display='grid' alignContent='center'>
+        <NotificationIconContainer>
+          <NotificationsActiveIcon
             sx={{
-              bgcolor: 'success.light',
-              margin: '0 auto',
-              mb: 1
+              fontSize: 40,
+              color: theme.palette.primary.main,
+              animation: `${pulse} 2s infinite ease-in-out`
             }}
-          >
-            <CheckCircleOutlineIcon />
-          </Avatar>
-          <Typography variant="body2" color="success.main" fontWeight="medium">
-            Push notifications enabled successfully!
-          </Typography>
-        </Box>
-      )}
+          />
+        </NotificationIconContainer>
 
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        textAlign="center"
-        sx={{ mt: 2, opacity: 0.7 }}
-      >
-        You can change notification settings anytime
-      </Typography>
-    </>)
+        <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
+          {isSubscribing ? "Setting Up Notifications..." : "Never Miss an Event!"}
+        </Typography>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          textAlign="center"
+          sx={{ mb: 3, px: 1 }}
+        >
+          {isSubscribing
+            ? "Preparing your personalized event notifications..."
+            : "Get instant updates about upcoming events, shrine timings and important announcements directly to your device."
+          }
+        </Typography>
+
+        {permissionStatus !== 'granted' && !isSubscribing && !isSubscribed && (
+          <EnableButton
+            variant="contained"
+            onClick={handleEnableNotifications}
+            fullWidth
+            disableElevation
+            startIcon={<NotificationsActiveIcon />}
+          >
+            Enable Notifications
+          </EnableButton>
+        )}
+
+        {permissionStatus === 'denied' && !showSettings && (
+          <SecondaryButton
+            variant="outlined"
+            onClick={() => setShowSettings(true)}
+            startIcon={<ErrorOutlineIcon />}
+            size="small"
+          >
+            Having trouble?
+          </SecondaryButton>
+        )}
+
+        <Divider />
+
+        {permissionStatus === 'granted' && isSubscribing && (
+          <Box sx={{ py: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+            <CircularProgress size={20} />
+            <Typography variant="body2" color="primary" fontWeight="medium">Almost there...</Typography>
+          </Box>
+        )}
+
+        {permissionStatus === 'granted' && !isSubscribing && isSubscribed && (
+          <Box sx={{ textAlign: 'center', py: 1 }}>
+            <Avatar
+              sx={{
+                bgcolor: 'success.light',
+                margin: '0 auto',
+                mb: 1
+              }}
+            >
+              <CheckCircleOutlineIcon />
+            </Avatar>
+            <Typography variant="body2" color="success.main" fontWeight="medium">
+              Push notifications enabled successfully!
+            </Typography>
+          </Box>
+        )}
+
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          textAlign="center"
+          sx={{ mt: 2, opacity: 0.7 }}
+        >
+          You can change notification settings anytime
+        </Typography>
+      </Box>
+    )
   }
 
   // Settings view - instructions for rejected permissions
@@ -456,8 +461,8 @@ const NotificationPrompt = () => {
                     </>
                   }
                 />
-                <MarkAsReadButton 
-                  size="small" 
+                <MarkAsReadButton
+                  size="small"
                   onClick={(e) => {
                     e.stopPropagation();
                     if (!notification.read) markAsRead(notification.id);
@@ -466,9 +471,9 @@ const NotificationPrompt = () => {
                   aria-label="mark as read"
                 >
                   <Tooltip title="Mark as read">
-                    <CheckCircleOutlineIcon 
-                      fontSize="small" 
-                      color={notification.read ? 'disabled' : 'primary'} 
+                    <CheckCircleOutlineIcon
+                      fontSize="small"
+                      color={notification.read ? 'disabled' : 'primary'}
                     />
                   </Tooltip>
                 </MarkAsReadButton>

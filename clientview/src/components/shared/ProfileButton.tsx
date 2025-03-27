@@ -302,31 +302,6 @@ const ProfileButton = ({ className }) => {
 
                                     {/* Install PWA component */}
                                     <InstallPrompt showAsComponent={true} />
-
-                                    {/* Notification subscription - only for authenticated users */}
-                                    {isAuthenticated && !isSubscribed && (
-                                        <Box sx={{
-                                            mt: 1.5,
-                                            pt: 1.5,
-                                            borderTop: `1px dashed ${theme.palette.divider}`,
-                                            width: '100%',
-                                            textAlign: 'center',
-                                            p: 1.5
-                                        }}>
-                                            <Tooltip title="Enable to receive event notifications">
-                                                <Button
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    onClick={() => setActiveTab(1)}
-                                                    size="small"
-                                                    startIcon={<NotificationsIcon />}
-                                                    sx={{ borderRadius: 2, textTransform: 'none' }}
-                                                >
-                                                    Enable Notifications
-                                                </Button>
-                                            </Tooltip>
-                                        </Box>
-                                    )}
                                 </Box>
                             </Fade>
 
