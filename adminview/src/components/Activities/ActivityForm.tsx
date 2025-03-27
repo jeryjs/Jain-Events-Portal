@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import { memo, useCallback, useEffect, useState } from 'react';
 
 import { EventType } from '@common/constants';
-import { Activity, CulturalActivity, InfoActivity, SportsActivity, TeamActivity } from '@common/models';
+import { Activity, CulturalActivity, InfoActivity, SportsActivity, TeamActivity, TechnicalActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getActivityTypes, getAllBaseEventTypes, getBaseEventType } from '@common/utils';
 
@@ -135,7 +135,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
             case EventType.INFO: return <MemoizedInfoView formData={formData as InfoActivity} setFormData={setFormData} />;
             case EventType.SPORTS: return <MemoizedSportsView formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
             case EventType.CULTURAL: return <MemoizedCulturalsView formData={formData as CulturalActivity} setFormData={setFormData} />;
-            case EventType.TECH: return <MemoizedTechnicalView formData={formData as TeamActivity} setFormData={setFormData} />;
+            case EventType.TECH: return <MemoizedTechnicalView formData={formData as TechnicalActivity} setFormData={setFormData} />;
             default: return <MemoizedGeneralView formData={formData} setFormData={setFormData} />;
         }
     }, [formData]);
