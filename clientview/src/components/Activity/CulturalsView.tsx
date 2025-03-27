@@ -712,7 +712,7 @@ export const CulturalsView = ({
         </Section>
       )}
 
-      /* Winners Section */
+      {/* Winners Section */}
       {activity.winners && activity.winners.length > 0 && (
         <Section>
           <Typography
