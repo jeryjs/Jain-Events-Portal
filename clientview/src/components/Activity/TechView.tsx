@@ -433,7 +433,7 @@ export const TechView = ({ activity }: TechViewProps) => {
                                 <ListItemText
                                   primary={member.name}
                                   secondary={
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden', whiteSpace: 'nowrap' }}>
                                       {member.usn && (
                                         <Typography variant="caption">
                                           <BadgeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />

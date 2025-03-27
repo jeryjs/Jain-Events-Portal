@@ -7,6 +7,7 @@ import {
   Dialog, DialogContent,
   Fade,
   IconButton,
+  ListItemText,
   Paper,
   Skeleton,
   Typography,
@@ -16,6 +17,11 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
+
+import BadgeIcon from "@mui/icons-material/Badge";
+import CodeIcon from "@mui/icons-material/Code";
+import SchoolIcon from "@mui/icons-material/School";
+
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { PollingForm } from "./CulturalsView/PollingForm";
@@ -97,8 +103,8 @@ const PerformerSection = styled(motion.section)(({ theme }) => ({
 }));
 
 const PerformerCard = styled(motion.div)(({ theme }) => ({
-  padding: theme.spacing(2, 3.5),
-  marginBottom: theme.spacing(2),
+  padding: theme.spacing(1, 1.5),
+  marginBottom: theme.spacing(1),
   borderRadius: theme.spacing(2),
   display: "flex",
   alignItems: "center",
@@ -177,8 +183,8 @@ const TeamCard = styled(motion.div)(({ theme }) => ({
 }));
 
 const PerformerAvatar = styled(Avatar)(({ theme }) => ({
-  width: 65,
-  height: 65,
+  width: 50,
+  height: 50,
   border: `3px solid ${alpha(theme.palette.background.paper, 0.9)}`,
   boxShadow: theme.palette.mode === "dark"
     ? `0 4px 14px ${alpha(theme.palette.common.black, 0.3)}`
@@ -706,7 +712,7 @@ export const CulturalsView = ({
         </Section>
       )}
 
-      {/* Winners Section */}
+      /* Winners Section */
       {activity.winners && activity.winners.length > 0 && (
         <Section>
           <Typography
@@ -740,23 +746,57 @@ export const CulturalsView = ({
               transition={{ duration: 0.5 }}
             >
               {activity.winners
-                .sort((a, b) => a.rank - b.rank) // Sort by rank
-                .slice(0, 2) // Only show winner and runner-up
+                .sort((a, b) => a.rank - b.rank)
                 .map((winner, idx) => {
-                  const position = idx === 0 ? "winner" : "runnerup";
+                  // Determine position styling based on rank
+                  const getPositionStyle = (rank) => {
+                    if (rank === 1) return "winner";     // Gold
+                    if (rank === 2) return "runnerup";   // Silver
+                    if (rank === 3) return "third";      // Bronze
+                    return "other";                      // Other positions
+                  };
 
-                  // Get team or participant info based on teamId
+                  const position = getPositionStyle(winner.rank);
                   const team = activity.teams?.find(t => t.id.trim() === winner.teamId.trim());
                   const participants = activity.getTeamParticipants(winner.teamId);
-                  const participant = participants?.length > 0 ? participants[0] : null;
-
+                  const participant = participants?.[0] || null;
                   const isTeam = team && participants?.length > 1;
                   const displayName = isTeam ? team.name : (participant?.name || "Unknown Participant");
 
-                  const positionLabels = {
-                    "winner": "Winner",
-                    "runnerup": "Runner Up"
+                  // Position labels and styling
+                  const getPositionLabel = (rank) => {
+                    const suffixes = ['th', 'st', 'nd', 'rd'];
+                    const v = rank % 100;
+                    return rank + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
                   };
+
+                  // Color mapping for positions
+                  const getPositionColor = (pos) => {
+                    switch (pos) {
+                      case "winner": return {
+                        chipBg: theme.palette.mode === 'dark' ? alpha('#FFD700', 0.2) : alpha('#FFD700', 0.7),
+                        chipText: theme.palette.mode === 'dark' ? alpha('#FFD700', 0.9) : "rgba(0,0,0,0.8)",
+                        nameColor: theme.palette.mode === "dark" ? alpha('#FFD700', 0.9) : theme.palette.warning.dark
+                      };
+                      case "runnerup": return {
+                        chipBg: theme.palette.mode === 'dark' ? alpha('#C0C0C0', 0.2) : alpha('#C0C0C0', 0.7),
+                        chipText: theme.palette.text.primary,
+                        nameColor: theme.palette.text.primary
+                      };
+                      case "third": return {
+                        chipBg: theme.palette.mode === 'dark' ? alpha('#CD7F32', 0.2) : alpha('#CD7F32', 0.7),
+                        chipText: theme.palette.mode === 'dark' ? alpha('#CD7F32', 0.9) : "rgba(0,0,0,0.8)",
+                        nameColor: theme.palette.mode === "dark" ? alpha('#CD7F32', 0.9) : alpha('#8B4513', 0.9)
+                      };
+                      default: return {
+                        chipBg: theme.palette.mode === 'dark' ? alpha(theme.palette.grey[700], 0.3) : alpha(theme.palette.grey[300], 0.7),
+                        chipText: theme.palette.text.secondary,
+                        nameColor: theme.palette.text.primary
+                      };
+                    }
+                  };
+
+                  const colors = getPositionColor(position);
 
                   return (
                     <WinnerCard
@@ -771,12 +811,12 @@ export const CulturalsView = ({
                       }}
                       whileHover={{
                         y: -5,
-                        boxShadow: theme.shadows[position === "winner" ? 8 : 5],
+                        boxShadow: theme.shadows[position === "winner" ? 8 : position === "runnerup" ? 5 : 3],
                         transition: { duration: 0.2 }
                       }}
                     >
                       <WinnerPosition placed={position}>
-                        {position === "winner" ? "1st" : "2nd"}
+                        {getPositionLabel(winner.rank)}
                       </WinnerPosition>
 
                       <WinnerAvatarContainer
@@ -797,7 +837,13 @@ export const CulturalsView = ({
                                 zIndex: 2,
                               }}
                             >
-                              {team.name.substring(0, 2).toUpperCase()}
+                              {team.name.trim().split(" ").length === 1
+                                ? team.name.substring(0, 2).toUpperCase()
+                                : team.name
+                                  .split(" ")
+                                  .map((word) => word.charAt(0))
+                                  .join("")
+                                  .toUpperCase()}
                             </Typography>
                           </WinnerTeamBadge>
                         ) : (
@@ -809,60 +855,91 @@ export const CulturalsView = ({
                         )}
                       </WinnerAvatarContainer>
 
-                      <Box sx={{ flex: 1 }}>
-                        <Typography
-                          variant="subtitle1"
-                          sx={{
-                            fontWeight: 600,
-                            fontSize: { xs: '0.95rem', sm: '1rem' },
-                            color: position === "winner"
-                              ? theme.palette.mode === "dark" ? alpha('#FFD700', 0.9) : theme.palette.warning.dark
-                              : theme.palette.text.primary,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 1,
-                            WebkitBoxOrient: "vertical",
-                          }}
-                        >
-                          {displayName}
-                        </Typography>
-
-                        {participant?.college && (
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{
-                              fontSize: '0.7rem',
+                      <Box sx={{
+                        flex: 1,
+                        minWidth: 0, // Important to contain flex items properly
+                        mr: 1 // Add margin to separate from badge
+                      }}>
+                        <ListItemText
+                          primary={
+                            <Typography
+                              variant="subtitle1"
+                              sx={{
+                                fontWeight: 600,
+                                fontSize: { xs: '0.95rem', sm: '1rem' },
+                                color: colors.nameColor,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 1,
+                                WebkitBoxOrient: "vertical",
+                              }}
+                            >
+                              {displayName}
+                            </Typography>
+                          }
+                          secondary={
+                            <Box sx={{
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              alignItems: 'center',
+                              gap: 1,
                               overflow: "hidden",
                               textOverflow: "ellipsis",
-                              display: "-webkit-box",
-                              WebkitLineClamp: 1,
-                              WebkitBoxOrient: "vertical",
-                            }}
-                          >
-                            {participant.college}
-                          </Typography>
-                        )}
+                              maxWidth: '100%'
+                            }}>
+                              {isTeam
+                                ? <Typography
+                                  variant="caption"
+                                  noWrap
+                                  sx={{
+                                    maxWidth: '100%',
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                  }}
+                                  title={activity.getTeamParticipants(winner.teamId).map(t => t.name).join(', ')}
+                                >
+                                  {activity.getTeamParticipants(winner.teamId).map(t => t.name).join(', ')}
+                                </Typography>
+                                : <>
+                                  {participant?.usn && (
+                                    <Typography variant="caption" noWrap>
+                                      <BadgeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                                      {participant.usn.toUpperCase()}
+                                    </Typography>
+                                  )}
+                                  {participant?.branch && (
+                                    <Typography variant="caption" noWrap>
+                                      <CodeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                                      {participant.branch}
+                                    </Typography>
+                                  )}
+                                  {participant?.college && (
+                                    <Typography variant="caption" noWrap title={participant.college}>
+                                      <SchoolIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                                      {participant.college}
+                                    </Typography>
+                                  )}
+                                </>}
+                            </Box>
+                          }
+                          secondaryTypographyProps={{ component: 'div' }} />
                       </Box>
 
-                      <CompactChip
-                        label={positionLabels[position]}
-                        color={position === "winner" ? "warning" : "default"}
-                        sx={{
-                          bgcolor: position === "winner"
-                            ? theme.palette.mode === 'dark' ? alpha('#FFD700', 0.2) : alpha('#FFD700', 0.7)
-                            : theme.palette.mode === 'dark' ? alpha('#C0C0C0', 0.2) : alpha('#C0C0C0', 0.7),
-                          color: position === "winner"
-                            ? theme.palette.mode === 'dark' ? alpha('#FFD700', 0.9) : "rgba(0,0,0,0.8)"
-                            : theme.palette.text.primary,
-                        }}
-                      />
+                      <Box sx={{ flexShrink: 0 }}>
+                        <CompactChip
+                          label={winner.rank === 1 ? "Winner" : winner.rank === 2 ? "Runner Up" : `${getPositionLabel(winner.rank)} Place`}
+                          sx={{
+                            bgcolor: colors.chipBg,
+                            color: colors.chipText,
+                          }}
+                        />
+                      </Box>
                     </WinnerCard>
                   );
                 })}
 
-              {/* Audience Choice Card - always show as a separate item */}
+              {/* Audience Choice Card */}
               {audienceChoice && (
                 <WinnerCard
                   initial={{ opacity: 0, y: 10 }}
@@ -892,97 +969,135 @@ export const CulturalsView = ({
                     Poll
                   </WinnerPosition>
 
-                  <WinnerAvatarContainer
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {(() => {
-                      // Get team or participant info for audience choice
-                      const team = activity.isSoloPerformance ? activity.participants.find(p => p.id.trim() === audienceChoice) : activity.teams?.find(t => t.id.trim() === audienceChoice);
-                      const participants = activity.getTeamParticipants(audienceChoice);
-                      const participant = participants?.length > 0 ? participants[0] : null;
-                      const isTeam = team && participants?.length > 1;
+                  {(() => {
+                    // Get team or participant info for audience choice
+                    const isTeam = !activity.isSoloPerformance;
+                    const displayName = activity.audienceChoice?.name || "";
+                    const team = activity.teams?.find(t => t.id.trim() === audienceChoice.trim());
+                    const participant = activity.participants.find(p => p.id?.trim() === audienceChoice?.trim());
 
-                      return isTeam ? (
-                        <WinnerTeamBadge placed="audience">
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              fontWeight: "bold",
-                              color: "#fff",
-                              textShadow: "0 1px 3px rgba(0,0,0,0.4)",
-                              position: "relative",
-                              zIndex: 2,
-                            }}
-                          >
-                            {team.name.substring(0, 2).toUpperCase()}
-                          </Typography>
-                        </WinnerTeamBadge>
-                      ) : (
-                        <WinnerAvatar
-                          alt={participant?.name || "Audience Choice"}
-                          src={participant?.profilePic}
-                          position="audience"
-                        />
-                      );
-                    })()}
-                  </WinnerAvatarContainer>
-
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="subtitle1"
-                      sx={{
-                        fontWeight: 600,
-                        fontSize: { xs: '0.95rem', sm: '1rem' },
-                        color: theme.palette.secondary.main,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 1,
-                        WebkitBoxOrient: "vertical",
-                      }}
-                    >
-                      {(() => {
-                        const team = activity.teams?.find(t => t.id === audienceChoice);
-                        const participants = activity.getTeamParticipants(audienceChoice);
-                        const participant = participants?.length > 0 ? participants[0] : null;
-                        const isTeam = team && participants?.length > 1;
-                        return isTeam ? team.name : (participant?.name || "Unknown Participant");
-                      })()}
-                    </Typography>
-
-                    {(() => {
-                      const participants = activity.getTeamParticipants(audienceChoice);
-                      const participant = participants?.length > 0 ? participants[0] : null;
-                      return participant?.college ? (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{
-                            fontSize: '0.7rem',
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 1,
-                            WebkitBoxOrient: "vertical",
-                          }}
+                    return (
+                      <>
+                        <WinnerAvatarContainer
+                          whileHover={{ scale: 1.05 }}
+                          transition={{ duration: 0.2 }}
                         >
-                          {participant.college}
-                        </Typography>
-                      ) : null;
-                    })()}
-                  </Box>
+                          {isTeam ? (
+                            <WinnerTeamBadge placed="audience">
+                              <Typography
+                                variant="h6"
+                                sx={{
+                                  fontWeight: "bold",
+                                  color: "#fff",
+                                  textShadow: "0 1px 3px rgba(0,0,0,0.4)",
+                                  position: "relative",
+                                  zIndex: 2,
+                                }}
+                              >
+                                {team?.name.trim().split(" ").length === 1
+                                  ? team.name.substring(0, 2).toUpperCase()
+                                  : team?.name
+                                    .split(" ")
+                                    .map((word) => word.charAt(0))
+                                    .join("")
+                                    .toUpperCase()}
+                              </Typography>
+                            </WinnerTeamBadge>
+                          ) : (
+                            <WinnerAvatar
+                              alt={participant?.name || "Audience Choice"}
+                              src={participant?.profilePic}
+                              position="audience"
+                            />
+                          )}
+                        </WinnerAvatarContainer>
 
-                  <CompactChip
-                    label="Audience Choice"
-                    color="secondary"
-                    sx={{
-                      bgcolor: theme.palette.mode === 'dark'
-                        ? alpha(theme.palette.secondary.main, 0.2)
-                        : alpha(theme.palette.secondary.light, 0.4),
-                      color: theme.palette.secondary.main
-                    }}
-                  />
+                        <Box sx={{
+                          flex: 1,
+                          minWidth: 0, // Important to contain flex items properly
+                          mr: 1 // Add margin to separate from badge
+                        }}>
+                          <ListItemText
+                            primary={
+                              <Typography
+                                variant="subtitle1"
+                                sx={{
+                                  fontWeight: 600,
+                                  fontSize: { xs: '0.95rem', sm: '1rem' },
+                                  color: theme.palette.secondary.main,
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 1,
+                                  WebkitBoxOrient: "vertical",
+                                }}
+                              >
+                                {displayName}
+                              </Typography>
+                            }
+                            secondary={
+                              <Box sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                alignItems: 'center',
+                                gap: 1,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                maxWidth: '100%'
+                              }}>
+                                {isTeam
+                                  ? <Typography
+                                    variant="caption"
+                                    noWrap
+                                    sx={{
+                                      maxWidth: '100%',
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                    }}
+                                    title={activity.getTeamParticipants(audienceChoice).map(t => t.name).join(', ')}
+                                  >
+                                    {activity.getTeamParticipants(audienceChoice).map(t => t.name).join(', ')}
+                                  </Typography>
+                                  : <>
+                                    {participant?.usn && (
+                                      <Typography variant="caption" noWrap>
+                                        <BadgeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                                        {participant.usn.toUpperCase()}
+                                      </Typography>
+                                    )}
+                                    {participant?.branch && (
+                                      <Typography variant="caption" noWrap>
+                                        <CodeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                                        {participant.branch}
+                                      </Typography>
+                                    )}
+                                    {participant?.college && (
+                                      <Typography variant="caption" noWrap title={participant.college}>
+                                        <SchoolIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                                        {participant.college}
+                                      </Typography>
+                                    )}
+                                  </>}
+                              </Box>
+                            }
+                            secondaryTypographyProps={{ component: 'div' }} />
+                        </Box>
+
+                        <Box sx={{ flexShrink: 0 }}>
+                          <CompactChip
+                            label="Audience Choice"
+                            color="secondary"
+                            sx={{
+                              bgcolor: theme.palette.mode === 'dark'
+                                ? alpha(theme.palette.secondary.main, 0.2)
+                                : alpha(theme.palette.secondary.light, 0.4),
+                              color: theme.palette.secondary.main
+                            }}
+                          />
+                        </Box>
+                      </>
+                    );
+                  })()}
                 </WinnerCard>
               )}
             </Box>
@@ -991,11 +1106,11 @@ export const CulturalsView = ({
       )}
 
       {/* Poll Section */}
-      <Section>
-        {activity.showPoll && (
+      {activity.showPoll && (
+        <Section>
           <PollingForm eventId={eventId} activityId={activity.id} activity={activity} />
-        )}
-      </Section>
+        </Section>
+      )}
 
       {/* Performers Section with Column Layout */}
       <PerformerSection
@@ -1003,28 +1118,29 @@ export const CulturalsView = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Typography
-          variant="h5"
-          component="h2"
-          fontWeight="bold"
-          sx={{
-            mb: 4,
-            position: "relative",
-            display: "inline-block",
-            "&::after": {
-              content: '""',
-              position: "absolute",
-              width: "60%",
-              height: "4px",
-              bottom: "-8px",
-              left: 0,
-              backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
-              borderRadius: "2px"
-            }
-          }}
-        >
-          Performers
-        </Typography>
+        {activity.canVote && (
+          <Typography
+            variant="h5"
+            component="h2"
+            fontWeight="bold"
+            sx={{
+              mb: 4,
+              position: "relative",
+              display: "inline-block",
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                width: "60%",
+                height: "4px",
+                bottom: "-8px",
+                left: 0,
+                backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
+                borderRadius: "2px"
+              }
+            }}
+          >
+            Performers
+          </Typography>)}
 
         {(!activity.participants || activity.participants.length === 0) ? (
           <Box
@@ -1123,7 +1239,7 @@ export const CulturalsView = ({
                   </TeamCard>
                 ))}
               </Box>
-            ) : (
+            ) : activity.canVote && (
               /* Individual performers - only show if there are no teams */
               <Box>
                 {activity.participants.map((participant, idx) => (
@@ -1145,28 +1261,34 @@ export const CulturalsView = ({
                       alt={participant.name}
                       src={participant.profilePic}
                     />
-
-                    <PerformerInfo>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{
-                          fontWeight: 600,
-                          mb: 0.5,
-                        }}
-                      >
-                        {participant.name}
-                      </Typography>
-
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{
-                          display: "block",
-                        }}
-                      >
-                        {participant.college || "Jain University"}
-                      </Typography>
-                    </PerformerInfo>
+                    <ListItemText
+                      primary={participant.name}
+                      secondary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                          {participant.usn && (
+                            <Typography variant="caption">
+                              <BadgeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                              {participant.usn.toUpperCase()}
+                            </Typography>
+                          )}
+                          {participant.branch && (
+                            <Typography variant="caption">
+                              <CodeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                              {participant.branch}
+                            </Typography>
+                          )}
+                          {participant.college && (
+                            <Typography variant="caption" noWrap sx={{ maxWidth: '100%' }} title={participant.college}>
+                              <SchoolIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                              {participant.college}
+                            </Typography>
+                          )}
+                        </Box>
+                      }
+                      secondaryTypographyProps={{
+                        component: 'div',
+                      }}
+                    />
                   </PerformerCard>
                 ))}
               </Box>
@@ -1259,12 +1381,35 @@ export const CulturalsView = ({
                         justifyContent: "center",
                         mx: "auto",
                         mb: 2,
-                        boxShadow: `0 16px 40px ${alpha(theme.palette.common.black, 0.25)}`,
+                        background: theme.palette.mode === "dark"
+                          ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.8)}, ${alpha(theme.palette.secondary.dark, 0.8)})`
+                          : `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        border: `4px solid ${alpha(theme.palette.background.paper, 0.9)}`,
+                        boxShadow: theme.palette.mode === "dark"
+                          ? `0 16px 40px ${alpha(theme.palette.common.black, 0.25)}`
+                          : `0 16px 40px ${alpha(theme.palette.common.black, 0.15)}`,
                         position: "relative",
-                        zIndex: 1
+                        zIndex: 1,
+                        "&::before": {
+                          content: '""',
+                          position: "absolute",
+                          inset: 0,
+                          borderRadius: "50%",
+                          background: `radial-gradient(circle at 30% 30%, ${alpha(theme.palette.common.white, 0.3)}, transparent 50%)`,
+                          zIndex: 1,
+                        }
                       }}
                     >
-                      <Typography variant="h3" sx={{ color: "#fff", fontWeight: "bold" }}>
+                      <Typography
+                        variant="h3"
+                        sx={{
+                          color: "#fff",
+                          fontWeight: "bold",
+                          textShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                          position: "relative",
+                          zIndex: 2
+                        }}
+                      >
                         {selectedTeam.name.trim().split(" ").length === 1
                           ? selectedTeam.name.substring(0, 2).toUpperCase()
                           : selectedTeam.name
@@ -1373,7 +1518,7 @@ export const CulturalsView = ({
                                 {member.name}
                               </Typography>
                               <Typography variant="caption" color="text.secondary">
-                                {member.usn} • {member.branch || 'Department not specified'}
+                                {member.usn} • {member.branch}
                               </Typography>
                               <Typography
                                 variant="caption"

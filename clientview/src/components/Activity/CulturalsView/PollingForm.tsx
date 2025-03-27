@@ -6,7 +6,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import LockIcon from '@mui/icons-material/Lock';
 import SwipeIcon from '@mui/icons-material/SwipeRightAlt';
-import { Alert, alpha, Avatar, Badge, Box, CircularProgress, Tooltip, Typography, useTheme } from '@mui/material';
+import BadgeIcon from '@mui/icons-material/Badge';
+import CodeIcon from '@mui/icons-material/Code';
+import SchoolIcon from '@mui/icons-material/School';
+import { Alert, alpha, Avatar, Badge, Box, CircularProgress, ListItemText, Tooltip, Typography, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
@@ -358,32 +361,56 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
 
                                 <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Typography variant="body1" fontWeight={isUserVote ? 600 : 400}>
-                                            {name}
-                                        </Typography>
-                                        {isUserVote && <VoteIcon fontSize="small" sx={{ ml: 1, width: 18, height: 18 }} />}
+
+                                        <ListItemText
+                                            primary={entry.name}
+                                            secondary={
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                                    {entry.usn && (
+                                                        <Typography variant="caption">
+                                                            <BadgeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                                                            {entry.usn.toUpperCase()}
+                                                        </Typography>
+                                                    )}
+                                                    {entry.college && (
+                                                        <Typography variant="caption" noWrap sx={{ maxWidth: '100%' }} title={entry.college}>
+                                                            <SchoolIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                                                            {entry.college}
+                                                        </Typography>
+                                                    )}
+                                                    {entry.branch && (
+                                                        <Typography variant="caption">
+                                                            <CodeIcon fontSize="inherit" sx={{ mr: 0.5, fontSize: '0.8rem' }} />
+                                                            {entry.branch}
+                                                        </Typography>
+                                                    )}
+                                                </Box>
+                                            }
+                                            secondaryTypographyProps={{
+                                                component: 'div',
+                                            }}
+                                        />
                                     </Box>
 
                                     {!isSoloPerformance && teamMembers.length > 0 && (
-                                        <Typography
-                                            variant="caption"
-                                            color="text.secondary"
-                                            sx={{
-                                                display: 'block',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap',
-                                                minWidth: 0
-                                            }}
-                                        >
-                                            {teamMembers.map(m => m.name).join(', ')}
-                                        </Typography>
-                                    )}
-
-                                    {isSoloPerformance && entry.college && (
-                                        <Typography variant="caption" color="text.secondary">
-                                            {entry.college || 'FET, JU'}
-                                        </Typography>
+                                        <>
+                                            <Typography
+                                                variant="caption"
+                                                color="text.secondary"
+                                                sx={{
+                                                    display: 'block',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap',
+                                                    minWidth: 0
+                                                }}
+                                            >
+                                                {teamMembers.map(m => m.name).join(', ')}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {entry.college || 'FET, JU'}
+                                            </Typography>
+                                        </>
                                     )}
                                 </Box>
 
@@ -490,9 +517,9 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                         transition: 'all 0.2s ease',
                         '&:hover': (!isAuthenticated && activity.canVote)
                             ? {
-                                  bgcolor: alpha(theme.palette.primary.main, 0.08),
-                                  color: theme.palette.primary.main,
-                              }
+                                bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                color: theme.palette.primary.main,
+                            }
                             : {},
                     }}
                     onClick={(!isAuthenticated && activity.canVote) ? promptLogin : undefined}
@@ -501,8 +528,8 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                     {(!isAuthenticated && activity.canVote)
                         ? "Sign in to cast your vote!"
                         : activity.startTime > new Date()
-                        ? `Voting starts ${activity.relativeStartTime}`
-                        : "Voting is closed!"}
+                            ? `Voting starts ${activity.relativeStartTime}`
+                            : "Voting is closed!"}
                 </Typography>
             )}
         </PollContainer>
