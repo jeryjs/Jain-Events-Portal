@@ -35,8 +35,8 @@ class Activity {
         switch ((0, utils_1.getBaseEventType)(data.type)) {
             case constants_1.EventType.SPORTS: return models_1.SportsActivity.parse(data);
             case constants_1.EventType.CULTURAL: return models_1.CulturalActivity.parse(data);
+            case constants_1.EventType.TECH: return models_1.TechnicalActivity.parse(data);
             case constants_1.EventType.INFO: return models_1.InfoActivity.parse(data);
-            case constants_1.EventType.TECH: return TeamActivity.parse(data);
             default:
                 if (data.teams)
                     return TeamActivity.parse(data);
