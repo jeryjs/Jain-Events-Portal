@@ -1,10 +1,23 @@
-import { useState } from "react";
-import { CulturalActivity, Judge, Participant, TeamParticipant } from "@common/models";
-import { motion, AnimatePresence } from "framer-motion";
-import { Box, Typography, Paper, Avatar, Chip, styled, Dialog, DialogContent,
-  Fade, Zoom, useTheme, useMediaQuery, IconButton, alpha, Skeleton
-} from "@mui/material";
+import { CulturalActivity, Judge } from "@common/models";
 import CloseIcon from "@mui/icons-material/Close";
+import {
+  Avatar,
+  Box,
+  Chip,
+  Dialog, DialogContent,
+  Fade,
+  IconButton,
+  Paper,
+  Skeleton,
+  Typography,
+  Zoom,
+  alpha,
+  styled,
+  useMediaQuery,
+  useTheme
+} from "@mui/material";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 import { PollingForm } from "./CulturalsView/PollingForm";
 
 const Section = styled(Box)(({ theme }) => ({
@@ -17,7 +30,7 @@ const JudgeCard = styled(motion.div)(({ theme }) => ({
   textAlign: "center",
   cursor: "pointer",
   transition: "all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
-  background: theme.palette.mode === 'dark' 
+  background: theme.palette.mode === 'dark'
     ? `linear-gradient(145deg, ${alpha(theme.palette.background.paper, 0.8)} 0%, ${alpha(theme.palette.background.paper, 0.4)} 100%)`
     : `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
   overflow: "hidden",
@@ -36,7 +49,7 @@ const JudgeCard = styled(motion.div)(({ theme }) => ({
   },
   "&:hover": {
     transform: "translateY(-8px)",
-    boxShadow: theme.palette.mode === 'dark' 
+    boxShadow: theme.palette.mode === 'dark'
       ? `0 12px 28px ${alpha(theme.palette.common.black, 0.4)}`
       : `0 12px 28px ${alpha(theme.palette.common.black, 0.15)}`,
     "&::before": {
@@ -50,7 +63,7 @@ const JudgeAvatar = styled(Avatar)(({ theme }) => ({
   height: 80,
   margin: "0 auto 12px",
   border: `4px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'dark' ? 0.2 : 0.1)}`,
-  boxShadow: theme.palette.mode === 'dark' 
+  boxShadow: theme.palette.mode === 'dark'
     ? `0 8px 20px ${alpha(theme.palette.common.black, 0.25)}`
     : `0 8px 20px ${alpha(theme.palette.common.black, 0.12)}`,
   transition: "all 0.3s ease",
@@ -328,7 +341,7 @@ const WinnerTeamBadge = styled(Box)<{ placed: string }>(({ theme, placed }) => (
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  background: placed === "winner" 
+  background: placed === "winner"
     ? `linear-gradient(135deg, ${alpha('#FFD700', 0.9)}, ${alpha('#FFA500', 0.9)})`
     : `linear-gradient(135deg, ${alpha('#C0C0C0', 0.9)}, ${alpha('#A9A9A9', 0.9)})`,
   boxShadow: placed === "winner"
@@ -352,7 +365,7 @@ const WinnerPosition = styled(Box)<{ placed: string }>(({ theme, placed }) => ({
   position: "absolute",
   top: 0,
   right: 0,
-  background: placed === "winner" 
+  background: placed === "winner"
     ? `linear-gradient(45deg, ${alpha('#FFD700', 0.9)}, ${alpha('#FFA500', 0.9)})`
     : `linear-gradient(45deg, ${alpha('#C0C0C0', 0.9)}, ${alpha('#A9A9A9', 0.9)})`,
   color: placed === "winner" ? "#000" : "#fff",
@@ -397,7 +410,7 @@ export const CulturalsView = ({
   activity: CulturalActivity;
 }) => {
   const [selectedJudge, setSelectedJudge] = useState<Judge>(null);
-  const [selectedTeam, setSelectedTeam] = useState<{id: string, name: string} | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<{ id: string, name: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -426,7 +439,7 @@ export const CulturalsView = ({
     setSelectedTeam(null);
   };
 
-  const handleTeamClick = (team: {id: string, name: string}) => {
+  const handleTeamClick = (team: { id: string, name: string }) => {
     setSelectedTeam(team);
   };
   
@@ -451,11 +464,11 @@ export const CulturalsView = ({
       {/* Judges Section - Only render if judges data exists */}
       {hasJudges && (
         <Section>
-          <Typography 
-            variant="h5" 
-            component="h2" 
+          <Typography
+            variant="h5"
+            component="h2"
             fontWeight="bold"
-            sx={{ 
+            sx={{
               mb: 3,
               position: "relative",
               display: "inline-block",
@@ -475,11 +488,11 @@ export const CulturalsView = ({
           </Typography>
 
           {isEmptyJudges ? (
-            <Box 
-              sx={{ 
-                textAlign: "center", 
-                py: 6, 
-                px: 2, 
+            <Box
+              sx={{
+                textAlign: "center",
+                py: 6,
+                px: 2,
                 background: alpha(theme.palette.background.paper, isDarkMode ? 0.4 : 0.6),
                 borderRadius: 2,
                 border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.1 : 0.05)}`,
@@ -514,248 +527,248 @@ export const CulturalsView = ({
                   whileTap={{ scale: 0.98 }}
                 >
                   <motion.div>
-                    <Box 
-                      sx={{ 
+                    <Box
+                      sx={{
+                        position: "relative",
+                        "&::before": {
+                          content: '""',
+                          position: "absolute",
+                          inset: 0,
+                          background: `radial-gradient(circle, ${alpha(theme.palette.primary.light, 0.1)} 0%, transparent 70%)`,
+                          opacity: 0,
+                          transition: "opacity 0.3s ease",
+                        },
+                        "&:hover::before": {
+                          opacity: 1,
+                        }
+                      }}
+                    >
+                      <JudgeAvatar
+                        alt={judge.name}
+                        src={judge.profilePic}
+                      />
+                    </Box>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontWeight: 600,
+                        mb: 0.5,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 1,
+                        WebkitBoxOrient: "vertical",
+                      }}
+                    >
+                      {judge.name || "Guest Judge"}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "text.secondary",
+                        display: "block",
+                      }}
+                    >
+                      View Profile
+                    </Typography>
+                  </motion.div>
+                </JudgeCard>
+              ))}
+            </Box>
+          )}
+
+          {/* Judge Profile Dialog */}
+          <Dialog
+            open={selectedJudge !== null}
+            onClose={handleCloseDialog}
+            TransitionComponent={Fade}
+            TransitionProps={{ timeout: 500 }}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+              elevation: 24,
+              sx: {
+                borderRadius: 3,
+                overflow: "hidden",
+                bgcolor: theme.palette.background.paper,
+                border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
+                margin: isMobile ? 2 : 'auto',
+                maxHeight: isMobile ? 'calc(100% - 32px)' : '90vh',
+                width: isMobile ? 'calc(100% - 32px)' : '100%',
+              }
+            }}
+          >
+            {selectedJudge && (
+              <>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    zIndex: 1
+                  }}
+                >
+                  <IconButton
+                    onClick={handleCloseDialog}
+                    sx={{
+                      bgcolor: isDarkMode
+                        ? alpha(theme.palette.background.paper, 0.7)
+                        : "rgba(255,255,255,0.8)",
+                      "&:hover": {
+                        bgcolor: isDarkMode
+                          ? alpha(theme.palette.background.paper, 0.9)
+                          : "rgba(255,255,255,0.95)"
+                      },
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+
+                <StyledDialogContent sx={{
+                  pt: { xs: 5, sm: 4 },
+                  px: { xs: 2, sm: 4 },
+                  pb: { xs: 3, sm: 4 }
+                }}>
+                  <Box
+                    sx={{
+                      textAlign: "center",
                       position: "relative",
+                      mb: 4,
                       "&::before": {
                         content: '""',
                         position: "absolute",
-                        inset: 0,
-                        background: `radial-gradient(circle, ${alpha(theme.palette.primary.light, 0.1)} 0%, transparent 70%)`,
-                        opacity: 0,
-                        transition: "opacity 0.3s ease",
-                      },
-                      "&:hover::before": {
-                        opacity: 1,
+                        background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, isDarkMode ? 0.1 : 0.15)} 0%, transparent 70%)`,
+                        width: 240,
+                        height: 240,
+                        left: "50%",
+                        top: 0,
+                        transform: "translateX(-50%)",
+                        borderRadius: "50%",
+                        zIndex: 0
                       }
                     }}
                   >
-                  <JudgeAvatar
-                    alt={judge.name}
-                    src={judge.profilePic}
-                  />
-                </Box>
-                <Typography 
-                  variant="subtitle1" 
-                  sx={{ 
-                    fontWeight: 600,
-                    mb: 0.5,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: 1,
-                    WebkitBoxOrient: "vertical",
-                  }}
-                >
-                  {judge.name || "Guest Judge"}
-                </Typography>
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    color: "text.secondary",
-                    display: "block",
-                  }}
-                >
-                  View Profile
-                </Typography>
-                </motion.div>
-              </JudgeCard>
-            ))}
-          </Box>
-        )}
-
-        {/* Judge Profile Dialog */}
-        <Dialog
-          open={selectedJudge !== null}
-          onClose={handleCloseDialog}
-          TransitionComponent={Fade}
-          TransitionProps={{ timeout: 500 }}
-          maxWidth="sm"
-          fullWidth
-          PaperProps={{
-            elevation: 24,
-            sx: {
-              borderRadius: 3,
-              overflow: "hidden",
-              bgcolor: theme.palette.background.paper,
-              border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
-              margin: isMobile ? 2 : 'auto',
-              maxHeight: isMobile ? 'calc(100% - 32px)' : '90vh',
-              width: isMobile ? 'calc(100% - 32px)' : '100%',
-            }
-          }}
-        >
-          {selectedJudge && (
-            <>
-              <Box 
-                sx={{ 
-                  display: "flex", 
-                  justifyContent: "flex-end",
-                  position: "absolute",
-                  top: 8,
-                  right: 8,
-                  zIndex: 1
-                }}
-              >
-                <IconButton 
-                  onClick={handleCloseDialog}
-                  sx={{ 
-                    bgcolor: isDarkMode 
-                      ? alpha(theme.palette.background.paper, 0.7) 
-                      : "rgba(255,255,255,0.8)",
-                    "&:hover": { 
-                      bgcolor: isDarkMode 
-                        ? alpha(theme.palette.background.paper, 0.9) 
-                        : "rgba(255,255,255,0.95)" 
-                    },
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-              
-              <StyledDialogContent sx={{ 
-                pt: { xs: 5, sm: 4 },
-                px: { xs: 2, sm: 4 },
-                pb: { xs: 3, sm: 4 }
-              }}>
-                <Box 
-                  sx={{
-                    textAlign: "center",
-                    position: "relative",
-                    mb: 4,
-                    "&::before": {
-                      content: '""',
-                      position: "absolute",
-                      background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, isDarkMode ? 0.1 : 0.15)} 0%, transparent 70%)`,
-                      width: 240,
-                      height: 240,
-                      left: "50%",
-                      top: 0,
-                      transform: "translateX(-50%)",
-                      borderRadius: "50%",
-                      zIndex: 0
-                    }
-                  }}
-                >
-                  <Zoom in={!loading} style={{ transitionDelay: loading ? '250ms' : '0ms' }}>
-                    <Avatar
-                      sx={{
-                        width: isMobile ? 120 : 160,
-                        height: isMobile ? 120 : 160,
-                        mx: "auto",
-                        mb: 2,
-                        border: `6px solid ${alpha(theme.palette.background.paper, 0.9)}`,
-                        boxShadow: `0 16px 40px ${alpha(theme.palette.common.black, 0.2)}`,
-                        position: "relative",
-                        zIndex: 1
-                      }}
-                      alt={selectedJudge.name}
-                      src={selectedJudge.profilePic}
-                    />
-                  </Zoom>
-                  
-                  {loading ? (
-                    <Skeleton variant="text" width="60%" sx={{ mx: "auto", height: 40 }} />
-                  ) : (
-                    <Fade in={!loading} timeout={500}>
-                      <Typography 
-                        variant={isMobile ? "h5" : "h4"} 
-                        component="h3" 
-                        fontWeight="bold"
-                        sx={{ mb: 1 }}
-                      >
-                        {selectedJudge.name || "Guest Judge"}
-                      </Typography>
-                    </Fade>
-                  )}
-                  
-                  {loading ? (
-                    <Skeleton variant="text" width="80%" sx={{ mx: "auto" }} />
-                  ) : selectedJudge.description ? (
-                    <Fade in={!loading} timeout={700}>
-                      <Typography 
-                        variant="subtitle1" 
-                        color="text.secondary"
-                        sx={{ 
-                          fontStyle: "italic", 
-                          maxWidth: "600px",
-                          mx: "auto",
-                          mb: 3,
-                          display: "-webkit-box",
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          lineHeight: 1.5
-                        }}
-                      >
-                        "{selectedJudge.description}"
-                      </Typography>
-                    </Fade>
-                  ) : null}
-                </Box>
-                
-                {/* Portfolio/HTML Content Section */}
-                <Box sx={{ position: "relative" }}>
-                  {loading ? (
-                    <Box sx={{ pt: 2 }}>
-                      <Skeleton variant="rectangular" height={100} />
-                      <Skeleton variant="text" sx={{ mt: 1 }} />
-                      <Skeleton variant="text" />
-                    </Box>
-                  ) : (
-                    <Fade in={!loading && !!selectedJudge.portfolio} timeout={900}>
-                      <Paper
-                        elevation={0}
+                    <Zoom in={!loading} style={{ transitionDelay: loading ? '250ms' : '0ms' }}>
+                      <Avatar
                         sx={{
-                          mt: 1,
-                          p: { xs: 2, sm: 3 },
-                          bgcolor: isDarkMode 
-                            ? alpha(theme.palette.background.default, 0.4)
-                            : alpha(theme.palette.background.paper, 0.7),
-                          borderRadius: 2,
-                          border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.2 : 0.5)}`,
-                          "& img": {
-                            maxWidth: "100%",
-                            height: "auto",
-                            borderRadius: "4px",
-                            boxShadow: isDarkMode
-                              ? `0 2px 12px ${alpha(theme.palette.common.black, 0.3)}`
-                              : `0 2px 12px ${alpha(theme.palette.common.black, 0.1)}`,
-                          },
-                          "& a": {
-                            color: theme.palette.primary.main,
-                            textDecoration: "none",
-                            fontWeight: 500,
-                            "&:hover": {
-                              textDecoration: "underline",
-                            },
-                          },
-                          minHeight: 100,
-                          maxHeight: isMobile ? "calc(50vh - 180px)" : 500,
-                          overflowY: "auto",
+                          width: isMobile ? 120 : 160,
+                          height: isMobile ? 120 : 160,
+                          mx: "auto",
+                          mb: 2,
+                          border: `6px solid ${alpha(theme.palette.background.paper, 0.9)}`,
+                          boxShadow: `0 16px 40px ${alpha(theme.palette.common.black, 0.2)}`,
+                          position: "relative",
+                          zIndex: 1
                         }}
-                        dangerouslySetInnerHTML={{ __html: selectedJudge.portfolio }}
+                        alt={selectedJudge.name}
+                        src={selectedJudge.profilePic}
                       />
-                    </Fade>
-                  )}
-                </Box>
-              </StyledDialogContent>
-            </>
-          )}
-        </Dialog>
-      </Section>
+                    </Zoom>
+
+                    {loading ? (
+                      <Skeleton variant="text" width="60%" sx={{ mx: "auto", height: 40 }} />
+                    ) : (
+                      <Fade in={!loading} timeout={500}>
+                        <Typography
+                          variant={isMobile ? "h5" : "h4"}
+                          component="h3"
+                          fontWeight="bold"
+                          sx={{ mb: 1 }}
+                        >
+                          {selectedJudge.name || "Guest Judge"}
+                        </Typography>
+                      </Fade>
+                    )}
+
+                    {loading ? (
+                      <Skeleton variant="text" width="80%" sx={{ mx: "auto" }} />
+                    ) : selectedJudge.description ? (
+                      <Fade in={!loading} timeout={700}>
+                        <Typography
+                          variant="subtitle1"
+                          color="text.secondary"
+                          sx={{
+                            fontStyle: "italic",
+                            maxWidth: "600px",
+                            mx: "auto",
+                            mb: 3,
+                            display: "-webkit-box",
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            lineHeight: 1.5
+                          }}
+                        >
+                          "{selectedJudge.description}"
+                        </Typography>
+                      </Fade>
+                    ) : null}
+                  </Box>
+
+                  {/* Portfolio/HTML Content Section */}
+                  <Box sx={{ position: "relative" }}>
+                    {loading ? (
+                      <Box sx={{ pt: 2 }}>
+                        <Skeleton variant="rectangular" height={100} />
+                        <Skeleton variant="text" sx={{ mt: 1 }} />
+                        <Skeleton variant="text" />
+                      </Box>
+                    ) : (
+                      <Fade in={!loading && !!selectedJudge.portfolio} timeout={900}>
+                        <Paper
+                          elevation={0}
+                          sx={{
+                            mt: 1,
+                            p: { xs: 2, sm: 3 },
+                            bgcolor: isDarkMode
+                              ? alpha(theme.palette.background.default, 0.4)
+                              : alpha(theme.palette.background.paper, 0.7),
+                            borderRadius: 2,
+                            border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.2 : 0.5)}`,
+                            "& img": {
+                              maxWidth: "100%",
+                              height: "auto",
+                              borderRadius: "4px",
+                              boxShadow: isDarkMode
+                                ? `0 2px 12px ${alpha(theme.palette.common.black, 0.3)}`
+                                : `0 2px 12px ${alpha(theme.palette.common.black, 0.1)}`,
+                            },
+                            "& a": {
+                              color: theme.palette.primary.main,
+                              textDecoration: "none",
+                              fontWeight: 500,
+                              "&:hover": {
+                                textDecoration: "underline",
+                              },
+                            },
+                            minHeight: 100,
+                            maxHeight: isMobile ? "calc(50vh - 180px)" : 500,
+                            overflowY: "auto",
+                          }}
+                          dangerouslySetInnerHTML={{ __html: selectedJudge.portfolio }}
+                        />
+                      </Fade>
+                    )}
+                  </Box>
+                </StyledDialogContent>
+              </>
+            )}
+          </Dialog>
+        </Section>
       )}
 
       {/* Winners Section */}
       {activity.winners && activity.winners.length > 0 && (
         <Section>
-          <Typography 
-            variant="h5" 
-            component="h2" 
+          <Typography
+            variant="h5"
+            component="h2"
             fontWeight="bold"
-            sx={{ 
+            sx={{
               mb: 3,
               position: "relative",
               display: "inline-block",
@@ -786,15 +799,15 @@ export const CulturalsView = ({
                 .slice(0, 2) // Only show winner and runner-up
                 .map((winner, idx) => {
                   const position = idx === 0 ? "winner" : "runnerup";
-                  
+
                   // Get team or participant info based on teamId
                   const team = activity.teams?.find(t => t.id === winner.teamId);
                   const participants = activity.getTeamParticipants(winner.teamId);
                   const participant = participants?.length > 0 ? participants[0] : null;
-                  
+
                   const isTeam = team && participants?.length > 1;
                   const displayName = isTeam ? team.name : (participant?.name || "Unknown Participant");
-                  
+
                   const positionLabels = {
                     "winner": "Winner",
                     "runnerup": "Runner Up"
@@ -808,14 +821,14 @@ export const CulturalsView = ({
                       key={winner.teamId || idx}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ 
-                        duration: 0.4, 
+                      transition={{
+                        duration: 0.4,
                         delay: idx * 0.1,
                         type: "spring",
                         stiffness: 100
                       }}
-                      whileHover={{ 
-                        y: -5, 
+                      whileHover={{
+                        y: -5,
                         boxShadow: theme.shadows[position === "winner" ? 8 : 5],
                         transition: { duration: 0.2 }
                       }}
@@ -823,18 +836,18 @@ export const CulturalsView = ({
                       <WinnerPosition placed={position}>
                         {idx === 0 ? "1st" : "2nd"}
                       </WinnerPosition>
-                      
+
                       <WinnerAvatarContainer
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.2 }}
                       >
                         <WinnerCrown show={position === "winner"} />
-                        
+
                         {isTeam ? (
                           <WinnerTeamBadge placed={position}>
-                            <Typography 
-                              variant="h6" 
-                              sx={{ 
+                            <Typography
+                              variant="h6"
+                              sx={{
                                 fontWeight: "bold",
                                 color: "#fff",
                                 textShadow: "0 1px 3px rgba(0,0,0,0.4)",
@@ -853,14 +866,14 @@ export const CulturalsView = ({
                           />
                         )}
                       </WinnerAvatarContainer>
-                      
+
                       <Box sx={{ flex: 1 }}>
-                        <Typography 
-                          variant="subtitle1" 
-                          sx={{ 
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
                             fontWeight: 600,
                             fontSize: { xs: '0.95rem', sm: '1rem' },
-                            color: position === "winner" 
+                            color: position === "winner"
                               ? theme.palette.mode === "dark" ? alpha('#FFD700', 0.9) : theme.palette.warning.dark
                               : theme.palette.text.primary,
                             overflow: "hidden",
@@ -878,10 +891,10 @@ export const CulturalsView = ({
                             />
                           )}
                         </Typography>
-                        
+
                         {participant?.college && (
-                          <Typography 
-                            variant="caption" 
+                          <Typography
+                            variant="caption"
                             color="text.secondary"
                             sx={{
                               fontSize: '0.7rem',
@@ -896,18 +909,18 @@ export const CulturalsView = ({
                           </Typography>
                         )}
                       </Box>
-                      
-                      <CompactChip 
-                        label={positionLabels[position]} 
+
+                      <CompactChip
+                        label={positionLabels[position]}
                         color={position === "winner" ? "warning" : "default"}
-                        sx={{ 
-                          bgcolor: position === "winner" 
+                        sx={{
+                          bgcolor: position === "winner"
                             ? theme.palette.mode === 'dark' ? alpha('#FFD700', 0.2) : alpha('#FFD700', 0.7)
                             : theme.palette.mode === 'dark' ? alpha('#C0C0C0', 0.2) : alpha('#C0C0C0', 0.7),
-                          color: position === "winner" 
+                          color: position === "winner"
                             ? theme.palette.mode === 'dark' ? alpha('#FFD700', 0.9) : "rgba(0,0,0,0.8)"
                             : theme.palette.text.primary,
-                        }} 
+                        }}
                       />
                     </WinnerCard>
                   );
@@ -1045,11 +1058,11 @@ export const CulturalsView = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <Typography 
-          variant="h5" 
-          component="h2" 
+        <Typography
+          variant="h5"
+          component="h2"
           fontWeight="bold"
-          sx={{ 
+          sx={{
             mb: 4,
             position: "relative",
             display: "inline-block",
@@ -1069,11 +1082,11 @@ export const CulturalsView = ({
         </Typography>
 
         {(!activity.participants || activity.participants.length === 0) ? (
-          <Box 
-            sx={{ 
-              textAlign: "center", 
-              py: 6, 
-              px: 2, 
+          <Box
+            sx={{
+              textAlign: "center",
+              py: 6,
+              px: 2,
               background: alpha(theme.palette.background.paper, isDarkMode ? 0.4 : 0.6),
               borderRadius: 2,
               border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.1 : 0.05)}`,
@@ -1084,7 +1097,7 @@ export const CulturalsView = ({
             </Typography>
           </Box>
         ) : (
-          <Box sx={{ 
+          <Box sx={{
             display: "flex",
             flexDirection: "column",
             maxWidth: "100%",
@@ -1092,19 +1105,19 @@ export const CulturalsView = ({
             {/* Teams section - only display if there are teams */}
             {activity.teams && activity.teams.length > 0 ? (
               <Box sx={{ mb: 4 }}>
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
-                    mb: 2, 
-                    color: theme.palette.mode === "dark" 
-                      ? alpha(theme.palette.primary.light, 0.9) 
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mb: 2,
+                    color: theme.palette.mode === "dark"
+                      ? alpha(theme.palette.primary.light, 0.9)
                       : theme.palette.primary.main,
                     fontWeight: 600,
                   }}
                 >
                   Teams
                 </Typography>
-                
+
                 {activity.teams.map((team, idx) => (
                   <TeamCard
                     key={team.id || idx}
@@ -1112,30 +1125,35 @@ export const CulturalsView = ({
                     whileHover={{ x: 5 }}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ 
-                      duration: 0.4, 
+                    transition={{
+                      duration: 0.4,
                       delay: idx * 0.1,
                       type: "spring",
                       stiffness: 100,
                     }}
                   >
                     <TeamAvatar>
-                      <Typography 
-                        variant="h5" 
-                        sx={{ 
-                          fontWeight: "bold", 
-                          color: "#fff",
-                          textShadow: "0 2px 4px rgba(0,0,0,0.3)",
+                      <Avatar
+                        sx={{
+                          fontSize: 24,
+                          fontWeight: 'bold',
+                          backgroundColor: "transparent",
                         }}
                       >
-                        {team.name.substring(0, 2).toUpperCase()}
-                      </Typography>
+                        {team.name.trim().split(" ").length === 1
+                          ? team.name.substring(0, 2).toUpperCase()
+                          : team.name
+                            .split(" ")
+                            .map((word) => word.charAt(0))
+                            .join("")
+                            .toUpperCase()}
+                      </Avatar>
                     </TeamAvatar>
-                    
+
                     <PerformerInfo>
-                      <Typography 
-                        variant="h6" 
-                        sx={{ 
+                      <Typography
+                        variant="h6"
+                        sx={{
                           fontWeight: 600,
                           mb: 0.5,
                           display: "flex",
@@ -1144,11 +1162,11 @@ export const CulturalsView = ({
                       >
                         {team.name}
                       </Typography>
-                      
-                      <Typography 
-                        variant="body2" 
+
+                      <Typography
+                        variant="body2"
                         color="text.secondary"
-                        sx={{ 
+                        sx={{
                           display: "flex",
                           alignItems: "center",
                           gap: 0.5,
@@ -1170,8 +1188,8 @@ export const CulturalsView = ({
                     whileHover={{ x: 5 }}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ 
-                      duration: 0.4, 
+                    transition={{
+                      duration: 0.4,
                       delay: idx * 0.1,
                       type: "spring",
                       stiffness: 100,
@@ -1182,22 +1200,22 @@ export const CulturalsView = ({
                       alt={participant.name}
                       src={participant.profilePic}
                     />
-                    
+
                     <PerformerInfo>
-                      <Typography 
-                        variant="subtitle1" 
-                        sx={{ 
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
                           fontWeight: 600,
                           mb: 0.5,
                         }}
                       >
                         {participant.name}
                       </Typography>
-                      
-                      <Typography 
-                        variant="caption" 
+
+                      <Typography
+                        variant="caption"
                         color="text.secondary"
-                        sx={{ 
+                        sx={{
                           display: "block",
                         }}
                       >
@@ -1210,7 +1228,7 @@ export const CulturalsView = ({
             )}
           </Box>
         )}
-        
+
         {/* Team Detail Dialog */}
         <AnimatePresence>
           {selectedTeam && (
@@ -1234,39 +1252,39 @@ export const CulturalsView = ({
                 }
               }}
             >
-              <Box 
-                sx={{ 
-                  display: "flex", 
-                  justifyContent: "flex-end", 
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
                   position: "absolute",
                   top: 8,
                   right: 8,
                   zIndex: 10
                 }}
               >
-                <IconButton 
+                <IconButton
                   onClick={handleCloseTeam}
-                  sx={{ 
-                    bgcolor: isDarkMode 
-                      ? alpha(theme.palette.background.paper, 0.7) 
+                  sx={{
+                    bgcolor: isDarkMode
+                      ? alpha(theme.palette.background.paper, 0.7)
                       : "rgba(255,255,255,0.8)",
-                    "&:hover": { 
-                      bgcolor: isDarkMode 
-                        ? alpha(theme.palette.background.paper, 0.9) 
-                        : "rgba(255,255,255,0.95)" 
+                    "&:hover": {
+                      bgcolor: isDarkMode
+                        ? alpha(theme.palette.background.paper, 0.9)
+                        : "rgba(255,255,255,0.95)"
                     },
                   }}
                 >
                   <CloseIcon />
                 </IconButton>
               </Box>
-              
-              <PerformerDialogContent sx={{ 
+
+              <PerformerDialogContent sx={{
                 pt: { xs: 5, sm: 4 },
                 px: { xs: 2, sm: 4 },
                 pb: { xs: 3, sm: 4 }
               }}>
-                <Box 
+                <Box
                   sx={{
                     textAlign: "center",
                     position: "relative",
@@ -1294,7 +1312,6 @@ export const CulturalsView = ({
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                         mx: "auto",
                         mb: 2,
                         boxShadow: `0 16px 40px ${alpha(theme.palette.common.black, 0.25)}`,
@@ -1303,15 +1320,21 @@ export const CulturalsView = ({
                       }}
                     >
                       <Typography variant="h3" sx={{ color: "#fff", fontWeight: "bold" }}>
-                        {selectedTeam.name.substring(0, 2).toUpperCase()}
+                        {selectedTeam.name.trim().split(" ").length === 1
+                          ? selectedTeam.name.substring(0, 2).toUpperCase()
+                          : selectedTeam.name
+                            .split(" ")
+                            .map((word) => word.charAt(0))
+                            .join("")
+                            .toUpperCase()}
                       </Typography>
                     </Box>
                   </Zoom>
-                  
+
                   <Fade in={true} timeout={600}>
-                    <Typography 
-                      variant={isMobile ? "h5" : "h4"} 
-                      component="h3" 
+                    <Typography
+                      variant={isMobile ? "h5" : "h4"}
+                      component="h3"
                       fontWeight="bold"
                       sx={{ mb: 1 }}
                     >
@@ -1319,13 +1342,13 @@ export const CulturalsView = ({
                     </Typography>
                   </Fade>
                 </Box>
-                
+
                 <Fade in={true} timeout={800}>
                   <Box sx={{ position: "relative" }}>
-                    <Typography 
-                      variant="h6" 
-                      sx={{ 
-                        mb: 2, 
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        mb: 2,
                         fontWeight: 600,
                         position: "relative",
                         display: "inline-block",
@@ -1343,8 +1366,8 @@ export const CulturalsView = ({
                     >
                       Team Members
                     </Typography>
-                    
-                    <Box 
+
+                    <Box
                       component={motion.div}
                       sx={{ mb: 3 }}
                       initial="hidden"
@@ -1374,7 +1397,7 @@ export const CulturalsView = ({
                               p: 2,
                               mb: 2,
                               borderRadius: 2,
-                              bgcolor: isDarkMode 
+                              bgcolor: isDarkMode
                                 ? alpha(theme.palette.background.default, 0.4)
                                 : alpha(theme.palette.background.paper, 0.7),
                               border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.2 : 0.1)}`,
@@ -1393,9 +1416,9 @@ export const CulturalsView = ({
                             <Avatar
                               src={member.profilePic}
                               alt={member.name}
-                              sx={{ 
-                                mr: 2, 
-                                width: 60, 
+                              sx={{
+                                mr: 2,
+                                width: 60,
                                 height: 60,
                                 border: `3px solid ${alpha(theme.palette.primary.main, 0.2)}`,
                               }}
@@ -1407,16 +1430,16 @@ export const CulturalsView = ({
                               <Typography variant="caption" color="text.secondary">
                                 {member.usn} • {member.branch || 'Department not specified'}
                               </Typography>
-                              <Typography 
-                                variant="caption" 
-                                sx={{ 
-                                  display: "block", 
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  display: "block",
                                   mt: 0.5,
                                   color: theme.palette.primary.main,
                                   fontWeight: 500
                                 }}
                               >
-                                {member.college || "Jain University"}
+                                {member.college}
                               </Typography>
                             </Box>
                           </Paper>
@@ -1425,15 +1448,15 @@ export const CulturalsView = ({
                     </Box>
                   </Box>
                 </Fade>
-                
+
                 <Box sx={{ flex: 1 }}></Box>
-                
-                <Typography 
-                  variant="caption" 
-                  color="text.secondary" 
-                  sx={{ 
-                    textAlign: "center", 
-                    mt: 3, 
+
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    textAlign: "center",
+                    mt: 3,
                     display: "block",
                     opacity: 0.7
                   }}
