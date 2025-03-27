@@ -1,136 +1,244 @@
-import { styled, Box, Typography, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Chip, Avatar } from "@mui/material";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import GroupsIcon from '@mui/icons-material/Groups';
+import PersonIcon from '@mui/icons-material/Person';
+import { Avatar, Box, Chip, Collapse, Divider, Fade, Grow, List, ListItem, ListItemAvatar, ListItemText, Paper, Typography, Zoom, styled, useTheme } from "@mui/material";
+import React from "react"; // Import React for useState
 
 const Section = styled(Box)(({ theme }) => ({
-    marginTop: theme.spacing(4),
+  marginTop: theme.spacing(3), // Reduced margin
 }));
 
-const WinnerCard = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(2),
-  display: 'flex',
-  alignItems: 'center',
+// Simplified Winner Card - rely on default Paper styles + border for rank
+const WinnerCard = styled(Paper)<{ rank: number }>(({ theme, rank }) => {
+  const rankInfo = getRankColor(theme, rank); // Pass theme here
+  return {
+    padding: theme.spacing(1.5, 2), // Adjusted padding
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: theme.spacing(1.5),
+    borderRadius: theme.shape.borderRadius,
+    borderLeft: `4px solid ${rankInfo.color}`, // Use border for rank indication
+    // Removed hover effects for simplicity
+  };
+});
+
+const SectionHeading = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius,
-  transition: 'transform 0.2s',
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: theme.shadows[4],
-  }
+  fontWeight: 600, // Slightly bolder
 }));
 
-const getRankColor = (rank) => {
+// Pass theme to getRankColor to access palette
+const getRankColor = (theme, rank) => {
   switch (rank) {
     case 1: return { color: '#FFD700', label: '1st Place' }; // Gold
     case 2: return { color: '#C0C0C0', label: '2nd Place' }; // Silver
     case 3: return { color: '#CD7F32', label: '3rd Place' }; // Bronze
-    default: return { color: '#A0A0A0', label: `${rank}th Place` }; // Gray for others
+    default: return { color: theme.palette.text.disabled, label: `${rank}th Place` }; // Use theme color
   }
 };
 
 // Tech Activity View
 export const TechView = ({ activity }) => {
-    const winners = activity.winners || [];
-    const hasWinners = winners.length > 0;
-    
-    const getParticipantOrTeamName = (teamId) => {
-      // For solo performance, look for participant by USN
-      if (activity.isSoloPerformance) {
-        const participant = activity.participants?.find(p => p.usn === teamId);
-        return participant ? participant.name : 'Unknown Participant';
-      }
-      
-      // For team performance, find team name
-      const team = activity.teams?.find(t => t.id === teamId);
-      return team ? team.name : 'Unknown Team';
-    };
-    
-    return (
-      <Box>
+  const theme = useTheme();
+  const winners = activity.winners || [];
+  const hasWinners = winners.length > 0;
+  const participants = activity.participants || [];
+  const teams = activity.teams || [];
+  const isTeamEvent = !activity.isSoloPerformance && teams.length > 0;
+
+  const [openTeamId, setOpenTeamId] = React.useState<string | null>(null);
+
+  const handleTeamClick = (teamId: string) => {
+    setOpenTeamId(openTeamId === teamId ? null : teamId);
+  };
+
+  // Get full details of a participant or team based on ID
+  const getParticipantOrTeamDetails = (teamId) => {
+    if (activity.isSoloPerformance) {
+      const participant = participants.find(p => p.usn === teamId);
+      return participant ? {
+        name: participant.name,
+        college: participant.college,
+        usn: participant.usn,
+        branch: participant.branch,
+        isSolo: true
+      } : { name: 'Unknown Participant', isSolo: true };
+    }
+    const team = teams.find(t => t.id === teamId);
+    if (team) {
+      // Ensure participants have teamId property before filtering
+      const teamMembers = participants.filter(p => 'teamId' in p && p.teamId === team.id);
+      return {
+        name: team.name,
+        members: teamMembers,
+        isSolo: false
+      };
+    }
+    return { name: 'Unknown Team', isSolo: false };
+  };
+
+  const getTeamMembers = (teamId: string) => {
+    // Ensure participants have teamId property before filtering
+    return participants.filter(p => 'teamId' in p && p.teamId === teamId);
+  }
+
+  return (
+    <Box>
+      {/* Activity Details Section - Simplified */}
+      <Fade in={true} timeout={500}>
         <Section>
-          <Typography variant="h5" component="h2" fontWeight="bold" sx={{ mb: 2 }}>
-            Activity Details
-          </Typography>
-          <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Typography variant="body1">
-              Immerse yourself in this tech-focused activity featuring innovative challenges and learning experiences.
-            </Typography>
+          <Paper sx={{ p: 2, borderRadius: 1, mb: 3 }} variant="outlined">
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              <Chip
+                icon={<GroupsIcon fontSize="small" />}
+                label={activity.isSoloPerformance ? "Solo Event" : "Team Event"}
+                size="small"
+                variant="outlined"
+              />
+              <Chip
+                icon={<PersonIcon fontSize="small" />}
+                label={`${participants.length} Participants`}
+                size="small"
+                variant="outlined"
+              />
+              {isTeamEvent && (
+                <Chip
+                  icon={<GroupsIcon fontSize="small" />}
+                  label={`${teams.length} Teams`}
+                  size="small"
+                  variant="outlined"
+                />
+              )}
+            </Box>
           </Paper>
         </Section>
-        
-        {/* Winners Section */}
-        {hasWinners && (
+      </Fade>
+
+      {/* Winners Section - Simplified */}
+      {hasWinners && (
+        <Zoom in={true} style={{ transitionDelay: '100ms' }}>
           <Section>
-            <Typography variant="h5" component="h2" fontWeight="bold" sx={{ 
-              mb: 2, 
-              display: 'flex', 
-              alignItems: 'center' 
-            }}>
+            <SectionHeading variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
               <EmojiEventsIcon sx={{ mr: 1, color: 'gold' }} />
               Winners
-            </Typography>
-            
-            {winners
-              .sort((a, b) => a.rank - b.rank)
-              .map((winner) => {
-                const rankInfo = getRankColor(winner.rank);
-                return (
-                  <WinnerCard key={winner.teamId} elevation={winner.rank === 1 ? 3 : 1}>
-                    <Avatar 
-                      sx={{ 
-                        bgcolor: rankInfo.color, 
-                        color: '#000', 
-                        fontWeight: 'bold',
-                        width: 40, 
-                        height: 40,
-                        mr: 2
-                      }}
+            </SectionHeading>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              {winners
+                .sort((a, b) => a.rank - b.rank)
+                .map((winner, index) => {
+                  const rankInfo = getRankColor(theme, winner.rank); // Pass theme
+                  const details = getParticipantOrTeamDetails(winner.teamId);
+
+                  return (
+                    <Grow
+                      in={true}
+                      key={winner.teamId}
+                      style={{ transformOrigin: '0 0 0', transitionDelay: `${index * 50}ms` }}
                     >
-                      {winner.rank}
-                    </Avatar>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="h6">
-                        {getParticipantOrTeamName(winner.teamId)}
-                      </Typography>
-                      <Chip 
-                        label={rankInfo.label}
-                        size="small"
-                        sx={{ 
-                          bgcolor: rankInfo.color, 
-                          color: '#000',
-                          fontWeight: 'bold' 
-                        }}
-                      />
-                    </Box>
-                  </WinnerCard>
-                );
-              })}
+                      <WinnerCard
+                        variant="outlined" // Use outlined variant
+                        rank={winner.rank}
+                      >
+                        <Avatar
+                          sx={{
+                            bgcolor: rankInfo.color,
+                            color: theme.palette.getContrastText(rankInfo.color),
+                            mr: 1.5, // Adjusted margin
+                            width: 32, height: 32, // Smaller avatar
+                            fontSize: '0.875rem',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {winner.rank}
+                        </Avatar>
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography variant="body1" fontWeight="medium">
+                            {details.name}
+                          </Typography>
+                          {details.isSolo && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              {details.college || 'Unknown College'}
+                              {details.usn && ` - ${details.usn.toUpperCase()}`}
+                            </Typography>
+                          )}
+                          {!details.isSolo && details.members && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              Team ({details.members.length} members)
+                            </Typography>
+                          )}
+                        </Box>
+                        <Chip
+                          label={rankInfo.label}
+                          size="small"
+                          sx={{
+                            bgcolor: rankInfo.color,
+                            color: theme.palette.getContrastText(rankInfo.color),
+                            fontWeight: 'medium',
+                            ml: 1
+                          }}
+                        />
+                      </WinnerCard>
+                    </Grow>
+                  );
+                })}
+            </Box>
           </Section>
-        )}
-        
-        {/* For tech activities like coding or hackathons */}
-        <Section>
-          <Typography variant="h5" component="h2" fontWeight="bold" sx={{ mb: 2 }}>
-            Participants
-          </Typography>
-          <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>USN</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {activity.participants?.map((participant, idx) => (
-                  <TableRow key={participant.usn || idx}>
-                    <TableCell>{participant.name}</TableCell>
-                    <TableCell>{participant.usn.toUpperCase()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Section>
-      </Box>
-    );
-  };
+        </Zoom>
+      )}
+
+      {/* Teams Section (Only for Team Events) */}
+      {isTeamEvent && (
+        <Fade in={true} timeout={700} style={{ transitionDelay: '200ms' }}>
+          <Section>
+            <SectionHeading variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+              <GroupsIcon sx={{ mr: 1, color: 'action.active' }} />
+              Teams
+            </SectionHeading>
+            <Paper variant="outlined" sx={{ borderRadius: 1 }}>
+              <List dense disablePadding>
+                {teams.map((team, index) => {
+                  const members = getTeamMembers(team.id);
+                  const isOpen = openTeamId === team.id;
+                  return (
+                    <React.Fragment key={team.id}>
+                      <ListItem onClick={() => handleTeamClick(team.id)}>
+                        <ListItemText
+                          primary={team.name}
+                          secondary={`${members.length} member${members.length !== 1 ? 's' : ''}`}
+                        />
+                        {isOpen ? <ExpandLess /> : <ExpandMore />}
+                      </ListItem>
+                      <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                        <List disablePadding dense sx={{ pl: 4 }}>
+                          {members.map((member) => (
+                            <ListItem key={member.usn}>
+                              <ListItemAvatar sx={{ minWidth: 32 }}>
+                                <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
+                                  {member.name.charAt(0)}
+                                </Avatar>
+                              </ListItemAvatar>
+                              <ListItemText
+                                primary={member.name}
+                                secondary={`${member.usn?.toUpperCase()} ${member.branch && member.college ? ' • ' : ''} ${member.branch ? member.branch : ''} ${member.branch && member.college ? '•' : ''} ${member.college ? member.college : ''}`}
+                                primaryTypographyProps={{ variant: 'body2' }}
+                                secondaryTypographyProps={{ variant: 'caption' }}
+                              />
+
+                            </ListItem>
+                          ))}
+                        </List>
+                      </Collapse>
+                      {index < teams.length - 1 && <Divider />}
+                    </React.Fragment>
+                  );
+                })}
+              </List>
+            </Paper>
+          </Section>
+        </Fade>
+      )}
+    </Box>
+  );
+};
