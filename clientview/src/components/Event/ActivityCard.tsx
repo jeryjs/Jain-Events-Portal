@@ -743,7 +743,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                       </Box>
                     </>
                   ) : status === 'completed' ? (
-                    <Box sx={{ textAlign: 'center', py: 2, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider', borderRadius: 1 }}><Typography color="text.secondary" variant="body2">Winners to be announced</Typography></Box>
+                    <Box sx={{ textAlign: 'center', py: 2, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider', borderRadius: 1 }}><Typography color="text.secondary" variant="body2">Results to be announced</Typography></Box>
                   ) : null}
                 </>
               )}
