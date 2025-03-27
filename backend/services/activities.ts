@@ -113,7 +113,7 @@ export const deleteActivity = async (eventId: string, activityId: string) => {
 /*
  * Invalidate cache for activities
  */
-export const invalidateActgivitiesCache = async () => {
+export const invalidateActivitiesCache = async () => {
   cache.keys().forEach(key => {
     if (key.startsWith('activities-')) {
       cache.del(key);
