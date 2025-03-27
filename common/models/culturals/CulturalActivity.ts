@@ -35,7 +35,7 @@ class CulturalActivity extends Activity {
     if (!best) return null;
     if (this.isSoloPerformance) {
       // For solo events, assume pollData.teamId represents the participant's usn; customize the name as needed.
-      return { teamId: best.teamId, name: this.participants.find(p => p.usn === best.teamId)?.name || "Unknown Participant" };
+      return { teamId: best.teamId, name: this.participants.find(p => p.usn.trim() === best.teamId.trim())?.name || "Unknown Participant" };
     }
     // For team events, look up the team by id and return its info; if not found, provide default values.
     return { teamId: best.teamId, name: this.teams.find(t => t.id === best.teamId)?.name || "Unknown Team" };

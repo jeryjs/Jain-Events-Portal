@@ -785,7 +785,7 @@ export const CulturalsView = ({
                   const position = idx === 0 ? "winner" : "runnerup";
 
                   // Get team or participant info based on teamId
-                  const team = activity.teams?.find(t => t.id === winner.teamId);
+                  const team = activity.teams?.find(t => t.id.trim() === winner.teamId.trim());
                   const participants = activity.getTeamParticipants(winner.teamId);
                   const participant = participants?.length > 0 ? participants[0] : null;
 
