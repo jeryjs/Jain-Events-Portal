@@ -124,6 +124,7 @@ export const useActivities = (eventId: string) => {
 		queryFn: () => _fetchActivities(eventId),
 		// staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchInterval: (data) => {
+			return false	// Disable refetching for now
 			if (!data || !data.state.data) return false;
 
 			// Check if any activities are ongoing
@@ -149,6 +150,7 @@ export const useActivity = (eventId: string, activityId: string) => {
 		// staleTime: 1000 * 60 * 5, // 5 minutes
 		enabled: !!eventId && !!activityId,
 		refetchInterval: (data) => {
+			return false	// Disable refetching for now
 			if (!data || !data.state.data) return false;
 
 			// Check if this specific activity is ongoing
