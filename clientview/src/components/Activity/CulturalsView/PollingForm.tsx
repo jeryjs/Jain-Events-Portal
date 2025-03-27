@@ -471,35 +471,39 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
             </AnimatePresence>
 
             {/* Authentication and Voting Info */}
-            <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 0.5,
-                    mt: 1,
-                    p: 1.5,
-                    borderRadius: 1,
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
-                    border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
-                    cursor: (!isAuthenticated && activity.canVote) ? 'pointer' : 'default',
-                    transition: 'all 0.2s ease',
-                    '&:hover': (!isAuthenticated && activity.canVote) ? {
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
-                        color: theme.palette.primary.main
-                    } : {}
-                }}
-                onClick={(!isAuthenticated && activity.canVote) ? promptLogin : undefined}
-            >
-                <LockIcon sx={{ fontSize: 16 }} />
-                {activity.canVote
-                    ? (!isAuthenticated ? "Sign in to cast your vote!" : "You can cast your vote")
-                    : activity.startTime > new Date()
+            {((!isAuthenticated && activity.canVote) || !activity.canVote || activity.startTime > new Date()) && (
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 0.5,
+                        mt: 1,
+                        p: 1.5,
+                        borderRadius: 1,
+                        bgcolor: alpha(theme.palette.primary.main, 0.05),
+                        border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
+                        cursor: (!isAuthenticated && activity.canVote) ? 'pointer' : 'default',
+                        transition: 'all 0.2s ease',
+                        '&:hover': (!isAuthenticated && activity.canVote)
+                            ? {
+                                  bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                  color: theme.palette.primary.main,
+                              }
+                            : {},
+                    }}
+                    onClick={(!isAuthenticated && activity.canVote) ? promptLogin : undefined}
+                >
+                    <LockIcon sx={{ fontSize: 16 }} />
+                    {(!isAuthenticated && activity.canVote)
+                        ? "Sign in to cast your vote!"
+                        : activity.startTime > new Date()
                         ? `Voting starts ${activity.relativeStartTime}`
                         : "Voting is closed!"}
-            </Typography>
+                </Typography>
+            )}
         </PollContainer>
     );
 };
