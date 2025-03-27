@@ -23,8 +23,23 @@ class CulturalActivity extends models_1.Activity {
     get canVote() {
         return this.showPoll && this.startTime <= new Date() && (!this.endTime || this.endTime >= new Date());
     }
+    get audienceChoice() {
+        var _a, _b;
+        const best = this.pollData.reduce((prev, curr) => (curr.votes.length > prev.votes.length ? curr : prev), this.pollData[0] || { teamId: '', votes: [] });
+        if (!best)
+            return null;
+        if (this.isSoloPerformance) {
+            // For solo events, assume pollData.teamId represents the participant's usn; customize the name as needed.
+            return { teamId: best.teamId, name: ((_a = this.participants.find(p => p.usn === best.teamId)) === null || _a === void 0 ? void 0 : _a.name) || "Unknown Participant" };
+        }
+        // For team events, look up the team by id and return its info; if not found, provide default values.
+        return { teamId: best.teamId, name: ((_b = this.teams.find(t => t.id === best.teamId)) === null || _b === void 0 ? void 0 : _b.name) || "Unknown Team" };
+    }
     getParticipantTeam(usn) {
-        return this.teams.find(team => team.id === usn);
+        if (this.isSoloPerformance) {
+            return null;
+        }
+        return this.teams.find(t => this.getTeamParticipants(t.id).some(p => p.usn === usn)) || null;
     }
     getTeamParticipants(teamId) {
         // Type guard to check if a participant is a TeamParticipant
