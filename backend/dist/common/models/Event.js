@@ -34,8 +34,6 @@ class Event {
                     type: 'image'
                 }];
         }
-        // Ensure each banner item has a type
-        banner = banner.map(item => (Object.assign(Object.assign({}, item), { type: item.type || 'image' })));
         return new Event(data.id || "", data.name || "", data.type || constants_1.EventType.GENERAL, data.timings || [], data.description || "", data.venue || "", data.galleryLink || "", banner);
     }
     toJSON() {

@@ -44,12 +44,6 @@ export default class Event {
 			}];
 		}
 		
-		// Ensure each banner item has a type
-		banner = banner.map(item => ({
-			...item,
-			type: item.type || 'image'
-		}));
-		
 		return new Event(
 			data.id || "",
 			data.name || "",
