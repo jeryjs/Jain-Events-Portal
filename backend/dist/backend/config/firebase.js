@@ -40,7 +40,7 @@ const sendPushNotificationToAllUsers = (title, body, imageUrl, options) => __awa
             link: (options === null || options === void 0 ? void 0 : options.link) || '',
             timestamp: Date.now().toString(),
         },
-        topic: process.env.NODE_ENV === "development" ? 'all-users-test' : 'all-users',
+        topic: (process.env.VERCEL_ENV == "preview" || process.env.NODE_ENV === "development") ? 'all-users-test' : 'all-users',
     };
     try {
         yield exports.messaging.send(message);

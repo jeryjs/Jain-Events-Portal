@@ -42,7 +42,7 @@ export const sendPushNotificationToAllUsers = async (
       link: options?.link || '',
       timestamp: Date.now().toString(),
     },
-    topic: process.env.NODE_ENV === "development" ? 'all-users-test' : 'all-users',
+    topic: (process.env.VERCEL_ENV == "preview" || process.env.NODE_ENV === "development") ? 'all-users-test' : 'all-users',
   };
 
   try {
