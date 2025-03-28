@@ -1,20 +1,21 @@
-import { Suspense, useEffect, useState } from 'react';
+import AddIcon from '@mui/icons-material/Add';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
 import EditIcon from '@mui/icons-material/Edit';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ImageIcon from '@mui/icons-material/Image';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import {
-  Box, Button, CircularProgress,
-  IconButton, MenuItem, Fade,
-  Paper, Select, TextField, Typography, 
-  Tabs, Tab, Stack, FormControlLabel, Switch, Chip
+  Box, Button,
+  Chip,
+  CircularProgress,
+  Fade,
+  IconButton, MenuItem,
+  Paper, Select, TextField, Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -22,11 +23,12 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import dayjs from 'dayjs';
+import { Suspense, useEffect, useState } from 'react';
 
 import { EventType } from '@common/constants';
 import { BannerItem, Event } from '@common/models';
-import { ActivityButton } from './ActivityButton';
 import { getAllBaseEventTypes } from '@common/utils';
+import { ActivityButton } from './ActivityButton';
 
 const EventTypeInput = styled(Box)`
   position: absolute; bottom: 0; left: 0;
@@ -92,7 +94,7 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
 
   // Utility to update formData
   const editFormData = (key: string, value: any) => {
-    setFormData(prev => ({...prev, [key]: value }));
+    setFormData(prev => ({ ...prev, [key]: value }));
   };
 
   // Handle form submission
@@ -123,9 +125,9 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
   };
 
   // Get the current banner item or a default
-  const currentBannerItem: BannerItem = formData.banner && 
-    formData.banner.length > 0 && 
-    currentBannerIndex < formData.banner.length ? 
+  const currentBannerItem: BannerItem = formData.banner &&
+    formData.banner.length > 0 &&
+    currentBannerIndex < formData.banner.length ?
     formData.banner[currentBannerIndex] : { type: 'image' };
 
   // Add a new banner item
@@ -139,11 +141,11 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
   // Update the current banner item
   const updateCurrentBannerItem = (updates: Partial<BannerItem>) => {
     if (!formData.banner || currentBannerIndex >= formData.banner.length) return;
-    
+
     const updatedBanner = [...formData.banner];
-    updatedBanner[currentBannerIndex] = { 
-      ...updatedBanner[currentBannerIndex], 
-      ...updates 
+    updatedBanner[currentBannerIndex] = {
+      ...updatedBanner[currentBannerIndex],
+      ...updates
     };
     editFormData('banner', updatedBanner);
   };
@@ -151,7 +153,7 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
   // Remove the current banner item
   const removeCurrentBannerItem = () => {
     if (!formData.banner || formData.banner.length <= 1) return;
-    
+
     const updatedBanner = formData.banner.filter((_, index) => index !== currentBannerIndex);
     editFormData('banner', updatedBanner);
     setCurrentBannerIndex(Math.min(currentBannerIndex, updatedBanner.length - 1));
@@ -162,10 +164,14 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
     if (!item.url) {
       return (
         <Box
+          onClick={(e) => {
+            setIsImageEditOpen(!isImageEditOpen);
+          }}
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
+            cursor: 'pointer'
           }}
         >
           <AddPhotoAlternateIcon sx={{ fontSize: 48, color: '#999999' }} />
@@ -247,10 +253,8 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: 'pointer',
             overflow: 'hidden'
           }}
-          onClick={() => setIsImageEditOpen(!isImageEditOpen)}
         >
           {renderBannerPreview(currentBannerItem)}
 
@@ -260,6 +264,7 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
               required
               variant='filled'
               value={formData.type}
+              onClick={(e) => e.stopPropagation()}
               onChange={(e) => editFormData('type', e.target.value)}
               sx={{
                 bgcolor: 'rgba(255,255,255,0.6)',
@@ -323,60 +328,142 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
             </Box>
           )}
 
-          {/* Image Edit Overlay */}
+          {/* Left/Right Navigation Buttons for Banner */}
+          {formData.banner && formData.banner.length > 1 && (
+            <>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentBannerIndex((prev) =>
+                    prev === 0 ? formData.banner.length - 1 : prev - 1
+                  );
+                }}
+                sx={{
+                  position: 'absolute',
+                  left: 16,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  bgcolor: 'rgba(0,0,0,0.2)',
+                  color: 'white',
+                  zIndex: 2,
+                  '&:hover': {
+                    bgcolor: 'rgba(0,0,0,0.4)',
+                  },
+                }}
+              >
+                &#10094;
+              </IconButton>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentBannerIndex((prev) =>
+                    (prev + 1) % formData.banner.length
+                  );
+                }}
+                sx={{
+                  position: 'absolute',
+                  right: 16,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  bgcolor: 'rgba(0,0,0,0.2)',
+                  color: 'white',
+                  zIndex: 2,
+                  '&:hover': {
+                    bgcolor: 'rgba(0,0,0,0.4)',
+                  },
+                }}
+              >
+                &#10095;
+              </IconButton>
+            </>
+          )}
+
+          {/* Banner Edit Overlay (replaces Dialog) */}
           <Fade in={isImageEditOpen} timeout={300}>
             <Box
+              onClick={(e) => e.stopPropagation()}
               sx={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 width: '100%',
                 height: '100%',
-                bgcolor: 'rgba(0, 0, 0, 0.5)',
+                bgcolor: 'rgba(0, 0, 0, 0.75)',
+                backdropFilter: 'blur(4px)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: 2,
-                zIndex: 1,
+                zIndex: 10,
+                p: 3,
+                overflow: 'auto',
               }}
             >
-              <Box sx={{ p: 2, bgcolor: 'rgba(255, 255, 255, 0.9)', borderRadius: 2, width: '80%', maxWidth: '500px' }}>
-                <IconButton
-                  aria-label="close"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsImageEditOpen(false);
-                  }}
-                  sx={{
-                    position: 'absolute',
-                    right: 8,
-                    top: 8,
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-                <Typography variant="h6" gutterBottom>
-                  Edit Banner {currentBannerItem.type === 'image' ? 'Image' : 'Video'}
-                </Typography>
+              <Paper
+                sx={{
+                  width: '100%',
+                  maxWidth: 600,
+                  maxHeight: '100%',
+                  overflow: 'auto',
+                  borderRadius: 2,
+                  boxShadow: 10,
+                  p: 3
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Edit Banner {currentBannerItem.type === 'image' ? 'Image' : 'Video'}
+                  </Typography>
+                  <IconButton
+                    aria-label="close"
+                    onClick={() => setIsImageEditOpen(false)}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
 
                 {/* Media Type Selection */}
                 <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Chip 
-                    icon={<ImageIcon />} 
-                    label="Image" 
+                  <Chip
+                    icon={<ImageIcon />}
+                    label="Image"
                     clickable
                     color={currentBannerItem.type === 'image' ? 'primary' : 'default'}
                     onClick={() => updateCurrentBannerItem({ type: 'image' })}
                   />
-                  <Chip 
-                    icon={<VideoLibraryIcon />} 
-                    label="Video" 
+                  <Chip
+                    icon={<VideoLibraryIcon />}
+                    label="Video"
                     clickable
                     color={currentBannerItem.type === 'video' ? 'primary' : 'default'}
                     onClick={() => updateCurrentBannerItem({ type: 'video' })}
                   />
                 </Box>
+
+                {/* Banner Navigation in Overlay */}
+                {formData.banner && formData.banner.length > 1 && (
+                  <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Banner {currentBannerIndex + 1} of {formData.banner.length}
+                    </Typography>
+                    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', gap: 1 }}>
+                      {formData.banner.map((_, index) => (
+                        <Box
+                          key={index}
+                          onClick={() => setCurrentBannerIndex(index)}
+                          sx={{
+                            width: 10,
+                            height: 10,
+                            borderRadius: '50%',
+                            bgcolor: currentBannerIndex === index ? 'primary.main' : 'rgba(0,0,0,0.2)',
+                            cursor: 'pointer',
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
+                )}
 
                 <TextField
                   label={currentBannerItem.type === 'image' ? "Banner Image URL" : "Banner Video URL"}
@@ -400,35 +487,52 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
                   sx={{ mb: 2 }}
                 />
 
+                {/* Preview Section */}
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  Preview
+                </Typography>
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 150,
+                    bgcolor: '#f5f5f5',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 1,
+                    overflow: 'hidden',
+                    mb: 3
+                  }}
+                >
+                  {renderBannerPreview(currentBannerItem)}
+                </Box>
+
                 {/* Banner Item Actions */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
                   <Button
                     startIcon={<DeleteIcon />}
                     color="error"
                     disabled={formData.banner?.length <= 1}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeCurrentBannerItem();
-                    }}
+                    onClick={() => removeCurrentBannerItem()}
+                    variant="outlined"
                   >
                     Remove
                   </Button>
-                  
+
                   <Button
                     startIcon={<AddIcon />}
                     color="primary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addBannerItem();
-                    }}
+                    onClick={() => addBannerItem()}
+                    variant="contained"
                   >
                     Add New
                   </Button>
                 </Box>
-              </Box>
+              </Paper>
             </Box>
           </Fade>
 
+          {/* Edit Button */}
           <IconButton
             sx={{
               position: 'absolute',

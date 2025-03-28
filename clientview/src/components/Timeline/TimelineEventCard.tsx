@@ -125,7 +125,7 @@ const TimelineEventCard: React.FC<TimelineEventCardProps> = ({ event, sx }) => {
         <CardBackground
           style={{
             backgroundImage: `url(${bannerUrl})`,
-            ...event.eventBannerStyles
+            ...event.activeBannerStyles
           }}
         />
         <CardContent>

@@ -32,7 +32,7 @@ export default class Event {
 		});
 	}
 
-	static parse(data: any): Event {
+	static parse(data: any={}): Event {
 		// Make sure banner is always an array with the correct shape
 		let banner = data.banner || [{ type: 'image' }];
 		if (!Array.isArray(banner)) {
@@ -115,7 +115,7 @@ export default class Event {
 			}, {});
 	}
 
-	get eventBannerStyles(): Record<string, string> {
+	get activeBannerStyles(): Record<string, string> {
 		return this.getBannerStyles(this.activeBanner);
 	}
 }

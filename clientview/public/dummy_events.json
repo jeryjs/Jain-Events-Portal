@@ -9,9 +9,12 @@
         ],
         "description": "Get ready for the Culturals Meeting! This is a 3-day event that will be held at Sprintoor from March 13, 2025, at 9:00 AM to March 15, 2025, at 10:00 PM. The event will feature a variety of cultural performances, workshops, and competitions. There will also be food vendors and merchandise stalls. This is a great opportunity to learn about different cultures and meet new people. Don't miss out on this exciting event!",
         "venue": "Sprintoor",
-        "banner": {
+        "banner": [{
             "url": "https://img.pikbest.com/pikbest/pic/00/46/80/05h888piCSsf.jpg"
-        }
+        }, {
+            "url": "https://i.imgur.com/eWqjl2X.mp4",
+            "type": "video"
+        }]
     },
     {
         "id": "sportastica-2025",

@@ -44,7 +44,7 @@ const _fetchEvent = async (eventId: string): Promise<Event> => {
 
 export const useEvents = () => {
 	if (process.env.NODE_ENV === "development") {
-		// return useDummyEvents(20); // Use dummy events for now while testing
+		return useDummyEvents(200); // Use dummy events for now while testing
 	}
 
 	return useQuery({
@@ -56,7 +56,7 @@ export const useEvents = () => {
 
 export const useEvent = (eventId: string) => {
 	if (process.env.NODE_ENV === "development") {
-		// const eventsQuery = useEvents();
+		return useDummyEvent(eventId); // Use dummy event for now while testing
 	}
 
 	return useQuery({
@@ -79,6 +79,20 @@ export const useDummyEvents = (count = 100) => {
 		staleTime: 1000 * 60 * 5, // 5 minutes
 	});
 };
+
+export const useDummyEvent = (eventId: string) => {
+	return useQuery({
+		queryKey: ["dummy-event", eventId],
+		queryFn: async () => {
+			return fetch("/dummy_events.json")
+				.then((res) => res.json())
+				.then((data) => parseEvents(data).find((e) => e.id === eventId))
+				.then((it) => new Promise<typeof it>((resolve) => setTimeout(() => resolve(it), 1000))); // Simulate network delay
+		},
+		staleTime: 1000 * 60 * 5, // 5 minutes
+		refetchOnWindowFocus: true,
+	});
+}
 
 /*
  * Activities API
@@ -116,7 +130,7 @@ const _fetchActivity = async (eventId: string, activityId: string): Promise<Acti
 
 export const useActivities = (eventId: string) => {
 	if (process.env.NODE_ENV === "development") {
-		// return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
+		return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
 	}
 
 	return useQuery({
@@ -140,7 +154,7 @@ export const useActivities = (eventId: string) => {
 
 export const useActivity = (eventId: string, activityId: string) => {
 	if (process.env.NODE_ENV === "development") {
-		// return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
+		return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
 	}
 	// const activitiesQuery = useActivities(eventId);
 

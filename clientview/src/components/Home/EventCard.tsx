@@ -161,7 +161,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
               {isLoading && <Shimmer />}
               <StyledCardMedia
                 sx={{ width: '100%', height: '100%', display: 'block' }}
-                style={event.eventBannerStyles}
+                style={event.activeBannerStyles}
                 image={imageSrc}
                 title={event.name}
               />
@@ -202,7 +202,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
                 ? <Shimmer />
                 : <StyledCardMedia
                   sx={{ height: '100%', display: 'block' }}
-                  style={event.eventBannerStyles}
+                  style={event.activeBannerStyles}
                   image={imageSrc}
                   title={event.name}
                 />

@@ -1,5 +1,5 @@
 import { EventType } from '@common/constants';
-import { BannerItem } from '@common/models/Event';
+import Event, { BannerItem } from '@common/models/Event';
 import { getBaseEventType } from '@common/utils';
 import ActivityCard from '@components/Event/ActivityCard';
 import HighlightsCarousel from '@components/Event/HighlightsCarousel';
@@ -39,11 +39,11 @@ const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
   height: 30vh; min-height: 250px; max-height: 350px; width: 100%; overflow: hidden;
 `);
-const HeroImage = styled('img')(({ theme }) => `
+const HeroImage = styled(motion.img)(({ theme }) => `
   width: 100%; height: 100%; object-fit: cover; border-radius: 0 0 36px 36px;
 `);
-const HeroVideo = styled('video')(({ theme }) => `
-  width: 100%; height: 100%; object-fit: cover; border-radius: 0 0 36px 36px;
+const HeroVideo = styled(motion.video)(({ theme }) => `
+  width: 100%; height: 100%; border-radius: 0 0 36px 36px;
 `);
 const HeroOverlay = styled(Box)(({ theme }) => `
   position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 0 0 36px 36px;
@@ -127,98 +127,84 @@ const getEventTypeInfo = (type: EventType) => {
 const BannerMedia = ({ items }: { items: BannerItem[] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  
-  // Function to handle fullscreen toggle
+  const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartRef = useRef<number | null>(null);
+
+  const currentItem = items[currentIndex];
+  const currentCssStyles = Event.parse().getBannerStyles(currentItem);
+
+  // Toggle fullscreen for video
   const toggleFullscreen = () => {
-    if (!containerRef.current) return;
-    
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().then(() => {
-        setIsFullscreen(true);
-      }).catch((err) => {
-        console.error(`Error attempting to enable fullscreen: ${err.message}`);
-      });
-    } else {
-      document.exitFullscreen().then(() => {
-        setIsFullscreen(false);
-      }).catch((err) => {
-        console.error(`Error attempting to exit fullscreen: ${err.message}`);
-      });
+    if (videoRef.current) {
+      document.fullscreenElement
+        ? document.exitFullscreen()
+        : videoRef.current.requestFullscreen();
     }
   };
-  
-  // Auto rotate banner items
+
+  // Auto switch banner items
   useEffect(() => {
     if (items.length <= 1) return;
-    
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % items.length);
+      const videoElm = containerRef.current.querySelector("video"); 
+      if (videoElm?.ended || videoElm?.paused || !videoElm)
+        setCurrentIndex(prev => (prev + 1) % items.length);
     }, 5000);
-    
     return () => clearInterval(interval);
-  }, [items.length]);
-  
-  // Reset video element when changing items
-  useEffect(() => {
-    if (videoRef.current && items[currentIndex]?.type === 'video') {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
-    }
-  }, [currentIndex, items]);
-  
-  if (!items || items.length === 0) {
+  }, [items, currentIndex]);
+
+  // Touch gesture handlers for navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartRef.current === null) return;
+    const delta = touchStartRef.current - e.changedTouches[0].clientX;
+    if (delta > 50) setCurrentIndex(prev => (prev + 1) % items.length);
+    else if (delta < -50)
+      setCurrentIndex(prev => (prev === 0 ? items.length - 1 : prev - 1));
+    touchStartRef.current = null;
+  };
+
+  if (!items.length) {
     return (
-      <Box sx={{ 
-        width: '100%', 
-        height: '100%', 
-        bgcolor: '#F0F0F0',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          bgcolor: '#F0F0F0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
         <Typography>No banner media available</Typography>
       </Box>
     );
   }
-  
-  const currentItem = items[currentIndex];
-  
-  // Configure transition variants for particle effect
-  const particleVariants = {
-    enter: {
-      scale: 0,
-      opacity: 0
-    },
-    center: {
-      scale: 1,
-      opacity: 1,
-      transition: {
-        duration: 0.5
-      }
-    },
-    exit: {
-      scale: 1.2,
-      opacity: 0,
-      transition: {
-        duration: 0.5,
-        when: "afterChildren",
-        staggerChildren: 0.05
-      }
-    }
+
+  const fadeVariants = {
+    enter: { opacity: 0 },
+    center: { opacity: 1, transition: { duration: 0.5 } },
+    exit: { opacity: 0, transition: { duration: 0.5 } }
   };
-  
+
   return (
-    <Box ref={containerRef} sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+    <Box
+      ref={containerRef}
+      sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
           initial="enter"
           animate="center"
           exit="exit"
-          variants={particleVariants}
+          variants={fadeVariants}
           style={{ width: '100%', height: '100%' }}
         >
           {currentItem.type === 'video' && currentItem.url ? (
@@ -229,54 +215,80 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
                 autoPlay
                 muted={muted}
                 loop={false}
-                style={
-                  currentItem.customCss ? 
-                    Object.fromEntries(
-                      currentItem.customCss.split(';')
-                        .filter(prop => prop.trim())
-                        .map(prop => {
-                          const [key, value] = prop.split(':').map(p => p.trim());
-                          return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
-                        })
-                    ) : {}
-                }
+                style={currentCssStyles}
               />
-              <VideoControls>
-                <IconButton 
-                  onClick={() => setMuted(!muted)}
-                  sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' } }}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 10,
+                  right: 10,
+                  display: 'flex',
+                  gap: 1,
+                  zIndex: 5
+                }}
+              >
+                <IconButton
+                  onClick={() => setMuted(prev => !prev)}
+                  sx={{
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }
+                  }}
                   size="small"
                 >
                   {muted ? <VolumeOffIcon fontSize="small" /> : <VolumeUpIcon fontSize="small" />}
                 </IconButton>
-                <IconButton 
+                <IconButton
                   onClick={toggleFullscreen}
-                  sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' } }}
+                  sx={{
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }
+                  }}
                   size="small"
                 >
                   <FullscreenIcon fontSize="small" />
                 </IconButton>
-              </VideoControls>
+              </Box>
             </>
           ) : (
             <HeroImage
-              src={getDefaultImage(currentItem.url)}
+              src={currentItem.url ? getDefaultImage(currentItem.url) : getDefaultImage('')}
               alt="Event banner"
-              style={
-                currentItem.customCss ? 
-                  Object.fromEntries(
-                    currentItem.customCss.split(';')
-                      .filter(prop => prop.trim())
-                      .map(prop => {
-                        const [key, value] = prop.split(':').map(p => p.trim());
-                        return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
-                      })
-                  ) : {}
-              }
+              style={currentCssStyles}
             />
           )}
         </motion.div>
       </AnimatePresence>
+
+      {items.length > 1 && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 40,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: 1,
+            zIndex: 2
+          }}
+        >
+          {items.map((_, idx) => (
+            <Box
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: idx === currentIndex ? 'white' : 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+                transition: 'all 0.3s'
+              }}
+            />
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };
@@ -520,6 +532,7 @@ function EventPage() {
         {/* Hero Section with Background Image */}
         <Box>
           <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+            {/* Banner Image/Video */}
             <BannerMedia items={event.banner || []} />
             <HeroOverlay>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
