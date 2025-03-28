@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => `
-  min-width: 300px;
+  min-width: 350px;
   margin: ${theme.spacing(1)};
   border-radius: 16px;
   overflow: visible;
