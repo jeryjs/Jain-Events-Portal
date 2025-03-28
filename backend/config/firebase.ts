@@ -22,23 +22,27 @@ export const sendPushNotificationToAllUsers = async (
   imageUrl?: string,
   options?: {
     clickAction?: string;
-    saveToDatabase?: boolean;
+    showNotification?: boolean; // Whether to show a visible notification or just save silently
+    link?: string; // Optional link to redirect users
   }
 ) => {
   const message: TopicMessage = {
-    notification: {
+    notification: options?.showNotification !== false ? {
       title,
       body,
       imageUrl,
-    },
+    } : undefined,
     data: {
-      // Add data for handling in the service worker
-      saveToDatabase: options?.saveToDatabase ? 'true' : 'false',
+      // All notifications are saved by default
+      title, // Include title in data for silent notifications
+      body, // Include body in data for silent notifications
+      imageUrl: imageUrl || '', // Include imageUrl in data for silent notifications
+      showNotification: options?.showNotification !== false ? 'true' : 'false',
       clickAction: options?.clickAction || '/',
+      link: options?.link || '',
       timestamp: Date.now().toString(),
-      // Add any other metadata needed
     },
-    topic: 'all-users', // You can use a topic to send to all users
+    topic: process.env.NODE_ENV === "development" ? 'all-users-test' : 'all-users',
   };
 
   try {

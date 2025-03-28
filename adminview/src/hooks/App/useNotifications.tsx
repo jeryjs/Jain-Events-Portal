@@ -6,7 +6,13 @@ import { NotificationsApi } from './useApi';
  */
 export function useSendNotification() {
   return useMutation({
-    mutationFn: (data: { title: string; message: string; imageUrl?: string }) => 
+    mutationFn: (data: { 
+      title: string; 
+      message: string; 
+      imageUrl?: string;
+      link?: string;
+      showNotification?: boolean;
+    }) => 
       NotificationsApi.sendToAll(data),
     onError: (error) => console.error('Error sending notification:', error),
   });

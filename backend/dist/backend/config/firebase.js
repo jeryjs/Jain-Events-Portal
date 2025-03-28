@@ -37,7 +37,7 @@ const sendPushNotificationToAllUsers = (title, body, imageUrl, options) => __awa
             timestamp: Date.now().toString(),
             // Add any other metadata needed
         },
-        topic: 'all-users', // You can use a topic to send to all users
+        topic: process.env.NODE_ENV === "development" ? 'all-users-test' : 'all-users',
     };
     try {
         yield exports.messaging.send(message);

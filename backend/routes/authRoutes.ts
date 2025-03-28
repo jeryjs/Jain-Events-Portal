@@ -29,10 +29,13 @@ router.post("/subscribe", async (req: Request, res: Response) => {
 
 // Route to send push notifications to all users
 router.post("/sendNotificationToAll", adminMiddleware, async (req: Request, res: Response) => {
-    const { title, message } = req.body;
+    const { title, message, imageUrl, link, showNotification } = req.body;
 
     try {
-        await sendPushNotificationToAllUsers(title, message);
+        await sendPushNotificationToAllUsers(title, message, imageUrl, {
+            link,
+            showNotification
+        });
         console.log(`🔔 Notification sent to all users: '${title}'`);
         res.status(200).json({ message: `Notification sent to all users successfully` });
     } catch (error) {

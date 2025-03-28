@@ -130,28 +130,36 @@ const clearOldNotifications = async () => {
 messaging.onBackgroundMessage((payload) => {
 	console.log("Received background message ", payload);
 	
-	// Store notification in IndexedDB
-	if (payload.notification) {
-	  addNotification(payload.notification)
+	// Always store notification in IndexedDB, whether visible or silent
+	if (payload.notification || payload.data) {
+	  const notificationData = {
+	    title: payload.notification?.title || payload.data?.title,
+	    body: payload.notification?.body || payload.data?.body,
+	    imageUrl: payload.notification?.image || payload.data?.imageUrl,
+	  };
+	  
+	  addNotification(notificationData)
 	    .then(() => clearOldNotifications())
 	    .catch(error => console.error('Error processing background notification:', error));
 	}
 	
-	// Show the notification to the user
-	const notification = payload.notification;
-	const notificationOptions = {
-	  body: notification.body,
-	  icon: notification.image || '/JGI.webp',
-	  badge: '/JGI.webp',
-	  tag: `notification-${Date.now()}`, // Makes multiple notifications stack instead of replacing
-	  data: {
-	    // Include data to handle click actions
-	    url: notification.clickAction || '/',
-	    timestamp: Date.now()
-	  }
-	};
+	// Only show visible notification if showNotification is not explicitly false
+	if (payload.notification && payload.data?.showNotification !== 'false') {
+	  const notification = payload.notification;
+	  const notificationOptions = {
+	    body: notification.body,
+	    icon: notification.image || '/JGI.webp',
+	    badge: '/JGI.webp',
+	    tag: `notification-${Date.now()}`, // Makes multiple notifications stack instead of replacing
+	    data: {
+	      // Include data to handle click actions
+	      url: payload.data?.link || '/', // Use the link from the payload if available
+	      timestamp: Date.now()
+	    }
+	  };
 
-	self.registration.showNotification(notification.title, notificationOptions);
+	  self.registration.showNotification(notification.title, notificationOptions);
+	}
 });
 
 // Handle notification click

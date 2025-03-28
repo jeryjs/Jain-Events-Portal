@@ -183,7 +183,13 @@ export const AuthApi = {
 // Notifications API endpoints
 export const NotificationsApi = {
   // Send notification to all users
-  sendToAll: (data: { title: string; message: string; imageUrl?: string }) => 
+  sendToAll: (data: { 
+    title: string; 
+    message: string; 
+    imageUrl?: string;
+    link?: string;
+    showNotification?: boolean;
+  }) => 
     apiFetch<{ message: string }>('/user/sendNotificationToAll', {
       method: 'POST',
       body: JSON.stringify(data),

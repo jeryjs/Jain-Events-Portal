@@ -32,7 +32,7 @@ export const initializeMessaging = async () => {
 									headers: {
 										"Content-Type": "application/json",
 									},
-									body: JSON.stringify({ token: currentToken, topic: "all-users" }),
+									body: JSON.stringify({ token: currentToken, topic: process.env.NODE_ENV === "development" ? 'all-users-test' : 'all-users' }),
 								})
 									.then((response) => {
 										if (response.ok) {
@@ -78,19 +78,26 @@ initializeMessaging().then((result) => {
 const processNotification = (payload: any) => {
   console.log("Notification received: ", payload);
 
-  if (payload.notification) {
-    // Save notification to IndexedDB
-    addNotification({
-      title: payload.notification.title,
-      body: payload.notification.body,
-      imageUrl: payload.notification.image,
-    }).catch(err => console.error("Error saving notification:", err));
+  // Always save notification to IndexedDB
+  if (payload.notification || payload.data) {
+    const notificationData = {
+      title: payload.notification?.title || payload.data?.title,
+      body: payload.notification?.body || payload.data?.body,
+      imageUrl: payload.notification?.image || payload.data?.imageUrl,
+    };
+    
+    addNotification(notificationData)
+      .catch(err => console.error("Error saving notification:", err));
 
-    // Display notification if permission is granted
-    if (Notification.permission === "granted") {
+    // Only show visible notification if showNotification is not explicitly false
+    if (payload.notification && payload.data?.showNotification !== 'false' && Notification.permission === "granted") {
       const notificationOptions = {
         body: payload.notification.body,
-        icon: payload.notification.image,
+        icon: payload.notification.image || '/JGI.webp',
+        data: {
+          url: payload.data?.link || '/',
+          timestamp: Date.now()
+        }
       };
       new Notification(payload.notification.title, notificationOptions);
     }

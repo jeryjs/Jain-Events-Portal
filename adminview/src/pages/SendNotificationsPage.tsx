@@ -79,10 +79,11 @@ const SendNotificationsPage = () => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [link, setLink] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [saveToDatabase, setSaveToDatabase] = useState(true);
+  const [showNotification, setShowNotification] = useState(true);
 
   const { mutate: sendNotification, isPending, error } = useSendNotification();
 
@@ -91,7 +92,9 @@ const SendNotificationsPage = () => {
       { 
         title, 
         message: body, 
-        imageUrl: imageUrl || undefined
+        imageUrl: imageUrl || undefined,
+        link: link || undefined,
+        showNotification: showNotification
       },
       {
         onSuccess: () => {
@@ -100,6 +103,7 @@ const SendNotificationsPage = () => {
           setTitle('');
           setBody('');
           setImageUrl('');
+          setLink('');
           setPreviewVisible(false);
         }
       }
@@ -193,6 +197,27 @@ const SendNotificationsPage = () => {
               }}
             />
 
+            <TextField
+              label="Notification Link (optional)"
+              fullWidth
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              placeholder="https://example.com/page"
+              sx={{ mb: 3 }}
+              helperText="Provide a link to redirect users when they click the notification"
+              InputProps={{
+                endAdornment: (
+                  <IconButton 
+                    size="small" 
+                    sx={{ visibility: link ? 'visible' : 'hidden' }}
+                    onClick={() => setLink('')}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                ),
+              }}
+            />
+
             {previewVisible && (
               <NotificationPreview>
                 <Typography variant="subtitle2" gutterBottom color="text.secondary">
@@ -216,26 +241,26 @@ const SendNotificationsPage = () => {
             
             <OptionBox>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <StorageIcon color="primary" sx={{ mr: 1.5 }} />
+                <NotificationsActiveIcon color="primary" sx={{ mr: 1.5 }} />
                 <Box>
                   <Typography variant="subtitle2">
-                    Save to device history
-                    <Tooltip title="When enabled, this notification will be saved to users' device notification history even if they were offline when it was sent">
+                    Show Notification
+                    <Tooltip title="When enabled, users will receive a visible notification. When disabled, the notification will be silently saved to their notification history without a popup alert.">
                       <IconButton size="small" sx={{ ml: 0.5 }}>
                         <InfoOutlinedIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Save to users' notification history for later viewing
+                    Display a visible popup notification to users
                   </Typography>
                 </Box>
               </Box>
               <FormControlLabel
                 control={
                   <Switch 
-                    checked={saveToDatabase}
-                    onChange={(e) => setSaveToDatabase(e.target.checked)}
+                    checked={showNotification}
+                    onChange={(e) => setShowNotification(e.target.checked)}
                     color="primary"
                   />
                 }
@@ -280,11 +305,16 @@ const SendNotificationsPage = () => {
                 With image: {imageUrl}
               </Typography>
             )}
+            {link && (
+              <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                With link: {link}
+              </Typography>
+            )}
             <Divider sx={{ my: 1 }} />
             <Typography variant="caption" display="block">
               <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <StorageIcon fontSize="small" />
-                {saveToDatabase ? 'Will be saved to device history' : 'Not saved to device history'}
+                <NotificationsActiveIcon fontSize="small" />
+                {showNotification ? 'Will display a visible notification' : 'Will be silently saved to history'}
               </Box>
             </Typography>
           </Box>
