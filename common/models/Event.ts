@@ -1,5 +1,11 @@
 import { EventType } from "@common/constants";
 
+export interface BannerItem {
+	url?: string;
+	customCss?: string;
+	type?: 'image' | 'video';
+}
+
 export default class Event {
 	public timings: Date[];
 
@@ -11,7 +17,7 @@ export default class Event {
 		public description: string,
 		public venue: string,
 		public galleryLink: string,
-		public banner: { url?: string; customCss?: string }
+		public banner: BannerItem[] = []
 	) {
 		// Convert Timestamp-like objects (from firestore) to Date
 		this.timings = timings.map((t) => {
@@ -26,16 +32,27 @@ export default class Event {
 		});
 	}
 
-	static parse(data: any): Event {
+	static parse(data: any={}): Event {
+		// Make sure banner is always an array with the correct shape
+		let banner = data.banner || [{ type: 'image' }];
+		if (!Array.isArray(banner)) {
+			// Convert legacy banner format to new format
+			banner = [{ 
+				url: data.banner?.url || undefined, 
+				customCss: data.banner?.customCss || undefined,
+				type: 'image' 
+			}];
+		}
+		
 		return new Event(
-			data.id || '',
-			data.name || '',
+			data.id || "",
+			data.name || "",
 			data.type || EventType.GENERAL,
 			data.timings || [],
-			data.description || '',
-			data.venue || '',
-			data.galleryLink || '',
-			data.banner || {}
+			data.description || "",
+			data.venue || "",
+			data.galleryLink || "",
+			banner
 		);
 	}
 
@@ -69,21 +86,30 @@ export default class Event {
 		return end - start;
 	}
 
-  // Convert event image CSS string to object
-  get eventBannerStyles(): Record<string, string> {
-    if (!this.banner.customCss) return {};
-    
-    return this.banner.customCss
-      .split(";")
-      .filter(Boolean)
-      .reduce<Record<string, string>>((styleObj, rule) => {
-        const [prop, value] = rule.split(":").map(s => s.trim());
-        if (prop && value) {
-          // Convert kebab-case to camelCase
-          const camelProp = prop.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
-          styleObj[camelProp] = value;
-        }
-        return styleObj;
-      }, {});
-  }
+	// Get the current active banner item or return first one
+	get activeBanner(): BannerItem {
+		return this.banner && this.banner.length > 0 ? this.banner[0] : { type: 'image' };
+	}
+
+	// Convert event image CSS string to object
+	getBannerStyles(bannerItem: BannerItem): Record<string, string> {
+		if (!bannerItem.customCss) return {};
+
+		return bannerItem.customCss
+			.split(";")
+			.filter(Boolean)
+			.reduce<Record<string, string>>((styleObj, rule) => {
+				const [prop, value] = rule.split(":").map((s) => s.trim());
+				if (prop && value) {
+					// Convert kebab-case to camelCase
+					const camelProp = prop.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
+					styleObj[camelProp] = value;
+				}
+				return styleObj;
+			}, {});
+	}
+
+	get activeBannerStyles(): Record<string, string> {
+		return this.getBannerStyles(this.activeBanner);
+	}
 }

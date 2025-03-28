@@ -1,8 +1,15 @@
 import db from '@config/firebase';
 import { v4 as uuidv4 } from 'uuid';
 import { cache, TTL } from '@config/cache';
-import { Activity } from '@common/models';
+import { Activity, CulturalActivity } from '@common/models';
 import { parseActivities } from '@common/utils';
+import { 
+  getCachedItem, 
+  getCachedCollection, 
+  createCachedItem, 
+  updateCachedItem, 
+  deleteCachedItem 
+} from '@utils/cacheUtils';
 
 // Collection references
 const eventsCollection = db.collection('events');
@@ -12,111 +19,180 @@ const activitiesCollection = (eventId: string) => eventsCollection.doc(eventId).
  * Get all activities for an event
  */
 export const getActivities = async (eventId: string) => {
-    const cacheKey = `activities-${eventId}`;
-    const cachedActivities = cache.get(cacheKey);
-
-    if (cachedActivities) {
-        console.log(`📦 Serving cached activities for event ${eventId}`);
-        return cachedActivities as Activity[];
-    }
-
-    const snapshot = await activitiesCollection(eventId).get();
-    const activities = parseActivities(snapshot.docs.map(doc => doc.data()));
-
-    cache.set(cacheKey, activities, TTL.ACTIVITIES);
-
-    return activities;
+  const collectionKey = `activities-${eventId}`;
+  
+  return getCachedCollection<Activity>({
+    key: collectionKey,
+    fetchFn: async () => {
+      const snapshot = await activitiesCollection(eventId).get();
+      return parseActivities(snapshot.docs.map(doc => doc.data()));
+    },
+    ttl: TTL.ACTIVITIES
+  });
 };
 
 /**
  * Get specific activity by ID
  */
 export const getActivityById = async (eventId: string, activityId: string) => {
-    const cacheKey = `activities-${eventId}-${activityId}`;
-    const cachedActivity = cache.get(cacheKey);
-
-    if (cachedActivity) {
-        console.log(`📦 Serving cached activity ${activityId}`);
-        return cachedActivity as Activity;
-    }
-
-    const doc = await activitiesCollection(eventId).doc(activityId).get();
-    
-    if (!doc.exists) return null;
-
-    const activityData = Activity.parse(doc.data());
-    cache.set(cacheKey, activityData, TTL.ACTIVITIES);
-    
-    return activityData;
+  return getCachedItem<Activity>({
+    key: `activities-${eventId}-${activityId}`,
+    fetchFn: async () => {
+      const doc = await activitiesCollection(eventId).doc(activityId).get();
+      if (!doc.exists) return null;
+      return Activity.parse(doc.data());
+    },
+    ttl: TTL.ACTIVITIES
+  });
 };
 
 /**
  * Create new activity for an event
  */
 export const createActivity = async (eventId: string, activityData: any) => {
-    const eventDoc = await eventsCollection.doc(eventId).get();
-    
-    if (!eventDoc.exists) {
-        throw new Error(`Event ${eventId} does not exist`);
-    }
-    
-    const activityId = activityData.id || uuidv4();
-    const activityDoc = activitiesCollection(eventId).doc(activityId);
-    
-    await activityDoc.set(activityData);
-
-    // updateActivitiesCache(eventId, activityId, dataToStore);
-    cache.set(`activities-${eventId}-${activityId}`, activityData, TTL.ACTIVITIES);
-    cache.del(`activities-${eventId}`);
-    
-    return activityData;
+  const eventDoc = await eventsCollection.doc(eventId).get();
+  
+  if (!eventDoc.exists) {
+    throw new Error(`Event ${eventId} does not exist`);
+  }
+  
+  const activityId = activityData.id || uuidv4();
+  activityData.id = activityId;
+  
+  return createCachedItem<Activity>({
+    item: activityData,
+    collectionKey: `activities-${eventId}`,
+    itemKeyPrefix: `activities-${eventId}`,
+    saveFn: async (item) => {
+      await activitiesCollection(eventId).doc(activityId).set(item);
+    },
+    ttl: TTL.ACTIVITIES
+  });
 };
 
 /**
  * Update existing activity
  */
 export const updateActivity = async (eventId: string, activityId: string, activityData: any) => {
-    const activityDoc = activitiesCollection(eventId).doc(activityId);
-    const doc = await activityDoc.get();
-    
-    if (!doc.exists) return null;
-    
-    await activityDoc.update(activityData);
-    
-    // updateActivitiesCache(eventId, activityId, updatedDoc.data());
-    cache.set(`activities-${eventId}-${activityId}`, activityData, TTL.ACTIVITIES);
-    cache.del(`activities-${eventId}`);
-
-    return activityData;
+  const activityDoc = activitiesCollection(eventId).doc(activityId);
+  const doc = await activityDoc.get();
+  
+  if (!doc.exists) return null;
+  
+  // Ensure the ID is set correctly
+  activityData.id = activityId;
+  
+  return updateCachedItem<Activity>({
+    item: activityData,
+    collectionKey: `activities-${eventId}`,
+    itemKeyPrefix: `activities-${eventId}`,
+    updateFn: async (item) => {
+      await activityDoc.update(activityData);
+    },
+    ttl: TTL.ACTIVITIES
+  });
 };
 
 /**
  * Delete activity
  */
 export const deleteActivity = async (eventId: string, activityId: string) => {
-    const activityDoc = activitiesCollection(eventId).doc(activityId);
-    
-    await activityDoc.delete();    
-
-    cache.del(`activities-${eventId}-${activityId}`); 
-    cache.del(`activities-${eventId}`);
-
-    return true;
+  const activityDoc = activitiesCollection(eventId).doc(activityId);
+  
+  return deleteCachedItem<Activity>({
+    id: activityId,
+    collectionKey: `activities-${eventId}`,
+    itemKeyPrefix: `activities-${eventId}`,
+    deleteFn: async () => {
+      await activityDoc.delete();
+    },
+    ttl: TTL.ACTIVITIES
+  });
 };
 
+/*
+ * Invalidate cache for activities
+ */
+export const invalidateActivitiesCache = async () => {
+  cache.keys().forEach(key => {
+    if (key.startsWith('activities-')) {
+      cache.del(key);
+    }
+  });
+  console.log("Cache invalidated successfully for activities!");
+  return "Cache invalidated successfully for activities!";
+};
 
-// cache utility function
-const updateActivitiesCache = (eventId: string, activityId: string, data: any) => {
-    const cacheKey = `activities-${eventId}`;
-    const cachedActivities = (cache.get(cacheKey) || []) as Activity[];
+/**
+ * Get poll results for an activity
+ */
+export const getPollResults = async (eventId: string, activityId: string) => {
+  const activityKey = `activities-${eventId}-${activityId}`;
+  
+  // Get activity with poll data
+  const activity = await getCachedItem<Activity>({
+    key: activityKey,
+    fetchFn: async () => {
+      const doc = await activitiesCollection(eventId).doc(activityId).get();
+      if (!doc.exists) return null;
+      return Activity.parse(doc.data());
+    },
+    ttl: TTL.ACTIVITIES
+  });
+  
+  if (!(activity instanceof CulturalActivity)) {
+    throw new Error(`Invalid activity type for poll results: ${typeof activity}`);
+  }
+  
+  return activity.pollData;
+};
 
-    const updatedActivities = cachedActivities.map(activity => {
-        if (activity.id === activityId) {
-            return { ...activity, ...data };
-        }
-        return activity;
-    });
+/**
+ * Cast a vote for a team (or participant)
+ */
+export const castVote = async (eventId: string, activityId: string, teamId: string, username: string) => {
+  const activityKey = `activities-${eventId}-${activityId}`;
+  const activityDoc = activitiesCollection(eventId).doc(activityId);
 
-    cache.set(`${cacheKey}-${activityId}`, data, TTL.ACTIVITIES);
-    cache.set(cacheKey, updatedActivities, TTL.ACTIVITIES);
-}
+  const activity = await getCachedItem<Activity>({
+    key: activityKey,
+    fetchFn: async () => Activity.parse((await activityDoc.get()).data()),
+    ttl: TTL.ACTIVITIES
+  });
+
+  if (!(activity instanceof CulturalActivity)) throw new Error(`Invalid activity type for voting: ${typeof activity}`);
+  if (!activity.showPoll) throw new Error('Poll is not enabled for this activity');
+
+  const pollData = activity.pollData;
+  
+  // First, remove the user's vote from any team they previously voted for
+  for (const poll of pollData) {
+    const voteIndex = poll.votes.indexOf(username);
+    if (voteIndex !== -1) {
+      poll.votes.splice(voteIndex, 1);
+    }
+  }
+  
+  // Then add the vote to the selected team
+  let teamPoll = pollData.find(poll => poll.teamId === teamId);
+  if (!teamPoll) {
+    teamPoll = { teamId, votes: [] };
+    pollData.push(teamPoll);
+  }
+  
+  teamPoll.votes.push(username);
+  activity.pollData = pollData;
+
+  await updateCachedItem<CulturalActivity>({
+    item: activity,
+    collectionKey: `activities-${eventId}`,
+    itemKeyPrefix: `activities-${eventId}`,
+    updateFn: async (item) => await activityDoc.update(JSON.parse(JSON.stringify(item))),
+    ttl: TTL.ACTIVITIES
+  });
+  
+  return { 
+    success: true, 
+    message: 'Vote recorded successfully'
+  };
+};

@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "jain-fet-hub",
     "public": "dist",
     "ignore": [
       "firebase.json",
@@ -12,7 +13,7 @@
         "destination": "/index.html"
       },
       {
-        "source": "/admin",
+        "source": "/",
         "destination": "/index.html"
       }
     ]

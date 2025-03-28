@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyToken } from '@utils/authUtils';
+import { getUserFromToken, verifyToken } from '@utils/authUtils';
 import { Role } from '@common/constants';
 import { UserData } from '@common/models';
 
@@ -25,15 +25,16 @@ const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunc
   const token = authHeader.split(' ')[1];
   
   try {
-    // Verify token and extract user data from token
-    const decoded = verifyToken(token);
-    if (!decoded) {
+    // Get user data directly from token
+    const userData = getUserFromToken(token);
+    
+    if (!userData) {
       res.status(401).json({ message: 'Invalid token' });
       return;
     }
     
     // Attach user data to request
-    req.user = decoded as UserData;
+    req.user = userData;
     next();
   } catch (error) {
     // Handle specific token errors
@@ -53,7 +54,7 @@ const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunc
 /**
  * @description Middleware to authorize user with admin role.
  */
-const adminMiddleware = (req: Request, res: Response, next: NextFunction) => {
+const adminMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   // Check for token in Authorization header
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -67,16 +68,15 @@ const adminMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = authHeader.split(' ')[1];
   
   try {
-    // Verify token and extract user data from token
-    const decoded = verifyToken(token);
-    if (!decoded) {
+    // Get user data directly from token
+    const userData = getUserFromToken(token);
+    
+    if (!userData) {
       res.status(401).json({ message: 'Invalid token' });
       return;
     }
-    
-    const user = decoded as UserData;
 
-    if (user.role < Role.ADMIN) {
+    if (userData.role < Role.ADMIN) {
       res.status(403).json({ 
         message: 'Access denied',
         details: 'This action requires administrator privileges'
@@ -84,6 +84,8 @@ const adminMiddleware = (req: Request, res: Response, next: NextFunction) => {
       return;
     }
     
+    // Attach user data to request for potential use in route handlers
+    req.user = userData;
     next();
   } catch (error) {
     // Handle specific token errors
@@ -103,7 +105,7 @@ const adminMiddleware = (req: Request, res: Response, next: NextFunction) => {
 /**
  * @description Middleware to authorize user with manager or higher role.
  */
-const managerMiddleware = (req: Request, res: Response, next: NextFunction) => {
+const managerMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   // Check for token in Authorization header
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -117,16 +119,15 @@ const managerMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = authHeader.split(' ')[1];
   
   try {
-    // Verify token and extract user data from token
-    const decoded = verifyToken(token);
-    if (!decoded) {
+    // Get user data directly from token
+    const userData = getUserFromToken(token);
+    
+    if (!userData) {
       res.status(401).json({ message: 'Invalid token' });
       return;
     }
-
-    const user = decoded as UserData;
     
-    if (user.role < Role.MANAGER) {
+    if (userData.role < Role.MANAGER) {
       res.status(403).json({ 
         message: 'Access denied',
         details: 'This action requires manager privileges'
@@ -134,6 +135,8 @@ const managerMiddleware = (req: Request, res: Response, next: NextFunction) => {
       return;
     }
     
+    // Attach user data to request for potential use in route handlers
+    req.user = userData;
     next();
   } catch (error) {
     // Handle specific token errors

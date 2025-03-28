@@ -1,5 +1,5 @@
 import { EventType } from '@common/constants';
-import ThemeSwitcher from '@components/shared/ThemeSwitcher';
+import { ProfileButton } from '@components/shared';
 import { Box, Button, Tab, Tabs, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
@@ -55,15 +55,9 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ tabValue, onTabChange }) => {
             <Typography variant="h4" fontWeight="bold">Jain FET-Hub</Typography>
             <Typography variant="subtitle1" color="text.secondary">The Pulse of Jain FET</Typography>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button 
-              component={Link} 
-              to="/timeline"
-              sx={{ mr: 2 }}
-            >
-              Timeline
-            </Button>
-            <ThemeSwitcher />
+          <Box sx={{ display: 'flex', gap: { xs: 0, sm: 1, md: 2 }, alignItems: 'center' }}>
+            <Button component={Link} to="/timeline">Timeline</Button>
+            <ProfileButton className="profile-button" />
           </Box>
         </HeaderWrapper>
       </AppHeader>

@@ -47,10 +47,10 @@ export function useColorMode() {
         setMode((prevMode) => {
           const newMode = prevMode === 'light' ? 'dark' : 'light';
           
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`Switching to ${newMode} mode`);
-            location.reload();
-          }
+          // if (process.env.NODE_ENV === 'development') {
+          console.log(`Switching to ${newMode} mode`);
+          location.reload();
+          // }
           
           localStorage.setItem('theme', newMode);
           return newMode;

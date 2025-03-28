@@ -4,7 +4,7 @@ import useTheme from "@mui/material/styles/useTheme";
 // Helper function to generate a unique color based on a string
 export const generateColorFromString = (str: string): string => {
     let hash = 0;
-    for (let i = 0; i < str.length; i++) {
+    for (let i = 0; i < str?.length; i++) {
         hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
 
@@ -33,4 +33,19 @@ const darkenColor = (hexColor: string, factor: number = 0.2): string => {
     const newHexB = newB.toString(16).padStart(2, '0');
 
     return `#${newHexR}${newHexG}${newHexB}`;
+};
+
+export const pascalCase = (input: string, replaceUnderscore: boolean = true): string => {
+    if (!input) return '';
+
+    // Replace underscores with spaces if specified
+    const processedInput = replaceUnderscore ? input.replace(/_/g, ' ') : input;
+
+    // Find all alphanumeric word segments
+    const words = processedInput.trim().match(/[A-Za-z0-9]+/g);
+    if (!words) return '';
+    
+    return words
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
 };

@@ -1,5 +1,6 @@
 import { EventType } from "../../constants";
 import Activity from "../Activity";
+import { TeamParticipant } from "../Participant";
 import SportsPlayer from "./SportsPlayer";
 
 export class Cricket {
@@ -430,17 +431,24 @@ class SportsActivity<T extends Sport> extends Activity {
 		name: string,
 		startTime: Date,
 		endTime: Date,
-		eventType: EventType,
+		type: EventType,
 		public teams: { id: string; name: string }[],
-		public participants: SportsPlayer[],
+		public participants: TeamParticipant[],
 		public game: T
 	) {
-		super(id, name, startTime, endTime, participants, eventType);
+		super(id, name, startTime, endTime, participants, type);
 	}
 
 	static parse(data: any): SportsActivity<Sport> {
-		let gameType: Sport;
-		switch (data.eventType as EventType) {
+		let gameType: Sport; 
+		
+		// if data contains eventType, convert it to type
+        if (data.eventType) {
+            data.type = data.eventType;
+            delete data.eventType;
+        }
+
+		switch (data.type) {
 			case EventType.CRICKET: gameType = new Cricket(); break;
 			case EventType.FOOTBALL: gameType = new Football(); break;
 			case EventType.BASKETBALL: gameType = new Basketball(); break;
@@ -452,7 +460,7 @@ class SportsActivity<T extends Sport> extends Activity {
 
 		const participants = data.participants.map((p: any) => SportsPlayer.parse(p));
 		const game = Object.assign(gameType, data.game);
-		return new SportsActivity<typeof gameType>(data.id, data.name, data.startTime, data.endTime, data.eventType, data.teams, participants, game);
+		return new SportsActivity<typeof gameType>(data.id, data.name, data.startTime, data.endTime, data.type || data.eventType, data.teams, participants, game);
 	}
 	
 	// Get winning team details
@@ -466,11 +474,11 @@ class SportsActivity<T extends Sport> extends Activity {
 		return this.teams.find((t) => t.id === teamId) || null;
 	}
 
-	getPlayer(playerId: string): SportsPlayer | null {
+	getPlayer(playerId: string): TeamParticipant | null {
 		return this.participants.find((p) => p.usn === playerId) || null;
 	}
 
-	getTeamPlayers(teamId: string): SportsPlayer[] {
+	getTeamPlayers(teamId: string): TeamParticipant[] {
 		return this.participants.filter((p) => p.teamId === teamId);
 	}
 

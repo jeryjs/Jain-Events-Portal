@@ -18,14 +18,14 @@ const authMiddleware = (req, res, next) => {
     }
     const token = authHeader.split(' ')[1];
     try {
-        // Verify token and extract user data from token
-        const decoded = (0, authUtils_1.verifyToken)(token);
-        if (!decoded) {
+        // Get user data directly from token
+        const userData = (0, authUtils_1.getUserFromToken)(token);
+        if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
         }
         // Attach user data to request
-        req.user = decoded;
+        req.user = userData;
         next();
     }
     catch (error) {
@@ -56,20 +56,21 @@ const adminMiddleware = (req, res, next) => {
     }
     const token = authHeader.split(' ')[1];
     try {
-        // Verify token and extract user data from token
-        const decoded = (0, authUtils_1.verifyToken)(token);
-        if (!decoded) {
+        // Get user data directly from token
+        const userData = (0, authUtils_1.getUserFromToken)(token);
+        if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
         }
-        const user = decoded;
-        if (user.role < constants_1.Role.ADMIN) {
+        if (userData.role < constants_1.Role.ADMIN) {
             res.status(403).json({
                 message: 'Access denied',
                 details: 'This action requires administrator privileges'
             });
             return;
         }
+        // Attach user data to request for potential use in route handlers
+        req.user = userData;
         next();
     }
     catch (error) {
@@ -100,20 +101,21 @@ const managerMiddleware = (req, res, next) => {
     }
     const token = authHeader.split(' ')[1];
     try {
-        // Verify token and extract user data from token
-        const decoded = (0, authUtils_1.verifyToken)(token);
-        if (!decoded) {
+        // Get user data directly from token
+        const userData = (0, authUtils_1.getUserFromToken)(token);
+        if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
         }
-        const user = decoded;
-        if (user.role < constants_1.Role.MANAGER) {
+        if (userData.role < constants_1.Role.MANAGER) {
             res.status(403).json({
                 message: 'Access denied',
                 details: 'This action requires manager privileges'
             });
             return;
         }
+        // Attach user data to request for potential use in route handlers
+        req.user = userData;
         next();
     }
     catch (error) {

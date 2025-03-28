@@ -7,19 +7,19 @@ import {
   Chip,
   Container,
   IconButton,
-  Typography,
-  Skeleton
+  Typography
 } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { EventType } from '@common/constants';
-import { SportsActivity } from '@common/models';
+import { Activity, CulturalActivity, InfoActivity, SportsActivity, TechnicalActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getBaseEventType } from '@common/utils';
-import { ActivitySkeleton, CulturalsView, GeneralView, SportsView, TechView } from '@components/Activity';
+import { ActivitySkeleton, CulturalsView, GeneralView, InfoView, SportsView, TechView } from '@components/Activity';
 import PageTransition from '@components/shared/PageTransition';
 import { useActivity } from '@hooks/useApi';
+import { pascalCase } from '@utils/utils';
 
 // Styled Components
 const HeroContainer = styled(Box)(({ theme }) => ({
@@ -69,8 +69,8 @@ function ActivityPage() {
     navigate(`/${eventId}`);
   };
 
-  // Determine activity type based on eventType enum
-  const baseType = getBaseEventType(activity.eventType);
+  // Determine activity type based on EventType enum
+  const baseType = getBaseEventType(activity.type);
 
   return (
     <PageTransition>
@@ -79,31 +79,25 @@ function ActivityPage() {
         <ActivityHero activity={activity} baseType={baseType} handleBack={handleBack} />
 
         {/* Activity Content Based on Type */}
-        {baseType === EventType.SPORTS && (
-          <SportsView activity={activity as SportsActivity<Sport>} />
-        )}
-
-        {baseType === EventType.CULTURAL && (
-          <CulturalsView activity={activity} />
-        )}
-
-        {baseType === EventType.TECH && (
-          <TechView activity={activity} />
-        )}
-
-        {baseType === EventType.GENERAL && (
-          <GeneralView activity={activity} />
-        )}
-
+        {(() => {
+          switch (baseType) {
+            case EventType.GENERAL: return <GeneralView activity={activity} />;
+            case EventType.INFO: return <InfoView activity={activity as InfoActivity} />;
+            case EventType.SPORTS: return <SportsView activity={activity as SportsActivity<Sport>} />;
+            case EventType.CULTURAL: return <CulturalsView eventId={eventId} activity={activity as CulturalActivity} />;
+            case EventType.TECH: return <TechView activity={activity as TechnicalActivity} />;
+            default: return null;
+          }
+        })()}
       </Container>
     </PageTransition>
   );
 }
 
 // Activity Header Component
-const ActivityHero = ({ activity, baseType, handleBack }) => {
+const ActivityHero = ({ activity, baseType, handleBack }: { activity: Activity; baseType: EventType; handleBack: () => void; }) => {
   // Get appropriate background color based on activity type
-  const getBgColor = (type) => {
+  const getBgColor = (type: EventType) => {
     switch (type) {
       case EventType.SPORTS: return 'primary.main';
       case EventType.CULTURAL: return 'secondary.main';
@@ -113,90 +107,87 @@ const ActivityHero = ({ activity, baseType, handleBack }) => {
   };
 
   // Get activity type label
-  const getActivityTypeLabel = (type) => {
-    if (type >= EventType.TECH) return 'Tech Activity';
-    if (type >= EventType.CULTURAL) return 'Cultural Activity';
-    if (type >= EventType.SPORTS) return 'Sports Activity';
-    return 'General Activity';
+  const getActivityTypeLabel = (type: EventType) => {
+    return pascalCase(EventType[type]) + " Activity";
   };
 
   return (
     <HeroContainer
       sx={{
-      bgcolor: (theme) => theme.palette.background.default,
-      // color: (theme) => theme.palette.primary.contrastText,
-      boxShadow: (theme) => `0 10px 30px ${alpha(theme.palette.primary.dark, 0.3)}`,
+        bgcolor: (theme) => theme.palette.background.default,
+        // color: (theme) => theme.palette.primary.contrastText,
+        boxShadow: (theme) => `0 10px 30px ${alpha(theme.palette.primary.dark, 0.3)}`,
       }}
     >
       {/* Activity Header with Back Button */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, color: 'inherit' }}>
-      <IconButton
-        onClick={handleBack}
-        sx={{
-        mr: 2,
-        bgcolor: (theme) => alpha(theme.palette.background.paper, 0.2),
-        boxShadow: 1,
-        color: 'inherit',
-        '&:hover': {
-          bgcolor: (theme) => alpha(theme.palette.background.paper, 0.3),
-        },
-        }}
-      >
-        <ArrowBackIcon />
-      </IconButton>
-      <Typography variant="h5" component="h1" fontWeight="bold" color="inherit">
-        {activity.name}
-      </Typography>
+        <IconButton
+          onClick={handleBack}
+          sx={{
+            mr: 2,
+            bgcolor: (theme) => alpha(theme.palette.background.paper, 0.2),
+            boxShadow: 1,
+            color: 'inherit',
+            '&:hover': {
+              bgcolor: (theme) => alpha(theme.palette.background.paper, 0.3),
+            },
+          }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5" component="h1" fontWeight="bold" color="inherit">
+          {activity.name}
+        </Typography>
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-      <Box>
-        <HeaderChip
-        label={getActivityTypeLabel(activity.eventType)}
-        sx={{
-          bgcolor: (theme) => theme.palette.background.paper,
-          color: getBgColor(baseType),
-          fontWeight: 'bold',
-        }}
-        />
-        <Box sx={{ mt: 2, color: 'inherit' }}>
-        <InfoIconWrapper sx={{ color: 'inherit' }}>
-          <CalendarTodayIcon sx={{ color: 'inherit' }} />
-          <Typography variant="body2" color="inherit">
-          {activity.startTime.toLocaleDateString('en-US', {
-            weekday: 'short',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: true,
-          })}
-          </Typography>
-        </InfoIconWrapper>
-        <InfoIconWrapper sx={{ color: 'inherit' }}>
-          <PeopleIcon sx={{ color: 'inherit' }} />
-          {activity.participants?.length > 0 && (
-          <Box>
-            <Typography variant="subtitle2" sx={{ mb: 0.5 }} color="inherit">
-            {activity.participants?.length || 0} Participants
-            </Typography>
-            <AvatarGroup max={5}>
-            {activity.participants.map((participant, i) => (
-              <ParticipantAvatar
-              key={participant.usn || i}
-              alt={participant.name}
-              src={`https://eu.ui-avatars.com/api/?name=${participant.name || i}&size=50`}
-              sx={{
-                borderColor: getBgColor(baseType),
-              }}
-              />
-            ))}
-            </AvatarGroup>
+        <Box>
+          <HeaderChip
+            label={getActivityTypeLabel(activity.type)}
+            sx={{
+              bgcolor: (theme) => theme.palette.background.paper,
+              color: getBgColor(baseType),
+              fontWeight: 'bold',
+            }}
+          />
+          <Box sx={{ mt: 2, color: 'inherit' }}>
+            <InfoIconWrapper sx={{ color: 'inherit' }}>
+              <CalendarTodayIcon sx={{ color: 'inherit' }} />
+              <Typography variant="body2" color="inherit">
+                {activity.startTime.toLocaleDateString('en-US', {
+                  weekday: 'short',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  hour12: true,
+                })}
+              </Typography>
+            </InfoIconWrapper>
+            {activity.participants?.length > 0 && (<InfoIconWrapper sx={{ color: 'inherit' }}>
+              <PeopleIcon sx={{ color: 'inherit' }} />
+
+              <Box>
+                <Typography variant="subtitle2" sx={{ mb: 0.5 }} color="inherit">
+                  {activity.participants?.length || 0} Participants
+                </Typography>
+                <AvatarGroup max={5}>
+                  {activity.participants.map((participant, i) => (
+                    <ParticipantAvatar
+                      key={participant.usn || i}
+                      alt={participant.name}
+                      src={`https://eu.ui-avatars.com/api/?name=${participant.name || i}&size=50`}
+                      sx={{
+                        borderColor: getBgColor(baseType),
+                      }}
+                    />
+                  ))}
+                </AvatarGroup>
+              </Box>
+            </InfoIconWrapper>
+            )}
           </Box>
-          )}
-        </InfoIconWrapper>
         </Box>
-      </Box>
       </Box>
     </HeroContainer>
   );

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("@common/constants");
 class Event {
-    constructor(id, name, type, timings, description, venue, galleryLink, banner) {
+    constructor(id, name, type, timings, description, venue, galleryLink, banner = []) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -22,8 +22,19 @@ class Event {
             return new Date(t);
         });
     }
-    static parse(data) {
-        return new Event(data.id || '', data.name || '', data.type || constants_1.EventType.GENERAL, data.timings || [], data.description || '', data.venue || '', data.galleryLink || '', data.banner || {});
+    static parse(data = {}) {
+        var _a, _b;
+        // Make sure banner is always an array with the correct shape
+        let banner = data.banner || [{ type: 'image' }];
+        if (!Array.isArray(banner)) {
+            // Convert legacy banner format to new format
+            banner = [{
+                    url: ((_a = data.banner) === null || _a === void 0 ? void 0 : _a.url) || undefined,
+                    customCss: ((_b = data.banner) === null || _b === void 0 ? void 0 : _b.customCss) || undefined,
+                    type: 'image'
+                }];
+        }
+        return new Event(data.id || "", data.name || "", data.type || constants_1.EventType.GENERAL, data.timings || [], data.description || "", data.venue || "", data.galleryLink || "", banner);
     }
     toJSON() {
         // If there are timings, ensure they're stored as Firestore timestamps
@@ -52,15 +63,19 @@ class Event {
         const end = this.time.end.getTime();
         return end - start;
     }
+    // Get the current active banner item or return first one
+    get activeBanner() {
+        return this.banner && this.banner.length > 0 ? this.banner[0] : { type: 'image' };
+    }
     // Convert event image CSS string to object
-    get eventBannerStyles() {
-        if (!this.banner.customCss)
+    getBannerStyles(bannerItem) {
+        if (!bannerItem.customCss)
             return {};
-        return this.banner.customCss
+        return bannerItem.customCss
             .split(";")
             .filter(Boolean)
             .reduce((styleObj, rule) => {
-            const [prop, value] = rule.split(":").map(s => s.trim());
+            const [prop, value] = rule.split(":").map((s) => s.trim());
             if (prop && value) {
                 // Convert kebab-case to camelCase
                 const camelProp = prop.replace(/-([a-z])/g, (_, char) => char.toUpperCase());
@@ -68,6 +83,9 @@ class Event {
             }
             return styleObj;
         }, {});
+    }
+    get activeBannerStyles() {
+        return this.getBannerStyles(this.activeBanner);
     }
 }
 exports.default = Event;

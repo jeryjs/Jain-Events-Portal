@@ -1,34 +1,24 @@
-import { Participant, SportsPlayer } from '@common/models';
+import { Participant, TeamParticipant } from '@common/models';
 import AddIcon from '@mui/icons-material/Add';
 import CodeIcon from '@mui/icons-material/Code';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, Paper, Select, TextField, Tooltip, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, IconButton, InputLabel, List, ListItem, ListItemText, MenuItem, Paper, Select, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
 import { useState, useEffect, useRef } from 'react';
 
-type ParticipantType = SportsPlayer | Participant;
-
 interface ParticipantsFormProps {
-    participants: ParticipantType[];
-    setParticipants: (participants: ParticipantType[]) => void;
-    teams?: any[];
+    participants: Participant[];
+    setParticipants: (participants: Participant[]) => void;
+    teams?: { id: string, name: string }[];
+    defaultTeam?: string;
 }
 
-const initialFormState: Partial<ParticipantType> = {
-    name: '',
-    usn: '',
-    branch: '',
-    phone: '',
-    email: '',
-    teamId: '',
-    position: 'playing'
-};
-
-export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: ParticipantsFormProps) => {
+export const ParticipantsForm = ({ participants, setParticipants, teams = [], defaultTeam }: ParticipantsFormProps) => {
     const [open, setOpen] = useState(false);
     const [editIndex, setEditIndex] = useState<number | null>(null);
-    const [formValues, setFormValues] = useState(initialFormState);
+    const [formValues, setFormValues] = useState<Participant | null>(null);
+    
     const [error, setError] = useState('');
     const [isJsonMode, setIsJsonMode] = useState(false);
     const [jsonValue, setJsonValue] = useState('');
@@ -36,6 +26,19 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
 
     // Debounce timer for JSON updates
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Create initial form values
+    const createInitialFormValues = () => {
+        if (defaultTeam) return TeamParticipant.parse({ teamId: defaultTeam });
+        return Participant.parse({});
+    };
+
+    // Initialize form values when needed
+    useEffect(() => {
+        if (!formValues && open) {
+            setFormValues(createInitialFormValues());
+        }
+    }, [formValues, open]);
 
     // Update JSON when participants change (only when in JSON mode)
     useEffect(() => {
@@ -92,23 +95,13 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                         setJsonError(`Participant at index ${i} is missing required field: name`);
                         return;
                     }
-                    if (teams.length > 0 && !item.teamId) {
-                        setJsonError(`Participant at index ${i} is missing required field: teamId`);
-                        return;
-                    }
                 }
 
                 // If we got here, the JSON is valid - apply it immediately
                 setJsonError('');
 
                 // Convert each item to the appropriate type
-                const typedParticipants = parsed.map((p: any) => {
-                    if (teams.length > 0) {
-                        return SportsPlayer.parse(p);
-                    } else {
-                        return Participant.parse(p);
-                    }
-                });
+                const typedParticipants = parsed.map((p: any) => Participant.parse(p));
 
                 // Update participants
                 setParticipants(typedParticipants);
@@ -121,7 +114,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
     };
 
     const handleOpen = () => {
-        setFormValues(initialFormState);
+        setFormValues(createInitialFormValues());
         setEditIndex(null);
         setError('');
         setOpen(true);
@@ -138,45 +131,46 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
     };
 
     const handleDeleteParticipant = (index: number) => {
+        if(!confirm("Are you sure you want to delete participant: " + participants[index].name)) return
         const newParticipants = [...participants];
         newParticipants.splice(index, 1);
         setParticipants(newParticipants);
     };
 
     const handleChange = (field: string, value: any) => {
-        if (teams.length > 0) {
-            setFormValues(prev => SportsPlayer.parse({ ...prev, [field]: value }));
-        } else {
-            setFormValues(prev => Participant.parse({ ...prev, [field]: value }));
-        }
+        if (!formValues) return;
+        
+        setFormValues(prev => {
+            if (teams.length > 0) {
+                return TeamParticipant.parse({ ...prev, [field]: value });
+            } else {
+                return Participant.parse({ ...prev, [field]: value });
+            }
+        });
     };
 
     const validateForm = (): boolean => {
-        let isValid = true;
+        if (!formValues) return false;
+        
         if (!formValues.name?.trim()) {
             setError('Name is required.');
-            isValid = false;
-        } else if (teams.length > 0 && !formValues.teamId) {
-            setError('Team is required.');
-            isValid = false;
-        } else {
-            setError('');
+            return false;
         }
-        return isValid;
+        if (!formValues.usn?.trim()) {
+            setError('USN is required.');
+            return false;
+        }
+        
+        setError('');
+        return true;
     };
 
     const handleSave = () => {
-        if (!validateForm()) return;
+        if (!validateForm() || !formValues) return;
 
-        let newParticipant: Participant | SportsPlayer;
-
-        if (teams.length > 0) {
-            newParticipant = SportsPlayer.parse({ ...formValues, teamId: formValues.teamId });
-        } else {
-            newParticipant = Participant.parse(formValues);
-        }
-
+        const newParticipant = Participant.parse(formValues);
         const updatedParticipants = [...participants];
+        
         if (editIndex !== null) {
             updatedParticipants[editIndex] = newParticipant;
         } else {
@@ -185,6 +179,11 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
 
         setParticipants(updatedParticipants);
         handleClose();
+    };
+
+    // Get participant details string
+    const getParticipantDetails = (p: Participant): string => {
+        return p.detailsString ?? `USN: ${p.usn ?? 'N/A'} • Branch: ${p.branch ?? 'N/A'}`;
     };
 
     return (
@@ -233,9 +232,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                             {jsonError ? 'Fix the JSON error above to apply changes' : 'Changes are applied automatically when JSON is valid'}
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                            {teams.length > 0
-                                ? 'Required format: [{ "name": "Name", "teamId": "team-id" }, ...]'
-                                : 'Required format: [{ "name": "Name", ... }, ...]'}
+                            Required format: {'[{ "name": "Name", ... }, ...]'}
                         </Typography>
                     </Box>
                 </Box>
@@ -252,7 +249,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                         <List>
                             {participants.map((p, index) => (
                                 <ListItem
-                                    key={p.usn || index}
+                                    key={`${p.usn || `participant-${index}`}${('teamId' in p && p.teamId) ? '-' + p.teamId : ''}`}
                                     divider
                                     secondaryAction={
                                         <Box>
@@ -267,7 +264,7 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
                                 >
                                     <ListItemText
                                         primary={p.name}
-                                        secondary={p.detailsString??`USN: ${p.usn ?? 'N/A'} • Branch: ${p.branch ?? 'N/A'}`}
+                                        secondary={getParticipantDetails(p)}
                                     />
                                 </ListItem>
                             ))}
@@ -279,98 +276,108 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [] }: 
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>{editIndex !== null ? 'Edit Participant' : 'Add Participant'}</DialogTitle>
                 <DialogContent>
-                    <Grid container spacing={2} sx={{ mt: 1 }}>
-                        {error && (
+                    {formValues && (
+                        <Grid container spacing={2} sx={{ mt: 1 }}>
+                            {error && (
+                                <Grid item xs={12}>
+                                    <Alert severity="error">{error}</Alert>
+                                </Grid>
+                            )}
                             <Grid item xs={12}>
-                                <Alert severity="error">{error}</Alert>
+                                <TextField
+                                    label="Name"
+                                    value={formValues.name || ''}
+                                    onChange={(e) => handleChange('name', e.target.value)}
+                                    fullWidth
+                                    required
+                                />
                             </Grid>
-                        )}
-                        <Grid item xs={12}>
-                            <TextField
-                                label="Name"
-                                value={formValues.name || ''}
-                                onChange={(e) => handleChange('name', e.target.value)}
-                                fullWidth
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                label="USN"
-                                value={formValues.usn || ''}
-                                onChange={(e) => handleChange('usn', e.target.value)}
-                                fullWidth
-                                helperText="Leave blank to auto-generate"
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                label="Branch"
-                                value={formValues.branch || ''}
-                                onChange={(e) => handleChange('branch', e.target.value)}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                label="Phone"
-                                value={formValues.phone || ''}
-                                onChange={(e) => handleChange('phone', e.target.value)}
-                                fullWidth
-                                placeholder="Phone number"
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                label="Email"
-                                type="email"
-                                value={formValues.email || ''}
-                                onChange={(e) => handleChange('email', e.target.value)}
-                                fullWidth
-                                placeholder="Email address"
-                            />
-                        </Grid>
-                        {teams.length > 0 && (
-                            <Grid item display="flex" alignItems="center" gap={2} sx={{ width: '100%' }}>
-                                <FormControl fullWidth>
-                                    <InputLabel id="team-select-label">Team</InputLabel>
-                                    <Select
-                                        labelId="team-select-label"
-                                        id="team-select"
-                                        value={formValues.teamId || ''}
-                                        label="Team"
-                                        onChange={(e) => handleChange('teamId', e.target.value)}
-                                        required
-                                    >
-                                        {teams.map((team) => (
-                                            <MenuItem key={team.id} value={team.id}>
-                                                {team.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                {formValues.position && (
-                                    <ToggleButtonGroup
-                                        value={formValues.position || 'playing'}
-                                        exclusive
-                                        onChange={(e, value) => handleChange('position', value)}
-                                        aria-label="position"
-                                        color="info"
-                                    >
-                                        <ToggleButton value="playing" aria-label="playing">Playing</ToggleButton>
-                                        <ToggleButton value="substitute" aria-label="substitute">Substitute</ToggleButton>
-                                    </ToggleButtonGroup>
-                                )}
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="USN"
+                                    value={formValues.usn || ''}
+                                    onChange={(e) => handleChange('usn', e.target.value)}
+                                    fullWidth
+                                    required
+                                />
                             </Grid>
-                        )}
-                    </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="Branch"
+                                    value={formValues.branch || ''}
+                                    onChange={(e) => handleChange('branch', e.target.value)}
+                                    fullWidth
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="Phone"
+                                    value={formValues.phone || ''}
+                                    onChange={(e) => handleChange('phone', e.target.value)}
+                                    fullWidth
+                                    placeholder="Phone number"
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    label="Email"
+                                    type="email"
+                                    value={formValues.email || ''}
+                                    onChange={(e) => handleChange('email', e.target.value)}
+                                    fullWidth
+                                    placeholder="Email address"
+                                />
+                            </Grid>
+                            
+                            {/* Team field shown only if teams are provided */}
+                            {teams.length > 0 && (
+                                <Grid item xs={12} sm={6}>
+                                    <FormControl fullWidth>
+                                        <InputLabel id="team-select-label">Team</InputLabel>
+                                        <Select
+                                            labelId="team-select-label"
+                                            id="team-select"
+                                            value={(formValues as any).teamId || ''}
+                                            label="Team"
+                                            onChange={(e) => handleChange('teamId', e.target.value)}
+                                            required
+                                        >
+                                            <MenuItem value=""><em>No Team</em></MenuItem>
+                                            {teams.map((team) => (
+                                                <MenuItem key={team.id} value={team.id}>{team.name}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                            )}
+                            
+                            {/* Position field shown only if position prop is supported */}
+                            {'position' in formValues && (
+                                <Grid item xs={12} sm={6}>
+                                    <FormControl fullWidth>
+                                        <ToggleButtonGroup
+                                            value={formValues.position || 'playing'}
+                                            exclusive
+                                            onChange={(e, value) => handleChange('position', value)}
+                                            aria-label="position"
+                                            color="info"
+                                            fullWidth
+                                        >
+                                            <ToggleButton value="playing" aria-label="playing">Participating</ToggleButton>
+                                            <ToggleButton value="substitute" aria-label="substitute">Withdrawn</ToggleButton>
+                                        </ToggleButtonGroup>
+                                    </FormControl>
+                                </Grid>
+                            )}
+                        </Grid>
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
-                        disabled={!formValues.name?.trim() || (teams.length > 0 && !formValues.teamId)}
+                        disabled={!formValues?.name?.trim() || !formValues?.usn?.trim()}
                     >
                         Save
                     </Button>

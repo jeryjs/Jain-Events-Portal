@@ -5,8 +5,13 @@ import {
     createActivity, 
     updateActivity, 
     deleteActivity,
+    invalidateActivitiesCache,
+    getPollResults,
+    castVote,
 } from '@services/activities';
-import { adminMiddleware, managerMiddleware } from '@middlewares/auth';
+import { adminMiddleware, authMiddleware, managerMiddleware } from '@middlewares/auth';
+import { getUserFromToken } from '@utils/authUtils';
+import { UserData } from '@common/models';
 
 const router = express.Router();
 
@@ -15,7 +20,7 @@ const router = express.Router();
  */
 
 // Get all activities for an event
-router.get('/activities/:eventId', async (req: Request, res: Response) => {
+router.get('/:eventId', async (req: Request, res: Response) => {
     try {
         const activities = await getActivities(req.params.eventId);
         res.json(activities || []);
@@ -26,7 +31,7 @@ router.get('/activities/:eventId', async (req: Request, res: Response) => {
 });
 
 // Get specific activity by ID
-router.get('/activities/:eventId/:activityId', async (req: Request, res: Response) => {
+router.get('/:eventId/:activityId', async (req: Request, res: Response) => {
     try {
         const activity = await getActivityById(req.params.eventId, req.params.activityId);
         if (activity) {
@@ -41,7 +46,7 @@ router.get('/activities/:eventId/:activityId', async (req: Request, res: Respons
 });
 
 // Create new activity
-router.post('/activities/:eventId', managerMiddleware, async (req: Request, res: Response) => {
+router.post('/:eventId', managerMiddleware, async (req: Request, res: Response) => {
     try {
         const newActivity = await createActivity(req.params.eventId, req.body);
         res.status(201).json(newActivity);
@@ -52,7 +57,7 @@ router.post('/activities/:eventId', managerMiddleware, async (req: Request, res:
 });
 
 // Update activity
-router.patch('/activities/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
+router.patch('/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
     try {
         const updatedActivity = await updateActivity(
             req.params.eventId, 
@@ -71,7 +76,7 @@ router.patch('/activities/:eventId/:activityId', managerMiddleware, async (req: 
 });
 
 // Delete activity
-router.delete('/activities/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
+router.delete('/:eventId/:activityId', managerMiddleware, async (req: Request, res: Response) => {
     try {
         const result = await deleteActivity(req.params.eventId, req.params.activityId);
         if (result) {
@@ -85,4 +90,48 @@ router.delete('/activities/:eventId/:activityId', managerMiddleware, async (req:
     }
 });
 
+// Invalidate cache for activities
+router.post('/invalidate-cache', adminMiddleware, async (req: Request, res: Response) => {
+    try {
+        const result = await invalidateActivitiesCache();
+        res.json({ message: result });
+    } catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache' });
+    }
+});
+
+// Get poll results for an activity
+router.get('/:eventId/:activityId/poll', async (req: Request, res: Response) => {
+    try {
+        const results = await getPollResults(req.params.eventId, req.params.activityId);
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching poll results:', error);
+        res.status(500).json({ message: 'Error fetching poll results' });
+    }
+});
+
+// Cast a vote for a participant
+router.post('/:eventId/:activityId/vote/:teamId', authMiddleware, async (req: Request, res: Response) => {
+    try {
+        const userdata = 'user' in req ? req.user as UserData : null;
+        if (!userdata) {
+            res.status(400).json({ message: 'User data missing from token' });
+            return;
+        }
+        const result = await castVote(req.params.eventId, req.params.activityId, req.params.teamId, userdata.username);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error casting vote:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error casting vote';
+        
+        if (errorMessage.includes('already voted')) {
+            res.status(400).json({ message: errorMessage });
+            return;
+        }
+
+        res.status(500).json({ message: errorMessage });
+    }
+});
 export default router;

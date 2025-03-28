@@ -1,7 +1,11 @@
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useMemo } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import InstallPrompt from '@components/shared/InstallPrompt';
+import { LoginProvider } from '@components/shared/LoginContext';
 import ActivityPage from './pages/ActivityPage';
 import ArticlePage from './pages/ArticlePage';
 import ArticlesPage from './pages/ArticlesPage';
@@ -10,7 +14,6 @@ import HomePage from './pages/HomePage';
 import TimelinePage from './pages/TimelinePage';
 import { ColorModeContext, useColorMode } from './utils/ColorMode';
 import queryClient from './utils/QueryClient';
-import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const colorMode = useColorMode();
@@ -34,20 +37,27 @@ function App() {
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <BrowserRouter>
-            <Routes>
-              {/* Articles routes - specific ones first */}
-              <Route path="/articles/:articleId" element={<ArticlePage />} />
-              <Route path="/articles" element={<ArticlesPage />} />
-              {/* Timeline route */}
-              <Route path="/timeline" element={<TimelinePage />} />
-              {/* Event routes */}
-              <Route path="/:eventId/:activityId" element={<ActivityPage />} />
-              <Route path="/:eventId" element={<EventPage />} />
-              <Route path="/" element={<HomePage />} />
-            </Routes>
-            <Analytics />
-          </BrowserRouter>
+          <LoginProvider>
+            <BrowserRouter>
+              <Routes>
+                {/* Articles routes - specific ones first */}
+                <Route path="/articles/:articleId" element={<ArticlePage />} />
+                <Route path="/articles" element={<ArticlesPage />} />
+                {/* Timeline route */}
+                <Route path="/timeline" element={<TimelinePage />} />
+                {/* Event routes */}
+                <Route path="/:eventId/:activityId" element={<ActivityPage />} />
+                <Route path="/:eventId" element={<EventPage />} />
+                <Route path="/" element={<HomePage />} />
+              </Routes>
+
+              {/* Show prompt to install PWA */}
+              <InstallPrompt />
+
+              {/* Vercel Analytics */}
+              <SpeedInsights />
+            </BrowserRouter>
+          </LoginProvider>
         </ThemeProvider>
       </ColorModeContext.Provider>
     </QueryClientProvider>

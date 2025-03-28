@@ -1,20 +1,23 @@
-import { useEffect, useState, memo, useCallback } from 'react';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Box, Button, CircularProgress, FormControl, Grid, IconButton, InputLabel, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, FormControl, Grid2 as Grid, IconButton, InputLabel, ListSubheader, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
 import { ClearIcon, renderTimeViewClock } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
+import { memo, useCallback, useEffect, useState } from 'react';
 
 import { EventType } from '@common/constants';
-import { Activity, CulturalActivity, SportsActivity } from '@common/models';
+import { Activity, CulturalActivity, InfoActivity, SportsActivity, TeamActivity, TechnicalActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
-import { getBaseEventType } from '@common/utils';
+import { getActivityTypes, getAllBaseEventTypes, getBaseEventType } from '@common/utils';
 
 import { CulturalsView } from './CulturalsView';
 import { GeneralView } from './GeneralView';
+import { InfoView } from './InfoView';
 import { SportsView } from './SportsView';
+import { TechnicalView } from './TechnicalView';
+import { pascalCase } from '@utils/utils';
 
 interface ActivityFormProps {
     eventId?: string;
@@ -27,12 +30,14 @@ interface ActivityFormProps {
 const MemoizedSportsView = memo(SportsView);
 const MemoizedCulturalsView = memo(CulturalsView);
 const MemoizedGeneralView = memo(GeneralView);
+const MemoizedInfoView = memo(InfoView);
+const MemoizedTechnicalView = memo(TechnicalView);
 
 export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }: ActivityFormProps) => {
     const [formData, setFormData] = useState<Partial<Activity>>({
         id: '',
         name: '',
-        eventType: EventType.GENERAL,
+        type: EventType.GENERAL,
         startTime: new Date(),
         endTime: undefined,  // Add endTime field with default undefined
         participants: []
@@ -51,7 +56,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
             setFormData(Activity.parse({
                 id: '',
                 name: '',
-                eventType: EventType.GENERAL,
+                type: EventType.GENERAL,
                 startTime: new Date(),
                 endTime: undefined,
                 participants: [],
@@ -64,7 +69,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
     }, [activity]);
 
     // Handle form field changes
-    const handleChange = useCallback((field: string, value: any) => {
+    const handleChange = useCallback((field: keyof Activity, value: any) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -79,13 +84,13 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
             newErrors.name = 'Activity name is required';
         }
 
-        if (!formData.eventType) {
-            newErrors.eventType = 'Activity type is required';
+        if (!formData.type) {
+            newErrors.type = 'Activity type is required';
         }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
-    }, [formData.name, formData.eventType]);
+    }, [formData.name, formData.type]);
 
     // Handle form submission
     const handleSubmit = useCallback(async () => {
@@ -126,18 +131,19 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
 
     // Render different view based on activity type - memoized
     const renderActivityTypeSpecificView = useCallback(() => {
-        switch (getBaseEventType(formData.eventType)) {
-            case EventType.SPORTS:
-                return <MemoizedSportsView formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
-            case EventType.CULTURAL:
-                return <MemoizedCulturalsView formData={formData as CulturalActivity} setFormData={setFormData} />;
-            case EventType.TECH:
-                return <MemoizedGeneralView formData={formData} setFormData={setFormData} />; // Use GeneralView for Tech for now
-            default:
-                return <MemoizedGeneralView formData={formData} setFormData={setFormData} />;
+        switch (getBaseEventType(formData.type)) {
+            case EventType.INFO: return <MemoizedInfoView formData={formData as InfoActivity} setFormData={setFormData} />;
+            case EventType.SPORTS: return <MemoizedSportsView formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
+            case EventType.CULTURAL: return <MemoizedCulturalsView formData={formData as CulturalActivity} setFormData={setFormData} />;
+            case EventType.TECH: return <MemoizedTechnicalView formData={formData as TechnicalActivity} setFormData={setFormData} />;
+            default: return <MemoizedGeneralView formData={formData} setFormData={setFormData} />;
         }
     }, [formData]);
-    const eventTypes = Object.entries(EventType).map(([key, value]) => ({ key, value }));
+    
+    const groupedActivityTypes = getAllBaseEventTypes().reduce((acc, type) => {
+        acc[getBaseEventType(type)] = getActivityTypes(type);
+        return acc;
+    }, {} as Record<EventType, EventType[]>);
 
     return (
         <Paper elevation={3} sx={{ p: 3 }}>
@@ -161,22 +167,55 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                         required
                     />
 
-                    <FormControl fullWidth margin="normal" error={!!errors.eventType}>
+                    <FormControl fullWidth margin="normal" error={!!errors.type}>
                         <InputLabel>Activity Type</InputLabel>
                         <Select
-                            value={formData.eventType || ''}
+                            value={formData.type || ''}
                             label="Activity Type"
-                            onChange={(e) => handleChange('eventType', e.target.value)}
+                            onChange={(e) => handleChange('type', e.target.value)}
                         >
-                            {eventTypes.map(({ key, value }) => (
-                                Number(value) && <MenuItem key={key} value={value}>{key}</MenuItem>
-                            ))}
+                            {(() => {
+                                const [activeGroup, setActiveGroup] = useState<string | null>(null);
+                                
+                                return Object.entries(groupedActivityTypes).flatMap(([baseType, subTypes]) => {
+                                    const groupId = `group-${baseType}`;
+                                    
+                                    return [
+                                        <MenuItem key={baseType} value={baseType} data-group-id={groupId} onMouseEnter={() => setActiveGroup(groupId)}
+                                            onMouseLeave={(e) => {
+                                                // Only hide if not moving to another element with the same group ID
+                                                if (!e.relatedTarget || !(e.relatedTarget as Element).closest(`[data-group-id="${groupId}"]`)) {
+                                                    setActiveGroup(null);
+                                                }
+                                            }}
+                                        >
+                                            {pascalCase(EventType[baseType])}
+                                        </MenuItem>,
+                                        ...subTypes.map(subType => (
+                                            <MenuItem key={subType} value={subType} data-group-id={groupId} onMouseEnter={() => setActiveGroup(groupId)}
+                                                onMouseLeave={(e) => {
+                                                    if (!e.relatedTarget || !(e.relatedTarget as Element).closest(`[data-group-id="${groupId}"]`)) {
+                                                        setActiveGroup(null);
+                                                    }
+                                                }}
+                                                sx={{ 
+                                                    maxHeight: activeGroup === groupId ? '32px' : '0px',
+                                                    opacity: activeGroup === groupId ? 1 : 0,
+                                                    padding: activeGroup === groupId ? '6px 40px' : '0px 40px',
+                                                    transition: 'max-height 300ms ease, opacity 300ms ease, padding 300ms ease',
+                                                }}
+                                            >
+                                                {pascalCase(EventType[subType])}
+                                            </MenuItem>
+                                        ))
+                                    ];
+                                });
+                            })()}
                         </Select>
-                        {errors.eventType && <Typography color="error">{errors.eventType}</Typography>}
+                        {errors.type && <Typography color="error">{errors.type}</Typography>}
                     </FormControl>
-
                     <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid item xs={12} md={6} display="flex" alignItems="center">
+                        <Grid size={{xs:12, md:6}} display="flex" alignItems="center">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
                                     label="Start Time"
@@ -191,7 +230,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                             </LocalizationProvider>
                             <IconButton onClick={() => handleChange('startTime', null)}><ClearIcon /></IconButton>
                         </Grid>
-                        <Grid item xs={12} md={6} display="flex" alignItems="center">
+                        <Grid size={{xs:12, md:6}} display="flex" alignItems="center">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
                                     label="End Time"

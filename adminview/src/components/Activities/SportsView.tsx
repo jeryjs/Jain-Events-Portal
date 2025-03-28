@@ -1,7 +1,7 @@
 import { useState, useCallback, memo } from 'react';
 import { Box, Button, Dialog, Typography, Paper } from '@mui/material';
-import { TeamsForm } from './SportsView/TeamsForm';
-import { ParticipantsForm } from './ParticipantsForm';
+import { TeamsForm } from './shared/TeamsForm';
+import { ParticipantsForm } from './shared/ParticipantsForm';
 import { CricketForm } from './SportsView/Cricket';
 import { GenericSport } from './SportsView/GenericSport';
 import { SportsActivity, SportsPlayer } from '@common/models';
@@ -56,7 +56,7 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
 
   // Render sport-specific form based on selected sport type
   const renderSportSpecificForm = useCallback(() => {
-    switch (formData.eventType) {
+    switch (formData.type) {
       case EventType.CRICKET: return <CricketForm formData={formData as SportsActivity<Cricket>} setFormData={setFormData} />;
       case EventType.BASKETBALL: return <BasketballForm formData={formData as SportsActivity<Basketball>} setFormData={setFormData} />;
       case EventType.FOOTBALL: return <FootballForm formData={formData as SportsActivity<Football>} setFormData={setFormData} />;

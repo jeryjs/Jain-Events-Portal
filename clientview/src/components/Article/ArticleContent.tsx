@@ -1,15 +1,17 @@
-import React from 'react';
-import { Box, Typography, Chip, Paper, Divider, IconButton, Button } from '@mui/material';
-import { styled, alpha, Theme } from '@mui/material/styles';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
-import ShareIcon from '@mui/icons-material/Share';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import { BlockNoteView } from "@blocknote/mantine";
+import ShareIcon from '@mui/icons-material/Share';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Box, Button, Chip, Divider, IconButton, Paper, Typography } from '@mui/material';
+import { alpha, styled, Theme } from '@mui/material/styles';
+import { motion } from 'framer-motion';
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+import Markdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
 const ContentPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -64,23 +66,19 @@ interface ArticleContentProps {
   onToggleBookmark: () => void;
   onShare: () => void;
   relatedArticles: any[];
-  editor: any;
-  theme: Theme;
 }
 
-const ArticleContent: React.FC<ArticleContentProps> = ({ 
-  article, 
-  bookmarked, 
-  onToggleBookmark, 
-  onShare, 
+const ArticleContent: React.FC<ArticleContentProps> = ({
+  article,
+  bookmarked,
+  onToggleBookmark,
+  onShare,
   relatedArticles,
-  editor,
-  theme
 }) => {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }} 
-      animate={{ opacity: 1, y: 0 }} 
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <ContentPaper>
@@ -101,8 +99,8 @@ const ArticleContent: React.FC<ArticleContentProps> = ({
           <MetaItem>
             <CalendarTodayIcon />
             <Typography variant="body2">
-              {new Date(article.publishedAt).toLocaleDateString('en-US', { 
-                year: 'numeric', month: 'short', day: 'numeric' 
+              {new Date(article.publishedAt).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
               })}
             </Typography>
           </MetaItem>
@@ -117,11 +115,11 @@ const ArticleContent: React.FC<ArticleContentProps> = ({
         </ArticleMeta>
 
         {/* Article Summary */}
-        <Typography 
-          variant="subtitle1" 
-          sx={{ 
-            mb: 4, 
-            fontSize: '1.1rem', 
+        <Typography
+          variant="subtitle1"
+          sx={{
+            mb: 4,
+            fontSize: '1.1rem',
             fontWeight: 500,
             color: 'text.secondary',
             fontStyle: 'italic'
@@ -131,21 +129,23 @@ const ArticleContent: React.FC<ArticleContentProps> = ({
         </Typography>
 
         <Divider sx={{ my: 3 }} />
-        
+
         {/* Article Content */}
         <MarkdownContent>
-          <BlockNoteView editor={editor} editable={false} theme={theme.palette.mode} />
+          <Markdown remarkRehypeOptions={{ allowDangerousHtml: true }} rehypePlugins={[rehypeRaw]}>
+            {article.content}
+          </Markdown>
         </MarkdownContent>
 
         {/* Tags */}
         {article.tags.length > 0 && (
           <TagsContainer>
             {article.tags.map((tag: string) => (
-              <Chip 
-                key={tag} 
-                label={tag} 
-                size="small" 
-                variant="outlined" 
+              <Chip
+                key={tag}
+                label={tag}
+                size="small"
+                variant="outlined"
                 sx={{ fontWeight: 500 }}
               />
             ))}
@@ -162,15 +162,15 @@ const ArticleContent: React.FC<ArticleContentProps> = ({
               {article.relatedArticleIds.map((relatedId: string) => {
                 const relatedArticle = relatedArticles?.find(a => a.id === relatedId);
                 if (!relatedArticle) return null;
-                
+
                 return (
-                  <Button 
+                  <Button
                     key={relatedId}
                     component={Link}
                     to={`/articles/${relatedId}`}
                     variant="text"
-                    sx={{ 
-                      textAlign: 'left', 
+                    sx={{
+                      textAlign: 'left',
                       justifyContent: 'flex-start',
                       color: 'text.primary',
                       textTransform: 'none',

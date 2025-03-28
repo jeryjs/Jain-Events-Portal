@@ -20,7 +20,7 @@ const router = express_1.default.Router();
  * Activity Routes
  */
 // Get all activities for an event
-router.get('/activities/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const activities = yield (0, activities_1.getActivities)(req.params.eventId);
         res.json(activities || []);
@@ -31,7 +31,7 @@ router.get('/activities/:eventId', (req, res) => __awaiter(void 0, void 0, void 
     }
 }));
 // Get specific activity by ID
-router.get('/activities/:eventId/:activityId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/:eventId/:activityId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const activity = yield (0, activities_1.getActivityById)(req.params.eventId, req.params.activityId);
         if (activity) {
@@ -47,7 +47,7 @@ router.get('/activities/:eventId/:activityId', (req, res) => __awaiter(void 0, v
     }
 }));
 // Create new activity
-router.post('/activities/:eventId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/:eventId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newActivity = yield (0, activities_1.createActivity)(req.params.eventId, req.body);
         res.status(201).json(newActivity);
@@ -58,7 +58,7 @@ router.post('/activities/:eventId', auth_1.managerMiddleware, (req, res) => __aw
     }
 }));
 // Update activity
-router.patch('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updatedActivity = yield (0, activities_1.updateActivity)(req.params.eventId, req.params.activityId, req.body);
         if (updatedActivity) {
@@ -74,7 +74,7 @@ router.patch('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req,
     }
 }));
 // Delete activity
-router.delete('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/:eventId/:activityId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, activities_1.deleteActivity)(req.params.eventId, req.params.activityId);
         if (result) {
@@ -87,6 +87,49 @@ router.delete('/activities/:eventId/:activityId', auth_1.managerMiddleware, (req
     catch (error) {
         console.error('Error deleting activity:', error);
         res.status(500).json({ message: 'Error deleting activity' });
+    }
+}));
+// Invalidate cache for activities
+router.post('/invalidate-cache', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield (0, activities_1.invalidateActivitiesCache)();
+        res.json({ message: result });
+    }
+    catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache' });
+    }
+}));
+// Get poll results for an activity
+router.get('/:eventId/:activityId/poll', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const results = yield (0, activities_1.getPollResults)(req.params.eventId, req.params.activityId);
+        res.json(results);
+    }
+    catch (error) {
+        console.error('Error fetching poll results:', error);
+        res.status(500).json({ message: 'Error fetching poll results' });
+    }
+}));
+// Cast a vote for a participant
+router.post('/:eventId/:activityId/vote/:teamId', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userdata = 'user' in req ? req.user : null;
+        if (!userdata) {
+            res.status(400).json({ message: 'User data missing from token' });
+            return;
+        }
+        const result = yield (0, activities_1.castVote)(req.params.eventId, req.params.activityId, req.params.teamId, userdata.username);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        console.error('Error casting vote:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Error casting vote';
+        if (errorMessage.includes('already voted')) {
+            res.status(400).json({ message: errorMessage });
+            return;
+        }
+        res.status(500).json({ message: errorMessage });
     }
 }));
 exports.default = router;

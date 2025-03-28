@@ -5,17 +5,30 @@ import {
     createArticle, 
     updateArticle, 
     deleteArticle,
+    updateArticleViewCount,
+    invalidateArticlesCache,
 } from "@services/articles";
 import { adminMiddleware } from '@middlewares/auth';
+import rateLimit from 'express-rate-limit';
 
 const router = Router();
+
+// Rate limiter to prevent abuse (1 request per minute per article)
+const viewCountLimiter = rateLimit({
+  windowMs: 30 * 60 * 1000, // 30 minutes
+  max: 1,
+  message: 'Article already marked as read!',
+  keyGenerator: function (req: Request, res: Response) {
+    return req.ip + '-' + req.params.articleId; // Unique key per IP and article ID
+  },
+});
 
 /**
  * Article Routes
  */
 
 // Get all articles
-router.get('/articles', async (_: Request, res: Response) => {
+router.get('/', async (_: Request, res: Response) => {
     try {
         const articles = await getArticles();
         res.json(articles);
@@ -26,7 +39,7 @@ router.get('/articles', async (_: Request, res: Response) => {
 });
 
 // Get article by ID
-router.get('/articles/:articleId', async (req: Request, res: Response) => {
+router.get('/:articleId', async (req: Request, res: Response) => {
     try {
         const article = await getArticleById(req.params.articleId);
         if (article) {
@@ -41,7 +54,7 @@ router.get('/articles/:articleId', async (req: Request, res: Response) => {
 });
 
 // Create new article
-router.post('/articles', adminMiddleware, async (req: Request, res: Response) => {
+router.post('', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const newArticle = await createArticle(req.body);
         res.status(201).json(newArticle);
@@ -52,7 +65,7 @@ router.post('/articles', adminMiddleware, async (req: Request, res: Response) =>
 });
 
 // Update article
-router.patch('/articles/:articleId', adminMiddleware, async (req: Request, res: Response) => {
+router.patch('/:articleId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const updatedArticle = await updateArticle(req.params.articleId, req.body);
         res.json(updatedArticle);
@@ -63,7 +76,7 @@ router.patch('/articles/:articleId', adminMiddleware, async (req: Request, res: 
 });
 
 // Delete article
-router.delete('/articles/:articleId', adminMiddleware, async (req: Request, res: Response) => {
+router.delete('/:articleId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const result = await deleteArticle(req.params.articleId);
         if (result) {
@@ -74,6 +87,33 @@ router.delete('/articles/:articleId', adminMiddleware, async (req: Request, res:
     } catch (error) {
         console.error('Error deleting article:', error);
         res.status(500).json({ message: 'Error deleting article', details: error });
+    }
+});
+
+// Update article view count
+router.post('/:articleId/view', viewCountLimiter, async (req: Request, res: Response) => {
+  try {
+    const articleId = req.params.articleId;
+    const article = await updateArticleViewCount(articleId);
+    if (article) {
+      res.json({ message: 'View count updated successfully' });
+    } else {
+      res.status(404).json({ message: 'Article not found' });
+    }
+  } catch (error) {
+    console.error('Error updating article view count:', error);
+    res.status(500).json({ message: 'Error updating article view count', details: error });
+  }
+});
+
+// Invalidate cache for articles
+router.post('/invalidate-cache', adminMiddleware, async (req: Request, res: Response) => {
+    try {
+        const message = await invalidateArticlesCache();
+        res.json({ message });
+    } catch (error) {
+        console.error('Error invalidating cache:', error);
+        res.status(500).json({ message: 'Error invalidating cache', details: error });
     }
 });
 
