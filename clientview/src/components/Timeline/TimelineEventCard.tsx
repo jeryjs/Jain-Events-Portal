@@ -7,9 +7,10 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { EventType } from '@common/constants';
 import { Link } from 'react-router-dom';
 import { getBaseEventType } from '@common/utils';
+import { Event } from '@common/models';
 
 interface TimelineEventCardProps {
-  event: any;
+  event: Event;
   sx?: {};
 }
 
@@ -112,7 +113,7 @@ const TimelineEventCard: React.FC<TimelineEventCardProps> = ({ event, sx }) => {
   const formattedTime = formatDate(eventDate);
 
   // Get default banner if not available
-  const bannerUrl = event.banner?.url || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg';
+  const bannerUrl = event.activeBanner?.url || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg';
 
   return (
     <CardContainer

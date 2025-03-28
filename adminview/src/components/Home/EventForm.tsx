@@ -6,10 +6,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import DescriptionIcon from '@mui/icons-material/Description';
 import EditIcon from '@mui/icons-material/Edit';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import ImageIcon from '@mui/icons-material/Image';
 import {
   Box, Button, CircularProgress,
   IconButton, MenuItem, Fade,
-  Paper, Select, TextField, Typography
+  Paper, Select, TextField, Typography, 
+  Tabs, Tab, Stack, FormControlLabel, Switch, Chip
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,7 +24,7 @@ import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import dayjs from 'dayjs';
 
 import { EventType } from '@common/constants';
-import { Event } from '@common/models';
+import { BannerItem, Event } from '@common/models';
 import { ActivityButton } from './ActivityButton';
 import { getAllBaseEventTypes } from '@common/utils';
 
@@ -44,6 +49,7 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isImageEditOpen, setIsImageEditOpen] = useState(false);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -75,14 +81,18 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
       errors.timings = 'End time must be after start time';
     }
 
-    if (Object.keys(errors).length > 0) setFormErrors(errors);
-    alert(JSON.stringify(errors, null, 2)); // For debugging purposes
+    // Ensure at least one banner item exists
+    if (!formData.banner || formData.banner.length === 0) {
+      errors.banner = 'At least one banner item is required';
+    }
+
+    setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   // Utility to update formData
   const editFormData = (key: string, value: any) => {
-    setFormData(Event.parse({ ...formData, [key]: value }));
+    setFormData(prev => ({...prev, [key]: value }));
   };
 
   // Handle form submission
@@ -112,6 +122,106 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
     }
   };
 
+  // Get the current banner item or a default
+  const currentBannerItem: BannerItem = formData.banner && 
+    formData.banner.length > 0 && 
+    currentBannerIndex < formData.banner.length ? 
+    formData.banner[currentBannerIndex] : { type: 'image' };
+
+  // Add a new banner item
+  const addBannerItem = () => {
+    const newItem: BannerItem = { type: 'image' };
+    const updatedBanner = [...(formData.banner || []), newItem];
+    editFormData('banner', updatedBanner);
+    setCurrentBannerIndex(updatedBanner.length - 1);
+  };
+
+  // Update the current banner item
+  const updateCurrentBannerItem = (updates: Partial<BannerItem>) => {
+    if (!formData.banner || currentBannerIndex >= formData.banner.length) return;
+    
+    const updatedBanner = [...formData.banner];
+    updatedBanner[currentBannerIndex] = { 
+      ...updatedBanner[currentBannerIndex], 
+      ...updates 
+    };
+    editFormData('banner', updatedBanner);
+  };
+
+  // Remove the current banner item
+  const removeCurrentBannerItem = () => {
+    if (!formData.banner || formData.banner.length <= 1) return;
+    
+    const updatedBanner = formData.banner.filter((_, index) => index !== currentBannerIndex);
+    editFormData('banner', updatedBanner);
+    setCurrentBannerIndex(Math.min(currentBannerIndex, updatedBanner.length - 1));
+  };
+
+  // Preview rendering for banner item
+  const renderBannerPreview = (item: BannerItem) => {
+    if (!item.url) {
+      return (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}
+        >
+          <AddPhotoAlternateIcon sx={{ fontSize: 48, color: '#999999' }} />
+          <Typography variant="subtitle1" color="#999999" mt={1}>
+            Add Banner {item.type === 'image' ? 'Image' : 'Video'}
+          </Typography>
+        </Box>
+      );
+    }
+
+    if (item.type === 'video') {
+      return (
+        <Box
+          component="video"
+          src={item.url}
+          controls
+          muted
+          sx={{ width: '100%', height: '100%' }}
+          style={
+            item.customCss
+              ? Object.fromEntries(
+                item.customCss.split(';')
+                  .filter(prop => prop.trim())
+                  .map(prop => {
+                    const [key, value] = prop.split(':').map(p => p.trim());
+                    return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
+                  })
+              )
+              : {}
+          }
+        />
+      );
+    }
+
+    return (
+      <Box
+        component="img"
+        src={item.url}
+        alt="Banner image"
+        sx={{ width: '100%', height: '100%' }}
+        style={
+          item.customCss
+            ? Object.fromEntries(
+              item.customCss.split(';')
+                .filter(prop => prop.trim())
+                .map(prop => {
+                  const [key, value] = prop.split(':').map(p => p.trim());
+                  return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
+                })
+            )
+            : {}
+        }
+      />
+    );
+  };
+
   return (
     <Suspense fallback={<CircularProgress />}>
       <Paper
@@ -126,55 +236,23 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
           padding: { xs: 2, md: 3 }
         }}
       >
-        {/* Banner Image Section */}
+        {/* Banner Image/Video Section */}
         <Box
           sx={{
             position: 'relative',
             width: '100%',
             height: '350px',
-            bgcolor: formData.banner.url ? 'transparent' : '#F0F0F0',
-            borderBottom: formData.banner.url ? 'none' : '2px dashed #CCCCCC',
+            bgcolor: currentBannerItem?.url ? 'transparent' : '#F0F0F0',
+            borderBottom: currentBannerItem?.url ? 'none' : '2px dashed #CCCCCC',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             overflow: 'hidden'
           }}
+          onClick={() => setIsImageEditOpen(!isImageEditOpen)}
         >
-          {formData.banner.url ? (
-            <Box
-              onClick={() => setIsImageEditOpen(!isImageEditOpen)}
-              component="img"
-              src={formData.banner.url}
-              alt={formData.name}
-              sx={{ width: '100%', height: '100%' }}
-              style={
-                formData.banner.customCss
-                  ? Object.fromEntries(
-                    formData.banner.customCss.split(';')
-                      .filter(prop => prop.trim())
-                      .map(prop => {
-                        const [key, value] = prop.split(':').map(p => p.trim());
-                        return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
-                      })
-                  )
-                  : {}
-              }
-            />
-          ) : (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-              }}
-            >
-              <AddPhotoAlternateIcon sx={{ fontSize: 48, color: '#999999' }} />
-              <Typography variant="subtitle1" color="#999999" mt={1}>
-                Add Banner Image
-              </Typography>
-            </Box>
-          )}
+          {renderBannerPreview(currentBannerItem)}
 
           {/* Event Type Tag */}
           <EventTypeInput>
@@ -207,6 +285,44 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
             )}
           </EventTypeInput>
 
+          {/* Banner Navigation/Pagination */}
+          {formData.banner && formData.banner.length > 1 && (
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 16,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 1,
+                zIndex: 2,
+              }}
+            >
+              {formData.banner.map((_, index) => (
+                <Box
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentBannerIndex(index);
+                  }}
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: '50%',
+                    bgcolor: currentBannerIndex === index ? 'primary.main' : 'rgba(255,255,255,0.7)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: 'scale(1.2)',
+                    },
+                  }}
+                />
+              ))}
+            </Box>
+          )}
+
           {/* Image Edit Overlay */}
           <Fade in={isImageEditOpen} timeout={300}>
             <Box
@@ -225,10 +341,13 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
                 zIndex: 1,
               }}
             >
-              <Box sx={{ p: 2, bgcolor: 'rgba(255, 255, 255, 0.8)', borderRadius: 2, width: '80%', maxWidth: '500px' }}>
+              <Box sx={{ p: 2, bgcolor: 'rgba(255, 255, 255, 0.9)', borderRadius: 2, width: '80%', maxWidth: '500px' }}>
                 <IconButton
                   aria-label="close"
-                  onClick={() => setIsImageEditOpen(false)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsImageEditOpen(false);
+                  }}
                   sx={{
                     position: 'absolute',
                     right: 8,
@@ -237,15 +356,35 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
                 >
                   <CloseIcon />
                 </IconButton>
-                <Typography variant="h6" gutterBottom>Edit Banner Image</Typography>
+                <Typography variant="h6" gutterBottom>
+                  Edit Banner {currentBannerItem.type === 'image' ? 'Image' : 'Video'}
+                </Typography>
+
+                {/* Media Type Selection */}
+                <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip 
+                    icon={<ImageIcon />} 
+                    label="Image" 
+                    clickable
+                    color={currentBannerItem.type === 'image' ? 'primary' : 'default'}
+                    onClick={() => updateCurrentBannerItem({ type: 'image' })}
+                  />
+                  <Chip 
+                    icon={<VideoLibraryIcon />} 
+                    label="Video" 
+                    clickable
+                    color={currentBannerItem.type === 'video' ? 'primary' : 'default'}
+                    onClick={() => updateCurrentBannerItem({ type: 'video' })}
+                  />
+                </Box>
 
                 <TextField
-                  label="Banner Image URL"
-                  placeholder="Enter image URL here..."
+                  label={currentBannerItem.type === 'image' ? "Banner Image URL" : "Banner Video URL"}
+                  placeholder={`Enter ${currentBannerItem.type} URL here...`}
                   fullWidth
                   margin="normal"
-                  value={formData.banner.url || ''}
-                  onChange={(e) => editFormData('banner', { ...formData.banner, url: e.target.value })}
+                  value={currentBannerItem.url || ''}
+                  onChange={(e) => updateCurrentBannerItem({ url: e.target.value })}
                   sx={{ mb: 2 }}
                 />
 
@@ -254,15 +393,42 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
                   placeholder="e.g., object-fit: cover; object-position: center top;"
                   fullWidth
                   margin="normal"
-                  value={formData.banner.customCss || ''}
-                  onChange={(e) => editFormData('banner', { ...formData.banner, customCss: e.target.value })}
+                  value={currentBannerItem.customCss || ''}
+                  onChange={(e) => updateCurrentBannerItem({ customCss: e.target.value })}
                   multiline
-                  helperText="Enter CSS properties for fine-tuning image display"
+                  helperText={`Enter CSS properties for fine-tuning ${currentBannerItem.type} display`}
                   sx={{ mb: 2 }}
                 />
+
+                {/* Banner Item Actions */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                  <Button
+                    startIcon={<DeleteIcon />}
+                    color="error"
+                    disabled={formData.banner?.length <= 1}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeCurrentBannerItem();
+                    }}
+                  >
+                    Remove
+                  </Button>
+                  
+                  <Button
+                    startIcon={<AddIcon />}
+                    color="primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addBannerItem();
+                    }}
+                  >
+                    Add New
+                  </Button>
+                </Box>
               </Box>
             </Box>
           </Fade>
+
           <IconButton
             sx={{
               position: 'absolute',
@@ -299,38 +465,6 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
             }}
             sx={{ mb: 4 }}
           />
-
-          {/* Event Type */}
-          {/* <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-            <Typography
-              variant="h6"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                mr: 2,
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-                pb: 1,
-                minWidth: '240px' // Adjust as needed
-              }}
-            >
-              <CategoryIcon sx={{ mr: 1 }} />
-              Event Type
-            </Typography>
-            <FormControl fullWidth margin="normal" >
-              <InputLabel>Event Type</InputLabel>
-              <Select
-                value={formData.type}
-                onChange={(e) => editFormData('type', e.target.value)}
-                label="Event Type"
-              >
-                <MenuItem value={EventType.GENERAL}>General</MenuItem>
-                <MenuItem value={EventType.SPORTS}>Sports</MenuItem>
-                <MenuItem value={EventType.CULTURAL}>Cultural</MenuItem>
-                <MenuItem value={EventType.TECH}>Tech</MenuItem>
-              </Select>
-            </FormControl>
-          </Box> */}
 
           {/* Date & Time Section */}
           <Box sx={{ mb: 4 }}>

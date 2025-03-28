@@ -116,7 +116,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
 
   // Load the event image and show shimmer while loading
   const getEventImage = async () => {
-    const imageSrc = event.banner.url ?? `https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg`;
+    const imageSrc = event.activeBanner?.url ?? `https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg`;
     try { await fetch(imageSrc) } catch { return imageSrc };  // To figure out how long to show the shimmer for the image on load
     return imageSrc;
   };

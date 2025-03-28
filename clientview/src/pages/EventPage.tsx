@@ -1,4 +1,5 @@
 import { EventType } from '@common/constants';
+import { BannerItem } from '@common/models/Event';
 import { getBaseEventType } from '@common/utils';
 import ActivityCard from '@components/Event/ActivityCard';
 import HighlightsCarousel from '@components/Event/HighlightsCarousel';
@@ -6,7 +7,10 @@ import useImgur from '@hooks/useImgur';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import {
   Accordion,
   AccordionDetails,
@@ -24,7 +28,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { generateColorFromString } from '@utils/utils';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import PageTransition from '../components/shared/PageTransition';
@@ -38,10 +42,21 @@ const HeroContainer = styled(motion.div)(({ theme }) => `
 const HeroImage = styled('img')(({ theme }) => `
   width: 100%; height: 100%; object-fit: cover; border-radius: 0 0 36px 36px;
 `);
+const HeroVideo = styled('video')(({ theme }) => `
+  width: 100%; height: 100%; object-fit: cover; border-radius: 0 0 36px 36px;
+`);
 const HeroOverlay = styled(Box)(({ theme }) => `
   position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 0 0 36px 36px;
   background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.3) 100%);
   display: flex; flex-direction: column; justify-content: space-between; padding: 16px;
+`);
+const VideoControls = styled(Box)(({ theme }) => `
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
 `);
 const EventTypeChip = styled(Chip)(({ theme }) => `
   position: absolute; margin-top: -30px; left: 50%; transform: translateX(-50%);
@@ -106,6 +121,164 @@ const getEventTypeInfo = (type: EventType) => {
     text: EventType[type],
     color: generateColorFromString(EventType[type]),
   };
+};
+
+// Banner Media Component with automatic rotation
+const BannerMedia = ({ items }: { items: BannerItem[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [muted, setMuted] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Function to handle fullscreen toggle
+  const toggleFullscreen = () => {
+    if (!containerRef.current) return;
+    
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+      }).catch((err) => {
+        console.error(`Error attempting to exit fullscreen: ${err.message}`);
+      });
+    }
+  };
+  
+  // Auto rotate banner items
+  useEffect(() => {
+    if (items.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % items.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [items.length]);
+  
+  // Reset video element when changing items
+  useEffect(() => {
+    if (videoRef.current && items[currentIndex]?.type === 'video') {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+    }
+  }, [currentIndex, items]);
+  
+  if (!items || items.length === 0) {
+    return (
+      <Box sx={{ 
+        width: '100%', 
+        height: '100%', 
+        bgcolor: '#F0F0F0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <Typography>No banner media available</Typography>
+      </Box>
+    );
+  }
+  
+  const currentItem = items[currentIndex];
+  
+  // Configure transition variants for particle effect
+  const particleVariants = {
+    enter: {
+      scale: 0,
+      opacity: 0
+    },
+    center: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        duration: 0.5
+      }
+    },
+    exit: {
+      scale: 1.2,
+      opacity: 0,
+      transition: {
+        duration: 0.5,
+        when: "afterChildren",
+        staggerChildren: 0.05
+      }
+    }
+  };
+  
+  return (
+    <Box ref={containerRef} sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentIndex}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          variants={particleVariants}
+          style={{ width: '100%', height: '100%' }}
+        >
+          {currentItem.type === 'video' && currentItem.url ? (
+            <>
+              <HeroVideo
+                ref={videoRef}
+                src={currentItem.url}
+                autoPlay
+                muted={muted}
+                loop={false}
+                style={
+                  currentItem.customCss ? 
+                    Object.fromEntries(
+                      currentItem.customCss.split(';')
+                        .filter(prop => prop.trim())
+                        .map(prop => {
+                          const [key, value] = prop.split(':').map(p => p.trim());
+                          return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
+                        })
+                    ) : {}
+                }
+              />
+              <VideoControls>
+                <IconButton 
+                  onClick={() => setMuted(!muted)}
+                  sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' } }}
+                  size="small"
+                >
+                  {muted ? <VolumeOffIcon fontSize="small" /> : <VolumeUpIcon fontSize="small" />}
+                </IconButton>
+                <IconButton 
+                  onClick={toggleFullscreen}
+                  sx={{ bgcolor: 'rgba(0,0,0,0.5)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' } }}
+                  size="small"
+                >
+                  <FullscreenIcon fontSize="small" />
+                </IconButton>
+              </VideoControls>
+            </>
+          ) : (
+            <HeroImage
+              src={getDefaultImage(currentItem.url)}
+              alt="Event banner"
+              style={
+                currentItem.customCss ? 
+                  Object.fromEntries(
+                    currentItem.customCss.split(';')
+                      .filter(prop => prop.trim())
+                      .map(prop => {
+                        const [key, value] = prop.split(':').map(p => p.trim());
+                        return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
+                      })
+                  ) : {}
+              }
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </Box>
+  );
 };
 
 // Activity Accordion Component
@@ -347,11 +520,7 @@ function EventPage() {
         {/* Hero Section with Background Image */}
         <Box>
           <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-            <HeroImage
-              src={getDefaultImage(event.banner.url)}
-              alt={event.name}
-              style={event.eventBannerStyles}
-            />
+            <BannerMedia items={event.banner || []} />
             <HeroOverlay>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                 <IconButton onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
