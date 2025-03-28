@@ -25,17 +25,20 @@ exports.db.settings({ ignoreUndefinedProperties: true });
  */
 const sendPushNotificationToAllUsers = (title, body, imageUrl, options) => __awaiter(void 0, void 0, void 0, function* () {
     const message = {
-        notification: {
+        notification: (options === null || options === void 0 ? void 0 : options.showNotification) !== false ? {
             title,
             body,
             imageUrl,
-        },
+        } : undefined,
         data: {
-            // Add data for handling in the service worker
-            saveToDatabase: (options === null || options === void 0 ? void 0 : options.saveToDatabase) ? 'true' : 'false',
+            // All notifications are saved by default
+            title, // Include title in data for silent notifications
+            body, // Include body in data for silent notifications
+            imageUrl: imageUrl || '', // Include imageUrl in data for silent notifications
+            showNotification: (options === null || options === void 0 ? void 0 : options.showNotification) !== false ? 'true' : 'false',
             clickAction: (options === null || options === void 0 ? void 0 : options.clickAction) || '/',
+            link: (options === null || options === void 0 ? void 0 : options.link) || '',
             timestamp: Date.now().toString(),
-            // Add any other metadata needed
         },
         topic: process.env.NODE_ENV === "development" ? 'all-users-test' : 'all-users',
     };

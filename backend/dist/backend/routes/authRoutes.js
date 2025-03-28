@@ -33,9 +33,12 @@ router.post("/subscribe", (req, res) => __awaiter(void 0, void 0, void 0, functi
 }));
 // Route to send push notifications to all users
 router.post("/sendNotificationToAll", auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, message } = req.body;
+    const { title, message, imageUrl, link, showNotification } = req.body;
     try {
-        yield (0, firebase_1.sendPushNotificationToAllUsers)(title, message);
+        yield (0, firebase_1.sendPushNotificationToAllUsers)(title, message, imageUrl, {
+            link,
+            showNotification
+        });
         console.log(`🔔 Notification sent to all users: '${title}'`);
         res.status(200).json({ message: `Notification sent to all users successfully` });
     }
