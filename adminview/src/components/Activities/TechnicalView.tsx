@@ -1,5 +1,5 @@
 import { Participant, TechnicalActivity } from '@common/models';
-import { Autocomplete, Box, Card, CardContent, Chip, IconButton, MenuItem, Paper, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Alert, Autocomplete, Box, Card, CardContent, Chip, FormControlLabel, IconButton, MenuItem, Paper, Select, Stack, Switch, TextField, Tooltip, Typography } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageTeamsForm from './shared/ManageTeamsForm';
@@ -92,6 +92,31 @@ export const TechnicalView = ({ formData, setFormData }: TechnicalViewProps) => 
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>Event Configuration</Typography>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={formData.isSoloPerformance}
+                onChange={(e) => handleChange('isSoloPerformance', e.target.checked)}
+                color="primary"
+              />
+            }
+            label={
+              <Box>
+                <Typography fontWeight="medium">Solo Activity</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {formData.isSoloPerformance
+                    ? "Each participant is treated as an individual entry (team of 1)"
+                    : "Participants compete as teams"}
+                </Typography>
+              </Box>
+            }
+          />
+
+          {formData.isSoloPerformance && (
+            <Alert severity="info" sx={{ mt: 2 }}>
+              In solo mode, each participant competes as an individual entry.
+            </Alert>
+          )}
         </CardContent>
       </Card>
 
@@ -178,7 +203,7 @@ export const TechnicalView = ({ formData, setFormData }: TechnicalViewProps) => 
             <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>Add Winner:</Typography>
             <Autocomplete
               options={(formData.isSoloPerformance ? participants : teams).filter(
-                item => !winners.some(w => w.teamId === item.id)
+                item => !winners.some(w => w.teamId.trim() === item.id.trim())
               )}
               getOptionLabel={(option) => option.name}
               renderInput={(params) => (
@@ -199,6 +224,6 @@ export const TechnicalView = ({ formData, setFormData }: TechnicalViewProps) => 
           </Box>
         </Box>
       </Paper>
-    </Box>
+    </Box >
   );
 };
