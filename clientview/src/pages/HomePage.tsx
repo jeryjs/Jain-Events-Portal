@@ -1,6 +1,6 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Box, CardContent, CardMedia, Chip, Container, Skeleton, Typography } from '@mui/material';
+import { Alert, Box, Card, CardContent, CardMedia, Chip, Container, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -16,6 +16,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import PhotoGallery from '@components/shared/PhotoGallery';
 import HighlightsCarousel from '@components/Event/HighlightsCarousel';
+import { NotificationPrompt } from '@components/shared';
+import useNotifications from '@hooks/useNotifications';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -68,6 +70,7 @@ function HomePage() {
   const { data: events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
   const { data: imgur, isLoading: imgurLoading } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
+  const { isSubscribed } = useNotifications()
 
   const [catTabId, setTabId] = useState([0, -1]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
@@ -201,6 +204,12 @@ function HomePage() {
             <HighlightsCarousel images={highlights} />
           </Section>
         )}
+
+        {/* Prompt to enable notifications */}
+        <Card sx={{display: !isSubscribed?'block':'none' }}>
+          <Alert sx={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }}>We're currently sending out announcements through the FET-Hub app! Enable notifications to stay updated!!</Alert>
+          <NotificationPrompt sx={{'h6, p, div': { display: 'none' }}}/>
+        </Card>
 
         {/* Dynamically render the Events section with more events first (past tries to be last) */}
         {sortedSections.map(section => (

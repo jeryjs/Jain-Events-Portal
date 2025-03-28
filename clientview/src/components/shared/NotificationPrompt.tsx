@@ -40,6 +40,8 @@ const EnableButton = styled(Button)(({ theme }) => ({
   fontWeight: 'bold',
   textTransform: 'none',
   borderRadius: '16px',
+  maxWidth: 800,
+  placeSelf: 'center',
   padding: '10px 24px',
   transition: 'all 0.3s ease',
   animation: `${pulse} 2s infinite ease-in-out`,
@@ -123,7 +125,7 @@ const NotificationTimestamp = styled(Typography)(({ theme }) => ({
   marginTop: theme.spacing(0.5),
 }));
 
-const NotificationPrompt = () => {
+const NotificationPrompt = (props) => {
   const [showSettings, setShowSettings] = useState(false);
   const theme = useTheme();
 
@@ -216,7 +218,7 @@ const NotificationPrompt = () => {
 
   if (!isSubscribed && !showSettings) {
     return (
-      <Box display='grid' alignContent='center'>
+      <Box display='grid' alignContent='center' {...props}>
         <NotificationIconContainer>
           <NotificationsActiveIcon
             sx={{
