@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
-import ThemeSwitcher from '@components/shared/ThemeSwitcher';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   position: 'relative',
@@ -82,7 +81,6 @@ const ArticleHero: React.FC<ArticleHeroProps> = ({ article, onBack }) => {
         >
           <ArrowBackIcon />
         </IconButton>
-        {/* <ThemeSwitcher /> */}
       </Box>
       <HeroContent>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>

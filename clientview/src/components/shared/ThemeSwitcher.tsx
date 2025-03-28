@@ -50,11 +50,14 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ variant, size, sx }) => {
                 boxShadow: 3,
                 my: 1,
                 bgcolor: 'action.hover',
+                cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 '&:hover': {
                     boxShadow: 6
                 },
             }}
+            onClick={colorMode.toggleColorMode}
+            onDoubleClick={colorMode.clearStoredMode}
             secondaryAction={
                 <Switch
                     edge="end"
@@ -83,7 +86,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ variant, size, sx }) => {
             </ListItemIcon>
             <ListItemText 
                 primary={`Theme: ${colorMode.mode === 'dark' ? 'Dark' : 'Light'}`} 
-                secondary="Tap the switch to change theme"
+                secondary="Tap to switch theme"
             />
         </ListItem>
     );

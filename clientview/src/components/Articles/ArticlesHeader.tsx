@@ -1,4 +1,3 @@
-import ThemeSwitcher from '@components/shared/ThemeSwitcher';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, IconButton, InputBase, Typography } from '@mui/material';
@@ -107,7 +106,6 @@ const ArticlesHeader: React.FC<ArticlesHeaderProps> = ({
         >
           <ArrowBackIcon />
         </IconButton>
-        <ThemeSwitcher />
       </Box>
       <HeroContent>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
