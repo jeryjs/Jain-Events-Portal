@@ -8,7 +8,7 @@ try {
     // Workaround for module-alias in vercel deployment.
     if (process.env.VERCEL == '1' || __filename.endsWith('.js')) {
         console.log("Registering tsconfig-paths");
-        console.log("CURRENT ENVIRONMENT: ", process.env.NODE_ENV);
+        console.log("CURRENT ENVIRONMENT: ", process.env.VERCEL_ENV || process.env.NODE_ENV);
         // Workaround for tsconfig-paths in vercel deployment.
         const tsConfigPaths = require("../../tsconfig.json").compilerOptions.paths;
         const resolvedPaths = {};
