@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import EventsPage from './pages/EventsPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import ArticlesPage from './pages/ArticlesPage';
+import SendNotificationsPage from './pages/SendNotificationsPage';
 import { AuthProvider } from './hooks/AuthContext';
 import { ProtectedLayout } from './components/Auth';
 import { Role } from '@common/constants';
@@ -67,7 +68,7 @@ const App = () => {
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <BrowserRouter basename="/admin">
+          <BrowserRouter>
             <Suspense fallback={<div>Loading admin view...</div>}>
               <Routes>
                 {/* Public route - Login */}
@@ -81,12 +82,14 @@ const App = () => {
                   
                   {/* Activities routes */}
                   <Route path="events/:eventId/activities" element={<ActivitiesPage />} />
-                  <Route path="events/:eventId/activities/create" element={<ActivitiesPage />} />
                   <Route path="events/:eventId/activities/:activityId" element={<ActivitiesPage />} />
 
                   {/* Articles routes */}
                   <Route path="articles" element={<ArticlesPage />} />
                   <Route path="articles/:articleId" element={<ArticlesPage />} />
+
+                  {/* Send Notifications route */}
+                  <Route path="/send-notifications" element={<SendNotificationsPage />} />
                 </Route>
 
                 {/* Redirect all other paths to home */}

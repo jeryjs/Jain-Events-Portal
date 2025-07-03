@@ -24,3 +24,8 @@ export {
     useUpdateArticle,
     useDeleteArticle
 } from './useArticles';
+
+// Export notification hooks
+export {
+    useSendNotification
+} from './useNotifications';

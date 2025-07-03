@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton } from '@mui/material';
+import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton, Button } from '@mui/material';
 
 import { EventForm } from '../components/Home/EventForm';
 import { EventsList, ActivityButton } from '../components/Home';
-import { useEvent, useCreateEvent, useUpdateEvent } from '@hooks/App';
+import { useEvent, useCreateEvent, useUpdateEvent, useDeleteEvent } from '@hooks/App';
 import slugify from '../utils/Slugify';
 import { Event } from '@common/models';
 
@@ -17,6 +17,7 @@ const EventsPage = () => {
   const eventQuery = useEvent(eventId, !isCreating && !!eventId);
   const createMutation = useCreateEvent();
   const updateMutation = useUpdateEvent();
+  const deleteMutation = useDeleteEvent();
 
   // Handle event selection
   const handleSelectEvent = (id: string) => {
@@ -47,6 +48,19 @@ const EventsPage = () => {
     }
   };
 
+
+  // Handle delete action
+  const handleDeleteEvent = async () => {
+    if (eventId) {
+      await deleteMutation.mutateAsync(eventId, {
+        onSuccess: () => {
+          setIsCreating(false);
+          navigate('/events');
+        }
+      });
+    }
+  };
+
   return (
     <Container maxWidth={false} sx={{ height: '100vh', py: 3 }}>
       <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -54,9 +68,14 @@ const EventsPage = () => {
           Event Management
         </Typography>
 
-        <IconButton component={Link} to="/articles">
-          go to articles
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton component={Link} to="/send-notifications">
+            Send Notifications
+          </IconButton>
+          <IconButton component={Link} to="/articles">
+            Go to Articles
+          </IconButton>
+        </Box>
       </Card>
 
       <Grid container spacing={3} sx={{ height: '-webkit-fill-available', width: '100%' }}>
@@ -98,6 +117,7 @@ const EventsPage = () => {
                 event={eventQuery.data}
                 isCreating={isCreating}
                 onSave={handleSaveEvent}
+                onDelete={handleDeleteEvent}
               />
             </Box>
           )}

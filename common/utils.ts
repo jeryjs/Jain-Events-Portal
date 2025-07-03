@@ -29,11 +29,18 @@ export function parseArticles(data: any[]): Article[] {
 }
 
 export const getBaseEventType = (it: number): EventType => {
+    if (it >= EventType.NSS) return EventType.NSS;
     if (it >= EventType.TECH) return EventType.TECH;
     if (it >= EventType.CULTURAL) return EventType.CULTURAL;
     if (it >= EventType.SPORTS) return EventType.SPORTS;
+    if (it == EventType.INFO) return EventType.INFO;
     return EventType.GENERAL;
 };
+
+export const getAllBaseEventTypes = (): EventType[] => {
+    return Object.values(EventType)
+        .filter((value) => typeof value === "number" && value % 1000 === 0) as EventType[];
+}
 
 export const getActivityTypes = (type: EventType): EventType[] => {
     const nextBaseType = type + 1000;

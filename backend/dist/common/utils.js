@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getActivityTypes = exports.getBaseEventType = void 0;
+exports.getActivityTypes = exports.getAllBaseEventTypes = exports.getBaseEventType = void 0;
 exports.parseEvents = parseEvents;
 exports.parseActivities = parseActivities;
 exports.parseArticles = parseArticles;
@@ -28,15 +28,24 @@ function parseArticles(data) {
         new Date(b.publishedAt || Date.now()).getTime());
 }
 const getBaseEventType = (it) => {
+    if (it >= constants_1.EventType.NSS)
+        return constants_1.EventType.NSS;
     if (it >= constants_1.EventType.TECH)
         return constants_1.EventType.TECH;
     if (it >= constants_1.EventType.CULTURAL)
         return constants_1.EventType.CULTURAL;
     if (it >= constants_1.EventType.SPORTS)
         return constants_1.EventType.SPORTS;
+    if (it == constants_1.EventType.INFO)
+        return constants_1.EventType.INFO;
     return constants_1.EventType.GENERAL;
 };
 exports.getBaseEventType = getBaseEventType;
+const getAllBaseEventTypes = () => {
+    return Object.values(constants_1.EventType)
+        .filter((value) => typeof value === "number" && value % 1000 === 0);
+};
+exports.getAllBaseEventTypes = getAllBaseEventTypes;
 const getActivityTypes = (type) => {
     const nextBaseType = type + 1000;
     const types = [];

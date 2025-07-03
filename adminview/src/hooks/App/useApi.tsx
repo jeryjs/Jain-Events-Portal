@@ -160,7 +160,7 @@ export const ArticlesApi = {
 // Auth API endpoints
 export const AuthApi = {
   login: async (username: string, password: string) => {
-    const response = await fetch(`${API_BASE_URL}/auth/admin/authenticate`, {
+    const response = await fetch(`${API_BASE_URL}/user/admin/authenticate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -180,10 +180,27 @@ export const AuthApi = {
   }
 };
 
+// Notifications API endpoints
+export const NotificationsApi = {
+  // Send notification to all users
+  sendToAll: (data: { 
+    title: string; 
+    message: string; 
+    imageUrl?: string;
+    link?: string;
+    showNotification?: boolean;
+  }) => 
+    apiFetch<{ message: string }>('/user/sendNotificationToAll', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};
+
 // Export all API endpoints
 export default {
   events: EventsApi,
   activities: ActivitiesApi,
   articles: ArticlesApi,
   auth: AuthApi,
+  notifications: NotificationsApi,
 };

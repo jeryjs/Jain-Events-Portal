@@ -1,5 +1,18 @@
+
+/**
+ * Represents the different types of events available in the system.
+ *
+ * @remarks
+ * Each base type is identified by an enum value that is divisible by 1000.
+ * Enum values that are increments of a base type represent specific sub-categories.
+ *
+ * For example:
+ * - A value of 1000 (e.g., SPORTS) is a base type.
+ * - A value of 1001 (e.g., BASKETBALL) is a sub-type under the SPORTS base type.
+ */
 export enum EventType {
 	GENERAL = 0,
+	INFO = 1,
 
 	SPORTS = 1000,
 	BASKETBALL = 1001,
@@ -11,14 +24,19 @@ export enum EventType {
 
 	CULTURAL = 2000,
 	DANCE = 2001,
-	SINGING = 2002,
-	DJ = 2003,
+	MUSIC = 2002,
+	FASHION_SHOW = 2003,
+	THEATERS = 2004,
+	ORATORY = 2005,
+	LITERATURE = 2006,
 
 	TECH = 3000,
 	CODING = 3001,
 	HACKATHON = 3002,
 	QUIZ = 3003,
 	WORKSHOP = 3004,
+
+	NSS = 4000,
 }
 
 export enum ArticleStatus {

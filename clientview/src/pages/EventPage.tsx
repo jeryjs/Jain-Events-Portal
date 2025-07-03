@@ -1,36 +1,62 @@
-import { Suspense, useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Box, Typography, Container, IconButton, Chip, Divider, Skeleton, Paper,
-  Accordion, AccordionSummary, AccordionDetails, alpha,
-  Dialog
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { EventType } from '@common/constants';
+import Event, { BannerItem } from '@common/models/Event';
+import { getBaseEventType } from '@common/utils';
+import ActivityCard from '@components/Event/ActivityCard';
+import HighlightsCarousel from '@components/Event/HighlightsCarousel';
+import useImgur from '@hooks/useImgur';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { motion } from 'framer-motion';
-import { useActivities, useEvent } from '../hooks/useApi';
-import ActivityCard from '@components/Event/ActivityCard';
-import PhotoGallery from '../components/shared/PhotoGallery';
-import PageTransition from '../components/shared/PageTransition';
-import { EventType } from '@common/constants';
-import { getBaseEventType } from '@common/utils';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  alpha,
+  Box,
+  Chip,
+  Container,
+  Dialog,
+  Divider,
+  IconButton,
+  Paper,
+  Skeleton,
+  Typography
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { generateColorFromString } from '@utils/utils';
-import useImgur from '@hooks/useImgur';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import PageTransition from '../components/shared/PageTransition';
+import PhotoGallery from '../components/shared/PhotoGallery';
+import { useActivities, useEvent } from '../hooks/useApi';
 
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
   height: 30vh; min-height: 250px; max-height: 350px; width: 100%; overflow: hidden;
 `);
-const HeroImage = styled('img')(({ theme }) => `
+const HeroImage = styled(motion.img)(({ theme }) => `
   width: 100%; height: 100%; object-fit: cover; border-radius: 0 0 36px 36px;
+`);
+const HeroVideo = styled(motion.video)(({ theme }) => `
+  width: 100%; height: 100%; border-radius: 0 0 36px 36px;
 `);
 const HeroOverlay = styled(Box)(({ theme }) => `
   position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 0 0 36px 36px;
   background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.3) 100%);
   display: flex; flex-direction: column; justify-content: space-between; padding: 16px;
+`);
+const VideoControls = styled(Box)(({ theme }) => `
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
 `);
 const EventTypeChip = styled(Chip)(({ theme }) => `
   position: absolute; margin-top: -30px; left: 50%; transform: translateX(-50%);
@@ -97,17 +123,187 @@ const getEventTypeInfo = (type: EventType) => {
   };
 };
 
+// Banner Media Component with automatic rotation
+const BannerMedia = ({ items }: { items: BannerItem[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [muted, setMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartRef = useRef<number | null>(null);
+
+  const currentItem = items[currentIndex];
+  const currentCssStyles = Event.parse().getBannerStyles(currentItem);
+
+  // Toggle fullscreen for video
+  const toggleFullscreen = () => {
+    if (videoRef.current) {
+      document.fullscreenElement
+        ? document.exitFullscreen()
+        : videoRef.current.requestFullscreen();
+    }
+  };
+
+  // Auto switch banner items
+  useEffect(() => {
+    if (items.length <= 1) return;
+    const interval = setInterval(() => {
+      const videoElm = containerRef.current.querySelector("video"); 
+      if (videoElm?.ended || videoElm?.paused || !videoElm)
+        setCurrentIndex(prev => (prev + 1) % items.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [items, currentIndex]);
+
+  // Touch gesture handlers for navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartRef.current === null) return;
+    const delta = touchStartRef.current - e.changedTouches[0].clientX;
+    if (delta > 50) setCurrentIndex(prev => (prev + 1) % items.length);
+    else if (delta < -50)
+      setCurrentIndex(prev => (prev === 0 ? items.length - 1 : prev - 1));
+    touchStartRef.current = null;
+  };
+
+  if (!items.length) {
+    return (
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          bgcolor: '#F0F0F0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <Typography>No banner media available</Typography>
+      </Box>
+    );
+  }
+
+  const fadeVariants = {
+    enter: { opacity: 0 },
+    center: { opacity: 1, transition: { duration: 0.5 } },
+    exit: { opacity: 0, transition: { duration: 0.5 } }
+  };
+
+  return (
+    <Box
+      ref={containerRef}
+      sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentIndex}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          variants={fadeVariants}
+          style={{ width: '100%', height: '100%' }}
+        >
+          {currentItem.type === 'video' && currentItem.url ? (
+            <>
+              <HeroVideo
+                ref={videoRef}
+                src={currentItem.url}
+                autoPlay
+                muted={muted}
+                loop={false}
+                style={currentCssStyles}
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 10,
+                  right: 10,
+                  display: 'flex',
+                  gap: 1,
+                  zIndex: 5
+                }}
+              >
+                <IconButton
+                  onClick={() => setMuted(prev => !prev)}
+                  sx={{
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }
+                  }}
+                  size="small"
+                >
+                  {muted ? <VolumeOffIcon fontSize="small" /> : <VolumeUpIcon fontSize="small" />}
+                </IconButton>
+                <IconButton
+                  onClick={toggleFullscreen}
+                  sx={{
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }
+                  }}
+                  size="small"
+                >
+                  <FullscreenIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </>
+          ) : (
+            <HeroImage
+              src={currentItem.url ? getDefaultImage(currentItem.url) : getDefaultImage('')}
+              alt="Event banner"
+              style={currentCssStyles}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      {items.length > 1 && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 40,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: 1,
+            zIndex: 2
+          }}
+        >
+          {items.map((_, idx) => (
+            <Box
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: idx === currentIndex ? 'white' : 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+                transition: 'all 0.3s'
+              }}
+            />
+          ))}
+        </Box>
+      )}
+    </Box>
+  );
+};
+
 // Activity Accordion Component
 interface ActivityAccordionProps {
-  eventType: EventType;
+  activityType: EventType;
   activities: any[];
   eventId: string;
 }
 
-const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activities, eventId }) => {
+const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, activities, eventId }) => {
   const [expanded, setExpanded] = useState(activities.length <= 3);
   const [fixtureDialog, setFixtureDialog] = useState<string | Record<string, string> | null>(null);
-  const { text: activityType, color } = getEventTypeInfo(eventType);
+  const { text: activityTypeText, color } = getEventTypeInfo(activityType);
 
   /// Hardcoding the fixture data for the sportastica-2025 event temporarily
   const fixtures = eventId === "sportastica-2025" && {
@@ -120,7 +316,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
 
   const handleFixtureClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const fixture = fixtures[eventType];
+    const fixture = fixtures[activityType];
     fixture && setFixtureDialog(fixture);
   };
 
@@ -128,7 +324,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
     !fixtureDialog ? null : typeof fixtureDialog === "string" ? (
       <motion.img
         src={fixtureDialog}
-        alt={`Fixture for ${activityType}`}
+        alt={`Fixture for ${activityTypeText}`}
         style={{ width: "100%" }}
       />
     ) : (
@@ -138,7 +334,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
             <Typography variant="subtitle2">{key}</Typography>
             <motion.img
               src={url}
-              alt={`Fixture ${key} for ${activityType}`}
+              alt={`Fixture ${key} for ${activityTypeText}`}
               style={{ width: "100%" }}
             />
           </Box>
@@ -158,13 +354,13 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ eventType, activi
         }}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ backgroundColor: alpha(color, 0.1), "& .MuiAccordionSummary-content": { alignItems: "center" } }}>
-          <Chip label={activityType} size="small" sx={{ backgroundColor: alpha(color, 0.3), fontWeight: "medium", mr: 2 }} />
+          <Chip label={activityTypeText} size="small" sx={{ backgroundColor: alpha(color, 0.3), fontWeight: "medium", mr: 2 }} />
 
           <Typography variant="subtitle1" sx={{ fontWeight: "medium" }}>
-            {activities.length}{" "} {getBaseEventType(eventType) === EventType.SPORTS ? "Matches" : activities.length === 1 ? "Activity" : "Activities"}
+            {activities.length}{" "} {getBaseEventType(activityType) === EventType.SPORTS ? "Matches" : activities.length === 1 ? "Activity" : "Activities"}
           </Typography>
 
-          {fixtures[eventType] && (<IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
+          {fixtures[activityType] && (<IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
             <Typography variant="caption">Fixtures</Typography>
           </IconButton>)}
         </AccordionSummary>
@@ -211,30 +407,42 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
     );
   }
 
-  // Group activities by event type
-  const groupedActivities = activities.reduce((acc, activity) => {
-    const activityType = activity.eventType;
-    if (!acc[activityType]) {
-      acc[activityType] = [];
-    }
-    acc[activityType].push(activity);
-    return acc;
-  }, {} as Record<number, any[]>);
+  // Separate info activities from other activities
+  const infoActivities = activities.filter(activity => getBaseEventType(activity.type) === EventType.INFO);
+  const nonInfoActivities = activities.filter(activity => getBaseEventType(activity.type) !== EventType.INFO);
 
-  // Sort the groups by event type (so they appear in a consistent order)
+  // TODO: revert making info activities last after infinity-2025
+  // Group activities by event type for non-info activities
+  const groupedActivities: Record<number, any[]> = {};
+
+  nonInfoActivities.forEach(activity => {
+    const activityType = activity.type;
+    if (!groupedActivities[activityType]) {
+      groupedActivities[activityType] = [];
+    }
+    groupedActivities[activityType].push(activity);
+  });
+
+  // Prepare info activities as a separate group
+  const infoGroup = infoActivities.length > 0 ? { [EventType.INFO]: infoActivities } : {};
+
+  // Merge the groups, making sure the INFO group comes last
+  const orderedGroups = [
+    ...Object.entries(groupedActivities),
+    ...Object.entries(infoGroup)
+  ];
+
+  // Return the activities with INFO rendered last if it exists
   return (
     <Box>
-      {Object.entries(groupedActivities)
-        .sort(([typeA], [typeB]) => Number(typeA) - Number(typeB))
-        .map(([type, acts]) => (
-          <ActivityAccordion
-            key={type}
-            eventType={Number(type) as EventType}
-            activities={acts}
-            eventId={eventId}
-          />
-        ))
-      }
+      {orderedGroups.map(([type, acts]) => (
+        <ActivityAccordion
+          key={type}
+          activityType={Number(type) as EventType}
+          activities={acts}
+          eventId={eventId}
+        />
+      ))}
     </Box>
   );
 };
@@ -244,7 +452,7 @@ function EventPage() {
   const navigate = useNavigate();
 
   const { data: event, isLoading: eventLoading } = useEvent(eventId);
-  const { data: imgur, isLoading: imgurLoading } = useImgur("https://imgur.com/a/infinty-2025-FQ1Q1gF");
+  const { data: imgur, isLoading: imgurLoading } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
@@ -311,17 +519,21 @@ function EventPage() {
     );
   }
 
+  // temp for ininity: Hardcode the highlights-
+  const highlights = eventId === "infinity-2025" ? [
+    'https://i.imgur.com/hnY5dx2l.jpeg',
+    'https://i.imgur.com/8oNrZuzl.jpeg',
+    'https://i.imgur.com/2W2fEIYl.jpeg'
+  ] : null;
+
   return (
     <Suspense fallback={null}>
       <PageTransition>
         {/* Hero Section with Background Image */}
         <Box>
           <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-            <HeroImage
-              src={getDefaultImage(event.banner.url)}
-              alt={event.name}
-              style={event.eventBannerStyles}
-            />
+            {/* Banner Image/Video */}
+            <BannerMedia items={event.banner || []} />
             <HeroOverlay>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                 <IconButton onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
@@ -424,6 +636,15 @@ function EventPage() {
               </>
             )}
           </ContentSection>
+
+          {/*  Temp Infinity Highlights section */}
+          {highlights && <Box>
+            <Divider sx={{ my: 3 }} />
+            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 1 }}>
+              Highlights
+            </Typography>
+            <HighlightsCarousel images={highlights} />
+          </Box>}
 
           <Divider sx={{ my: 3 }} />
 

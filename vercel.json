@@ -14,13 +14,6 @@
             "config": {
                 "outDir": "./clientview/dist"
             }
-        },
-        {
-            "src": "adminview/package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "outDir": "./adminview/dist"
-            }
         }
     ],
     "routes": [
@@ -29,15 +22,15 @@
             "dest": "/backend/dist/backend/index.js"
         },
         {
-            "src": "/admin(/?.*)",
-            "dest": "/adminview/$1"
-        },
-        {
             "src": "/(.*)",
             "dest": "/clientview/$1"
         },
         {
             "handle": "filesystem"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/clientview/index.html"
         }
     ]
 }

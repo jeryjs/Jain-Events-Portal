@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     
     try {
-      const response = await fetch(`${config.API_BASE_URL}/auth/admin/authenticate`, {
+      const response = await fetch(`${config.API_BASE_URL}/user/admin/authenticate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

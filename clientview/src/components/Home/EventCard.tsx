@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => `
-  min-width: 300px;
+  min-width: 350px;
   margin: ${theme.spacing(1)};
   border-radius: 16px;
   overflow: visible;
@@ -116,7 +116,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
 
   // Load the event image and show shimmer while loading
   const getEventImage = async () => {
-    const imageSrc = event.banner.url ?? `https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg`;
+    const imageSrc = event.activeBanner?.url ?? `https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg`;
     try { await fetch(imageSrc) } catch { return imageSrc };  // To figure out how long to show the shimmer for the image on load
     return imageSrc;
   };
@@ -161,7 +161,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
               {isLoading && <Shimmer />}
               <StyledCardMedia
                 sx={{ width: '100%', height: '100%', display: 'block' }}
-                style={event.eventBannerStyles}
+                style={event.activeBannerStyles}
                 image={imageSrc}
                 title={event.name}
               />
@@ -202,7 +202,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
                 ? <Shimmer />
                 : <StyledCardMedia
                   sx={{ height: '100%', display: 'block' }}
-                  style={event.eventBannerStyles}
+                  style={event.activeBannerStyles}
                   image={imageSrc}
                   title={event.name}
                 />

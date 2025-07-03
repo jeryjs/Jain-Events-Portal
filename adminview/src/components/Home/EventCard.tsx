@@ -92,7 +92,7 @@ export const EventCard = ({ event, isSelected, collapsed, onClick }: EventCardPr
 
   return (
     <StyledCard isSelected={isSelected} collapsed={collapsed} onClick={handleClick}>
-      {event.banner?.url && <StyledCardMedia image={event.banner.url} title={event.name} />}
+      {event.activeBanner?.url && <StyledCardMedia image={event.activeBanner.url} title={event.name} />}
       {collapsed ? (
         <Box
           sx={{
