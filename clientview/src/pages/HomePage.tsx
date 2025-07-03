@@ -199,17 +199,17 @@ function HomePage() {
         <HomeHeader tabValue={catTabId[0]} onTabChange={handleTabChange} />
 
         {/* Highlights Section */}
-        {highlights && (
+        {/* {highlights && (
           <Section title='Infinity 2025 Highlights' moreLink='/infinity-2025'>
             <HighlightsCarousel images={highlights} />
           </Section>
-        )}
+        )} */}
 
         {/* Prompt to enable notifications */}
-        <Box sx={{display: !isSubscribed?'block':'none' }}>
+        {/* <Box sx={{display: !isSubscribed?'block':'none' }}>
           <Alert sx={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }}>We're currently sending out announcements through the FET-Hub app! Enable notifications to stay updated!!</Alert>
           <NotificationPrompt sx={{'h6, p, div': { display: 'none' }}}/>
-        </Box>
+        </Box> */}
 
         {/* Dynamically render the Events section with more events first (past tries to be last) */}
         {sortedSections.map(section => (

@@ -14,6 +14,7 @@ import HomePage from './pages/HomePage';
 import TimelinePage from './pages/TimelinePage';
 import { ColorModeContext, useColorMode } from './utils/ColorMode';
 import queryClient from './utils/QueryClient';
+import React from 'react';
 
 function App() {
   const colorMode = useColorMode();
@@ -51,8 +52,17 @@ function App() {
                 <Route path="/" element={<HomePage />} />
               </Routes>
 
-              {/* Show prompt to install PWA */}
-              <InstallPrompt />
+              {/*
+                Delay showing InstallPrompt by 20 seconds
+              */}
+              {(() => {
+                const [showPrompt, setShowPrompt] = React.useState(false);
+                React.useEffect(() => {
+                  const timer = setTimeout(() => setShowPrompt(true), 20000);
+                  return () => clearTimeout(timer);
+                }, []);
+                return showPrompt ? <InstallPrompt /> : null;
+              })()}
 
               {/* Vercel Analytics */}
               <SpeedInsights />
