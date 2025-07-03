@@ -199,7 +199,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
       transition: {
         duration: 0.4,
         delay: delay * 0.1,
-        ease: "easeOut"
+        ease: "easeOut" as const
       }
     }
   };

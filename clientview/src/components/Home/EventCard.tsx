@@ -135,7 +135,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
       transition: {
         duration: 0.5,
         delay: delay * 0.1,
-        ease: "easeOut"
+        ease: "easeOut" as const
       }
     }
   };
