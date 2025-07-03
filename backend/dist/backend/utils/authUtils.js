@@ -40,9 +40,7 @@ const verifyToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
         // First try to verify as a standard JWT
         return jsonwebtoken_1.default.verify(token, JWT_SECRET);
     }
-    catch (error) {
-        console.warn("JWT verification failed, falling back to Firebase ID token verification:", error);
-    }
+    catch (_a) { }
     try {
         return yield firebase_admin_1.default.auth().verifyIdToken(token);
     }

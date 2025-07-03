@@ -8,6 +8,7 @@ export interface BannerItem {
 
 export default class Event {
 	public timings: Date[];
+	public managers?: string[];
 
 	constructor(
 		public id: string,
@@ -17,10 +18,11 @@ export default class Event {
 		public description: string,
 		public venue: string,
 		public galleryLink: string,
-		public banner: BannerItem[] = []
+		public banner: BannerItem[] = [],
+		managers?: string[]
 	) {
-		// Convert Timestamp-like objects (from firestore) to Date
-		this.timings = timings.map((t) => {
+	// Convert Timestamp-like objects (from firestore) to Date
+	this.timings = timings.map((t) => {
 			// If already a Date object
 			if (t instanceof Date) return t;
 
@@ -52,7 +54,8 @@ export default class Event {
 			data.description || "",
 			data.venue || "",
 			data.galleryLink || "",
-			banner
+			banner,
+			data.managers || []
 		);
 	}
 
@@ -70,6 +73,7 @@ export default class Event {
 			venue: this.venue,
 			galleryLink: this.galleryLink,
 			banner: this.banner,
+			managers: this.managers,
 		};
 	}
 

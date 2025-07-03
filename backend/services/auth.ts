@@ -1,35 +1,23 @@
 import { Role } from "@common/constants";
 import { UserData } from "@common/models";
 import db from "@config/firebase";
-import { generateToken } from "@utils/authUtils";
+import { getUserFromToken } from "@utils/authUtils";
 
 // collection reference
 const usersCollection = db.collection("users");
 
 /**
- * Authenticate a user with username and password
- * @param username - The username to authenticate
- * @param password - The password to check
- * @returns A promise that resolves to an object containing user data and auth token if authenticated, null otherwise
+ * Get user by Firebase UID (from decoded token)
  */
-export async function authenticateUser(username: string, password: string): Promise<{ userData: UserData; token: string } | null> {
-	// Find user in our "database"
-	const userDoc = await usersCollection.doc(username).get();
-	const user = userDoc.exists ? userDoc.data() : null;
-
-	// User not found
-	if (!user) { return null }
-
-    // Check if incorrect password
-    if (user.password !== password) { return null }
-
-    // Create user data object from our model
-    const userData = UserData.parse({...user, role: user.role});
-
-	// Generate JWT token with user data
-	const token = generateToken(userData);
-
-	return { userData, token };
+export async function getUserByUID(uid: string): Promise<UserData | null> {
+	const userDoc = await usersCollection.doc(uid).get();
+	if (!userDoc.exists) return null;
+	const userData = UserData.parse(userDoc.data());
+	// Default admin logic
+	if (userData.username === 'jery99961@gmail.com' && userData.role < Role.ADMIN) {
+		userData.role = Role.ADMIN;
+	}
+	return userData;
 }
 
 /**
@@ -38,15 +26,10 @@ export async function authenticateUser(username: string, password: string): Prom
  * @param requiredRole - Role required for access
  * @returns True if user has required role, false otherwise
  */
-export async function verifyUserRole(username: string, requiredRole: Role): Promise<boolean> {
-	const user = await getUserByUsername(username);
-
-	if (!user) {
-		return false;
-	}
-
-	// Check if user's role meets the required role
-	return user.role === requiredRole;
+export async function verifyUserRole(uid: string, requiredRole: Role): Promise<boolean> {
+	const user = await getUserByUID(uid);
+	if (!user) return false;
+	return user.role >= requiredRole;
 }
 
 /**
@@ -54,12 +37,10 @@ export async function verifyUserRole(username: string, requiredRole: Role): Prom
  * @param username - Username to look up
  * @returns UserData object if found, null otherwise
  */
+// Deprecated: Use getUserByUID instead
 export async function getUserByUsername(username: string): Promise<UserData | null> {
-	const user = (await usersCollection.doc(username).get()).data();
-
-	if (!user) {
-		return null;
-	}
-
-	return UserData.parse(user);
+	// Optionally implement if you want to support lookup by email
+	const snapshot = await usersCollection.where('username', '==', username).limit(1).get();
+	if (snapshot.empty) return null;
+	return UserData.parse(snapshot.docs[0].data());
 }

@@ -1,11 +1,11 @@
-import { Article } from "@common/models";
+import { Article, UserData } from "@common/models";
 import Activity from "@common/models/Activity";
 import Event from "@common/models/Event";
 import { parseActivities, parseArticles, parseEvents } from "@common/utils";
 import { useLogin } from "@components/shared";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import queryClient from "@utils/QueryClient";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import config from "../config";
 
 /*
@@ -340,4 +340,47 @@ export const useUpdateArticleViewCount = () => {
 	};
 
 	return { updateViewCount };
+};
+
+
+/**
+ * useSession - fetches backend session user info using Firebase ID token
+ * @returns { getSession: (idToken: string) => Promise<UserData | null> }
+ */
+export const useSession = () => {
+	// Returns a function to fetch session info from backend
+	const getSession = useCallback(async (idToken: string): Promise<UserData | null> => {
+		try {
+			const resp = await fetch(`${config.API_BASE_URL}/user/session`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ idToken })
+			});
+			if (!resp.ok) throw new Error("Failed to fetch session");
+			const { user: backendUser } = await resp.json();
+			return backendUser;
+		} catch (e) {
+			return null;
+		}
+	}, []);
+	return { getSession };
+};
+
+
+/**
+ * useAssignManagers - returns a mutation to assign managers to an event
+ * Usage: const { mutateAsync: assignManagers, isLoading, error } = useAssignManagers();
+ */
+export const useAssignManagers = () => {
+	return useMutation({
+		mutationFn: async ({ eventId, managers }: { eventId: string, managers: string[] }) => {
+			const resp = await fetch(`${config.API_BASE_URL}/events/${eventId}/managers`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ managers })
+			});
+			if (!resp.ok) throw new Error("Failed to assign managers");
+			return resp.json();
+		}
+	});
 };

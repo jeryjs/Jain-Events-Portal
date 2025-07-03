@@ -28,9 +28,7 @@ const verifyToken = async (token: string): Promise<admin.auth.DecodedIdToken | J
 	try {
 		// First try to verify as a standard JWT
 		return jwt.verify(token, JWT_SECRET) as JwtPayload;
-	} catch (error) {
-		console.warn("JWT verification failed, falling back to Firebase ID token verification:", error);
-	}
+	} catch { }
 	try {
 		return await admin.auth().verifyIdToken(token);
 	} catch (error) {

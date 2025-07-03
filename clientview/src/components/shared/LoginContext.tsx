@@ -26,6 +26,7 @@ import {
 } from 'firebase/auth';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { app } from '../../firebaseConfig';
+import { useSession } from '../../hooks/useApi';
 
 // Initialize Firebase auth
 const auth = getAuth(app);
@@ -137,6 +138,7 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+  const { getSession } = useSession();
 
   // Convert Firebase User to UserData
   const createUserDataFromFirebase = (user: User): UserData => {
@@ -153,17 +155,15 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     try {
       // Get Firebase ID token (JWT)
       const idToken = await user.getIdToken();
-      // Create UserData from Firebase user
-      const userData = createUserDataFromFirebase(user);
-      const userEmail = user.email || '';
-
+      // Use useSession hook to get backend user info (with correct role)
+      const backendUser = await getSession(idToken);
+      if (!backendUser) throw new Error('Failed to fetch session');
       // Store in localStorage
       localStorage.setItem('auth_token', idToken);
-      localStorage.setItem('auth_user', JSON.stringify(userData));
-      localStorage.setItem('auth_username', userEmail);
-
+      localStorage.setItem('auth_user', JSON.stringify(backendUser));
+      localStorage.setItem('auth_username', backendUser.username);
       // Update state
-      setUserData(userData);
+      setUserData(backendUser);
       setToken(idToken);
     } catch (error) {
       console.error('Error processing login:', error);
@@ -190,13 +190,21 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
       setToken(null);
       signOut(auth);
     } else if (storedUser && storedToken) {
-      try {
-        setUserData(UserData.parse(storedUser));
-        setToken(storedToken);
-      } catch (e) {
-        localStorage.removeItem('auth_user');
-        localStorage.removeItem('auth_token');
-      }
+      // Always refresh user from backend session for correct role
+      getSession(storedToken)
+        .then((backendUser) => {
+          if (backendUser) {
+            setUserData(backendUser);
+            setToken(storedToken);
+            localStorage.setItem('auth_user', JSON.stringify(backendUser));
+          } else {
+            localStorage.removeItem('auth_user');
+            localStorage.removeItem('auth_token');
+          }
+        })
+        .finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
     }
 
     // Listen for Firebase auth state changes

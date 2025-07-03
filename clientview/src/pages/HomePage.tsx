@@ -5,11 +5,14 @@ import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { EventType } from '@common/constants';
+import { EventType, Role } from '@common/constants';
 import { EventCard, HomeHeader, Section } from '@components/Home';
 import NoEventsDisplay from '@components/Home/NoEventsDisplay';
 import PageTransition from '@components/shared/PageTransition';
-import { useArticles, useEvents } from '@hooks/useApi';
+import { useArticles, useEvents, useAssignManagers } from '@hooks/useApi';
+import { useLogin } from '@components/shared/LoginContext';
+import { Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, IconButton, Tooltip } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 import useImgur from '@hooks/useImgur';
 import { pascalCase } from '@utils/utils';
 import React from 'react';
@@ -64,6 +67,27 @@ const ArticleCard = styled(Link)(({ theme }) => ({
 }));
 
 function HomePage() {
+  const { userData } = useLogin();
+  const [manageDialogOpen, setManageDialogOpen] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [managerEmails, setManagerEmails] = useState('');
+  const [assignError, setAssignError] = useState('');
+  const { mutateAsync: assignManagers, status: assignStatus } = useAssignManagers();
+  const assigning = assignStatus === 'pending';
+
+  // Assign managers to event
+  const handleAssignManagers = async () => {
+    if (!selectedEventId) return;
+    setAssignError('');
+    try {
+      const emails = managerEmails.split(',').map(e => e.trim()).filter(Boolean);
+      await assignManagers({ eventId: selectedEventId, managers: emails });
+      setManageDialogOpen(false);
+      setManagerEmails('');
+    } catch (e) {
+      setAssignError('Failed to assign managers');
+    }
+  };
   const mounted = useRef(false);
   useEffect(() => { if (mounted.current) return; else mounted.current = true; }, []);
 
@@ -211,6 +235,23 @@ function HomePage() {
           <NotificationPrompt sx={{'h6, p, div': { display: 'none' }}}/>
         </Box> */}
 
+        {/* Admin Actions Section (Admin only) */}
+        {userData?.role >= Role.ADMIN && (
+          <Section title='Admin Actions'>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
+              <Button variant="outlined" color="secondary" onClick={() => {/* Navigate to create activity */ }}>
+                Create New Event
+              </Button>
+              <Button variant="outlined" color="info" onClick={() => {/* Navigate to create article */ }}>
+                Create New Article
+              </Button>
+              <Button variant="outlined" color="warning" onClick={() => {/* Navigate to create highlight */ }}>
+                Send Notification
+              </Button>
+            </Box>
+          </Section>
+        )}
+
         {/* Dynamically render the Events section with more events first (past tries to be last) */}
         {sortedSections.map(section => (
           <React.Fragment key={section.key}>
@@ -226,7 +267,7 @@ function HomePage() {
         {/* Articles Section */}
         <Section title='Articles' moreLink='/articles'>
           <Box sx={{ position: 'relative', px: 2, mb: 2, overflow: 'visible' }}>
-            <HorizontalScroll 
+            <HorizontalScroll
               whileTap={{ cursor: 'grabbing' }}
               // Only apply these props for non-mobile (they can interfere with native scrolling)
               {...(window.innerWidth > 600 ? {
@@ -250,25 +291,25 @@ function HomePage() {
                           height="180"
                           image={article.image.url}
                           alt={article.title}
-                          sx={{ 
+                          sx={{
                             transition: 'transform 0.6s ease-in-out',
-                            '&:hover': { transform: 'scale(1.08)' } 
+                            '&:hover': { transform: 'scale(1.08)' }
                           }}
                         />
-                        <Box sx={{ 
-                          position: 'absolute', 
-                          top: 0, 
-                          left: 0, 
-                          width: '100%', 
-                          height: '100%', 
+                        <Box sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
                           background: 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.4))',
-                        }}/>
-                        <Chip 
+                        }} />
+                        <Chip
                           size="small"
-                          label={pascalCase(EventType[article.relatedEventType]) || 'Article'} 
-                          sx={{ 
-                            position: 'absolute', 
-                            top: 12, 
+                          label={pascalCase(EventType[article.relatedEventType]) || 'Article'}
+                          sx={{
+                            position: 'absolute',
+                            top: 12,
                             right: 12,
                             backgroundColor: 'ButtonShadow',
                             // color: 'white',
@@ -282,8 +323,8 @@ function HomePage() {
                           <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, lineHeight: 1.2 }}>
                             {article.title}
                           </Typography>
-                          <Typography 
-                            variant="body2" 
+                          <Typography
+                            variant="body2"
                             color="text.secondary"
                             sx={{
                               display: '-webkit-box',
@@ -299,14 +340,14 @@ function HomePage() {
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <AccessTimeIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }}/>
+                            <AccessTimeIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
                             <Typography variant="caption" color="text.secondary">
                               {article.readingTimeMinutes || 1} min read
                             </Typography>
                           </Box>
-                          <Box sx={{ 
-                            color: 'primary.main', 
-                            display: 'flex', 
+                          <Box sx={{
+                            color: 'primary.main',
+                            display: 'flex',
                             alignItems: 'center',
                             fontWeight: 'bold',
                             fontSize: '0.75rem'
@@ -320,10 +361,30 @@ function HomePage() {
                   </motion.div>
                 ))}
               {/* Add empty spacer at the end for better scrolling experience */}
-              <Box sx={{ minWidth: 16 }} /> 
+              <Box sx={{ minWidth: 16 }} />
             </HorizontalScroll>
           </Box>
         </Section>
+        {/* Manager Assignment Dialog (admin only) */}
+        <Dialog open={manageDialogOpen} onClose={() => setManageDialogOpen(false)}>
+          <DialogTitle>Assign Managers (by email)</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Manager Emails (comma separated)"
+              value={managerEmails}
+              onChange={e => setManagerEmails(e.target.value)}
+              fullWidth
+              autoFocus
+              margin="dense"
+              placeholder="manager1@email.com, manager2@email.com"
+            />
+            {assignError && <Typography color="error">{assignError}</Typography>}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setManageDialogOpen(false)} disabled={assigning}>Cancel</Button>
+            <Button onClick={handleAssignManagers} disabled={assigning || !managerEmails.trim()} variant="contained">Assign</Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </PageTransition>
   );

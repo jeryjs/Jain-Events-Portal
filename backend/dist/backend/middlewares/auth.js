@@ -16,15 +16,16 @@ const constants_1 = require("@common/constants");
  * @description Middleware to authenticate user based on JWT token.
  */
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    var _a;
+    // Use session cookie for authentication
+    const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.session;
+    if (!token) {
         res.status(401).json({
             message: 'Authentication required',
-            details: 'Valid Bearer token is required in Authorization header'
+            details: 'Valid session cookie is required'
         });
         return;
     }
-    const token = authHeader.split(' ')[1];
     try {
         const userData = yield (0, authUtils_1.getUserFromToken)(token);
         if (!userData) {
@@ -50,15 +51,15 @@ exports.authMiddleware = authMiddleware;
  * @description Middleware to authorize user with admin role.
  */
 const adminMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    var _a;
+    const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.session;
+    if (!token) {
         res.status(401).json({
             message: 'Authentication required',
-            details: 'Valid Bearer token is required in Authorization header'
+            details: 'Valid session cookie is required'
         });
         return;
     }
-    const token = authHeader.split(' ')[1];
     try {
         const userData = yield (0, authUtils_1.getUserFromToken)(token);
         if (!userData) {
@@ -91,15 +92,15 @@ exports.adminMiddleware = adminMiddleware;
  * @description Middleware to authorize user with manager or higher role.
  */
 const managerMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    var _a;
+    const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.session;
+    if (!token) {
         res.status(401).json({
             message: 'Authentication required',
-            details: 'Valid Bearer token is required in Authorization header'
+            details: 'Valid session cookie is required'
         });
         return;
     }
-    const token = authHeader.split(' ')[1];
     try {
         const userData = yield (0, authUtils_1.getUserFromToken)(token);
         if (!userData) {

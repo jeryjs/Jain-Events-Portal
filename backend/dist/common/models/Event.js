@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("@common/constants");
 class Event {
-    constructor(id, name, type, timings, description, venue, galleryLink, banner = []) {
+    constructor(id, name, type, timings, description, venue, galleryLink, banner = [], managers) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -34,7 +34,7 @@ class Event {
                     type: 'image'
                 }];
         }
-        return new Event(data.id || "", data.name || "", data.type || constants_1.EventType.GENERAL, data.timings || [], data.description || "", data.venue || "", data.galleryLink || "", banner);
+        return new Event(data.id || "", data.name || "", data.type || constants_1.EventType.GENERAL, data.timings || [], data.description || "", data.venue || "", data.galleryLink || "", banner, data.managers || []);
     }
     toJSON() {
         // If there are timings, ensure they're stored as Firestore timestamps
@@ -50,6 +50,7 @@ class Event {
             venue: this.venue,
             galleryLink: this.galleryLink,
             banner: this.banner,
+            managers: this.managers,
         };
     }
     get time() {

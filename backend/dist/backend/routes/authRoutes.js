@@ -13,8 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const authUtils_1 = require("@utils/authUtils");
 const auth_1 = require("@middlewares/auth");
-const auth_2 = require("@services/auth");
+// import { authenticateUser } from "@services/auth";
 const firebase_1 = require("@config/firebase");
 const constants_1 = require("@common/constants");
 const router = express_1.default.Router();
@@ -47,51 +48,44 @@ router.post("/sendNotificationToAll", auth_1.adminMiddleware, (req, res) => __aw
         res.status(500).json({ message: `Error sending notification to all users`, details: error });
     }
 }));
-// Route to authenticate any user (admin, manager, or regular user)
-router.post("/authenticate", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Route to establish a secure session (login)
+router.post("/session", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        const { username, password } = req.body;
-        if (!username || !password) {
-            res.status(400).send("Username and password are required");
+        const { idToken } = req.body;
+        if (!idToken) {
+            res.status(400).json({ message: "Missing idToken" });
             return;
         }
-        const authResult = yield (0, auth_2.authenticateUser)(username, password);
-        if (authResult) {
-            const { userData, token } = authResult;
-            res.json({ userData, token });
-        }
-        else {
-            res.status(401).send("Invalid credentials");
-        }
-    }
-    catch (e) {
-        res.status(500).send(`Authentication failed: ${e.message}`);
-    }
-}));
-// Admin-specific authentication route
-router.post("/admin/authenticate", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { username, password } = req.body;
-        if (!username || !password) {
-            res.status(400).send("Username and password are required");
+        // Verify Firebase ID token
+        const decoded = yield (0, authUtils_1.verifyToken)(idToken);
+        if (!decoded) {
+            res.status(401).json({ message: "Invalid token" });
             return;
         }
-        const authResult = yield (0, auth_2.authenticateUser)(username, password);
-        if (authResult) {
-            // Check if the user has admin role
-            if (authResult.userData.role !== constants_1.Role.ADMIN) {
-                res.status(403).send("Access denied: Admin privileges required");
-                return;
-            }
-            const { userData, token } = authResult;
-            res.json({ userData, token });
-        }
-        else {
-            res.status(401).send("Invalid credentials");
-        }
+        // Determine role: check if email is in admin list
+        // (Assume you have a function or config to get admin emails, e.g. getAdminEmails())
+        const adminEmails = (process.env.ADMIN_EMAILS || "jery99961@gmail.com").split(",").map(e => e.trim().toLowerCase());
+        const isAdmin = decoded.email && adminEmails.includes(decoded.email.toLowerCase());
+        const user = {
+            name: decoded.name || ((_a = decoded.email) === null || _a === void 0 ? void 0 : _a.split("@")[0]) || "User",
+            username: decoded.email || decoded.uid,
+            role: isAdmin ? constants_1.Role.ADMIN : constants_1.Role.USER,
+            profilePic: decoded.picture || undefined
+        };
+        // Set secure, HTTP-only cookie
+        res.cookie("session", idToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+        });
+        res.json({ user });
     }
-    catch (e) {
-        res.status(500).send(`Authentication failed: ${e.message}`);
+    catch (error) {
+        console.error("Session error:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
+    return;
 }));
 exports.default = router;

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { getUserFromToken, verifyToken } from '@utils/authUtils';
+import cookieParser from 'cookie-parser';
 import { Role } from '@common/constants';
 import { UserData } from '@common/models';
 
@@ -12,16 +13,15 @@ interface AuthenticatedRequest extends Request {
  * @description Middleware to authenticate user based on JWT token.
  */
 const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  // Use session cookie for authentication
+  const token = req.cookies?.session;
+  if (!token) {
     res.status(401).json({ 
       message: 'Authentication required', 
-      details: 'Valid Bearer token is required in Authorization header'
+      details: 'Valid session cookie is required'
     });
     return;
   }
-
-  const token = authHeader.split(' ')[1];
   try {
     const userData = await getUserFromToken(token);
     if (!userData) {
@@ -46,16 +46,14 @@ const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: Ne
  * @description Middleware to authorize user with admin role.
  */
 const adminMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const token = req.cookies?.session;
+  if (!token) {
     res.status(401).json({ 
       message: 'Authentication required', 
-      details: 'Valid Bearer token is required in Authorization header'
+      details: 'Valid session cookie is required'
     });
     return;
   }
-
-  const token = authHeader.split(' ')[1];
   try {
     const userData = await getUserFromToken(token);
     if (!userData) {
@@ -87,16 +85,14 @@ const adminMiddleware = async (req: AuthenticatedRequest, res: Response, next: N
  * @description Middleware to authorize user with manager or higher role.
  */
 const managerMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const token = req.cookies?.session;
+  if (!token) {
     res.status(401).json({ 
       message: 'Authentication required', 
-      details: 'Valid Bearer token is required in Authorization header'
+      details: 'Valid session cookie is required'
     });
     return;
   }
-
-  const token = authHeader.split(' ')[1];
   try {
     const userData = await getUserFromToken(token);
     if (!userData) {

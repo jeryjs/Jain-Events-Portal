@@ -1,3 +1,23 @@
+// Assign managers to an event (admin only)
+export const assignManagersToEvent = async (eventId: string, managers: string[]) => {
+  // Store managers as an array of usernames/emails in the event document
+  await eventsCollection.doc(eventId).update({ managers });
+  cache.del(`${ITEM_KEY_PREFIX}-${eventId}`);
+};
+
+// Get managers for an event
+export const getEventManagers = async (eventId: string): Promise<string[]> => {
+  const doc = await eventsCollection.doc(eventId).get();
+  if (!doc.exists) return [];
+  const data = doc.data();
+  return data?.managers || [];
+};
+
+// Check if a user is a manager for an event
+export const isUserEventManager = async (eventId: string, username: string): Promise<boolean> => {
+  const managers = await getEventManagers(eventId);
+  return managers.includes(username);
+};
 import Event from '@common/models/Event';
 import { parseEvents } from '@common/utils';
 import { cache, TTL } from '@config/cache';
@@ -18,12 +38,22 @@ const ITEM_KEY_PREFIX = "events";
 /**
  * Get all events
  */
-export const getEvents = async () => {
+// Helper to filter sensitive fields
+function filterEventForUser(event: any, user?: { role: number, username: string }) {
+  // Only admins or managers for this event can see managers field
+  if (!user || (user.role < 100 && !(event.managers && event.managers.includes(user.username)))) {
+    const { managers, ...rest } = event;
+    return rest;
+  }
+  return event;
+}
+
+export const getEvents = async (user?: { role: number, username: string }) => {
   return getCachedCollection<Event>({
     key: COLLECTION_KEY,
     fetchFn: async () => {
       const snapshot = await eventsCollection.get();
-      return parseEvents(snapshot.docs.map(doc => doc.data()));
+      return parseEvents(snapshot.docs.map(doc => filterEventForUser(doc.data(), user)));
     },
     ttl: TTL.EVENTS
   });
@@ -32,13 +62,13 @@ export const getEvents = async () => {
 /**
  * Get event by ID
  */
-export const getEventById = async (eventId: string) => {
+export const getEventById = async (eventId: string, user?: { role: number, username: string }) => {
   return getCachedItem<Event>({
     key: `${ITEM_KEY_PREFIX}-${eventId}`,
     fetchFn: async () => {
       const doc = await eventsCollection.doc(eventId).get();
       if (!doc.exists) return null;
-      return Event.parse(doc.data());
+      return Event.parse(filterEventForUser(doc.data(), user));
     },
     ttl: TTL.EVENTS
   });
@@ -66,18 +96,12 @@ export const createEvent = async (eventData: any) => {
 /**
  * Update existing event
  */
-export const updateEvent = async (eventId: string, eventData: any) => {
-  const event = Event.parse(eventData);
-  
-  return updateCachedItem<Event>({
-    item: event,
-    collectionKey: COLLECTION_KEY,
-    itemKeyPrefix: ITEM_KEY_PREFIX,
-    updateFn: async (item) => {
-      await eventsCollection.doc(item.id).update(item.toJSON());
-    },
-    ttl: TTL.EVENTS
-  });
+export const updateEvent = async (eventId: string, eventData: Partial<Event>) => {
+  // Only update provided fields (patch)
+  await eventsCollection.doc(eventId).update(eventData);
+  // Invalidate cache for this event
+  cache.del(`${ITEM_KEY_PREFIX}-${eventId}`);
+  return (await eventsCollection.doc(eventId).get()).data();
 };
 
 /**
