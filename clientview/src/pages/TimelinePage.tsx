@@ -44,14 +44,6 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 300, damping: 24 }
-  }
-};
 
 // Styled components
 const TimelineContainer = styled(motion.div)(({ theme }) => ({
@@ -255,6 +247,9 @@ function TimelinePage() {
 
   // Format date for display
   const formatEventDate = useCallback((date: Date): string => {
+    if (date.getFullYear() >= 3000) {
+      return "To Be Announced";
+    }
     return date.toLocaleDateString('en-US', {
       day: 'numeric',
       month: 'short'
@@ -315,7 +310,14 @@ function TimelinePage() {
                         </MonthYearHeader>
 
                         {monthEvents.map((event) => (
-                          <motion.div key={event.id} variants={itemVariants}>
+                          <motion.div key={event.id} variants={{
+                            hidden: { opacity: 0, y: 20 },
+                            visible: {
+                              opacity: 1,
+                              y: 0,
+                              transition: { type: "spring", stiffness: 300, damping: 24 }
+                            }
+                          }}>
                             <StyledTimelineItem position={itemDirection(event)}>
                               <TimelineOppositeContent sx={{
                                 display: { xs: 'none', md: 'block' },
