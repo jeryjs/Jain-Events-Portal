@@ -63,16 +63,23 @@ router.post("/session", async (req: Request, res: Response) => {
 			return;
 		}
 
-		// Determine role: check if email is in admin list
-		// (Assume you have a function or config to get admin emails, e.g. getAdminEmails())
-		const adminEmails = (process.env.ADMIN_EMAILS || "jery99961@gmail.com").split(",").map(e => e.trim().toLowerCase());
-		const isAdmin = decoded.email && adminEmails.includes(decoded.email.toLowerCase());
-		const user = {
-			name: decoded.name || decoded.email?.split("@")[0] || "User",
-			username: decoded.email || decoded.uid,
-			role: isAdmin ? Role.ADMIN : Role.USER,
-			profilePic: decoded.picture || undefined
-		};
+		// Get complete user data from database or create minimal user data
+		let user;
+		if ('uid' in decoded) {
+			user = await getUserByUID(decoded.uid);
+		}
+		
+		// Fallback to token data if no database record
+		if (!user) {
+			const adminEmails = (process.env.ADMIN_EMAILS || "jery99961@gmail.com").split(",").map(e => e.trim().toLowerCase());
+			const isAdmin = decoded.email && adminEmails.includes(decoded.email.toLowerCase());
+			user = {
+				name: decoded.name || decoded.email?.split("@")[0] || "User",
+				username: decoded.email || decoded.uid,
+				role: isAdmin ? Role.ADMIN : Role.USER,
+				profilePic: decoded.picture || undefined
+			};
+		}
 
 		// Set secure, HTTP-only cookie
 		res.cookie("session", idToken, {

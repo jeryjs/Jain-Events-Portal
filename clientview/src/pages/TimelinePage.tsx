@@ -108,7 +108,7 @@ const LoadingPlaceholder = () => (
 
 function TimelinePage() {
   const theme = useTheme();
-  const { data: events, isLoading } = useEvents();
+  const { events, isLoading } = useEvents();
   const timelineRef = useRef<HTMLDivElement>(null);
   const [activeMarker, setActiveMarker] = useState<MarkerType | null>(null);
   const [itemRefs, setItemRefs] = useState<Record<string, React.RefObject<HTMLElement>>>({});

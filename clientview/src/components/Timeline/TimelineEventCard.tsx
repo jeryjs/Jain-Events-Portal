@@ -101,6 +101,7 @@ const TimelineEventCard: React.FC<TimelineEventCardProps> = ({ event, sx }) => {
   const isNarrowScreen = useMediaQuery((theme: any) => theme.breakpoints.down('md'));
   // Format date for display
   const formatDate = (date: Date) => {
+    if (date.getFullYear() >= 3000) return "Stay tuned for the big reveal!";
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
       hour: '2-digit',

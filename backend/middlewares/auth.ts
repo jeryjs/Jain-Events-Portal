@@ -11,6 +11,7 @@ interface AuthenticatedRequest extends Request {
 
 /**
  * @description Middleware to authenticate user based on JWT token.
+ * Fetches complete user data from database for accurate role information.
  */
 const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   // Use session cookie for authentication
@@ -23,7 +24,8 @@ const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: Ne
     return;
   }
   try {
-    const userData = await getUserFromToken(token);
+    // Fetch complete user data from database for accurate roles
+    const userData = await getUserFromToken(token, true);
     if (!userData) {
       res.status(401).json({ message: 'Invalid token' });
       return;
@@ -44,8 +46,23 @@ const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: Ne
 
 /**
  * @description Middleware to authorize user with admin role.
+ * Reuses user data from authMiddleware if available.
  */
 const adminMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  // If user is already authenticated, check role directly
+  if (req.user) {
+    if (req.user.role < Role.ADMIN) {
+      res.status(403).json({ 
+        message: 'Access denied',
+        details: 'This action requires administrator privileges'
+      });
+      return;
+    }
+    next();
+    return;
+  }
+
+  // Otherwise, authenticate first
   const token = req.cookies?.session;
   if (!token) {
     res.status(401).json({ 
@@ -55,7 +72,7 @@ const adminMiddleware = async (req: AuthenticatedRequest, res: Response, next: N
     return;
   }
   try {
-    const userData = await getUserFromToken(token);
+    const userData = await getUserFromToken(token, true);
     if (!userData) {
       res.status(401).json({ message: 'Invalid token' });
       return;
@@ -83,8 +100,23 @@ const adminMiddleware = async (req: AuthenticatedRequest, res: Response, next: N
 
 /**
  * @description Middleware to authorize user with manager or higher role.
+ * Reuses user data from authMiddleware if available.
  */
 const managerMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  // If user is already authenticated, check role directly
+  if (req.user) {
+    if (req.user.role < Role.MANAGER) {
+      res.status(403).json({ 
+        message: 'Access denied',
+        details: 'This action requires manager privileges'
+      });
+      return;
+    }
+    next();
+    return;
+  }
+
+  // Otherwise, authenticate first
   const token = req.cookies?.session;
   if (!token) {
     res.status(401).json({ 
@@ -94,7 +126,7 @@ const managerMiddleware = async (req: AuthenticatedRequest, res: Response, next:
     return;
   }
   try {
-    const userData = await getUserFromToken(token);
+    const userData = await getUserFromToken(token, true);
     if (!userData) {
       res.status(401).json({ message: 'Invalid token' });
       return;

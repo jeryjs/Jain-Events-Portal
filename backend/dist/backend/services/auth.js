@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserByUID = getUserByUID;
 exports.verifyUserRole = verifyUserRole;
 exports.getUserByUsername = getUserByUsername;
-const constants_1 = require("@common/constants");
 const models_1 = require("@common/models");
 const firebase_1 = __importDefault(require("@config/firebase"));
 // collection reference
@@ -25,15 +24,17 @@ const usersCollection = firebase_1.default.collection("users");
  */
 function getUserByUID(uid) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userDoc = yield usersCollection.doc(uid).get();
-        if (!userDoc.exists)
-            return null;
-        const userData = models_1.UserData.parse(userDoc.data());
-        // Default admin logic
-        if (userData.username === 'jery99961@gmail.com' && userData.role < constants_1.Role.ADMIN) {
-            userData.role = constants_1.Role.ADMIN;
+        try {
+            const userDoc = yield usersCollection.doc(uid).get();
+            if (!userDoc.exists)
+                return null;
+            const userData = models_1.UserData.parse(userDoc.data());
+            return userData;
         }
-        return userData;
+        catch (error) {
+            console.error("Error fetching user by UID:", error);
+            return null;
+        }
     });
 }
 /**

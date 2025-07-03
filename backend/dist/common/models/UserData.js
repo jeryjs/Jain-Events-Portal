@@ -11,6 +11,11 @@ class UserData {
     static parse(data) {
         if (typeof data === 'string')
             data = JSON.parse(data);
+        // Apply admin role logic for configured admin emails
+        const adminEmails = (process.env.ADMIN_EMAILS || "jery99961@gmail.com").split(",").map(e => e.trim().toLowerCase());
+        if (data.username && adminEmails.includes(data.username.toLowerCase()) && data.role < constants_1.Role.ADMIN) {
+            data.role = constants_1.Role.ADMIN;
+        }
         return new UserData(data.name || '', data.username || data.email || '', data.role || constants_1.Role.USER, data.profilePic || data.profile || `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(data.name)}`);
     }
     toJSON() {

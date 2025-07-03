@@ -14,6 +14,7 @@ const authUtils_1 = require("@utils/authUtils");
 const constants_1 = require("@common/constants");
 /**
  * @description Middleware to authenticate user based on JWT token.
+ * Fetches complete user data from database for accurate role information.
  */
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -27,7 +28,8 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         return;
     }
     try {
-        const userData = yield (0, authUtils_1.getUserFromToken)(token);
+        // Fetch complete user data from database for accurate roles
+        const userData = yield (0, authUtils_1.getUserFromToken)(token, true);
         if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
@@ -49,9 +51,23 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 exports.authMiddleware = authMiddleware;
 /**
  * @description Middleware to authorize user with admin role.
+ * Reuses user data from authMiddleware if available.
  */
 const adminMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
+    // If user is already authenticated, check role directly
+    if (req.user) {
+        if (req.user.role < constants_1.Role.ADMIN) {
+            res.status(403).json({
+                message: 'Access denied',
+                details: 'This action requires administrator privileges'
+            });
+            return;
+        }
+        next();
+        return;
+    }
+    // Otherwise, authenticate first
     const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.session;
     if (!token) {
         res.status(401).json({
@@ -61,7 +77,7 @@ const adminMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         return;
     }
     try {
-        const userData = yield (0, authUtils_1.getUserFromToken)(token);
+        const userData = yield (0, authUtils_1.getUserFromToken)(token, true);
         if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
@@ -90,9 +106,23 @@ const adminMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
 exports.adminMiddleware = adminMiddleware;
 /**
  * @description Middleware to authorize user with manager or higher role.
+ * Reuses user data from authMiddleware if available.
  */
 const managerMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
+    // If user is already authenticated, check role directly
+    if (req.user) {
+        if (req.user.role < constants_1.Role.MANAGER) {
+            res.status(403).json({
+                message: 'Access denied',
+                details: 'This action requires manager privileges'
+            });
+            return;
+        }
+        next();
+        return;
+    }
+    // Otherwise, authenticate first
     const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.session;
     if (!token) {
         res.status(401).json({
@@ -102,7 +132,7 @@ const managerMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         return;
     }
     try {
-        const userData = yield (0, authUtils_1.getUserFromToken)(token);
+        const userData = yield (0, authUtils_1.getUserFromToken)(token, true);
         if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;

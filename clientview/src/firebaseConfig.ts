@@ -32,7 +32,7 @@ export const initializeMessaging = async () => {
 									headers: {
 										"Content-Type": "application/json",
 									},
-									body: JSON.stringify({ token: currentToken, topic: (process.env.VERCEL_ENV == "preview" || process.env.NODE_ENV === "development") ? 'all-users-test' : 'all-users' }),
+									body: JSON.stringify({ token: currentToken, topic: 'all-users' }),
 								})
 									.then((response) => {
 										if (response.ok) {

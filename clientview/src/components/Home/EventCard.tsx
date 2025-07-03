@@ -90,8 +90,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
   const { userData: user } = useLogin();
 
   // Determine if user is admin or manager for this event
-  const isAdmin = user?.role >= Role.MANAGER;
-  const isManager = isAdmin || (event.managers && user && event.managers.includes(user.username));
+  const isManager = (user?.role >= Role.ADMIN) || (event.managers && user && event.managers.includes(user.username));
 
   // Check the start date year and set date/time accordingly
   const startDate = new Date(event.time.start);

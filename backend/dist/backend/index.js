@@ -48,18 +48,44 @@ require("dotenv/config");
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const eventRoutes_1 = __importDefault(require("@routes/eventRoutes"));
 const activityRoutes_1 = __importDefault(require("@routes/activityRoutes"));
 const articleRoutes_1 = __importDefault(require("@routes/articleRoutes"));
 const authRoutes_1 = __importDefault(require("@routes/authRoutes"));
 const os = require("os");
 const app = (0, express_1.default)();
+// Configure CORS to handle credentials
+app.use((0, cors_1.default)({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin)
+            return callback(null, true);
+        // Allow localhost on any port for development
+        if (origin.match(/^http:\/\/localhost:\d+$/))
+            return callback(null, true);
+        // Allow vercel preview deployments
+        if (origin.match(/^https:\/\/jain-events-portal-[a-z0-9]+\.vercel\.app$/))
+            return callback(null, true);
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:5780',
+            'http://localhost:5781',
+            'https://jain-fet-hub.web.app',
+            'https://jain-fet-hub.vercel.app'
+        ];
+        if (allowedOrigins.includes(origin))
+            return callback(null, true);
+        return callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true // Allow credentials (cookies, authorization headers, etc.)
+}));
 // Middlewares to use only in production
 if (process.env.NODE_ENV !== "development") {
-    app.use((0, cors_1.default)());
     app.use((0, helmet_1.default)());
 }
 app.use(express_1.default.json());
+app.use((0, cookie_parser_1.default)());
 app.get("/api", (req, res) => {
     res.send("API Server is running successfully!!");
 });

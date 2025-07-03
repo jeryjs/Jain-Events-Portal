@@ -91,7 +91,7 @@ function HomePage() {
   const mounted = useRef(false);
   useEffect(() => { if (mounted.current) return; else mounted.current = true; }, []);
 
-  const { data: events, isLoading: isEventsLoading, error } = useEvents();
+  const { events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
   const { data: imgur, isLoading: imgurLoading } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
   const { isSubscribed } = useNotifications()

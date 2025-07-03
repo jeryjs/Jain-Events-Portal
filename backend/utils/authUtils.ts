@@ -38,19 +38,27 @@ const verifyToken = async (token: string): Promise<admin.auth.DecodedIdToken | J
 };
 
 /**
- * Extract UserData from a Firebase ID token
+ * Extract UserData from a Firebase ID token and optionally fetch from database
  * @param {string} token - The token to decode
+ * @param {boolean} fetchFromDb - Whether to fetch complete user data from database
  * @returns {Promise<UserData | null>} UserData object if verification succeeds, null otherwise
  */
-const getUserFromToken = async (token: string): Promise<UserData | null> => {
+const getUserFromToken = async (token: string, fetchFromDb: boolean = false): Promise<UserData | null> => {
 	try {
 		const decoded = await verifyToken(token);
 		if (!decoded) return null;
-		// Map Firebase token fields to UserData
+
+		// If we need complete user data, fetch from database using the UID
+		if (fetchFromDb && 'uid' in decoded) {
+			const { getUserByUID } = await import('@services/auth');
+			const dbUser = await getUserByUID(decoded.uid);
+			if (dbUser) return dbUser;
+		}
+
 		return UserData.parse({
 			name: decoded.name || decoded.email?.split('@')[0] || '',
 			username: decoded.email || '',
-			role: decoded.role || Role.USER, // You may want to set custom claims for role
+			role: decoded.role || Role.USER,
 			profilePic: decoded.picture || undefined,
 		});
 	} catch (error) {

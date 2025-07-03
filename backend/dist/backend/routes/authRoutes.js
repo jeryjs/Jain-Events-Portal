@@ -14,7 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const authUtils_1 = require("@utils/authUtils");
-const auth_1 = require("@middlewares/auth");
+const auth_1 = require("@services/auth");
+const auth_2 = require("@middlewares/auth");
 // import { authenticateUser } from "@services/auth";
 const firebase_1 = require("@config/firebase");
 const constants_1 = require("@common/constants");
@@ -33,7 +34,7 @@ router.post("/subscribe", (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 }));
 // Route to send push notifications to all users
-router.post("/sendNotificationToAll", auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/sendNotificationToAll", auth_2.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { title, message, imageUrl, link, showNotification } = req.body;
     try {
         yield (0, firebase_1.sendPushNotificationToAllUsers)(title, message, imageUrl, {
@@ -63,16 +64,22 @@ router.post("/session", (req, res) => __awaiter(void 0, void 0, void 0, function
             res.status(401).json({ message: "Invalid token" });
             return;
         }
-        // Determine role: check if email is in admin list
-        // (Assume you have a function or config to get admin emails, e.g. getAdminEmails())
-        const adminEmails = (process.env.ADMIN_EMAILS || "jery99961@gmail.com").split(",").map(e => e.trim().toLowerCase());
-        const isAdmin = decoded.email && adminEmails.includes(decoded.email.toLowerCase());
-        const user = {
-            name: decoded.name || ((_a = decoded.email) === null || _a === void 0 ? void 0 : _a.split("@")[0]) || "User",
-            username: decoded.email || decoded.uid,
-            role: isAdmin ? constants_1.Role.ADMIN : constants_1.Role.USER,
-            profilePic: decoded.picture || undefined
-        };
+        // Get complete user data from database or create minimal user data
+        let user;
+        if ('uid' in decoded) {
+            user = yield (0, auth_1.getUserByUID)(decoded.uid);
+        }
+        // Fallback to token data if no database record
+        if (!user) {
+            const adminEmails = (process.env.ADMIN_EMAILS || "jery99961@gmail.com").split(",").map(e => e.trim().toLowerCase());
+            const isAdmin = decoded.email && adminEmails.includes(decoded.email.toLowerCase());
+            user = {
+                name: decoded.name || ((_a = decoded.email) === null || _a === void 0 ? void 0 : _a.split("@")[0]) || "User",
+                username: decoded.email || decoded.uid,
+                role: isAdmin ? constants_1.Role.ADMIN : constants_1.Role.USER,
+                profilePic: decoded.picture || undefined
+            };
+        }
         // Set secure, HTTP-only cookie
         res.cookie("session", idToken, {
             httpOnly: true,

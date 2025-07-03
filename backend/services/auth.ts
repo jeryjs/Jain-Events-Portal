@@ -10,14 +10,17 @@ const usersCollection = db.collection("users");
  * Get user by Firebase UID (from decoded token)
  */
 export async function getUserByUID(uid: string): Promise<UserData | null> {
-	const userDoc = await usersCollection.doc(uid).get();
-	if (!userDoc.exists) return null;
-	const userData = UserData.parse(userDoc.data());
-	// Default admin logic
-	if (userData.username === 'jery99961@gmail.com' && userData.role < Role.ADMIN) {
-		userData.role = Role.ADMIN;
+	try {
+		const userDoc = await usersCollection.doc(uid).get();
+		if (!userDoc.exists) return null;
+		
+		const userData = UserData.parse(userDoc.data());
+		
+		return userData;
+	} catch (error) {
+		console.error("Error fetching user by UID:", error);
+		return null;
 	}
-	return userData;
 }
 
 /**

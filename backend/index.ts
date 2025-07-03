@@ -44,6 +44,7 @@ import "dotenv/config";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
 
 import eventRoutes from "@routes/eventRoutes";
 import activityRoutes from "@routes/activityRoutes";
@@ -53,13 +54,42 @@ import authRoutes from "@routes/authRoutes";
 const os = require("os");
 const app = express();
 
+// Configure CORS to handle credentials
+app.use(cors<Request>({
+	origin: function (origin, callback) {
+		// Allow requests with no origin (like mobile apps or curl requests)
+		if (!origin) return callback(null, true);
+		
+		// Allow localhost on any port for development
+		if (origin.match(/^http:\/\/localhost:\d+$/))
+			return callback(null, true);
+
+		// Allow vercel preview deployments
+		if (origin.match(/^https:\/\/jain-events-portal-[a-z0-9]+\.vercel\.app$/))
+			return callback(null, true);
+		
+		const allowedOrigins = [
+			'http://localhost:3000',
+			'http://localhost:5780',
+			'http://localhost:5781',
+			'https://jain-fet-hub.web.app',
+			'https://jain-fet-hub.vercel.app'
+		];
+		if (allowedOrigins.includes(origin))
+			return callback(null, true);
+		
+		return callback(new Error('Not allowed by CORS'));
+	},
+	credentials: true // Allow credentials (cookies, authorization headers, etc.)
+}));
+
 // Middlewares to use only in production
 if (process.env.NODE_ENV !== "development") {
-	app.use(cors<Request>());
 	app.use(helmet());
 }
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/api", (req: Request, res: Response) => {
 	res.send("API Server is running successfully!!");

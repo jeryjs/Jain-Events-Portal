@@ -6,6 +6,7 @@ import { useLogin } from "@components/shared";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import queryClient from "@utils/QueryClient";
 import { useCallback, useEffect, useRef } from "react";
+import * as admin from "./admin"; // Import admin API hooks
 import config from "../config";
 
 /*
@@ -47,11 +48,7 @@ export const useEvents = () => {
 		// return useDummyEvents(200); // Use dummy events for now while testing
 	}
 
-	return useQuery({
-		queryKey: ["events"],
-		queryFn: _fetchEvents,
-		staleTime: 1000 * 60 * 5, // 5 minutes
-	});
+	return admin.useEvents();
 };
 
 export const useEvent = (eventId: string) => {
@@ -59,12 +56,7 @@ export const useEvent = (eventId: string) => {
 		// return useDummyEvent(eventId); // Use dummy event for now while testing
 	}
 
-	return useQuery({
-		queryKey: ["event", eventId],
-		queryFn: () => _fetchEvent(eventId),
-		staleTime: 1000 * 60 * 5, // 5 minutes
-		enabled: !!eventId,
-	});
+	return admin.useEvent(eventId);
 };
 
 export const useDummyEvents = (count = 100) => {
@@ -133,23 +125,7 @@ export const useActivities = (eventId: string) => {
 		// return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
 	}
 
-	return useQuery({
-		queryKey: ["activities", eventId],
-		queryFn: () => _fetchActivities(eventId),
-		// staleTime: 1000 * 60 * 5, // 5 minutes
-		refetchInterval: (data) => {
-			return false	// Disable refetching for now
-			if (!data || !data.state.data) return false;
-
-			// Check if any activities are ongoing
-			const hasOngoingActivities = data.state.data.some((activity) => {
-				return activity.isOngoing;
-			});
-
-			// Only refetch if there's at least one ongoing activity
-			return hasOngoingActivities ? 60000 : false;
-		},
-	});
+	return admin.useEventActivities(eventId);
 };
 
 export const useActivity = (eventId: string, activityId: string) => {
@@ -158,23 +134,7 @@ export const useActivity = (eventId: string, activityId: string) => {
 	}
 	// const activitiesQuery = useActivities(eventId);
 
-	return useQuery({
-		queryKey: ["activity", eventId, activityId],
-		queryFn: () => _fetchActivity(eventId, activityId),
-		// staleTime: 1000 * 60 * 5, // 5 minutes
-		enabled: !!eventId && !!activityId,
-		refetchInterval: (data) => {
-			return false	// Disable refetching for now
-			if (!data || !data.state.data) return false;
-
-			// Check if this specific activity is ongoing
-			const activity = data.state.data;
-			const isOngoing = activity.isOngoing;
-
-			// Only refetch if this activity is ongoing
-			return isOngoing ? 60000 : false;
-		},
-	});
+	return admin.useActivity(eventId, activityId);
 };
 
 export const useCastVote = (eventId: string, activityId: string) => {
@@ -259,23 +219,13 @@ export const useArticles = () => {
 		// return useDummyArticles(20); // Use dummy articles for now while testing
 	}
 
-	return useQuery({
-		queryKey: ["articles"],
-		queryFn: _fetchArticles,
-		staleTime: 1000 * 60 * 30, // 30 minutes
-		refetchOnWindowFocus: false,
-	});
+	return admin.useArticles();
 };
 
 export const useArticle = (articleId: string) => {
-	const articlesQuery = useArticles();
+	// const articlesQuery = useArticles();
 
-	return useQuery({
-		queryKey: ["article", articleId],
-		queryFn: async () => articlesQuery.data?.find((a) => a.id === articleId),
-		staleTime: 1000 * 60 * 30, // 30 minutes
-		enabled: !articlesQuery.isLoading,
-	});
+	return admin.useArticle(articleId);
 };
 
 const useDummyArticles = (count = 30) => {
@@ -354,6 +304,7 @@ export const useSession = () => {
 			const resp = await fetch(`${config.API_BASE_URL}/user/session`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
+				credentials: 'include', // Important: This allows the session cookie to be set
 				body: JSON.stringify({ idToken })
 			});
 			if (!resp.ok) throw new Error("Failed to fetch session");

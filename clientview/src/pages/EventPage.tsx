@@ -1,11 +1,18 @@
-import { EventType } from '@common/constants';
+import { EventType, Role } from '@common/constants';
 import Event, { BannerItem } from '@common/models/Event';
 import { getBaseEventType } from '@common/utils';
+import { EventForm } from '@components/admin/EventForm';
 import ActivityCard from '@components/Event/ActivityCard';
 import HighlightsCarousel from '@components/Event/HighlightsCarousel';
+import { useLogin } from '@components/shared';
+import PageTransition from '@components/shared/PageTransition';
+import PhotoGallery from '@components/shared/PhotoGallery';
+import { useDeleteEvent, useUpdateEvent } from '@hooks/admin';
+import { useActivities, useAssignManagers, useEvent } from '@hooks/useApi';
 import useImgur from '@hooks/useImgur';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -15,25 +22,25 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
   alpha,
   Box,
   Chip,
   Container,
   Dialog,
   Divider,
+  Fab,
   IconButton,
   Paper,
   Skeleton,
+  Snackbar,
   Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { generateColorFromString } from '@utils/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import PageTransition from '../components/shared/PageTransition';
-import PhotoGallery from '../components/shared/PhotoGallery';
-import { useActivities, useEvent } from '../hooks/useApi';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
@@ -147,7 +154,7 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
   useEffect(() => {
     if (items.length <= 1) return;
     const interval = setInterval(() => {
-      const videoElm = containerRef.current.querySelector("video"); 
+      const videoElm = containerRef.current.querySelector("video");
       if (videoElm?.ended || videoElm?.paused || !videoElm)
         setCurrentIndex(prev => (prev + 1) % items.length);
     }, 5000);
@@ -303,32 +310,32 @@ interface ActivityAccordionProps {
 const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, activities, eventId }) => {
   const [expanded, setExpanded] = useState(activities.length <= 3);
   const { text, color } = getEventTypeInfo(activityType);
-  
+
   return (
-    <Accordion 
-      expanded={expanded} 
+    <Accordion
+      expanded={expanded}
       onChange={() => setExpanded(!expanded)}
-      sx={{ 
-        mb: 2, 
+      sx={{
+        mb: 2,
         borderRadius: 2,
         overflow: 'hidden',
         '&:before': { display: 'none' },
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
       }}
     >
-      <AccordionSummary 
+      <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
-        sx={{ 
+        sx={{
           backgroundColor: alpha(color, 0.1),
           '& .MuiAccordionSummary-content': {
             alignItems: 'center'
           }
         }}
       >
-        <Chip 
+        <Chip
           label={text}
           size="small"
-          sx={{ 
+          sx={{
             backgroundColor: color,
             color: 'white',
             fontWeight: 'medium',
@@ -341,11 +348,11 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, act
       </AccordionSummary>
       <AccordionDetails sx={{ p: 1 }}>
         {activities.map((activity, index) => (
-          <ActivityCard 
-            key={activity.id} 
-            activity={activity} 
-            eventId={eventId} 
-            delay={index} 
+          <ActivityCard
+            key={activity.id}
+            activity={activity}
+            eventId={eventId}
+            delay={index}
           />
         ))}
       </AccordionDetails>
@@ -355,7 +362,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, act
 
 // Activity list component with React.Suspense
 const ActivitiesSection = ({ eventId }: { eventId: string }) => {
-  const { data: activities, isLoading } = useActivities(eventId);
+  const { activities, isLoading } = useActivities(eventId);
   const len = activities && Array.isArray(activities) ? activities.length : 0;
 
   if (isLoading) {
@@ -419,13 +426,52 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
 function EventPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { userData } = useLogin();
+  const { mutateAsync: assignManagers } = useAssignManagers();
+  const { mutateAsync: updateEvent } = useUpdateEvent();
+  const { mutateAsync: deleteEvent } = useDeleteEvent();
 
-  const { data: event, isLoading: eventLoading } = useEvent(eventId);
+  const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId);
   const { data: imgur, isLoading: imgurLoading } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
+
+  // Get edit state from URL search params
+  const isEditMode = searchParams.get('edit') === 'true';
+
+  // Check if user can edit this event
+  const canEdit = userData && (
+    userData.role >= Role.ADMIN ||
+    (event?.managers && event.managers.includes(userData.username))
+  );
+
+  // Handle event save
+  const handleEventSave = async (eventData: Partial<Event>) => {
+    try {
+      if (!eventId) throw new Error('Event ID is required');
+      await updateEvent(eventData);
+      setSearchParams(prev => { prev.delete('edit'); return prev; }, { replace: true });
+      refetch();
+    } catch (error) {
+      setError((error instanceof Error ? error.message : 'Failed to save event'));
+      console.error('Failed to save event:', error);
+    }
+  };
+
+  // Handle event delete
+  const handleEventDelete = async (eventId: string) => {
+    try {
+      await deleteEvent(eventId);
+      navigate('/');
+    } catch (error) {
+      setError((error instanceof Error ? error.message : 'Failed to delete event'));
+      console.error('Failed to delete event:', error);
+    }
+  };
 
   // Check if description is truncated
   useEffect(() => {
@@ -489,11 +535,6 @@ function EventPage() {
   }
 
   // temp for ininity: Hardcode the highlights-
-  const highlights = eventId === "infinity-2025" ? [
-    'https://i.imgur.com/hnY5dx2l.jpeg',
-    'https://i.imgur.com/8oNrZuzl.jpeg',
-    'https://i.imgur.com/2W2fEIYl.jpeg'
-  ] : null;
 
   return (
     <Suspense fallback={null}>
@@ -607,12 +648,12 @@ function EventPage() {
           </ContentSection>
 
           {/*  Temp Infinity Highlights section */}
-          {highlights && <Box>
+          {event.highlights && <Box>
             <Divider sx={{ my: 3 }} />
             <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 1 }}>
               Highlights
             </Typography>
-            <HighlightsCarousel images={highlights} />
+            <HighlightsCarousel images={event.highlights.split(',').map(url => url.trim())} />
           </Box>}
 
           <Divider sx={{ my: 3 }} />
@@ -652,6 +693,40 @@ function EventPage() {
             columns={4}
           />
         </Container>
+
+        {/* Floating Edit Button (Admin/Manager only) */}
+        {canEdit && (
+          <Fab
+            color="primary"
+            sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 1000 }}
+            onClick={() => setSearchParams(prev => ({ ...prev, edit: 'true' }))}
+          >
+            <EditIcon />
+          </Fab>
+        )}
+
+        {/* Fullscreen Edit Dialog */}
+        <Dialog open={isEditMode} maxWidth={false} fullScreen>
+          <EventForm
+            event={event}
+            isCreating={false}
+            onSave={handleEventSave}
+            onDelete={handleEventDelete}
+            onCancel={() => setSearchParams(prev => { prev.delete('edit'); return prev; }, { replace: true })}
+          />
+        </Dialog>
+
+        {/* Error Notification */}
+        <Snackbar
+          open={!!error}
+          autoHideDuration={6000}
+          onClose={() => setError(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>
+            {error}
+          </Alert>
+        </Snackbar>
       </PageTransition>
     </Suspense>
   );
