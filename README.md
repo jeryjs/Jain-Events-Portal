@@ -23,7 +23,8 @@ A React app with UI in MUI and Express.js backend for managing events at Jain Un
 
 #### Prerequisites
 - Node.js
-- npm
+- Pnpm
+     - Note: Pnpm is the recommended package manager for this project, however you can also use npm or any other package manager with its suitable commands.
 
 #### Clone the Repository
 ```bash
@@ -33,7 +34,7 @@ cd Jain-Events-Portal
 
 #### Install Dependencies
 ```bash
-npm run init
+pnpm run setup
 ```
 
 ---
@@ -80,7 +81,7 @@ FIREBASE_ACCOUNT_KEY_JSON={your-firebase-key-json}
 ### Running the Development Server
 ```bash
 cd Jain-Events-Portal
-npm run dev
+pnpm run dev
 ```
 Navigate to `http://localhost:PORT` to see the app in action.
 > Make sure to setup admin/test accounts in the firestore database first.
@@ -100,7 +101,7 @@ Navigate to `http://localhost:PORT` to see the app in action.
 #### Manual Deployment
 1. Install Vercel CLI:
      ```bash
-     npm install -g vercel
+     pnpm add -g vercel
      ```
 2. Login to Vercel:
      ```bash
