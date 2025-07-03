@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hasMinimumRole = exports.isAuthenticated = exports.managerMiddleware = exports.adminMiddleware = exports.authMiddleware = void 0;
 const authUtils_1 = require("@utils/authUtils");
@@ -6,8 +15,7 @@ const constants_1 = require("@common/constants");
 /**
  * @description Middleware to authenticate user based on JWT token.
  */
-const authMiddleware = (req, res, next) => {
-    // Check for token in Authorization header
+const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         res.status(401).json({
@@ -18,18 +26,15 @@ const authMiddleware = (req, res, next) => {
     }
     const token = authHeader.split(' ')[1];
     try {
-        // Get user data directly from token
-        const userData = (0, authUtils_1.getUserFromToken)(token);
+        const userData = yield (0, authUtils_1.getUserFromToken)(token);
         if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
         }
-        // Attach user data to request
         req.user = userData;
         next();
     }
     catch (error) {
-        // Handle specific token errors
         if (error instanceof Error) {
             const message = error.message.includes('expired')
                 ? 'Token has expired'
@@ -39,13 +44,12 @@ const authMiddleware = (req, res, next) => {
         }
         res.status(401).json({ message: 'Authentication failed' });
     }
-};
+});
 exports.authMiddleware = authMiddleware;
 /**
  * @description Middleware to authorize user with admin role.
  */
-const adminMiddleware = (req, res, next) => {
-    // Check for token in Authorization header
+const adminMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         res.status(401).json({
@@ -56,8 +60,7 @@ const adminMiddleware = (req, res, next) => {
     }
     const token = authHeader.split(' ')[1];
     try {
-        // Get user data directly from token
-        const userData = (0, authUtils_1.getUserFromToken)(token);
+        const userData = yield (0, authUtils_1.getUserFromToken)(token);
         if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
@@ -69,12 +72,10 @@ const adminMiddleware = (req, res, next) => {
             });
             return;
         }
-        // Attach user data to request for potential use in route handlers
         req.user = userData;
         next();
     }
     catch (error) {
-        // Handle specific token errors
         if (error instanceof Error) {
             const message = error.message.includes('expired')
                 ? 'Token has expired'
@@ -84,13 +85,12 @@ const adminMiddleware = (req, res, next) => {
         }
         res.status(401).json({ message: 'Authentication failed' });
     }
-};
+});
 exports.adminMiddleware = adminMiddleware;
 /**
  * @description Middleware to authorize user with manager or higher role.
  */
-const managerMiddleware = (req, res, next) => {
-    // Check for token in Authorization header
+const managerMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         res.status(401).json({
@@ -101,8 +101,7 @@ const managerMiddleware = (req, res, next) => {
     }
     const token = authHeader.split(' ')[1];
     try {
-        // Get user data directly from token
-        const userData = (0, authUtils_1.getUserFromToken)(token);
+        const userData = yield (0, authUtils_1.getUserFromToken)(token);
         if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
@@ -114,12 +113,10 @@ const managerMiddleware = (req, res, next) => {
             });
             return;
         }
-        // Attach user data to request for potential use in route handlers
         req.user = userData;
         next();
     }
     catch (error) {
-        // Handle specific token errors
         if (error instanceof Error) {
             const message = error.message.includes('expired')
                 ? 'Token has expired'
@@ -129,7 +126,7 @@ const managerMiddleware = (req, res, next) => {
         }
         res.status(401).json({ message: 'Authentication failed' });
     }
-};
+});
 exports.managerMiddleware = managerMiddleware;
 /**
  * @description Helper function to check if a request is authenticated

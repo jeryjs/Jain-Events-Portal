@@ -11,8 +11,7 @@ interface AuthenticatedRequest extends Request {
 /**
  * @description Middleware to authenticate user based on JWT token.
  */
-const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  // Check for token in Authorization header
+const authMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(401).json({ 
@@ -23,30 +22,22 @@ const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunc
   }
 
   const token = authHeader.split(' ')[1];
-  
   try {
-    // Get user data directly from token
-    const userData = getUserFromToken(token);
-    
+    const userData = await getUserFromToken(token);
     if (!userData) {
       res.status(401).json({ message: 'Invalid token' });
       return;
     }
-    
-    // Attach user data to request
     req.user = userData;
     next();
   } catch (error) {
-    // Handle specific token errors
     if (error instanceof Error) {
       const message = error.message.includes('expired') 
         ? 'Token has expired' 
         : 'Invalid token';
-      
       res.status(401).json({ message, details: error.message });
       return;
     }
-    
     res.status(401).json({ message: 'Authentication failed' });
   }
 };
@@ -54,8 +45,7 @@ const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunc
 /**
  * @description Middleware to authorize user with admin role.
  */
-const adminMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  // Check for token in Authorization header
+const adminMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(401).json({ 
@@ -66,16 +56,12 @@ const adminMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFun
   }
 
   const token = authHeader.split(' ')[1];
-  
   try {
-    // Get user data directly from token
-    const userData = getUserFromToken(token);
-    
+    const userData = await getUserFromToken(token);
     if (!userData) {
       res.status(401).json({ message: 'Invalid token' });
       return;
     }
-
     if (userData.role < Role.ADMIN) {
       res.status(403).json({ 
         message: 'Access denied',
@@ -83,21 +69,16 @@ const adminMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFun
       });
       return;
     }
-    
-    // Attach user data to request for potential use in route handlers
     req.user = userData;
     next();
   } catch (error) {
-    // Handle specific token errors
     if (error instanceof Error) {
       const message = error.message.includes('expired') 
         ? 'Token has expired' 
         : 'Invalid token';
-      
       res.status(401).json({ message, details: error.message });
       return;
     }
-    
     res.status(401).json({ message: 'Authentication failed' });
   }
 };
@@ -105,8 +86,7 @@ const adminMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFun
 /**
  * @description Middleware to authorize user with manager or higher role.
  */
-const managerMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  // Check for token in Authorization header
+const managerMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(401).json({ 
@@ -117,16 +97,12 @@ const managerMiddleware = (req: AuthenticatedRequest, res: Response, next: NextF
   }
 
   const token = authHeader.split(' ')[1];
-  
   try {
-    // Get user data directly from token
-    const userData = getUserFromToken(token);
-    
+    const userData = await getUserFromToken(token);
     if (!userData) {
       res.status(401).json({ message: 'Invalid token' });
       return;
     }
-    
     if (userData.role < Role.MANAGER) {
       res.status(403).json({ 
         message: 'Access denied',
@@ -134,21 +110,16 @@ const managerMiddleware = (req: AuthenticatedRequest, res: Response, next: NextF
       });
       return;
     }
-    
-    // Attach user data to request for potential use in route handlers
     req.user = userData;
     next();
   } catch (error) {
-    // Handle specific token errors
     if (error instanceof Error) {
       const message = error.message.includes('expired') 
         ? 'Token has expired' 
         : 'Invalid token';
-      
       res.status(401).json({ message, details: error.message });
       return;
     }
-    
     res.status(401).json({ message: 'Authentication failed' });
   }
 };

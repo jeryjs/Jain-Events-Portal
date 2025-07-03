@@ -1,5 +1,7 @@
 import { UserData } from "@common/models";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import admin from "firebase-admin";
+import { Role } from "@common/constants";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -16,41 +18,43 @@ const generateToken = (userData: UserData): string => {
 	return jwt.sign(userData.toJSON(), JWT_SECRET);
 };
 
+
 /**
- * Verifies a token which might be a regular JWT or a base64-encoded JSON string
- * @param {string} token - The token to verify
- * @returns {JwtPayload | null} Decoded token payload if verification succeeds, null if verification fails
+ * Verifies a Firebase ID token and returns the decoded payload
+ * @param {string} token - The Firebase ID token to verify
+ * @returns {admin.auth.DecodedIdToken | null} Decoded token payload if verification succeeds, null if verification fails
  */
-const verifyToken = (token: string): JwtPayload | null => {
+const verifyToken = async (token: string): Promise<admin.auth.DecodedIdToken | JwtPayload | null> => {
 	try {
 		// First try to verify as a standard JWT
 		return jwt.verify(token, JWT_SECRET) as JwtPayload;
 	} catch (error) {
-		// If the token isn't a valid JWT, try treating it as a base64-encoded JSON string (for Firebase integration)
-		try {
-			const decodedString = atob(token);
-			return JSON.parse(decodedString);
-		} catch (parseError) {
-			console.error("Failed to parse token:", parseError);
-			return null;
-		}
+		console.warn("JWT verification failed, falling back to Firebase ID token verification:", error);
+	}
+	try {
+		return await admin.auth().verifyIdToken(token);
+	} catch (error) {
+		console.error("Failed to verify Firebase ID token:", error);
+		return null;
 	}
 };
 
 /**
- * Extract UserData from a token
+ * Extract UserData from a Firebase ID token
  * @param {string} token - The token to decode
- * @returns {UserData | null} UserData object if verification succeeds, null otherwise
+ * @returns {Promise<UserData | null>} UserData object if verification succeeds, null otherwise
  */
-const getUserFromToken = (token: string): UserData | null => {
+const getUserFromToken = async (token: string): Promise<UserData | null> => {
 	try {
-		// Get decoded payload
-		const decoded = verifyToken(token);
-		
+		const decoded = await verifyToken(token);
 		if (!decoded) return null;
-		
-		// Parse the decoded token into a UserData object
-		return UserData.parse(decoded);
+		// Map Firebase token fields to UserData
+		return UserData.parse({
+			name: decoded.name || decoded.email?.split('@')[0] || '',
+			username: decoded.email || '',
+			role: decoded.role || Role.USER, // You may want to set custom claims for role
+			profilePic: decoded.picture || undefined,
+		});
 	} catch (error) {
 		console.error("Failed to extract user from token:", error);
 		return null;

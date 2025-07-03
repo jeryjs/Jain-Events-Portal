@@ -148,24 +148,23 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // Generate token and store user data
-  const processUserLogin = (user: User): void => {
+  // Generate token and store user data (using Firebase ID token)
+  const processUserLogin = async (user: User): Promise<void> => {
     try {
+      // Get Firebase ID token (JWT)
+      const idToken = await user.getIdToken();
       // Create UserData from Firebase user
       const userData = createUserDataFromFirebase(user);
       const userEmail = user.email || '';
 
-      // Create token using UserData
-      const tokenVal = btoa(JSON.stringify(userData));
-
       // Store in localStorage
-      localStorage.setItem('auth_token', tokenVal);
+      localStorage.setItem('auth_token', idToken);
       localStorage.setItem('auth_user', JSON.stringify(userData));
       localStorage.setItem('auth_username', userEmail);
 
       // Update state
       setUserData(userData);
-      setToken(tokenVal);
+      setToken(idToken);
     } catch (error) {
       console.error('Error processing login:', error);
     }
@@ -177,7 +176,20 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     const storedUser = localStorage.getItem('auth_user');
     const storedToken = localStorage.getItem('auth_token');
 
-    if (storedUser && storedToken) {
+    // Helper: check if token is a valid JWT (Firebase ID token)
+    const isJWT = (token: string) => {
+      return /^([\w-]+\.){2}[\w-]+$/.test(token);
+    };
+
+    // If old token format (not JWT), sign out user
+    if (storedToken && !isJWT(storedToken)) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_username');
+      setUserData(null);
+      setToken(null);
+      signOut(auth);
+    } else if (storedUser && storedToken) {
       try {
         setUserData(UserData.parse(storedUser));
         setToken(storedToken);
@@ -188,13 +200,14 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     }
 
     // Listen for Firebase auth state changes
-    const unsubscribe = onAuthStateChanged(auth, user => {
+    const unsubscribe = onAuthStateChanged(auth, async user => {
       if (user) {
-        processUserLogin(user);
+        await processUserLogin(user);
       } else {
         // Clear user data on logout
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
+        localStorage.removeItem('auth_username');
         setUserData(null);
         setToken(null);
       }
@@ -207,7 +220,7 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
   const loginWithGoogle = async (): Promise<void> => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      processUserLogin(result.user);
+      await processUserLogin(result.user);
     } catch (error) {
       console.error('Login error:', error);
     }

@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/jeryjs/Jain-Events-Portal#readme",
   "dependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express-rate-limit": "^7.5.1",
