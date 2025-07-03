@@ -411,10 +411,15 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
   const infoActivities = activities.filter(activity => getBaseEventType(activity.type) === EventType.INFO);
   const nonInfoActivities = activities.filter(activity => getBaseEventType(activity.type) !== EventType.INFO);
 
-  // TODO: revert making info activities last after infinity-2025
-  // Group activities by event type for non-info activities
+  // Group activities by event type
   const groupedActivities: Record<number, any[]> = {};
 
+  // First handle INFO activities if they exist
+  if (infoActivities.length > 0) {
+    groupedActivities[EventType.INFO] = infoActivities;
+  }
+
+  // Then handle the rest of activity types
   nonInfoActivities.forEach(activity => {
     const activityType = activity.type;
     if (!groupedActivities[activityType]) {
@@ -423,26 +428,19 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
     groupedActivities[activityType].push(activity);
   });
 
-  // Prepare info activities as a separate group
-  const infoGroup = infoActivities.length > 0 ? { [EventType.INFO]: infoActivities } : {};
-
-  // Merge the groups, making sure the INFO group comes last
-  const orderedGroups = [
-    ...Object.entries(groupedActivities),
-    ...Object.entries(infoGroup)
-  ];
-
-  // Return the activities with INFO rendered last if it exists
+  // Return the activities, now with INFO guaranteed to be first if it exists
   return (
     <Box>
-      {orderedGroups.map(([type, acts]) => (
-        <ActivityAccordion
-          key={type}
-          activityType={Number(type) as EventType}
-          activities={acts}
-          eventId={eventId}
-        />
-      ))}
+      {Object.entries(groupedActivities)
+        .map(([type, acts]) => (
+          <ActivityAccordion
+            key={type}
+            activityType={Number(type) as EventType}
+            activities={acts}
+            eventId={eventId}
+          />
+        ))
+      }
     </Box>
   );
 };
