@@ -93,7 +93,7 @@ function HomePage() {
 
   const { events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
-  const { data: imgur, isLoading: imgurLoading } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
+  const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
   const { isSubscribed } = useNotifications()
 
   const [catTabId, setTabId] = useState([0, -1]);
@@ -261,7 +261,7 @@ function HomePage() {
 
         {/* Photos Section */}
         <Section title='Gallery'>
-          <PhotoGallery images={imgur ? imgur.map(it => it.link) : []} isLoading={imgurLoading} rows={2} columns={4} />
+          <PhotoGallery images={imgur ? imgur.map(it => it.link) : []} isLoading={imgurLoading} rows={2} columns={4} loadFailed={imgurError} />
         </Section>
 
         {/* Articles Section */}

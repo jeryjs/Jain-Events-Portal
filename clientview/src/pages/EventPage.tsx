@@ -433,7 +433,7 @@ function EventPage() {
   const { mutateAsync: deleteEvent } = useDeleteEvent();
 
   const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId);
-  const { data: imgur, isLoading: imgurLoading } = useImgur(event?.galleryLink || '');
+  const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
@@ -691,6 +691,7 @@ function EventPage() {
             isLoading={imgurLoading}
             rows={2}
             columns={4}
+            loadFailed={imgurError}
           />
         </Container>
 
