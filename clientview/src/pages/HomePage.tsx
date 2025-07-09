@@ -1,26 +1,23 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Alert, Box, Card, CardContent, CardMedia, Chip, Container, Skeleton, Typography } from '@mui/material';
+import { Box, CardContent, CardMedia, Chip, Container, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { EventType, Role } from '@common/constants';
+import HighlightsCarousel from '@components/Event/HighlightsCarousel';
 import { EventCard, HomeHeader, Section } from '@components/Home';
 import NoEventsDisplay from '@components/Home/NoEventsDisplay';
-import PageTransition from '@components/shared/PageTransition';
-import { useArticles, useEvents, useAssignManagers } from '@hooks/useApi';
 import { useLogin } from '@components/shared/LoginContext';
-import { Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, IconButton, Tooltip } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import PageTransition from '@components/shared/PageTransition';
+import PhotoGallery from '@components/shared/PhotoGallery';
+import { useArticles, useAssignManagers, useEvents } from '@hooks/useApi';
 import useImgur from '@hooks/useImgur';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import { pascalCase } from '@utils/utils';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import PhotoGallery from '@components/shared/PhotoGallery';
-import HighlightsCarousel from '@components/Event/HighlightsCarousel';
-import { NotificationPrompt } from '@components/shared';
-import useNotifications from '@hooks/useNotifications';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -94,16 +91,15 @@ function HomePage() {
   const { events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
   const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
-  const { isSubscribed } = useNotifications()
 
   const [catTabId, setTabId] = useState([0, -1]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
 
   const filteredEvents = (events ?? [])
     .filter(event => catTabId[1] > 0 ? event.type === catTabId[1] : true)
-    .sort((a, b) => a.time.start.getTime() - b.time.start.getTime());
+    .sort((a, b) => b.time.start.getTime() - a.time.start.getTime());
 
-  const ongoingEvents = filteredEvents?.filter((it) => it.time.start < new Date() && it.time.end > new Date()).slice(0, 6) || [];
+  const ongoingEvents = filteredEvents?.filter((it) => it.time.start < new Date() && it.time.end > new Date()).slice(0, 3) || [];
   const upcomingEvents = filteredEvents?.filter((it) => it.time.start > new Date()).slice(0, 3) || [];
   const pastEvents = filteredEvents?.filter((it) => it.time.end < new Date()).slice(0, 3) || [];
 
@@ -209,25 +205,17 @@ function HomePage() {
   }, [events, catTabId]);
 
 
-  // temp - hardcode infinity 2025 highlights
-  const highlights = [
-    'https://i.imgur.com/hnY5dx2l.jpeg',
-    'https://i.imgur.com/8oNrZuzl.jpeg',
-    'https://i.imgur.com/2W2fEIYl.jpeg'
-  ];
-
-
   return (
     <PageTransition>
       <Container maxWidth="lg">
         <HomeHeader tabValue={catTabId[0]} onTabChange={handleTabChange} />
 
-        {/* Highlights Section */}
-        {/* {highlights && (
-          <Section title='Infinity 2025 Highlights' moreLink='/infinity-2025'>
-            <HighlightsCarousel images={highlights} />
+        {/* Highlights Section - Show latest ongoing event highlights */}
+        {ongoingEvents[0]?.highlights && (
+          <Section title={ongoingEvents[0].name + ' Highlights'} moreLink={'/' + ongoingEvents[0].id}>
+            <HighlightsCarousel images={ongoingEvents[0].highlights.split(',')} />
           </Section>
-        )} */}
+        )}
 
         {/* Prompt to enable notifications */}
         {/* <Box sx={{display: !isSubscribed?'block':'none' }}>
@@ -252,7 +240,7 @@ function HomePage() {
           </Section>
         )}
 
-        {/* Dynamically render the Events section with more events first (past tries to be last) */}
+        {/* Dynamically render the Events section with ongoing events first (past tries to be last) */}
         {sortedSections.map(section => (
           <React.Fragment key={section.key}>
             {section.view}
