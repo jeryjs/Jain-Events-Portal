@@ -1,8 +1,7 @@
 {
 	"name": "jain-events-portal",
-	"version": "0.0.1",
+	"version": "2.0.0",
 	"description": "A web portal for Jain University Events.",
-	"main": "index.js",
 	"scripts": {
 		"start:backend": "cd backend && pnpm run dev",
 		"start:clientview": "cd clientview && pnpm run dev",
@@ -11,7 +10,7 @@
 		"init:backend": "cd backend && pnpm install",
 		"init:clientview": "cd clientview && pnpm install",
 		"init:adminview": "cd adminview && pnpm install",
-		"setup": "pnpx concurrently -n \"backend,clientview,adminview\" \"pnpm run start:backend\" \"pnpm run start:clientview\" \"pnpm run start:adminview\" \"pnpm run init:backend\" \"pnpm run init:clientview\" \"pnpm run init:adminview\"",
+		"init": "pnpx concurrently -n \"backend,clientview,adminview\" \"pnpm run start:backend\" \"pnpm run start:clientview\" \"pnpm run start:adminview\" \"pnpm run init:backend\" \"pnpm run init:clientview\" \"pnpm run init:adminview\"",
 		"update:backend": "cd backend && pnpm update",
 		"update:clientview": "cd clientview && pnpm update",
 		"update:adminview": "cd adminview && pnpm update",

@@ -34,7 +34,7 @@ cd Jain-Events-Portal
 
 #### Install Dependencies
 ```bash
-pnpm run setup
+pnpm run init
 ```
 
 ---
