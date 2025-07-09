@@ -33,4 +33,8 @@ export default class UserData {
             profilePic: this.profilePic,
         };
     }
+
+    get isAdmin() {
+        return this.role >= Role.ADMIN;
+    }
 }

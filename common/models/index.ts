@@ -2,7 +2,7 @@
 export { default as UserData } from "./UserData";
 export { default as Activity, TeamActivity } from "./Activity";
 export { default as Event } from "./Event";
-export type { BannerItem } from "./Event";
+export type { BannerItem, EventConfig } from "./Event";
 export { default as Participant, TeamParticipant } from "./Participant";
 export { default as Article } from "./Article";
 

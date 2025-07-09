@@ -1,14 +1,14 @@
 import { EventType, Role } from '@common/constants';
-import Event, { BannerItem } from '@common/models/Event';
+import Event, { BannerItem, EventConfig } from '@common/models/Event';
 import { getBaseEventType } from '@common/utils';
-import { EventForm } from '@components/admin/EventForm';
+import { EventForm } from '@components/Event/admin/EventForm';
 import ActivityCard from '@components/Event/ActivityCard';
 import HighlightsCarousel from '@components/Event/HighlightsCarousel';
 import { useLogin } from '@components/shared';
 import PageTransition from '@components/shared/PageTransition';
 import PhotoGallery from '@components/shared/PhotoGallery';
 import { useDeleteEvent, useUpdateEvent } from '@hooks/admin';
-import { useActivities, useAssignManagers, useEvent } from '@hooks/useApi';
+import { useActivities, useEvent } from '@hooks/useApi';
 import useImgur from '@hooks/useImgur';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -67,7 +67,7 @@ const VideoControls = styled(Box)(({ theme }) => `
 `);
 const EventTypeChip = styled(Chip)(({ theme }) => `
   position: absolute; margin-top: -30px; left: 50%; transform: translateX(-50%);
-  width: 70%; height: 52px; font-size: 24px; font-weight: bold; border-radius: 24px;
+  min-width: 70%; height: 52px; font-size: 24px; font-weight: bold; border-radius: 24px;
   background-color: ${theme.palette.background.paper}; color: ${theme.palette.text.secondary};
 `);
 const ContentSection = styled(Box)(({ theme }) => `
@@ -305,10 +305,11 @@ interface ActivityAccordionProps {
   activityType: EventType;
   activities: any[];
   eventId: string;
+  config?: EventConfig;
 }
 
-const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, activities, eventId }) => {
-  const [expanded, setExpanded] = useState(activities.length <= 3);
+const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, activities, eventId, config }) => {
+  const [expanded, setExpanded] = useState(config?.expandedCategories?.includes(activityType));
   const { text, color } = getEventTypeInfo(activityType);
 
   return (
@@ -361,7 +362,7 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, act
 };
 
 // Activity list component with React.Suspense
-const ActivitiesSection = ({ eventId }: { eventId: string }) => {
+const ActivitiesSection = ({ eventId, config }: { eventId: string, config: EventConfig }) => {
   const { activities, isLoading } = useActivities(eventId);
   const len = activities && Array.isArray(activities) ? activities.length : 0;
 
@@ -416,6 +417,7 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
             activityType={Number(type) as EventType}
             activities={acts}
             eventId={eventId}
+            config={config}
           />
         ))
       }
@@ -428,12 +430,12 @@ function EventPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { userData } = useLogin();
-  const { mutateAsync: assignManagers } = useAssignManagers();
+  // const { mutateAsync: assignManagers } = useAssignManagers();
   const { mutateAsync: updateEvent } = useUpdateEvent();
   const { mutateAsync: deleteEvent } = useDeleteEvent();
 
   const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId);
-  const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
+  const { data: imgur, isFetched: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
@@ -647,7 +649,7 @@ function EventPage() {
             )}
           </ContentSection>
 
-          {/*  Temp Infinity Highlights section */}
+          {/*  Highlights section */}
           {event.highlights && <Box>
             <Divider sx={{ my: 3 }} />
             <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 1 }}>
@@ -672,27 +674,29 @@ function EventPage() {
                 ))}
               </Box>
             }>
-              <ActivitiesSection eventId={eventId || ''} />
+              <ActivitiesSection eventId={eventId || ''} config={event.config} />
             </Suspense>
           </ActivitySectionContainer>
 
           <Divider sx={{ my: 3 }} />
 
           {/* Photo Gallery Section */}
-          <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', mb: 2 }}>
-            Event Gallery
-          </Typography>
-          <PhotoGallery
-            images={
-              eventId === "sportastica-2025" ?
-                (imgur ? [...imgur].reverse().map(it => it.link) : []) :
-                (imgur ? imgur.map(it => it.link) : [])
-            }
-            isLoading={imgurLoading}
-            rows={2}
-            columns={4}
-            loadFailed={imgurError}
-          />
+          {event.galleryLink && <Box>
+            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', mb: 2 }}>
+              Event Gallery
+            </Typography>
+            <PhotoGallery
+              images={
+                eventId === "sportastica-2025" ?
+                  (imgur ? [...imgur].reverse().map(it => it.link) : []) :
+                  (imgur ? imgur.map(it => it.link) : [])
+              }
+              isLoading={imgurLoading}
+              rows={2}
+              columns={4}
+              loadFailed={imgurError}
+            />
+          </Box>}
         </Container>
 
         {/* Floating Edit Button (Admin/Manager only) */}

@@ -6,16 +6,27 @@ import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
 import EditIcon from '@mui/icons-material/Edit';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ImageIcon from '@mui/icons-material/Image';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import SettingsIcon from '@mui/icons-material/Settings';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Box, Button,
     Chip,
     CircularProgress,
     Fade,
-    IconButton, MenuItem,
-    Paper, Select, TextField, Typography
+    IconButton,
+    MenuItem,
+    Paper,
+    Select,
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -25,9 +36,10 @@ import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import dayjs from 'dayjs';
 import { Suspense, useEffect, useState } from 'react';
 
-import { EventType } from '@common/constants';
+import { EventType, Role } from '@common/constants';
 import { BannerItem, Event } from '@common/models';
-import { getAllBaseEventTypes } from '@common/utils';
+import { getActivityTypes, getAllBaseEventTypes } from '@common/utils';
+import { useLogin } from '@components/shared';
 
 const EventTypeInput = styled(Box)`
   margin-block: 0px; left: 0;
@@ -43,6 +55,8 @@ interface EventFormProps {
 }
 
 export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: EventFormProps) {
+    const { userData: user } = useLogin();
+
     // Default States for form fields
     const [formData, setFormData] = useState<Partial<Event>>({
         ...Event.parse({}).toJSON(),
@@ -123,23 +137,31 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
     const _getChangedFields = (original: Event, current: Partial<Event>): Partial<Event> => {
         const changes: Partial<Event> = {};
 
-        // Compare each field and only include if changed
-        if (original.name !== current.name) changes.name = current.name;
-        if (original.venue !== current.venue) changes.venue = current.venue;
-        if (original.description !== current.description) changes.description = current.description;
-        if (original.type !== current.type) changes.type = current.type;
-        if (original.galleryLink !== current.galleryLink) changes.galleryLink = current.galleryLink;
-        if (original.highlights !== current.highlights) changes.highlights = current.highlights;
+        // Only compare keys that exist in current (formData)
+        Object.keys(current).forEach((key) => {
+            // @ts-ignore
+            const origVal = original[key];
+            // @ts-ignore
+            const currVal = current[key];
 
-        // Compare timings array
-        if (JSON.stringify(original.timings) !== JSON.stringify(current.timings)) {
-            changes.timings = current.timings;
-        }
-
-        // Compare banner array
-        if (JSON.stringify(original.banner) !== JSON.stringify(current.banner)) {
-            changes.banner = current.banner;
-        }
+            // Deep compare for arrays/objects, shallow for primitives
+            if (Array.isArray(origVal) || Array.isArray(currVal)) {
+                if (JSON.stringify(origVal) !== JSON.stringify(currVal)) {
+                    // @ts-ignore
+                    changes[key] = currVal;
+                }
+            } else if (typeof origVal === 'object' && origVal !== null && currVal !== null) {
+                if (JSON.stringify(origVal) !== JSON.stringify(currVal)) {
+                    // @ts-ignore
+                    changes[key] = currVal;
+                }
+            } else {
+                if (origVal !== currVal) {
+                    // @ts-ignore
+                    changes[key] = currVal;
+                }
+            }
+        });
 
         // Always include ID for updates
         if (!isCreating) changes.id = original.id;
@@ -777,6 +799,79 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                             sx={{ mb: 4 }}
                         />
                     </Box>
+
+                    {/* Advanced Settings Accordion */}
+                    <Accordion sx={{ mb: 4, ml: -4, borderRadius: 2, overflow: 'hidden' }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <SettingsIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                                <Typography variant="h6">Advanced Settings</Typography>
+                            </Box>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            {/* Event Managers */}
+                            {(user?.role >= Role.ADMIN) && <Box sx={{ mb: 3 }}>
+                                <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'medium' }}>
+                                    Event Managers
+                                </Typography>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                                    {formData.managers?.map((email) => (
+                                        <Chip
+                                            key={email}
+                                            label={email}
+                                            onDelete={() => editFormData('managers', formData.managers?.filter(m => m !== email) || [])}
+                                            color="primary"
+                                            variant="outlined"
+                                        />
+                                    ))}
+                                </Box>
+                                <TextField
+                                    size="small"
+                                    placeholder="Enter manager email and press Enter"
+                                    fullWidth
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter') {
+                                            const target = e.target as HTMLInputElement;
+                                            const email = target.value.trim();
+                                            if (email && !formData.managers?.includes(email)) {
+                                                editFormData('managers', [...(formData.managers || []), email]);
+                                                target.value = '';
+                                            }
+                                        }
+                                    }}
+                                />
+                            </Box>}
+
+                            {/* Expanded Categories */}
+                            <Typography variant="subtitle1" sx={{ fontWeight: 'medium', mb: 1 }}>
+                                Expanded Categories
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                Select which activity categories should be expanded by default in the event view.
+                            </Typography>
+                            <ToggleButtonGroup
+                                value={formData.config?.expandedCategories || []}
+                                onChange={(_, categories) => editFormData('config', { ...formData.config, expandedCategories: categories })}
+                                sx={{
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: 1,
+                                    '& .MuiToggleButton-root': {
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        minWidth: 'auto',
+                                        px: 2
+                                    }
+                                }}
+                            >
+                                {[...new Set([EventType.INFO, ...getActivityTypes(event?.type)])].map((type) => (
+                                    <ToggleButton key={type} value={type} size="small">
+                                        {EventType[type]}
+                                    </ToggleButton>
+                                ))}
+                            </ToggleButtonGroup>
+                        </AccordionDetails>
+                    </Accordion>
 
                     {/* Save and Delete Buttons */}
                     <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>

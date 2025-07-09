@@ -6,6 +6,11 @@ export interface BannerItem {
 	type?: 'image' | 'video';
 }
 
+export interface EventConfig {
+	expandedCategories?: EventType[];
+	[key: string]: any;
+}
+
 export default class Event {
 	public timings: Date[];
 
@@ -19,7 +24,8 @@ export default class Event {
 		public galleryLink: string,
 		public highlights: string,
 		public banner: BannerItem[] = [],
-		public managers: string[]
+		public managers: string[] = [],
+		public config: EventConfig = {}
 	) {
 	// Convert Timestamp-like objects (from firestore) to Date
 	this.timings = timings.map((t) => {
@@ -56,7 +62,8 @@ export default class Event {
 			data.galleryLink || "",
 			data.highlights || "",
 			banner,
-			data.managers || []
+			data.managers || [],
+			data.config || {}
 		);
 	}
 
@@ -76,6 +83,7 @@ export default class Event {
 			highlights: this.highlights,
 			banner: this.banner,
 			managers: this.managers,
+			config: this.config,
 		};
 	}
 

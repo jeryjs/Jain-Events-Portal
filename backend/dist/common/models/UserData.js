@@ -26,5 +26,8 @@ class UserData {
             profilePic: this.profilePic,
         };
     }
+    get isAdmin() {
+        return this.role >= constants_1.Role.ADMIN;
+    }
 }
 exports.default = UserData;
