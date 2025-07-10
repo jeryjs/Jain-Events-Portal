@@ -1,16 +1,19 @@
 import { EventType, Role } from '@common/constants';
 import Event, { BannerItem, EventConfig } from '@common/models/Event';
+import { Activity } from '@common/models';
 import { getBaseEventType } from '@common/utils';
 import { EventForm } from '@components/Event/admin/EventForm';
+import { ActivityForm } from '@components/Activity/admin/ActivityForm';
 import ActivityCard from '@components/Event/ActivityCard';
 import HighlightsCarousel from '@components/Event/HighlightsCarousel';
 import { useLogin } from '@components/shared';
 import PageTransition from '@components/shared/PageTransition';
 import PhotoGallery from '@components/shared/PhotoGallery';
-import { useDeleteEvent, useUpdateEvent } from '@hooks/admin';
+import { useDeleteEvent, useUpdateEvent, useCreateActivity } from '@hooks/admin';
 import { useActivities, useEvent } from '@hooks/useApi';
 import useImgur from '@hooks/useImgur';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AddIcon from '@mui/icons-material/Add';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -34,6 +37,7 @@ import {
   Paper,
   Skeleton,
   Snackbar,
+  Tooltip,
   Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -115,12 +119,6 @@ const getEventTypeText = (type: number): string => {
   if (type >= EventType.SPORTS) return 'Sports Event';
   return 'General Event';
 };
-
-// Helper function to get default image if banner image is not set
-const getDefaultImage = (src): string => {
-  return src || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg';
-};
-
 
 // Helper function to get event type information
 const getEventTypeInfo = (type: EventType) => {
@@ -260,7 +258,7 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
             </>
           ) : (
             <HeroImage
-              src={currentItem.url ? getDefaultImage(currentItem.url) : getDefaultImage('')}
+              src={currentItem.url || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg'}
               alt="Event banner"
               style={currentCssStyles}
             />
@@ -433,6 +431,7 @@ function EventPage() {
   // const { mutateAsync: assignManagers } = useAssignManagers();
   const { mutateAsync: updateEvent } = useUpdateEvent();
   const { mutateAsync: deleteEvent } = useDeleteEvent();
+  const { mutateAsync: createActivity } = useCreateActivity(eventId);
 
   const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId);
   const { data: imgur, isFetched: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
@@ -441,9 +440,6 @@ function EventPage() {
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
-
-  // Get edit state from URL search params
-  const isEditMode = searchParams.get('edit') === 'true';
 
   // Check if user can edit this event
   const canEdit = userData && (
@@ -472,6 +468,19 @@ function EventPage() {
     } catch (error) {
       setError((error instanceof Error ? error.message : 'Failed to delete event'));
       console.error('Failed to delete event:', error);
+    }
+  };
+
+  // Handle activity save - Create new activity
+  const handleActivitySave = async (activityData: Activity) => {
+    try {
+      if (!eventId) throw new Error('Event ID is required');
+      await createActivity(activityData);
+      {() => setSearchParams(prev => { prev.delete('createActivity'); return prev; }, { replace: true })}
+      // Refetch activities (they're fetched in ActivitiesSection)
+    } catch (error) {
+      setError((error instanceof Error ? error.message : 'Failed to create activity'));
+      console.error('Failed to create activity:', error);
     }
   };
 
@@ -699,25 +708,44 @@ function EventPage() {
           </Box>}
         </Container>
 
-        {/* Floating Edit Button (Admin/Manager only) */}
+        {/* Floating Action Buttons (Admin/Manager only) */}
         {canEdit && (
-          <Fab
-            color="primary"
-            sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 1000 }}
-            onClick={() => setSearchParams(prev => ({ ...prev, edit: 'true' }))}
-          >
-            <EditIcon />
-          </Fab>
+          <Box sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 1000, display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {/* Create Activity FAB */}
+            <Tooltip title="Create a new activity for this event" placement="left">
+              <Fab color="secondary" onClick={() => setSearchParams(prev => ({ ...prev, createActivity: 'true' }), { replace: true })}>
+                <AddIcon />
+              </Fab>
+            </Tooltip>
+
+            {/* Edit Event FAB */}
+            <Tooltip title="Edit event details and settings" placement="left">
+              <Fab color="primary" onClick={() => setSearchParams(prev => ({ ...prev, edit: 'true' }))}>
+                <EditIcon />
+              </Fab>
+            </Tooltip>
+          </Box>
         )}
 
         {/* Fullscreen Edit Dialog */}
-        <Dialog open={isEditMode} maxWidth={false} fullScreen>
+        <Dialog open={searchParams.get('edit') === 'true'} maxWidth={false} fullScreen>
           <EventForm
             event={event}
             isCreating={false}
             onSave={handleEventSave}
             onDelete={handleEventDelete}
             onCancel={() => setSearchParams(prev => { prev.delete('edit'); return prev; }, { replace: true })}
+          />
+        </Dialog>
+
+        {/* Create Activity Dialog */}
+        <Dialog open={searchParams.get('createActivity') === 'true'} maxWidth="lg" onClose={() => setSearchParams(prev => { prev.delete('createActivity'); return prev; }, { replace: true })}>
+          <ActivityForm
+            eventId={eventId}
+            activity={null}
+            managers={event?.managers}
+            isCreating={true}
+            onSave={handleActivitySave}
           />
         </Dialog>
 

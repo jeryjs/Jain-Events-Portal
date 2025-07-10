@@ -22,6 +22,7 @@ function App() {
   const theme = useMemo(
     () =>
       createTheme({
+        shape: { borderRadius: 8 },
         palette: {
           mode: colorMode.mode,
           primary: {

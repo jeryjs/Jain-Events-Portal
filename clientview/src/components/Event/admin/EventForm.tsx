@@ -9,6 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ImageIcon from '@mui/icons-material/Image';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LockIcon from '@mui/icons-material/Lock';
 import SettingsIcon from '@mui/icons-material/Settings';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import {
@@ -56,6 +57,23 @@ interface EventFormProps {
 
 export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: EventFormProps) {
     const { userData: user } = useLogin();
+
+    // Show access denied if user doesn't have permission
+    if (!(user?.role >= Role.ADMIN || event?.managers?.includes(user?.username))) {
+        return (
+            <Paper sx={{ borderRadius: 2, flexDirection: 'column', margin: 'auto auto', padding: { xs: 2, md: 3 }, minHeight: '30vh', minWidth: '60vw' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, width: '100%' }}>
+                    <Typography variant="h5" component="h1">Access Denied</Typography>
+                    {onCancel && (<IconButton onClick={onCancel} size="large"><CloseIcon /></IconButton>)}
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                    <LockIcon sx={{ fontSize: 64, color: 'text.secondary' }} />
+                    <Typography variant="h6" color="text.secondary">You don't have permission to {isCreating ? 'create' : 'edit'} events.</Typography>
+                    <Typography variant="body1" color="text.secondary">Only administrators and event managers can modify events.</Typography>
+                </Box>
+            </Paper>
+        );
+    }
 
     // Default States for form fields
     const [formData, setFormData] = useState<Partial<Event>>({
