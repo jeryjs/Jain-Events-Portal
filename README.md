@@ -1,5 +1,5 @@
 # Jain FET Hub
-> https://jain-events-portal.vercel.app/
+> https://jain-fet-hub.vercel.app/
 
 
 
