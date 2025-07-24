@@ -15,7 +15,7 @@ A React app with UI in MUI and Express.js backend for managing events at Jain Un
 ## Preview
 <img width="48%" src="https://github.com/user-attachments/assets/2f026777-ec62-4994-8f3d-4a899eea12d4" /><img width="48%" src="https://github.com/user-attachments/assets/db443def-45a9-4cd1-856a-e49239890898" />
 <img width="24%" src="https://github.com/user-attachments/assets/993f2c36-de2b-471b-bdd6-b263d0cc3d9a" /><img width="24%" src="https://github.com/user-attachments/assets/6be5127e-e7f6-4e52-b994-d6ba05334234" /><img width="24%" src="https://github.com/user-attachments/assets/ac98e100-6a41-40fb-a273-ca0a783b4fcf" /><img width="24%" src="https://github.com/user-attachments/assets/38df313b-df2e-4257-aa70-73708add918d" />
-<img width="48%" src="https://github.com/user-attachments/assets/5f697c6e-5782-4c27-ba40-f74b959a63e1" /><img width="48%" src="https://github.com/user-attachments/assets/95da72f7-28c3-41c3-97f1-d5a278b9c313" />
+<img width="48%" src="https://github.com/user-attachments/assets/e6b1a40f-d886-4133-b300-5b74be01389a" /><img width="48%" src="https://github.com/user-attachments/assets/95da72f7-28c3-41c3-97f1-d5a278b9c313" />
 
 ## Build
 
