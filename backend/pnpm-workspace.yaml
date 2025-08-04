@@ -1,5 +1,0 @@
-onlyBuiltDependencies:
-  - '@firebase/util'
-  - pre-commit
-  - protobufjs
-  - spawn-sync

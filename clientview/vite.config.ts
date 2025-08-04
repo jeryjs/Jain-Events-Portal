@@ -60,4 +60,24 @@ export default defineConfig({
     port: 5780,
     host: "0.0.0.0"
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'react-vendor';
+            if (id.includes('@mui')) return 'mui-vendor';
+            if (id.includes('@tanstack')) return 'tanstack-vendor';
+            if (id.includes('framer-motion')) return 'framer-motion-vendor';
+            return 'vendor';
+          }
+          // split each page into its own chunk
+          if (id.includes('/src/pages/')) {
+            const match = id.match(/\/src\/pages\/([^/]+)\.tsx$/);
+            if (match) return `page-${match[1]}`;
+          }
+        },
+      },
+    },
+  },
 })
