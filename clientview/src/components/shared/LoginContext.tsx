@@ -27,6 +27,7 @@ import {
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { app } from '../../firebaseConfig';
 import { useSession } from '../../hooks/useApi';
+import { TokenManager } from '../../utils/tokenRefresh';
 
 // Initialize Firebase auth
 const auth = getAuth(app);
@@ -224,6 +225,42 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
 
     return () => unsubscribe();
   }, []);
+
+  // Token refresh effect to prevent expiration (CLIENT-SIDE ONLY)
+  useEffect(() => {
+    if (!auth.currentUser) return;
+
+    const refreshToken = async () => {
+      try {
+        // Use TokenManager for consistent token management
+        if (TokenManager.needsRefresh()) {
+          await TokenManager.forceRefresh();
+          // Update local token state ONLY - no backend calls
+          const freshToken = await auth.currentUser!.getIdToken(false);
+          setToken(freshToken);
+          localStorage.setItem('auth_token', freshToken);
+          console.log('🔄 Firebase token refreshed locally');
+        }
+      } catch (error) {
+        console.error('❌ Token refresh failed:', error);
+        // If refresh fails, user might need to re-login
+        if (error instanceof Error && error.message.includes('network')) {
+          // Network error - retry later
+          return;
+        }
+        // Auth error - clear session
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        setToken(null);
+        setUserData(null);
+      }
+    };
+
+    // Refresh token every 30 minutes (Firebase tokens expire after 1 hour)
+    const intervalId = setInterval(refreshToken, 30 * 60 * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [auth.currentUser]);
 
   const loginWithGoogle = async (): Promise<void> => {
     try {

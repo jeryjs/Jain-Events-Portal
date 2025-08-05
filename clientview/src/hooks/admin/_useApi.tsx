@@ -1,6 +1,9 @@
 import { Event, Activity, Article } from '@common/models';
 import { parseActivities, parseEvents } from '@common/utils';
 import config from "../../config";
+import { TokenManager } from '../../utils/tokenRefresh';
+import { getAuth } from 'firebase/auth';
+import { app } from '../../firebaseConfig';
 
 const API_BASE_URL = config.API_BASE_URL;
 
@@ -10,6 +13,19 @@ const API_BASE_URL = config.API_BASE_URL;
  */
 async function apiFetch<T>(url: string, options: RequestInit = {}) {
     try {
+        // For write operations (POST, PATCH, DELETE), ensure token is fresh
+        const method = options.method?.toLowerCase();
+        const isWriteOperation = method && ['post', 'patch', 'put', 'delete'].includes(method);
+        
+        if (isWriteOperation) {
+            try {
+                await TokenManager.ensureFreshToken();
+            } catch (tokenError) {
+                console.warn('Token refresh failed before API call, proceeding anyway:', tokenError);
+                // Continue with the API call - the session cookie might still be valid
+            }
+        }
+
         // Ensure headers object exists
         const headers = {
             'Content-Type': 'application/json',
@@ -28,7 +44,41 @@ async function apiFetch<T>(url: string, options: RequestInit = {}) {
         if (!response.ok) {
             // Handle authentication errors specifically
             if (response.status === 401) {
-                // Optional: Trigger auth refresh or redirect to login
+                // Try to get a fresh token and establish new session
+                if (isWriteOperation) {
+                    try {
+                        // Get fresh Firebase token
+                        await TokenManager.forceRefresh();
+                        const freshToken = await getAuth(app).currentUser?.getIdToken(true);
+                        
+                        if (freshToken) {
+                            // Establish new backend session with fresh token
+                            const sessionResponse = await fetch(`${API_BASE_URL}/user/session`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                credentials: 'include',
+                                body: JSON.stringify({ idToken: freshToken })
+                            });
+                            
+                            if (sessionResponse.ok) {
+                                console.log('🔄 Backend session refreshed, retrying API call...');
+                                
+                                // Retry the original request with new session cookie
+                                const retryResponse = await fetch(`${API_BASE_URL}${url}`, fetchOptions);
+                                if (retryResponse.ok) {
+                                    // For DELETE requests, responses might be empty
+                                    if (retryResponse.status === 204 || retryResponse.headers.get('Content-Length') === '0') {
+                                        return { success: true } as T;
+                                    }
+                                    return await retryResponse.json() as T;
+                                }
+                            }
+                        }
+                    } catch (retryError) {
+                        console.error('Session refresh and retry failed:', retryError);
+                    }
+                }
+                
                 console.error('Authentication error: Not authorized to perform this action');
                 throw new Error('You are not authorized to perform this action. Please log in again.');
             }
