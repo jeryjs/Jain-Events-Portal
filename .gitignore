@@ -1,0 +1,30 @@
+# Logs
+logs
+*.log
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+ppnpm-debug.log*
+lerna-debug.log*
+
+.vercel/
+adminview/
+backend/
+clientview/
+
+node_modules
+dist
+dist-ssr
+dev-dist
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
