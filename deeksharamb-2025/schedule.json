@@ -467,162 +467,214 @@
         "date": "12/08",
         "entries": [
             {
-                "batch": "G4",
-                "branches": [
-                    "CSE-AIML",
-                    "ISE"
-                ],
-                "admission_coordinators": [
-                    "Dr. R SUDUMAR (AIML - 98949 82065)",
-                    "Dr. Shankar. DS Kushal Chakraborty"
-                ],
-                "student_count": "380",
-                "activities": [
-                    {
-                        "time": "08:45AM to 10:15AM",
-                        "name": "University & Department Overview, Dept. tour, Library tour, Campus Tour",
-                        "venue": "AIML-A (113B), AIML-B (114B), AIML-C (114D), AIML-D (114C), AIML-E (115B), ISE-312",
-                        "coordinators": [
-                            "Department Heads"
-                        ]
-                    },
-                    {
-                        "time": "10:45AM to 12:15PM",
-                        "name": "Know yourself questionnaire on Interest & Talents / Antiragging forms / Nashamukt bharat / ABC ID",
-                        "venue": null,
-                        "coordinators": [
-                            "Admission coordinators"
-                        ]
-                    },
-                    {
-                        "time": "01:00PM to 04:00PM",
-                        "name": "Freshman Leadership Program (Speaker: Alexander Rinku, Oracle- Director - Human Resources)",
-                        "venue": "Colosseum",
-                        "coordinators": [
-                            "Dr. Pushparajesh (994143747)",
-                            "Mr. Senthil (9900385871)"
-                        ]
-                    }
+            "batch": "G5",
+            "branches": [
+                "ME",
+                "ASE",
+                "ANE",
+                "EEE",
+                "ECE",
+                "CE",
+                "ALL M.Tech"
+            ],
+            "admission_coordinators": [
+                "Dr. KANTHARAJ (ME - 9841070704)",
+                "PROF. SHASHIKUMAR S (ANE/ASE - 8660512408)",
+                "Dr. P KISHORE KUMAR (EEE - 9410154656)",
+                "Dr. VINAY KUMAR S B (ECE - 9538582897)",
+                "Prof. PAVAN P S (CE - 9686863539)",
+                "Dr. SHWETHA M S (FT - 8105439163)"
+            ],
+            "student_count": "321+ parents",
+            "activities": [
+                {
+                "time": "08:45AM to 12:15PM",
+                "name": "REGISTRATION",
+                "venue": "FET Seminar Hall + 113 ABC + 114 ABC = 6 rooms for Registration, Room 101 For Students Kit",
+                "coordinators": [
+                    "Dr. Benaka Prasad (9986982138)"
                 ]
+                },
+                {
+                "time": "01:00PM to 04:00PM",
+                "name": "PARENTS INTERACTION (2:45 PM TO 3:30 PM)",
+                "venue": null,
+                "coordinators": []
+                }
+            ]
             },
             {
-                "batch": "G3",
-                "branches": [
-                    "CSE",
-                    "CSE-GEN AI",
-                    "CSE-PY&C",
-                    "CSE-AI DEVOPS"
-                ],
-                "admission_coordinators": [
-                    "Dr. GOVIND ISHANKAR (CSE - 9659517042)",
-                    "Dr. SOMSHEKAR REDDY (CSE - 8982448766)",
-                    "Mr. VAIBHAVJAY (DEVOPS - 9482883005)"
-                ],
-                "student_count": "380",
-                "activities": [
-                    {
-                        "time": "08:45AM to 10:15AM",
-                        "name": "Aerobics",
-                        "venue": "Colosseum",
-                        "coordinators": [
-                            "Mr. Kiran N (9904928004)"
-                        ]
-                    },
-                    {
-                        "time": "10:45AM to 12:15PM",
-                        "name": "Expert Talk (Speaker: Mr. Sagar, Software lead - HCL)",
-                        "venue": null,
-                        "coordinators": [
-                            "Dr. Pushparajesh (994143747)",
-                            "Mr. Senthil (9900385871)"
-                        ]
-                    },
-                    {
-                        "time": "01:00PM to 04:00PM",
-                        "name": "Community Service (Outside & Inside Campus)",
-                        "venue": "Adopted village",
-                        "coordinators": [
-                            "Dr. Raghu N (9916209756)"
-                        ]
-                    }
+            "batch": "G4",
+            "branches": [
+                "CSE-AIML",
+                "ISE"
+            ],
+            "admission_coordinators": [
+                "Dr. R SUGUMAR (AIML - 98949 82065)",
+                "Dr. Shankar Dr. Kushal Chakraborty"
+            ],
+            "student_count": "380",
+            "activities": [
+                {
+                "time": "08:45AM to 10:15AM",
+                "name": "University & Department Overview, Dept. tour, Liibrary tour, Campus Tour",
+                "venue": "AIML-A (113B), AIML-B (114A), AIML-C (114B), AIML-D (114C), AIML-E(115B), ISE-312",
+                "coordinators": [
+                    "Department Heads"
                 ]
+                },
+                {
+                "time": "10:45AM to 12:15PM",
+                "name": "Know yourself questionnaire on Interest & Talents / Antiragging forms / Nashamukt bharat / ABC ID",
+                "venue": null,
+                "coordinators": [
+                    "Admission coordinators"
+                ]
+                },
+                {
+                "time": "01:00PM to 04:00PM",
+                "name": "Freshman Leadership Program (Alexander Rinku, Oracle- Director - Human Resources)",
+                "venue": "Colosseum",
+                "coordinators": [
+                    "Dr. Pushparajesh (994143747)",
+                    "Mr. Senthil (9900385871)"
+                ]
+                }
+            ]
             },
             {
-                "batch": "G2",
-                "branches": [
-                    "CSE-TCS",
-                    "CSE-CTMA",
-                    "CSE-AIDE",
-                    "CSE-CPS"
-                ],
-                "admission_coordinators": [
-                    "Dr. T Y RANJAN (CTIS, CTMA - 9704198051)",
-                    "Prof. VIVEK GUPTA (AIDE - 8738709973)",
-                    "Dr. NISHANT TRIPATHI (CPS - 70845 23614)"
-                ],
-                "student_count": "307",
-                "activities": [
-                    {
-                        "time": "08:45AM to 10:15AM",
-                        "name": "Mentoring and UHV Session",
-                        "venue": "IIAEM-Aerospace Seminar Hall (CTIS, CTMA), CB-Civil CAD LAB (AIDE-A & B), FET-322 A (AIDE-C, CPS)",
-                        "coordinators": [
-                            "Dr. R T Nanda (9845920339)",
-                            "Dr. Vandana (7382458982)",
-                            "Prof. Monika Anand (9645592292)",
-                            "Dr. Kaushik (9538203201)",
-                            "Dr. Shitra"
-                        ]
-                    },
-                    {
-                        "time": "10:45AM to 12:15PM",
-                        "name": "Academic Readiness Assessment",
-                        "venue": null,
-                        "coordinators": [
-                            "Dr. Ghanashyam (9164422960)",
-                            "Dr. Harsha S V. (9538571172)"
-                        ]
-                    },
-                    {
-                        "time": "01:00PM to 04:00PM",
-                        "name": "Literary / Oratory activity",
-                        "venue": "IIAEM-Aerospace Seminar Hall (CTIS, CTMA), CB-Civil CAD LAB (AIDE-A & B), FET-322 A (AIDE-C, CPS)",
-                        "coordinators": [
-                            "Dr. Gabriela Sabatini S (88707 52540)",
-                            "Ms. Raveena K P (96339 36614)"
-                        ]
-                    }
+            "batch": "G3",
+            "branches": [
+                "CSE",
+                "CSE-GEN AI",
+                "CSE-PWC",
+                "CSE-AI DEVOPS"
+            ],
+            "admission_coordinators": [
+                "Dr. GOWRI SHANKAR J (CSE - 9659517042)",
+                "Dr. SOMASHEKAR REDDY (CSE - 6362448766)",
+                "Mr. VAIBHAV(AI DEVOPS - 9462833005)"
+            ],
+            "student_count": "380",
+            "activities": [
+                {
+                "time": "08:45AM to 10:15AM",
+                "name": "Aerobics",
+                "venue": "colosseum",
+                "coordinators": [
+                    "Mr. Kiran N (8904928004)",
+                    "Mr. Kishor Kumar"
                 ]
+                },
+                {
+                "time": "10:45AM to 12:15PM",
+                "name": "Expert Talk (Mr. Sagar, Software lead - HCL)",
+                "venue": "colosseum",
+                "coordinators": [
+                    "Dr. Pushparajesh (994143747)",
+                    "Mr. Senthil (9900385871)"
+                ]
+                },
+                {
+                "time": "01:00PM to 04:00PM",
+                "name": "Community Service (Outside & Inside Campus)",
+                "venue": "Adopted village",
+                "coordinators": [
+                    "Dr. Raghu N (9916209756)"
+                ]
+                }
+            ]
             },
             {
-                "batch": "G1",
-                "branches": [
-                    "CSE-SE",
-                    "CSE-IOT",
-                    "CSE-DS",
-                    "CSE-AI",
-                    "CSE-CS",
-                    "CSE-BCT"
-                ],
-                "admission_coordinators": [
-                    "Dr. RAMESHBABU (SE - 7760444406)",
-                    "Prof. AISHWARYA R (CSEB - 9638399781)",
-                    "Dr. PANDURANGA NAIK Y (IOT - 8073244499)",
-                    "Prof. NARASIMHAYYA B E (AI - 9538061042)",
-                    "Dr. N SURESH KUMAR (DS - 9656744016)",
-                    "Dr. N PRIYA (BCT - 9944022990)"
-                ],
-                "student_count": "367",
-                "activities": [
-                    {
-                        "time": "01:00PM to 04:00PM",
-                        "name": "Students Outing (Old age homes or Modern / Sustainable Villages)",
-                        "venue": null,
-                        "coordinators": [
-                            "Dr. Raghu N (9916209756)"
-                        ]
-                    }
+            "batch": "G2",
+            "branches": [
+                "CSE-CTIS",
+                "CSE-CTMA",
+                "CSE-AIDE",
+                "CSE-CPS"
+            ],
+            "admission_coordinators": [
+                "Dr. T V RAMAN (CTIS/CTMA - 9704193051)",
+                "Prof. VIVEK GUPTA (AIDE - 8737909973)",
+                "Dr. NISHANT TRIPATHI (CPS - 70845 23614)"
+            ],
+            "student_count": "307",
+            "activities": [
+                {
+                "time": "08:45AM to 10:15AM",
+                "name": "Mentoring and UHV Session",
+                "venue": "IIAEM-Aerospace Seminar Hall (CTIS, CTMA), CB-Civil CAD LAB (AIDE-A & B), FET-322 A (AIDE-C, CPS)",
+                "coordinators": [
+                    "Dr. R T Nanda (9845920339)",
+                    "Dr. Vandana (7382458382)",
+                    "Prof. Monika Anand (9845559292)",
+                    "Dr. Kaushik (9535420203)",
+                    "Dr. Shiva"
                 ]
+                },
+                {
+                "time": "10:45AM to 12:15PM",
+                "name": "Academic Readiness Assessment",
+                "venue": "IIAEM-Aerospace Seminar Hall (CTIS, CTMA), CB-Civil CAD LAB (AIDE-A & B), FET-322 A (AIDE-C, CPS)",
+                "coordinators": [
+                    "Dr. Ghanashyam (9164422960)",
+                    "Dr. Harsha S.V. (9538571172)"
+                ]
+                },
+                {
+                "time": "01:00PM to 04:00PM",
+                "name": "Literary / Oratory activity",
+                "venue": "IIAEM-Aerospace Seminar Hall (CTIS, CTMA), CB-Civil CAD LAB (AIDE-A & B), FET-322 A (AIDE-C, CPS)",
+                "coordinators": [
+                    "Dr. Gabriela Sabatini S (88707 52540)",
+                    "Ms. Raveena K P (96339 36614)"
+                ]
+                }
+            ]
+            },
+            {
+            "batch": "G1",
+            "branches": [
+                "CSE-SE",
+                "CSBS",
+                "CSE-IOT",
+                "CSE-AI",
+                "CSE-DS",
+                "CSE-CyS",
+                "CSE-BCT"
+            ],
+            "admission_coordinators": [
+                "Dr. RAMESHBABU (SE - 7780544486)",
+                "Prof. AISHWARYA R (CSBS - 9535393751)",
+                "Dr. PANDURANGA RAO M V (IOT - 8073254459)",
+                "Prof. NARASIMHAYYA B E (AI - 9538061042)",
+                "Dr. N SURESH KUMAR (DS - 8056744016)",
+                "Dr. RAVIKUMAR S (Cys - 9445778728)",
+                "Dr. N PRIYA (BCT - 9944052990)"
+            ],
+            "student_count": "367",
+            "activities": [
+                {
+                "time": "08:45AM to 10:15AM",
+                "name": "library / FCRC VISIT",
+                "venue": "CSE-SE, CSBS,CSE-IOT, CSE-AI(FET-Amphitheatre), CSE-DS,CSE-CYS,CSE-BCT(FET-Cafeteria)",
+                "coordinators": []
+                },
+                {
+                "time": "10:45AM to 12:15PM",
+                "name": "Expert Talk (Mr. Sagar, Software lead - HCL)",
+                "venue": "colosseum",
+                "coordinators": [
+                    "Dr. Raghu N (9916209756)"
+                ]
+                },
+                {
+                "time": "01:00PM to 04:00PM",
+                "name": "Sketching and Painting",
+                "venue": "FET-Amphitheatre",
+                "coordinators": []
+                }
+            ]
             }
         ]
     },

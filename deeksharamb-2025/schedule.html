@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>B.Tech Student Orientation Schedule 2025-26</title>
+    <link rel="icon" type="image/webp" href="https://github.com/jeryjs/Jain-Events-Portal/raw/refs/heads/main/clientview/public/JGI.webp">
+    <style>
+        .schedule-container { max-width: 800px; margin: 0 auto; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .filters { display: flex; gap: 8px; margin-bottom: 20px; position: sticky; top: 0; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 100; }
+        .filter-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; background: white; font-size: 14px; flex: 1; min-width: 0; }
+        .date-card { background: #f8f9fa; border-radius: 8px; margin-bottom: 16px; overflow: hidden; border: 1px solid #e9ecef; }
+        .date-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 16px; font-weight: 600; }
+        .batch-section { border-bottom: 1px solid #e9ecef; }
+        .batch-section:last-child { border-bottom: none; }
+        .batch-header { background: #e3f2fd; padding: 10px 16px; font-weight: 500; color: #1565c0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .batch-content { padding: 16px; display: none; }
+        .batch-content.active { display: block; }
+        .activity { background: white; border-left: 4px solid #4caf50; padding: 12px; margin-bottom: 8px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .activity-time { font-weight: 600; color: #2e7d32; font-size: 14px; }
+        .activity-name { font-size: 16px; margin: 4px 0; color: #333; }
+        .activity-venue { font-size: 13px; color: #666; margin: 4px 0; }
+        .coordinators { font-size: 12px; color: #888; }
+        .branches { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+        .branch-tag { background: #e1f5fe; color: #0277bd; padding: 2px 6px; border-radius: 12px; font-size: 11px; }
+        .toggle-icon { transition: transform 0.2s; }
+        .toggle-icon.rotated { transform: rotate(180deg); }
+        .nav-btn { background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; margin-top: 8px; }
+        .nav-btn:hover { background: #5a67d8; }
+        .no-results { text-align: center; padding: 40px; color: #666; }
+        .loading { text-align: center; padding: 60px 20px; }
+        .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; margin-bottom: 16px; }
+        .shimmer-header { height: 50px; margin-bottom: 12px; }
+        .shimmer-content { height: 100px; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .error { text-align: center; padding: 40px; color: #d32f2f; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; max-width: 400px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
+        .map-link { display: block; padding: 12px; margin: 8px 0; background: #f5f5f5; border-radius: 6px; text-decoration: none; color: #333; transition: background 0.2s; }
+        .map-link:hover { background: #e0e0e0; }
+        @media (max-width: 600px) {
+            .schedule-container { padding: 0px; }
+            .filters { gap: 6px; padding: 12px; }
+            .filter-select { font-size: 13px; padding: 6px 8px; }
+        }
+        @media (prefers-color-scheme: dark) {
+            body { background: #181a1b; color: #e0e0e0; }
+            .schedule-container { background: #23272a; color: #e0e0e0; }
+            .filters { background: #23272a; }
+            .filter-select { background: #23272a; color: #e0e0e0; border-color: #444; }
+            .date-card { background: #23272a; border-color: #333; }
+            .date-header { background: linear-gradient(135deg, #23272a 0%, #667eea 100%); color: #e0e0e0; }
+            .batch-header { background: #23272a; color: #90caf9; border-color: #333; }
+            .batch-content { background: #181a1b; }
+            .activity { background: #181a1b; border-left-color: #81c784; color: #e0e0e0; }
+            .activity-time { color: #81c784; }
+            .activity-name { color: #e0e0e0; }
+            .activity-venue { color: #bdbdbd; }
+            .coordinators { color: #bdbdbd; }
+            .branch-tag { background: #263238; color: #4fc3f7; }
+            .nav-btn { background: #5a67d8; }
+            .nav-btn:hover { background: #4c51bf; }
+            .no-results { color: #bdbdbd; }
+            .loading { color: #bdbdbd; }
+            .shimmer { background: linear-gradient(90deg, #23272a 25%, #181a1b 50%, #23272a 75%); }
+            .error { color: #ef5350; }
+            .modal-content { background: #23272a; color: #e0e0e0; }
+            .modal-close { color: #bdbdbd; }
+            .map-link { background: #181a1b; color: #e0e0e0; }
+            .map-link:hover { background: #2c2f33; }
+        }
+    </style>
+</head>
+<body>
+    <div class="schedule-container">
+        <h2>B.Tech Student Orientation Schedule 2025-26</h1>
+        
+        <div class="filters">
+            <select id="dateFilter" class="filter-select">
+                <option value="">All Dates</option>
+            </select>
+            <select id="groupFilter" class="filter-select">
+                <option value="">All Groups</option>
+            </select>
+            <select id="branchFilter" class="filter-select">
+                <option value="">All Branches</option>
+            </select>
+        </div>
+        <button class="nav-btn" onclick="openMapsModal()">🗺️ Campus Locations</button>
+
+        <div id="scheduleDisplay"></div>
+    </div>
+
+    <!-- Maps Modal -->
+    <div id="mapsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Campus Locations</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="mapsList"></div>
+        </div>
+    </div>
+    <script>
+        let schedule = [];
+
+        const maps = {
+            "Global Campus": "https://maps.app.goo.gl/JrLt9cTMP59CoCFY6",
+            "Engineering Block": "https://maps.app.goo.gl/ysaYyufEu63JtS2v7",
+            "Aerospace Block": "https://maps.app.goo.gl/nFFxqVkUKqCNCi9q8",
+            "Canteen": "https://maps.app.goo.gl/nnkViGJBCXX8k2E79",
+            "Bus Parking": "https://maps.app.goo.gl/NQFaLQZdX81AAfkBA",
+            "Amphitheater": "https://maps.app.goo.gl/XUNWqjQzfXw4fRY77"
+        }
+        
+        // localStorage management
+        const LocalStorage = {
+            deeksharam_2025: JSON.parse(localStorage.getItem('deeksharam_2025') || '{"date":"","group":"","branch":""}')
+        };
+        
+        function saveToLocalStorage() {
+            localStorage.setItem('deeksharam_2025', JSON.stringify(LocalStorage.deeksharam_2025));
+        }
+        
+        const filters = {
+            date: LocalStorage.deeksharam_2025.date || '',
+            group: LocalStorage.deeksharam_2025.group || '',
+            branch: LocalStorage.deeksharam_2025.branch || ''
+        };
+
+        async function fetchSchedule() {
+            const display = document.getElementById('scheduleDisplay');
+            
+            // Show loading shimmer
+            display.innerHTML = `
+                <div class="loading">
+                    <div style="font-size: 24px; margin-bottom: 16px;">Loading Schedule...</div>
+                    <div class="shimmer shimmer-header"></div>
+                    <div class="shimmer shimmer-content"></div>
+                    <div class="shimmer shimmer-header"></div>
+                    <div class="shimmer shimmer-content"></div>
+                    <div class="shimmer shimmer-header"></div>
+                    <div class="shimmer shimmer-content"></div>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/jeryjs/Jain-Events-Portal/refs/heads/data-store/deeksharamb-2025/schedule.json');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                schedule = await response.json();
+                initFilters();
+                renderSchedule();
+            } catch (error) {
+                display.innerHTML = `
+                    <div class="error">
+                        <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                        <h3 style="color: #d32f2f; margin-bottom: 8px;">Failed to Load Schedule</h3>
+                        <p style="color: #666; margin-bottom: 16px;">Unable to fetch the orientation schedule. Please check your internet connection.</p>
+                        <button onclick="fetchSchedule()" style="background: #d32f2f; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Retry</button>
+                    </div>
+                `;
+                console.error('Failed to fetch schedule:', error);
+            }
+        }
+
+        function getFilteredData() {
+            let filteredSchedule = schedule;
+            
+            if (filters.date) {
+                filteredSchedule = filteredSchedule.filter(day => day.date === filters.date);
+            }
+            
+            return {
+                dates: [...new Set(schedule.map(s => s.date))],
+                groups: [...new Set(filteredSchedule.flatMap(s => s.entries.map(e => e.batch)))],
+                branches: [...new Set(filteredSchedule.flatMap(s => s.entries.filter(e => {
+                    if (filters.group && e.batch !== filters.group) return false;
+                    return true;
+                }).flatMap(e => e.branches)))]
+            };
+        }
+
+        function initFilters() {
+            const data = getFilteredData();
+            
+            populateSelect('dateFilter', data.dates);
+            populateSelect('groupFilter', data.groups);
+            populateSelect('branchFilter', data.branches);
+
+            // Auto-select current date
+            const today = new Date();
+            const currentDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}`;
+            if (data.dates.includes(currentDate) && !filters.date) {
+                filters.date = currentDate;
+                LocalStorage.deeksharam_2025.date = currentDate;
+                saveToLocalStorage();
+                document.getElementById('dateFilter').value = currentDate;
+            }
+
+            // Restore saved filters
+            document.getElementById('dateFilter').value = filters.date;
+            document.getElementById('groupFilter').value = filters.group;
+            document.getElementById('branchFilter').value = filters.branch;
+
+            ['dateFilter', 'groupFilter', 'branchFilter'].forEach(id => {
+                document.getElementById(id).addEventListener('change', updateFilters);
+            });
+        }
+
+        function populateSelect(id, options) {
+            const select = document.getElementById(id);
+            const currentValue = select.value;
+            
+            // Clear existing options except the first one
+            select.innerHTML = select.children[0].outerHTML;
+            
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt;
+                option.textContent = opt;
+                select.appendChild(option);
+            });
+            
+            // Restore value if still valid
+            if (options.includes(currentValue)) {
+                select.value = currentValue;
+            } else if (currentValue && id !== 'dateFilter') {
+                // Clear invalid filter values (except date)
+                const type = id.replace('Filter', '');
+                filters[type] = '';
+                LocalStorage.deeksharam_2025[type] = '';
+                saveToLocalStorage();
+            }
+        }
+
+        function updateFilters(e) {
+            const type = e.target.id.replace('Filter', '');
+            const oldValue = filters[type];
+            filters[type] = e.target.value;
+            LocalStorage.deeksharam_2025[type] = e.target.value;
+            saveToLocalStorage();
+            
+            // If date or group changed, update dependent dropdowns
+            if (type === 'date' || type === 'group') {
+                const data = getFilteredData();
+                
+                if (type === 'date') {
+                    populateSelect('groupFilter', data.groups);
+                    populateSelect('branchFilter', data.branches);
+                } else if (type === 'group') {
+                    populateSelect('branchFilter', data.branches);
+                }
+            }
+            
+            renderSchedule();
+        }
+
+        function sortGroups(entries) {
+            return entries.sort((a, b) => {
+                const extractGroupNum = (batch) => {
+                    const match = batch.match(/G(\d+)/);
+                    return match ? parseInt(match[1]) : 999;
+                };
+                return extractGroupNum(a.batch) - extractGroupNum(b.batch);
+            });
+        }
+
+        function renderSchedule() {
+            const display = document.getElementById('scheduleDisplay');
+            const filtered = schedule.filter(day => {
+                if (filters.date && day.date !== filters.date) return false;
+                return day.entries.some(entry => {
+                    if (filters.group && entry.batch !== filters.group) return false;
+                    if (filters.branch && !entry.branches.includes(filters.branch)) return false;
+                    return true;
+                });
+            });
+
+            if (!filtered.length) {
+                display.innerHTML = `
+                    <div class="no-results">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📅</div>
+                        <h3 style="color: #333; margin-bottom: 8px;">No Schedule Found</h3>
+                        <p style="color: #666; margin-bottom: 16px;">No activities match your current filter selection.</p>
+                        <button onclick="clearFilters()" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Clear Filters</button>
+                    </div>
+                `;
+                return;
+            }
+
+            display.innerHTML = filtered.map(day => {
+                const validEntries = day.entries.filter(entry => {
+                    if (filters.group && entry.batch !== filters.group) return false;
+                    if (filters.branch && !entry.branches.includes(filters.branch)) return false;
+                    return true;
+                });
+
+                const sortedEntries = sortGroups(validEntries);
+
+                return `
+                    <div class="date-card">
+                        <div class="date-header">${day.date}</div>
+                        ${sortedEntries.map((entry, i) => `
+                            <div class="batch-section">
+                                <div class="batch-header" onclick="toggleBatch(this)">
+                                    <span>${entry.batch} - ${(entry.student_count || 'TBD').toString().replace('+ parents', '') + ' students'}</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="batch-content ${i === 0 ? 'active' : ''}">
+                                    <div class="branches">
+                                        ${entry.branches.map(b => `<span class="branch-tag">${b}</span>`).join('')}
+                                    </div>
+                                    ${entry.activities.map(activity => `
+                                        <div class="activity">
+                                            <div class="activity-time">${activity.time}</div>
+                                            <div class="activity-name">${activity.name}</div>
+                                            ${activity.venue ? `<div class="activity-venue">📍 ${activity.venue}</div>` : ''}
+                                            ${activity.coordinators?.length ? `<div class="coordinators">👥 ${activity.coordinators.join(', ')}</div>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleBatch(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            const isActive = content.classList.contains('active');
+            
+            content.classList.toggle('active', !isActive);
+            icon.classList.toggle('rotated', !isActive);
+        }
+
+        function clearFilters() {
+            filters.date = '';
+            filters.group = '';
+            filters.branch = '';
+            LocalStorage.deeksharam_2025.date = '';
+            LocalStorage.deeksharam_2025.group = '';
+            LocalStorage.deeksharam_2025.branch = '';
+            saveToLocalStorage();
+            
+            document.getElementById('dateFilter').value = '';
+            document.getElementById('groupFilter').value = '';
+            document.getElementById('branchFilter').value = '';
+            
+            // Refresh dropdowns
+            const data = getFilteredData();
+            populateSelect('groupFilter', data.groups);
+            populateSelect('branchFilter', data.branches);
+            
+            renderSchedule();
+        }
+
+        function openMapsModal(venue) {
+            const modal = document.getElementById('mapsModal');
+            const mapsList = document.getElementById('mapsList');
+            
+            // Show all campus locations
+            mapsList.innerHTML = Object.entries(maps).map(([location, url]) => 
+                `<a href="${url}" target="_blank" class="map-link">
+                    🗺️ ${location}
+                    <div style="font-size: 12px; color: #888; margin-top: 4px;">Open in Google Maps</div>
+                </a>`
+            ).join('');
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('mapsModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('mapsModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Initialize when schedule is loaded
+        if (schedule.length) {
+            renderSchedule();
+        } else {
+            fetchSchedule();
+        }
+    </script>
+</body>
+</html>
