@@ -44,7 +44,10 @@ export default defineConfig({
             type: "image/png"
           }
         ]
-      }
+      },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
+      },
     })
   ],
   resolve: {
@@ -60,6 +63,15 @@ export default defineConfig({
     port: 5780,
     host: "0.0.0.0"
   },
+
+  /**
+   * -------------------------------------------
+   * This is the ideal solution for fixing the 
+   * `Assets exceeding the limit: assets/vendor-DEtNzyKq.js is 3.13 MB, and won't be precached.`
+   * error, but since its too expensive on our vercel free quota, im just using the workaround instead.
+   * By workaround, i mean the `workbox.maximumFileSizeToCacheInBytes` option above.
+   * -------------------------------------------
+   * /
   build: {
     rollupOptions: {
       output: {
@@ -80,4 +92,5 @@ export default defineConfig({
       },
     },
   },
+  */
 })
