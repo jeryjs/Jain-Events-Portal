@@ -64,33 +64,29 @@ export default defineConfig({
     host: "0.0.0.0"
   },
 
-  /**
-   * -------------------------------------------
-   * This is the ideal solution for fixing the 
-   * `Assets exceeding the limit: assets/vendor-DEtNzyKq.js is 3.13 MB, and won't be precached.`
-   * error, but since its too expensive on our vercel free quota, im just using the workaround instead.
-   * By workaround, i mean the `workbox.maximumFileSizeToCacheInBytes` option above.
-   * -------------------------------------------
-   * /
   build: {
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'react-vendor';
-            if (id.includes('@mui')) return 'mui-vendor';
-            if (id.includes('@tanstack')) return 'tanstack-vendor';
-            if (id.includes('framer-motion')) return 'framer-motion-vendor';
-            return 'vendor';
-          }
-          // split each page into its own chunk
-          if (id.includes('/src/pages/')) {
-            const match = id.match(/\/src\/pages\/([^/]+)\.tsx$/);
-            if (match) return `page-${match[1]}`;
-          }
+        // Bundle everything into fewer chunks to reduce Vercel requests
+        manualChunks: {
+          // Single vendor chunk for all dependencies
+          vendor: ['react', 'react-dom', '@mui/material', '@mui/icons-material', '@mui/lab', '@tanstack/react-query', 'framer-motion'],
         },
+        // Reduce the number of separate CSS files
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          if (/\.(css)$/.test(assetInfo.name)) {
+            return `assets/[name]-[hash].${ext}`;
+          }
+          return `assets/[name]-[hash].${ext}`;
+        },
+        // Bundle JS files more aggressively
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
+    // Increase chunk size limit to allow larger bundles
+    chunkSizeWarningLimit: 5000,
   },
-  */
 })
