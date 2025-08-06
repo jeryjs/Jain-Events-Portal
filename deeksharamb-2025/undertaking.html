@@ -19,6 +19,8 @@
             position: relative;
         }
 
+        
+
         body::before {
             content: '';
             position: absolute;
@@ -870,6 +872,231 @@
             to {
                 opacity: 1;
                 transform: scale(1);
+            }
+        }
+
+        /* Dark Mode Styles */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                color: #e0e0e0;
+            }
+
+            body::before {
+                background: 
+                    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+            }
+
+            .header {
+                background: rgba(30, 30, 30, 0.95);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .university-name {
+                color: #64b5f6;
+            }
+
+            .faculty-name {
+                color: #b0b0b0;
+            }
+
+            .form-title h1 {
+                color: #e0e0e0;
+            }
+
+            .form-subtitle {
+                color: #b0b0b0;
+            }
+
+            .progress-container {
+                background: rgba(30, 30, 30, 0.95);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .progress-steps {
+                background: linear-gradient(135deg, #2c2c2c 0%, #1e1e1e 100%);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .step-number {
+                background: #3c3c3c;
+                color: #a0a0a0;
+            }
+
+            .step.active .step-number {
+                background: linear-gradient(135deg, #3f51b5 0%, #2c387e 100%);
+                color: white;
+            }
+
+            .step.completed .step-number {
+                background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+                color: white;
+            }
+
+            .step-title {
+                color: #b0b0b0;
+            }
+
+            .step.active .step-title {
+                color: #64b5f6;
+            }
+
+            .step.completed .step-title {
+                color: #81c784;
+            }
+
+            .form-content {
+                background: rgba(30, 30, 30, 0.98);
+            }
+
+            .current-step-info {
+                background: linear-gradient(135deg, #1e2a4a 0%, #2c3e50 100%);
+                border-left: 5px solid #3f51b5;
+            }
+
+            .current-step-title {
+                color: #64b5f6;
+            }
+
+            .current-step-description {
+                color: #b0b0b0;
+            }
+
+            .info-box {
+                background: linear-gradient(135deg, #2c2416 0%, #3c3020 100%);
+                border: 2px solid #5d4e37;
+            }
+
+            .info-box-title {
+                color: #ffcc80;
+            }
+
+            .info-box-content {
+                color: #ffcc80;
+            }
+
+            .document-list li {
+                color: #b0b0b0;
+            }
+
+            .action-btn {
+                background: linear-gradient(135deg, #3f51b5 0%, #2c387e 100%);
+                color: white;
+            }
+
+            .action-btn:hover {
+                background: linear-gradient(135deg, #2c387e 0%, #3f51b5 100%);
+            }
+
+            .pdf-guide-btn {
+                background: linear-gradient(135deg, #00acc1 0%, #00838f 100%) !important;
+                border: 2px solid #00acc1 !important;
+            }
+
+            .pdf-guide-btn:hover {
+                background: linear-gradient(135deg, #00838f 0%, #00acc1 100%) !important;
+                border-color: #00838f !important;
+            }
+
+            .website-btn {
+                background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            }
+
+            .website-btn:hover {
+                background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%);
+            }
+
+            .website-note {
+                background: linear-gradient(135deg, #2c2416 0%, #3c3020 100%);
+                border: 1px solid #5d4e37;
+                color: #ffcc80;
+            }
+
+            .guide-dropdown {
+                background: rgba(30, 30, 30, 0.98);
+                border: 2px solid #00acc1;
+            }
+
+            .guide-dropdown-title {
+                color: #00acc1;
+            }
+
+            .embedded-form-container {
+                background: linear-gradient(135deg, #2c2c2c 0%, #1e1e1e 100%);
+            }
+
+            .nav-btn {
+                color: white;
+            }
+
+            .prev-btn {
+                background: linear-gradient(135deg, #5d5d5d 0%, #424242 100%);
+            }
+
+            .prev-btn:hover {
+                background: linear-gradient(135deg, #424242 0%, #5d5d5d 100%);
+            }
+
+            .next-btn {
+                background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            }
+
+            .next-btn:hover {
+                background: linear-gradient(135deg, #388e3c 0%, #4caf50 100%);
+            }
+
+            .complete-container {
+                background: rgba(30, 30, 30, 0.95);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .complete-content {
+                background: linear-gradient(135deg, #2c2c2c 0%, #1e1e1e 100%);
+            }
+
+            .complete-title {
+                color: #64b5f6;
+            }
+
+            .complete-description {
+                color: #b0b0b0;
+            }
+
+            .complete-btn {
+                background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            }
+
+            .complete-btn:hover {
+                background: linear-gradient(135deg, #388e3c 0%, #4caf50 100%);
+            }
+
+            /* Dark mode step connectors */
+            .step:not(:last-child)::after {
+                background: linear-gradient(90deg, #3c3c3c 0%, #3c3c3c 100%);
+            }
+
+            .step.completed:not(:last-child)::after {
+                background: linear-gradient(90deg, #4caf50 0%, #388e3c 100%);
+            }
+
+            .step.active:not(:last-child)::after {
+                background: linear-gradient(90deg, #3f51b5 0%, #3c3c3c 100%);
+            }
+
+            /* Mobile dark mode step connectors */
+            @media (max-width: 480px) {
+                .step:not(:last-child)::after {
+                    background: linear-gradient(180deg, #3c3c3c 0%, #3c3c3c 100%);
+                }
+
+                .step.completed:not(:last-child)::after {
+                    background: linear-gradient(180deg, #4caf50 0%, #388e3c 100%);
+                }
+
+                .step.active:not(:last-child)::after {
+                    background: linear-gradient(180deg, #3f51b5 0%, #3c3c3c 100%);
+                }
             }
         }
     </style>
