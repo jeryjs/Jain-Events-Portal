@@ -815,7 +815,7 @@
                     {
                         "time": "08:45AM to 10:15AM",
                         "name": "Placement, Internship & Online Platform Overview",
-                        "venue": "CSE-SE (116A), CSBS (308), CSE-IOT (101), CSE-AI (106), CSE-DS (114C), CSE-CYS (114A), CSE-BCT (115B),CSE-CTIS(113C),CSE-CTMA(103),CSE-AIDE-A(112),CSE-AIDE-B(102),CSE-CPS(115C)",
+                        "venue": "CSE-SE (127A), CSE IOT (112),CSE AI (106),CSE DS(114C),CSE CYS(127B),CSE BCT(127C),CSE CTIS(113C),CSE CTMA(103),CSE CPS(102),CSE AIDE - A&B(GROUND FLOOR SEMINAR HALL ),CSBS(GROUND FLOOR SEMINAR HALL )",
                         "coordinators": [
                             "Dr. Pushparajesh (994143747)",
                             "Mr. Senthil (9900385871)"
@@ -824,7 +824,7 @@
                     {
                         "time": "10:45AM to 12:15PM",
                         "name": "Alumni Talk",
-                        "venue": "CSE-SE (116A), CSBS (308), CSE-IOT (101), CSE-AI (106), CSE-DS (114C), CSE-CYS (114A), CSE-BCT (115B),CSE-CTIS(113C),CSE-CTMA(103),CSE-AIDE-A(112),CSE-AIDE-B(102),CSE-CPS(115C)",
+                        "venue": "CSE-SE (127A), CSE IOT (112),CSE AI (106),CSE DS(114C),CSE CYS(127B),CSE BCT(127C),CSE CTIS(113C),CSE CTMA(103),CSE CPS(102),CSE AIDE - A&B(GROUND FLOOR SEMINAR HALL ),CSBS(GROUND FLOOR SEMINAR HALL )",
                         "coordinators": [
                             "Department Heads"
                         ]
@@ -903,7 +903,7 @@
                     {
                         "time": "08:45AM to 10:15AM",
                         "name": "Placement, Internship & Online Platform Overview",
-                        "venue": "CSE-SE (116A), CSBS (308), CSE-IOT (101), CSE-AI (106), CSE-DS(114C)",
+                        "venue": "CSE-A(103),CSE -B(106),CSE GEN AI -A(110),CSE GEN AI -B(112),CSE PWC -A(115C),CSE PWC-B(127A),CSE AI DEVOPS(127B)",
                         "coordinators": [
                             "Dr. Pushparajesh (994143747)",
                             "Mr. Senthil (9900385871)"
@@ -912,7 +912,7 @@
                     {
                         "time": "10:45AM to 12:15PM",
                         "name": "Alumni Talk",
-                        "venue": "CSE-SE (116A), CSBS (308), CSE-IOT (101), CSE-AI (106), CSE-DS(114C)",
+                        "venue": "CSE-A(103),CSE -B(106),CSE GEN AI -A(110),CSE GEN AI -B(112),CSE PWC -A(115C),CSE PWC-B(127A),CSE AI DEVOPS(127B)",
                         "coordinators": [
                             "Department Heads"
                         ]
@@ -1109,7 +1109,7 @@
                     {
                         "time": "08:45AM to 10:15AM",
                         "name": "Placement, Internship & Online Platform Overview",
-                        "venue": "AIML-A (113B), AIML-B (114A), AIML-C (114B), AIML-D (114C), AIML-E (115B), ISE-312",
+                        "venue": "AIML-A (103), AIML-B (106), AIML-C (110), AIML-D (111), AIML-E (115C), ISE-312",
                         "coordinators": [
                             "Dr. Pushparajesh (994143747)",
                             "Mr. Senthil (9900385871)"
@@ -1118,7 +1118,7 @@
                     {
                         "time": "10:45AM to 12:15PM",
                         "name": "Alumni Talk",
-                        "venue": "AIML-A (113B), AIML-B (114A), AIML-C (114B), AIML-D (114C), AIML-E (115B), ISE-312",
+                        "venue": "AIML-A (103), AIML-B (106), AIML-C (110), AIML-D (111), AIML-E (115C), ISE-312",
                         "coordinators": [
                             "Department Heads"
                         ]
@@ -1293,7 +1293,7 @@
                     {
                         "time": "08:45AM to 10:15AM",
                         "name": "Placement, Internship & Online Platform Overview",
-                        "venue": "Respective department classrooms: CB-ME (305), ECE (301), CE, EEE (010, 209), IIAEM-ASE (209), ANE (201)",
+                        "venue": "CB-ME (105), ECE (301), CE, EEE (010, 209), IIAEM-ASE (209), ANE (201)",
                         "coordinators": [
                             "Dr. Pushparajesh (994143747)",
                             "Mr. Senthil (9900385871)"
@@ -1302,7 +1302,7 @@
                     {
                         "time": "10:45AM to 12:15PM",
                         "name": "Alumni Talk",
-                        "venue": "Respective department classrooms: CB-ME (305), ECE (301), CE, EEE (010, 209), IIAEM-ASE (209), ANE (201)",
+                        "venue": "CB-ME (105), ECE (301), CE, EEE (010, 209), IIAEM-ASE (209), ANE (201)",
                         "coordinators": [
                             "Department Heads"
                         ]
