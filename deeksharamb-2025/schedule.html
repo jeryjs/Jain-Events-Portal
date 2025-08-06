@@ -112,7 +112,8 @@
             "Aerospace Block": "https://maps.app.goo.gl/nFFxqVkUKqCNCi9q8",
             "Canteen": "https://maps.app.goo.gl/nnkViGJBCXX8k2E79",
             "Bus Parking": "https://maps.app.goo.gl/NQFaLQZdX81AAfkBA",
-            "Amphitheater": "https://maps.app.goo.gl/XUNWqjQzfXw4fRY77"
+            "Amphitheater": "https://maps.app.goo.gl/XUNWqjQzfXw4fRY77",
+            "Colosseum": "https://maps.app.goo.gl/jLjnC2wgW7Xu2sk5A"
         }
         
         // localStorage management
@@ -200,16 +201,6 @@
             populateSelect('dateFilter', data.dates);
             populateSelect('groupFilter', data.groups);
             populateSelect('branchFilter', data.branches);
-
-            // Auto-select current date
-            const today = new Date();
-            const currentDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}`;
-            if (data.dates.includes(currentDate) && !filters.date) {
-                filters.date = currentDate;
-                LocalStorage.deeksharam_2025.date = currentDate;
-                saveToLocalStorage();
-                document.getElementById('dateFilter').value = currentDate;
-            }
 
             // Restore saved filters
             document.getElementById('dateFilter').value = filters.date;
