@@ -989,7 +989,7 @@
                     "Dr. P KISHORE KUMAR(EEE-9410154656",
                     "Dr. VINAY KUMAR S B(ECE-9538582897)",
                     "Prof. PAVAN P S(CE-9686863539)",
-                    "Dr.SHWETHA M S(FT-8105439163)",
+                    "Dr.SHWETHA M S(FT-8105439163)"
                 ],
                 "student_count": "321",
                 "activities": [
@@ -1443,17 +1443,113 @@
         "date": "28/08",
         "entries": [
             {
-                "batch": "G1 &G2",
+                "batch": "G1 & G2",
                 "branches": [
-                   
+                    "CSE-SE",
+                    "CSBS",
+                    "CSE-IOT",
+                    "CSE-DS",
+                    "CSE-AI",
+                    "CSE-CYS",
+                    "CSE-BCT"
                 ],
                 "admission_coordinators": [
-                   
+                    "Dr. RAMESHBABU (SE-7780544486)",
+                    "Prof. AISHWARYA R (CSBS-9535393751)",
+                    "Dr. PANDURANGA RAO M V (IOT-8073254459)",
+                    "Prof. NARASIMHAYYA B E (AI-9538061042)",
+                    "Dr. N SURESH KUMAR (DS-8056744016)",
+                    "Dr. RAVIKUMAR S (CYS-9445778728)",
+                    "Dr. N PRIYA (BCT-9944052990)"
                 ],
                 "student_count": null,
                 "activities": [
                     {
-                        "time": "Full Day",
+                        "time": "08:45AM to 10:15AM",
+                        "name": "COMMENCEMENT OF REGULAR CLASSES",
+                        "venue": "Respective Department Classrooms",
+                        "coordinators": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "date": "29/08",
+        "entries": [
+            {
+                "batch": "G3",
+                "branches": [
+                    "CSE",
+                    "CSE-GEN AI",
+                    "CSE-PWC",
+                    "CSE-AI DEVOPS"
+                ],
+                "admission_coordinators": [
+                    "Dr. GOWRI SHANKAR (CSE - 9659517042)",
+                    "Dr. SOMSHEKAR REDDY (CSE - 6362448766)",
+                    "Mr. VAIBHAV (AI DEVOPS - 9462833005)"
+                ],
+                "student_count": null,
+                "activities": [
+                    {
+                        "time": "08:45AM to 10:15AM",
+                        "name": "COMMENCEMENT OF REGULAR CLASSES",
+                        "venue": "Respective Department Classrooms",
+                        "coordinators": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "date": "01/09",
+        "entries": [
+            {
+                "batch": "G4",
+                "branches": [
+                    "CSE-AIML",
+                    "ISE"
+                ],
+                "admission_coordinators": [
+                    "Dr. R SUGUMAR (AIML - 98949 82065)",
+                    "Mrs. V. NIRUPA (ISE - 9676509555)"
+                ],
+                "student_count": null,
+                "activities": [
+                    {
+                        "time": "08:45AM to 10:15AM",
+                        "name": "COMMENCEMENT OF REGULAR CLASSES",
+                        "venue": "Respective Department Classrooms",
+                        "coordinators": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "date": "02/09",
+        "entries": [
+            {
+                "batch": "G5",
+                "branches": [
+                    "ME",
+                    "ASE",
+                    "ANE",
+                    "EEE",
+                    "ECE",
+                    "CE"
+                ],
+                "admission_coordinators": [
+                    "Dr. KANTHARAJ (ME - 9841070704)",
+                    "PROF SHASHIKUMAR (ANE/ASE - 8660512408)",
+                    "Dr. P KISHORE KUMAR (EEE - 9410154656)",
+                    "Dr. VINAY KUMAR S B (ECE - 9538582897)"
+                ],
+                "student_count": null,
+                "activities": [
+                    {
+                        "time": "08:45AM to 10:15AM",
                         "name": "COMMENCEMENT OF REGULAR CLASSES",
                         "venue": "Respective Department Classrooms",
                         "coordinators": []
