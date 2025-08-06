@@ -1460,13 +1460,45 @@
                     "Prof. NARASIMHAYYA B E (AI-9538061042)",
                     "Dr. N SURESH KUMAR (DS-8056744016)",
                     "Dr. RAVIKUMAR S (CYS-9445778728)",
-                    "Dr. N PRIYA (BCT-9944052990)"
+                    "Dr. N PRIYA (BCT-9944052990)",
+                    "Dr.T V RAMAN"
                 ],
                 "student_count": null,
                 "activities": [
                     {
-                        "time": "08:45AM to 10:15AM",
+                        "time": "08:45AM to 02:15PM",
                         "name": "COMMENCEMENT OF REGULAR CLASSES",
+                        "venue": "Respective Department Classrooms",
+                        "coordinators": []
+                    }
+                ]
+            }
+        ]
+    },
+     {
+                "batch": "G3 & G4 & G5",
+                "branches": [
+                    "CSE",
+                    "CSE-GEN AI",
+                    "CSE-PWC",
+                    "CSE-AI DEVOPS",
+                    "CSE-AIML",
+                    "CSE-ISE",
+                    "ME"
+                ],
+                "admission_coordinators": [
+                    "Dr. GOWRISHANKAR J (CSE-9659517042)",
+                    "Dr:. SOMASHEKAR REDDY (CSE -6362448766)",
+                    "Mr: VAIBHAV(AI DEVOPS-9462833005)",
+                    "Dr. R SUGUMAR (AIML -9894982065)",
+                    "Mrs. V. NIRUPA (ISE - 9676509555)",
+                    "Dr. KANTHARAI (ME-9841070704)"
+                ],
+                "student_count": null,
+                "activities": [
+                    {
+                        "time": "08:45AM to 02:15PM",
+                        "name": "BRIDGE COURSE",
                         "venue": "Respective Department Classrooms",
                         "coordinators": []
                     }
@@ -1493,8 +1525,39 @@
                 "student_count": null,
                 "activities": [
                     {
-                        "time": "08:45AM to 10:15AM",
+                        "time": "08:45AM to 02:15PM",
                         "name": "COMMENCEMENT OF REGULAR CLASSES",
+                        "venue": "Respective Department Classrooms",
+                        "coordinators": []
+                    }
+                ]
+            }
+        ]
+    },
+ {
+                "batch": "G4 & G5",
+                "branches": [
+                    "CSE-AIML",
+                    "ISE",
+                    "ME",
+                    "ASE",
+                    "ANE",
+                    "EEE",
+                    "ECE"
+                ],
+                "admission_coordinators": [
+                    "Dr: R SUGUMAR (AIML - 9894982065)",
+                    "Mrs. V. NIRUPA (ISE - 9676509555)",
+                    "Dr. KANTHARAJ (ME-9841070704)",
+                    "PROF. SHASHIKUMAR S (ANE/ASE - 8660512408)",
+                    "Dr. P KISHORE KUMAR (EEE -9410154656)",
+                    "Dr: VINAY KUMAR S B (ECE -9538582897)"
+                ],
+                "student_count": null,
+                "activities": [
+                    {
+                        "time": "08:45AM to 02:15PM",
+                        "name": "BRIDGE COURSE",
                         "venue": "Respective Department Classrooms",
                         "coordinators": []
                     }
@@ -1518,8 +1581,37 @@
                 "student_count": null,
                 "activities": [
                     {
-                        "time": "08:45AM to 10:15AM",
+                        "time": "08:45AM to 02:15PM",
                         "name": "COMMENCEMENT OF REGULAR CLASSES",
+                        "venue": "Respective Department Classrooms",
+                        "coordinators": []
+                    }
+                ]
+            }
+        ]
+    },
+{
+                "batch": "G5",
+                "branches": [
+                    "ME",
+                    "ASE",
+                    "ANE",
+                    "EEE",
+                    "ECE",
+                    "CE"
+                ],
+                "admission_coordinators": [
+                    "Dr. KANTHARAJ (ME-9841070704)",
+                    "PROF. SHASHIKUMAR S(ANEIASE-8660512408)",
+                    "Dr. P KISHORE KUMAR (EEE -9410154656)",
+                    "Dr. VINAY KUMAR S B(ECE-9538582897)",
+                    "Prof.PAVAN P S(CE-9686863539)"
+                ],
+                "student_count": null,
+                "activities": [
+                    {
+                        "time": "08:45AM to 02:15PM",
+                        "name": "BRIDGE COURSE",
                         "venue": "Respective Department Classrooms",
                         "coordinators": []
                     }
@@ -1544,7 +1636,8 @@
                     "Dr. KANTHARAJ (ME - 9841070704)",
                     "PROF SHASHIKUMAR (ANE/ASE - 8660512408)",
                     "Dr. P KISHORE KUMAR (EEE - 9410154656)",
-                    "Dr. VINAY KUMAR S B (ECE - 9538582897)"
+                    "Dr. VINAY KUMAR S B (ECE - 9538582897)",
+                    "Prof.PAVAN P S(CE-9686863539)"
                 ],
                 "student_count": null,
                 "activities": [
