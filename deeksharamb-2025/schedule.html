@@ -406,4 +406,36 @@
         }
     </script>
 </body>
+<script>
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'set-theme') {
+            const theme = event.data.theme;
+            let styleTag = document.getElementById('force-theme-style');
+            if (!styleTag) {
+                styleTag = document.createElement('style');
+                styleTag.id = 'force-theme-style';
+                document.head.appendChild(styleTag);
+            }
+            if (theme === 'dark') {
+                styleTag.textContent = `
+                    @media (prefers-color-scheme: dark) {
+                        :root { color-scheme: dark; }
+                    }
+                    @media (prefers-color-scheme: light) {
+                        :root { color-scheme: dark; }
+                    }
+                `;
+            } else {
+                styleTag.textContent = `
+                    @media (prefers-color-scheme: dark) {
+                        :root { color-scheme: light; }
+                    }
+                    @media (prefers-color-scheme: light) {
+                        :root { color-scheme: light; }
+                    }
+                `;
+            }
+        }
+    });
+</script>
 </html>
