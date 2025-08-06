@@ -9,7 +9,7 @@ export function useEvents() {
   const query = useQuery({
     queryKey: ['events'],
     queryFn: () => EventsApi.getAll(),
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		// staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   return {

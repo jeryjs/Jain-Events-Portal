@@ -9,8 +9,8 @@ export function useArticles() {
   return useQuery({
     queryKey: ['articles'],
     queryFn: () => ArticlesApi.getAll(),
-		staleTime: 1000 * 60 * 30, // 30 minutes
-		refetchOnWindowFocus: false,
+		// staleTime: 1000 * 60 * 30, // 30 minutes
+		// refetchOnWindowFocus: false,
   });
 }
 
@@ -22,7 +22,7 @@ export function useArticle(articleId?: string, enabled = true) {
     queryKey: ['article', articleId],
     queryFn: () => ArticlesApi.getById(articleId!),
     enabled: !!articleId && enabled,
-		staleTime: 1000 * 60 * 30, // 30 minutes
+		// staleTime: 1000 * 60 * 30, // 30 minutes
   });
 }
 
