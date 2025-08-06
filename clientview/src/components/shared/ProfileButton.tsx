@@ -15,7 +15,6 @@ import {
     Popover,
     Tab,
     Tabs,
-    Tooltip,
     Typography,
     useMediaQuery,
     useTheme
@@ -26,7 +25,6 @@ import useNotifications from '../../hooks/useNotifications';
 import InstallPrompt from './InstallPrompt';
 import { useLogin, useLoginPrompt } from './LoginContext';
 import NotificationPrompt from './NotificationPrompt';
-import ThemeSwitcher from './ThemeSwitcher';
 
 const glowPulse = keyframes`
   0% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.4); }
@@ -296,7 +294,7 @@ const ProfileButton = ({ className }) => {
                                     <Divider sx={{ width: '100%', my: 1.5 }} />
 
                                     {/* Theme switcher */}
-                                    <ThemeSwitcher variant='expanded'/>
+                                    {/* <ThemeSwitcher variant='expanded'/> */}
 
                                     <Divider sx={{ width: '100%', my: 1.5 }} />
 
