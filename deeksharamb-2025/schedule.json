@@ -79,6 +79,7 @@
                 "batch": "G1",
                 "branches": [
                     "CSE-SE",
+                    "CSBS",
                     "CSE-IOT",
                     "CSE-DS",
                     "CSE-AI",
