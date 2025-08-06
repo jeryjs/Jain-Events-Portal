@@ -739,10 +739,16 @@
                 padding: 0;
             }
 
-       
+            .progress-steps {
+                padding: 15px 10px;
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 10px;
+            }
 
             .step {
-                flex-basis: auto;
+                flex-basis: calc(33.333% - 10px);
+                min-width: 80px;
                 margin-bottom: 0;
                 position: relative;
             }
@@ -750,26 +756,25 @@
             .step:not(:last-child)::after {
                 content: '';
                 position: absolute;
-                top: 45px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 2px;
-                height: 20px;
-                background: linear-gradient(180deg, #dee2e6 0%, #dee2e6 100%);
+                top: 20px;
+                right: -50%;
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, #dee2e6 0%, #dee2e6 100%);
                 z-index: 1;
                 border-radius: 2px;
             }
 
             .step.completed:not(:last-child)::after {
-                background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
+                background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
             }
 
             .step.active:not(:last-child)::after {
-                background: linear-gradient(180deg, #2c5aa0 0%, #dee2e6 100%);
+                background: linear-gradient(90deg, #2c5aa0 0%, #dee2e6 100%);
             }
 
             .step-title {
-                max-width: none;
+                padding: 10px;
             }
 
             .form-title h1 {
