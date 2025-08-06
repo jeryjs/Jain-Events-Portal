@@ -114,8 +114,8 @@
         let schedule = [];
 
         const maps = {
-            "Global Campus": "https://maps.app.goo.gl/JrLt9cTMP59CoCFY6",
-            "Engineering Block": "https://maps.app.goo.gl/ysaYyufEu63JtS2v7",
+            "FET Building": "https://maps.app.goo.gl/JrLt9cTMP59CoCFY6",
+            "Core Block": "https://maps.app.goo.gl/ysaYyufEu63JtS2v7",
             "Aerospace Block": "https://maps.app.goo.gl/nFFxqVkUKqCNCi9q8",
             "Canteen": "https://maps.app.goo.gl/nnkViGJBCXX8k2E79",
             "Bus Parking": "https://maps.app.goo.gl/NQFaLQZdX81AAfkBA",
@@ -406,36 +406,4 @@
         }
     </script>
 </body>
-<script>
-    window.addEventListener('message', function(event) {
-        if (event.data && event.data.type === 'set-theme') {
-            const theme = event.data.theme;
-            let styleTag = document.getElementById('force-theme-style');
-            if (!styleTag) {
-                styleTag = document.createElement('style');
-                styleTag.id = 'force-theme-style';
-                document.head.appendChild(styleTag);
-            }
-            if (theme === 'dark') {
-                styleTag.textContent = `
-                    @media (prefers-color-scheme: dark) {
-                        :root { color-scheme: dark; }
-                    }
-                    @media (prefers-color-scheme: light) {
-                        :root { color-scheme: dark; }
-                    }
-                `;
-            } else {
-                styleTag.textContent = `
-                    @media (prefers-color-scheme: dark) {
-                        :root { color-scheme: light; }
-                    }
-                    @media (prefers-color-scheme: light) {
-                        :root { color-scheme: light; }
-                    }
-                `;
-            }
-        }
-    });
-</script>
 </html>
