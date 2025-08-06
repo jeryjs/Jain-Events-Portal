@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration Form - JAIN (Deemed-to-be-University)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 25px 0;
+            margin-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3d6f 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.2rem;
+            font-weight: bold;
+            box-shadow: 0 8px 25px rgba(44, 90, 160, 0.3);
+            position: relative;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header-text {
+            text-align: center;
+        }
+
+        .university-name {
+            font-size: 1.2rem;
+            color: #2c5aa0;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .faculty-name {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .form-title h1 {
+            font-size: 1.8rem;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-subtitle {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin: 0 15px 30px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            padding: 40px 50px;
+            background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -50%;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #dee2e6 0%, #dee2e6 100%);
+            z-index: 1;
+            border-radius: 2px;
+        }
+
+        .step.completed:not(:last-child)::after {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+        }
+
+        .step.active:not(:last-child)::after {
+            background: linear-gradient(90deg, #2c5aa0 0%, #dee2e6 100%);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dee2e6;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .step.active .step-number {
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3d6f 100%);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(44, 90, 160, 0.4);
+        }
+
+        .step.completed .step-number {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+            font-size: 0;
+        }
+
+        .step.completed .step-number::before {
+            content: '✓';
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.3;
+            max-width: 120px;
+            letter-spacing: 0.3px;
+        }
+
+        .step.active .step-title {
+            color: #2c5aa0;
+            font-weight: 600;
+        }
+
+        .step.completed .step-title {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .form-content {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 50px;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .current-step-info {
+            margin-bottom: 35px;
+            padding: 25px;
+            background: linear-gradient(135deg, #e8f0fe 0%, #f0f7ff 100%);
+            border-radius: 12px;
+            border-left: 5px solid #2c5aa0;
+            box-shadow: 0 4px 15px rgba(44, 90, 160, 0.1);
+        }
+
+        .current-step-title {
+            font-size: 1.4rem;
+            color: #2c5aa0;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .current-step-description {
+            color: #495057;
+            font-size: 1rem;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .step-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding-top: 25px;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 250px;
+            padding: 18px 30px;
+            background: linear-gradient(135deg, #2c5aa0 0%, #1e3d6f 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(44, 90, 160, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, #1e3d6f 0%, #2c5aa0 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(44, 90, 160, 0.4);
+        }
+
+        .pdf-guide-btn {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+            border: 2px solid #17a2b8 !important;
+            min-width: 280px !important;
+            font-size: 1rem !important;
+            box-shadow: 0 8px 25px rgba(23, 162, 184, 0.3) !important;
+        }
+
+        .pdf-guide-btn:hover {
+            background: linear-gradient(135deg, #138496 0%, #17a2b8 100%) !important;
+            border-color: #138496 !important;
+            box-shadow: 0 15px 35px rgba(23, 162, 184, 0.4) !important;
+        }
+
+        .pdf-guide-btn::before {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent) !important;
+        }
+
+        .guide-section {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .guide-section .pdf-guide-btn {
+            display: inline-block;
+            flex: none;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .guide-section .pdf-guide-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .guide-section .pdf-guide-btn.expanded {
+            border-radius: 15px 15px 0 0;
+            margin-bottom: 0;
+        }
+
+        .guide-dropdown {
+            display: none;
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid #17a2b8;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(23, 162, 184, 0.2);
+            animation: slideDown 0.3s ease;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .guide-dropdown.show {
+            display: block;
+        }
+
+        .guide-dropdown-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #17a2b8;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .guide-dropdown-content {
+            text-align: center;
+        }
+
+        .embedded-form-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
+            border-radius: 10px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .embedded-form-container .smallpdf-widget {
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .website-link-section {
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .website-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            min-width: 280px;
+        }
+
+        .website-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .website-btn:hover::before {
+            left: 100%;
+        }
+
+        .website-btn:hover {
+            background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(220, 53, 69, 0.4);
+        }
+
+        .website-note {
+            margin-top: 12px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #fff3cd 0%, #fef7d3 100%);
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            color: #856404;
+            font-size: 0.9rem;
+            font-weight: 500;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                max-height: 500px;
+            }
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .nav-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prev-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .prev-btn:hover {
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+        }
+
+        .next-btn:hover {
+            background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .step-icon {
+            font-size: 1.3rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #fef7d3 100%);
+            border: 2px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.1);
+        }
+
+        .info-box-title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
+        }
+
+        .info-box-content {
+            color: #856404;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .document-list {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .document-list li {
+            margin: 4px 0;
+            color: #495057;
+        }
+
+        /* Complete Section Styles */
+        .complete-section {
+            max-width: 1000px;
+            margin: 30px auto 0 auto;
+            padding: 0 30px;
+        }
+
+        .complete-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            margin: 0 15px;
+        }
+
+        .complete-content {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
+        }
+
+        .complete-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        .complete-title {
+            font-size: 2rem;
+            color: #2c5aa0;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .complete-description {
+            color: #495057;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .complete-btn {
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+            position: relative;
+            overflow: hidden;
+            min-width: 250px;
+        }
+
+        .complete-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .complete-btn:hover::before {
+            left: 100%;
+        }
+
+        .complete-btn:hover {
+            background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(40, 167, 69, 0.4);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .progress-steps {
+                padding: 20px 15px;
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .step {
+                flex-basis: calc(33.333% - 10px);
+                min-width: 80px;
+            }
+
+            .step:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                top: 20px;
+                right: -50%;
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, #dee2e6 0%, #dee2e6 100%);
+                z-index: 1;
+                border-radius: 2px;
+            }
+
+            .step.completed:not(:last-child)::after {
+                background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            }
+
+            .step.active:not(:last-child)::after {
+                background: linear-gradient(90deg, #2c5aa0 0%, #dee2e6 100%);
+            }
+
+            .form-content {
+                padding: 25px 20px;
+            }
+
+            .step-actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                min-width: auto;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-btn {
+                min-width: 100%;
+                width: 100%;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .logo {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0 10px;
+            }
+
+            .progress-steps {
+                padding: 15px 10px;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .step {
+                flex-basis: auto;
+                margin-bottom: 0;
+                position: relative;
+            }
+
+            .step:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                top: 45px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 2px;
+                height: 20px;
+                background: linear-gradient(180deg, #dee2e6 0%, #dee2e6 100%);
+                z-index: 1;
+                border-radius: 2px;
+            }
+
+            .step.completed:not(:last-child)::after {
+                background: linear-gradient(180deg, #28a745 0%, #20c997 100%);
+            }
+
+            .step.active:not(:last-child)::after {
+                background: linear-gradient(180deg, #2c5aa0 0%, #dee2e6 100%);
+            }
+
+            .step-title {
+                max-width: none;
+            }
+
+            .form-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .complete-content {
+                padding: 30px 20px;
+            }
+
+            .complete-title {
+                font-size: 1.6rem;
+            }
+
+            .complete-btn {
+                min-width: 100%;
+                padding: 18px 30px;
+                font-size: 1.1rem;
+            }
+
+            .guide-dropdown {
+                margin: 0 10px 25px 10px;
+                padding: 20px 15px;
+            }
+
+            .embedded-form-container {
+                min-height: 350px;
+                padding: 10px;
+            }
+
+            .embedded-form-container .smallpdf-widget {
+                height: 400px !important;
+            }
+
+            .website-btn {
+                min-width: 100%;
+                width: 100%;
+                padding: 14px 25px;
+                font-size: 0.95rem;
+            }
+
+            .website-note {
+                margin: 12px 10px 0 10px;
+                padding: 10px 15px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Animation */
+        .progress-container {
+            animation: slideInUp 0.8s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            animation: slideInDown 0.8s ease;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step {
+            animation: fadeInScale 0.6s ease;
+            animation-delay: calc(var(--step-index) * 0.1s);
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+        <!-- Progress Container -->
+        <div class="progress-container">
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step active" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Anti-Ragging Undertaking</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-title">ABC ID Registration</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-title">Student Pledge</div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <div class="form-content">
+                <!-- Step 1 Content -->
+                <div id="step1-content">
+                    <div class="guide-section">
+                        <a href="#" class="action-btn pdf-guide-btn" onclick="toggleGuideDropdown(1); return false;">
+                            📄 Guide - How to Fill Anti-Ragging Form
+                        </a>
+                        <div class="guide-dropdown" id="guide-dropdown-1">
+                            <div class="guide-dropdown-title">📄 Anti-Ragging Form Guide & Helper</div>
+                            <div class="guide-dropdown-content">
+                                <p style="margin-bottom: 15px; color: #495057;">Use this interactive guide to help you fill out the anti-ragging form correctly:</p>
+                                <div style="width: 100%; height: 480px;" class="smallpdf-widget" data-pdf-url="https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/Step-by-step-guide-on-How-to-fill-Online-Anti-Ragging-Undertaking.pdf"></div><script src="https://smallpdf.com/api/embed-widget.js"></script>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anti-Ragging Website Link Section -->
+                    <div class="website-link-section">
+                        <a href="https://antiragging.in/" target="_blank" class="website-btn">
+                            🌐 Click to Open the Anti-Ragging Website
+                        </a>
+                        <div class="website-note">
+                            <strong>📝 Important:</strong> After filling the form on the anti-ragging website, you must also complete the Google Form below to finish this step.
+                        </div>
+                    </div>
+                    
+                    <div class="current-step-info">
+                        <div class="current-step-title">
+                            <span class="step-icon">?</span>
+                            Anti-Ragging Undertaking Form
+                        </div>
+                        <div class="current-step-description">
+                            As per UGC regulations, all students must submit an anti-ragging undertaking before joining the institution. This is a mandatory requirement to ensure a safe and secure campus environment.
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">
+                            <span>⚠️</span>
+                            Mandatory Requirement
+                        </div>
+                        <div class="info-box-content">
+                            <strong>What you need to do:</strong>
+                            <ul class="document-list">
+                                <li>Fill the online anti-ragging undertaking form completely</li>
+                                <li>Provide accurate personal and contact information</li>
+                                <li>Submit parent/guardian details and contact information</li>
+                                <li>Accept the terms and conditions regarding ragging prevention</li>
+                            </ul>
+                            <strong>Note:</strong> This form must be completed before proceeding to the next step.
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLScCryyevhHFxwSa4kaK6SXQ120rjn7PyZa11yOnvOjEJf2x5A/viewform" class="action-btn" onclick="markStepCompleted(1)" target="_blank">
+                            ? Fill Anti-Ragging Undertaking Form
+                        </a>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="navigation-buttons">
+                        <button class="nav-btn prev-btn" onclick="previousStep()" style="display: none;">
+                            ← Previous Step
+                        </button>
+                        <button class="nav-btn next-btn" onclick="nextStep()">
+                            Next Step →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2 Content (Initially Hidden) -->
+                <div id="step2-content" style="display: none;">
+                    <div class="guide-section">
+                        <a href="#" class="action-btn pdf-guide-btn" onclick="toggleGuideDropdown(2); return false;">
+                            📄 Guide - How to Get ABC ID
+                        </a>
+                        <div class="guide-dropdown" id="guide-dropdown-2">
+                            <div class="guide-dropdown-title">📄 ABC ID Registration Guide & Helper</div>
+                            <div class="guide-dropdown-content">
+                                <p style="margin-bottom: 15px; color: #495057;">Interactive ABC ID Registration Guide - View the complete guide below:</p>
+                                <div class="embedded-form-container">
+                                    <div style="width: 100%; height: 480px;" class="smallpdf-widget" data-pdf-url="https://psou.ac.in/asset/docs/files/202302091209200d6bfd4a57.pdf"></div>
+                                    <script src="https://smallpdf.com/api/embed-widget.js"></script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="current-step-info">
+                        <div class="current-step-title">
+                            <span class="step-icon">🆔</span>
+                            ABC ID Registration
+                        </div>
+                        <div class="current-step-description">
+                            Academic Bank of Credits (ABC) ID is a unique identification for storing and managing your academic credits. This is required for credit transfer and academic mobility as per NEP 2020.
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">
+                            <span>💡</span>
+                            About ABC ID
+                        </div>
+                        <div class="info-box-content">
+                            <strong>What is ABC ID?</strong>
+                            <ul class="document-list">
+                                <li>A digital repository to store your academic credits</li>
+                                <li>Enables seamless credit transfer between institutions</li>
+                                <li>Required for degree verification and future admissions</li>
+                                <li>One-time registration valid throughout your academic journey</li>
+                            </ul>
+                            <strong>Required Information:</strong> Aadhar Card, Email ID, Mobile Number, and Academic Details
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSc8PLQCAD5IzYn4Apz3kMpBn0-uk__3d5h6EmrG8UZMzRn-Gg/viewform" class="action-btn" onclick="markStepCompleted(2)" target="_blank">
+                            🆔 Register for ABC ID
+                        </a>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="navigation-buttons">
+                        <button class="nav-btn prev-btn" onclick="previousStep()">
+                            ← Previous Step
+                        </button>
+                        <button class="nav-btn next-btn" onclick="nextStep()">
+                            Next Step →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3 Content (Initially Hidden) -->
+                <div id="step3-content" style="display: none;">
+                    <div class="current-step-info">
+                        <div class="current-step-title">
+                            <span class="step-icon">🤝</span>
+                            Student Pledge
+                        </div>
+                        <div class="current-step-description">
+                            Take the student pledge to commit to academic integrity, ethical conduct, and responsible citizenship. This pledge reflects your dedication to upholding the values and standards of the institution.
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <div class="info-box-title">
+                            <span>✋</span>
+                            Pledge Commitment
+                        </div>
+                        <div class="info-box-content">
+                            <strong>By taking this pledge, you commit to:</strong>
+                            <ul class="document-list">
+                                <li>Maintain academic integrity and avoid plagiarism</li>
+                                <li>Respect fellow students, faculty, and staff</li>
+                                <li>Follow institutional rules and regulations</li>
+                                <li>Contribute positively to the campus community</li>
+                                <li>Uphold the reputation and values of the university</li>
+                            </ul>
+                            <strong>This pledge is your promise to be a responsible and ethical student.</strong>
+                        </div>
+                    </div>
+
+                    <div class="step-actions">
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdyWwdrbncLhnvpm94JhECcRQmtoJKRo2fbnn7IG81IFxzPvw/viewform" class="action-btn" onclick="markStepCompleted(3)" target="_blank">
+                            🤝 Take Student Pledge
+                        </a>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="navigation-buttons">
+                        <button class="nav-btn prev-btn" onclick="previousStep()">
+                            ← Previous Step
+                        </button>
+                        <button class="nav-btn next-btn" onclick="completeRegistration()" style="display: none;">
+                            Complete Registration ✅
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complete Registration Section (appears when all steps are done) -->
+        <div class="complete-section" id="complete-section" style="display: none;">
+            <div class="complete-container">
+                <div class="complete-content">
+                    <div class="complete-icon">🎉</div>
+                    <h2 class="complete-title">Ready to Complete Registration!</h2>
+                    <p class="complete-description">
+                        You have successfully completed all three steps. Click the button below to finalize your registration.
+                    </p>
+                    <button class="complete-btn" onclick="completeRegistration()">
+                        ✅ Complete Registration
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+        let stepsCompleted = [false, false, false]; // Track which steps are completed
+
+        function markStepCompleted(stepNumber) {
+            stepsCompleted[stepNumber - 1] = true;
+            const stepElement = document.getElementById(`step${stepNumber}`);
+            if (stepElement) {
+                stepElement.classList.add('completed');
+            }
+            checkAllStepsCompleted();
+        }
+
+        function toggleGuideDropdown(stepNumber) {
+            const dropdown = document.getElementById(`guide-dropdown-${stepNumber}`);
+            const button = dropdown.previousElementSibling;
+            
+            if (dropdown.classList.contains('show')) {
+                // Close dropdown
+                dropdown.classList.remove('show');
+                button.classList.remove('expanded');
+                button.innerHTML = '📄 Guide - ' + (stepNumber === 1 ? 'How to Fill Anti-Ragging Form' : 'How to Get ABC ID');
+            } else {
+                // Close all other dropdowns first
+                document.querySelectorAll('.guide-dropdown').forEach(dd => {
+                    dd.classList.remove('show');
+                });
+                document.querySelectorAll('.pdf-guide-btn').forEach(btn => {
+                    btn.classList.remove('expanded');
+                });
+                
+                // Open this dropdown
+                dropdown.classList.add('show');
+                button.classList.add('expanded');
+                button.innerHTML = '📄 Hide Guide ▲';
+                
+                // Scroll to the dropdown
+                setTimeout(() => {
+                    dropdown.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+        }
+
+        function checkAllStepsCompleted() {
+            const allCompleted = stepsCompleted.every(step => step === true);
+            const completeSection = document.getElementById('complete-section');
+            
+            if (allCompleted && completeSection) {
+                completeSection.style.display = 'block';
+                completeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function showStep(stepNumber) {
+            // Hide all step contents
+            for (let i = 1; i <= totalSteps; i++) {
+                const stepContent = document.getElementById(`step${i}-content`);
+                const stepElement = document.getElementById(`step${i}`);
+                
+                if (stepContent) {
+                    stepContent.style.display = 'none';
+                }
+                
+                // Remove active class but keep completed class
+                if (stepElement) {
+                    stepElement.classList.remove('active');
+                }
+            }
+
+            // Show current step content
+            const currentStepContent = document.getElementById(`step${stepNumber}-content`);
+            const currentStepElement = document.getElementById(`step${stepNumber}`);
+            
+            if (currentStepContent) {
+                currentStepContent.style.display = 'block';
+            }
+            
+            if (currentStepElement && !stepsCompleted[stepNumber - 1]) {
+                currentStepElement.classList.add('active');
+            }
+
+            // Update navigation buttons
+            updateNavigationButtons(stepNumber);
+        }
+
+        function updateNavigationButtons(stepNumber) {
+            const prevBtns = document.querySelectorAll('.prev-btn');
+            const nextBtns = document.querySelectorAll('.next-btn');
+
+            prevBtns.forEach(btn => {
+                if (stepNumber === 1) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.style.display = 'inline-block';
+                }
+            });
+
+            nextBtns.forEach(btn => {
+                if (stepNumber === totalSteps) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.style.display = 'inline-block';
+                }
+            });
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+                
+                // Add smooth scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+                
+                // Add smooth scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function completeRegistration() {
+            alert('🎉 Congratulations! Your registration process is complete.\n\nAll three steps have been successfully completed:\n✅ Anti-Ragging Undertaking\n✅ ABC ID Registration\n✅ Student Pledge\n\nWelcome to JAIN (Deemed-to-be-University)!');
+        }
+
+        // Make steps clickable
+        function initializeStepNavigation() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const stepElement = document.getElementById(`step${i}`);
+                if (stepElement) {
+                    stepElement.addEventListener('click', function() {
+                        currentStep = i;
+                        showStep(currentStep);
+                        
+                        // Add smooth scroll to top
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                    
+                    // Add hover effect
+                    stepElement.style.cursor = 'pointer';
+                }
+            }
+        }
+
+        // Initialize the form when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            showStep(1);
+            initializeStepNavigation();
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                nextStep();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                previousStep();
+            }
+        });
+    </script>
+</body>
+</html>
