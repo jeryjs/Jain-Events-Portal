@@ -88,6 +88,13 @@
                 <option value="">All Branches</option>
             </select>
         </div>
+        <div style="display: flex; align-items: center; gap: 10px; border-radius: 14px; padding: 16px 22px; margin-bottom: 22px; font-size: 16px; box-shadow: 0 8px 32px 0 rgba(31,38,135,0.10); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.18);">
+            <svg xmlns="http://www.w3.org/2000/svg" height="28" width="28" fill="#2196f3" viewBox="0 0 24 24" style="flex-shrink:0; margin-right: 4px;">
+                <circle cx="12" cy="12" r="12" fill="#e3f2fd20"/>
+                <path d="M12 17a1 1 0 0 1-1-1v-4a1 1 0 1 1 2 0v4a1 1 0 0 1-1 1zm0-8a1.25 1.25 0 1 1 0 2.5A1.25 1.25 0 0 1 12 9z" fill="#2196f3"/>
+            </svg>
+            <span><strong>Attendance is mandatory</strong> for all students.</span>
+        </div>
         <button class="nav-btn" onclick="openMapsModal()">🗺️ Campus Locations</button>
 
         <div id="scheduleDisplay"></div>
@@ -148,7 +155,7 @@
             `;
             
             try {
-                const response = await fetch('https://raw.githubusercontent.com/jeryjs/Jain-Events-Portal/refs/heads/data-store/deeksharamb-2025/schedule.json');
+                const response = await fetch('schedule.json');
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 schedule = await response.json();
