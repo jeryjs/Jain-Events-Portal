@@ -177,10 +177,21 @@
                 dates: [...new Set(schedule.map(s => s.date))],
                 groups: [...new Set(filteredSchedule.flatMap(s => s.entries.map(e => e.batch)))],
                 branches: [...new Set(filteredSchedule.flatMap(s => s.entries.filter(e => {
-                    if (filters.group && e.batch !== filters.group) return false;
+                    if (filters.group && !batchMatches(e.batch, filters.group)) return false;
                     return true;
                 }).flatMap(e => e.branches)))]
             };
+        }
+
+        function batchMatches(entryBatch, selectedBatch) {
+            if (!selectedBatch) return true;
+            
+            // Always show "ALL" entries
+            if (entryBatch.toUpperCase().includes('ALL')) return true;
+            
+            // Check if the selected batch is contained in the entry batch
+            // This handles cases like "G1 & G2" matching both "G1" and "G2"
+            return entryBatch.toUpperCase().includes(selectedBatch.toUpperCase());
         }
 
         function initFilters() {
@@ -273,7 +284,7 @@
             const filtered = schedule.filter(day => {
                 if (filters.date && day.date !== filters.date) return false;
                 return day.entries.some(entry => {
-                    if (filters.group && entry.batch !== filters.group) return false;
+                    if (filters.group && !batchMatches(entry.batch, filters.group)) return false;
                     if (filters.branch && !entry.branches.includes(filters.branch)) return false;
                     return true;
                 });
@@ -293,7 +304,7 @@
 
             display.innerHTML = filtered.map(day => {
                 const validEntries = day.entries.filter(entry => {
-                    if (filters.group && entry.batch !== filters.group) return false;
+                    if (filters.group && !batchMatches(entry.batch, filters.group)) return false;
                     if (filters.branch && !entry.branches.includes(filters.branch)) return false;
                     return true;
                 });
@@ -306,7 +317,10 @@
                         ${sortedEntries.map((entry, i) => `
                             <div class="batch-section">
                                 <div class="batch-header" onclick="toggleBatch(this)">
-                                    <span>${entry.batch} - ${(entry.student_count || 'TBD').toString().replace('+ parents', '') + ' students'}</span>
+                                    <span>
+                                        ${entry.batch}
+                                        ${entry.student_count ? ' - ' + (entry.student_count.toString().replace('+ parents', '') + ' students') : ' students'}
+                                    </span>
                                     <span class="toggle-icon">▼</span>
                                 </div>
                                 <div class="batch-content ${i === 0 ? 'active' : ''}">
