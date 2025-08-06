@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student ID Verification</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; min-height: 100vh; color: #212529; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-radius: 16px; border: 1px solid rgba(0, 0, 0, 0.1); padding: 30px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; color: #495057; }
+        .search-box { position: relative; margin-bottom: 20px; }
+        .search-box input { width: 100%; padding: 15px 20px; border: 1px solid #dee2e6; border-radius: 12px; background: #fff; font-size: 16px; color: #495057; outline: none; transition: border-color 0.3s ease; }
+        .search-box input:focus { border-color: #495057; }
+        .search-box input::placeholder { color: #adb5bd; }
+        .shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { -position: -200% 0; } 100% { -position: 200% 0; } }
+        .branch-list, .student-list { list-style: none; max-height: 400px; overflow-y: auto; }
+        .branch-item, .student-item { background: #fff; margin: 10px 0; padding: 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; border: 1px solid #e9ecef; }
+        .branch-item:hover, .student-item:hover { background: #f8f9fa; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); border-color: #dee2e6; }
+        .student-item { display: flex; justify-content: space-between; align-items: center; }
+        .student-name { font-weight: 600; font-size: 1.1rem; }
+        .student-app { font-size: 0.9rem; opacity: 0.8; }
+        .id-card { background: white; color: #333; border-radius: 8px; padding: 0; text-align: left; max-width: 320px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); overflow: hidden; border: 1px solid #ddd; font-family: Arial, sans-serif; }
+        .jgu-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; padding: 12px 16px; margin: 0; display: flex; align-items: center; gap: 12px; }
+        .jgu-logo { width: 40px; height: 40px; background: transparent; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .jgu-logo img { width: 32px; height: 32px; object-fit: contain; }
+        .jgu-text { flex: 1; }
+        .jgu-text h3 { margin: 0; font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+        .jgu-text .dept { font-size: 0.7rem; margin: 2px 0; opacity: 0.95; line-height: 1.1; }
+        .jgu-text .website { font-size: 0.6rem; opacity: 0.8; margin-top: 2px; }
+        .student-badge { background: #ef4444; color: white; padding: 4px 12px; font-size: 0.75rem; font-weight: bold; margin: 8px 16px 0 16px; text-align: center; border-radius: 0 0 4px 4px; }
+        .card-main { padding: 16px; display: flex; gap: 12px; }
+        .card-left { flex: 1; }
+        .card-right { width: 80px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .student-photo { width: 70px; height: 85px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23999"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'); background-repeat: no-repeat; background-position: center; background-size: 40px; }
+        .year-badge { background: #ef4444; color: white; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; writing-mode: vertical-rl; text-orientation: mixed; border-radius: 2px; }
+        .card-field { margin: 8px 0; display: flex; align-items: flex-start; gap: 8px; }
+        .card-field strong { font-weight: 600; color: #374151; min-width: 45px; font-size: 0.85rem; }
+        .card-field span { font-weight: 500; color: #1f2937; flex: 1; font-size: 0.85rem; line-height: 1.3; }
+        .signature-section { margin-top: 16px; text-align: center; border-top: 1px solid #eee; padding-top: 12px; }
+        .signature { height: 30px; display: flex; align-items: center; justify-content: center; font-style: italic; color: #666; font-size: 0.8rem; }
+        .director-label { font-size: 0.7rem; color: #666; margin-top: 4px; }
+        .student-photo { width: 100px; height: 120px; background: #f0f0f0; margin: 0 auto 15px; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666; }
+        .nav-buttons { display: flex; gap: 15px; margin-top: 30px; justify-content: center; }
+        .btn { padding: 12px 30px; border: none; border-radius: 25px; font-size: 16px; cursor: pointer; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.2); color: inherit; backdrop-filter: blur(10px); }
+        .btn:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background: #495057; color: white; }
+        .btn-primary:hover { background: #343a40; }
+        .hidden { display: none !important; }
+        .barcode-section { margin: 0; padding: 16px 0; background: rgba(0, 0, 0, 0.02); border-radius: 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+        .barcode-hidden { text-align: center; color: #666; font-style: italic; }
+        .barcode-visible { text-align: center; }
+        .barcode { font-family: 'Courier New', monospace; font-size: 2px; letter-spacing: 0; margin: 12px 0; padding: 15px 0; background: white; border: none; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; line-height: 1; height: 75px; display: flex; align-items: center; justify-content: center; width: 100%; }
+        .barcode-bars { display: flex; align-items: stretch; height: 60px; width: 100%; justify-content: center; }
+        .bar { background: black; }
+        .space { background: transparent; }
+        .bar-1 { width: 1px; }
+        .bar-2 { width: 2px; }
+        .bar-3 { width: 3px; }
+        .bar-4 { width: 4px; }
+        .locked { position: relative; overflow: hidden; }
+        .locked::after { content: '🔒'; position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; }
+        .error-ui { text-align: center; padding: 40px; }
+        .error-icon { font-size: 4rem; margin-bottom: 20px; }
+        .error-message { font-size: 1.2rem; margin-bottom: 20px; color: #dc3545; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+        .modal h2 { margin-bottom: 15px; color: #dc3545; }
+        .modal p { margin-bottom: 25px; line-height: 1.5; }
+        .modal-buttons { display: flex; gap: 15px; justify-content: center; }
+        @media (prefers-color-scheme: dark) { 
+            body { background: #0d1117; color: #f0f6fc; } 
+            .glass-card { background: rgba(22, 27, 34, 0.9); border: 1px solid rgba(240, 246, 252, 0.1); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3); } 
+            .header h1 { color: #f0f6fc; } 
+            .search-box input { background: #21262d; border-color: #30363d; color: #f0f6fc; } 
+            .search-box input:focus { border-color: #58a6ff; } 
+            .search-box input::placeholder { color: #7d8590; } 
+            .branch-item, .student-item { background: #21262d; border-color: #30363d; } 
+            .branch-item:hover, .student-item:hover { background: #30363d; border-color: #484f58; } 
+            .modal-content { background: #21262d; color: #f0f6fc; } 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Error UI -->
+        <div id="error-ui" class="glass-card hidden">
+            <div class="error-ui">
+                <div class="error-icon">⚠️</div>
+                <div class="error-message">Failed to load student data</div>
+                <p>Please check your internet connection and try again.</p>
+                <button class="btn btn-primary" onclick="loadData()">Retry</button>
+            </div>
+        </div>
+
+        <!-- UI 1: Branch Selection -->
+        <div id="branch-ui" class="glass-card">
+            <div class="header">
+                <h1>Select Branch</h1>
+                <p>Choose your department</p>
+            </div>
+            <div class="search-box">
+                <input type="text" id="branch-search" placeholder="Search branches...">
+            </div>
+            <ul id="branch-list" class="branch-list"></ul>
+        </div>
+
+        <!-- UI 2: Student Selection -->
+        <div id="student-ui" class="glass-card hidden">
+            <div class="header">
+                <h1 id="selected-branch"></h1>
+                <p>Select your name</p>
+            </div>
+            <div class="search-box">
+                <input type="text" id="student-search" placeholder="Search students...">
+            </div>
+            <ul id="student-list" class="student-list"></ul>
+            <div class="nav-buttons">
+                <button class="btn" id="back-to-branches">Back</button>
+            </div>
+        </div>
+
+        <!-- UI 3: ID Card -->
+        <div id="card-ui" class="glass-card hidden">
+            <div id="id-card" class="id-card">
+                <div class="jgu-header">
+                    <div class="jgu-logo">
+                        <img src="https://github.com/jeryjs/Jain-Events-Portal/raw/refs/heads/main/clientview/public/JGI.webp" alt="JGI Logo" onerror="this.style.display='none'">
+                    </div>
+                    <div class="jgu-text">
+                        <h3>JAIN UNIVERSITY</h3>
+                        <div class="dept">FACULTY OF ENGINEERING AND TECHNOLOGY</div>
+                        <div class="website">www.jainuniversity.ac.in</div>
+                    </div>
+                </div>
+                <div class="student-badge">STUDENT</div>
+                <div class="card-main">
+                    <div class="card-left">
+                        <div class="card-field">
+                            <strong>NAME</strong>
+                            <span>: <span id="card-name"></span></span>
+                        </div>
+                        <div class="card-field">
+                            <strong>CLASS</strong>
+                            <span>: <span id="card-branch"></span></span>
+                        </div>
+                        <div class="card-field">
+                            <strong>ID</strong>
+                            <span>: <span id="card-app"></span></span>
+                        </div>
+                    </div>
+                </div>
+                <div id="barcode-section" class="barcode-section hidden">
+                    <div class="barcode" id="barcode-display"></div>
+                    <div style="font-size: 12px; color: #666; text-align: center; margin-top: 5px;">Barcode</div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-primary" id="confirm-btn">Confirm Details</button>
+                <button class="btn" id="back-to-students">Back</button>
+            </div>
+        </div>
+        
+        <!-- Confirmation Modal -->
+        <div id="confirm-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>⚠️ Important Notice</h2>
+                <p><strong>This action cannot be undone!</strong></p>
+                <p>Once you confirm your details, you will be locked into this selection and cannot change or go back to previous screens.</p>
+                <p>Please verify your information is correct before proceeding.</p>
+                <div class="modal-buttons">
+                    <button class="btn" id="cancel-confirm">Cancel</button>
+                    <button class="btn btn-primary" id="final-confirm">Yes, Lock In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const getAttendees = async () => {
+            return await fetch('scanner.min.json').then(res => res.json());
+        };
+
+        const branchDisplayNames = {
+            "ANE": "Aeronautical Engineering",
+            "ASE": "Aerospace Engineering",
+            "CV": "Civil Enginnering",
+            "CSE - SE": "Software Engineering",
+            "CSE - AIDD": "Artificial Intelligence & Dev Ops",
+            "CSE-AIDE": "Artificial Intelligence & Data Engineering",
+            "AIML": "Artificial Intelligence & Machine Learning",
+            "CSE-BCT": "Blockchain Technology",
+            "CSE-CTIS": "Cloud Technology & Information Security",
+            "CSE-CPS": "Cyber Physical Systems",
+            "GEN-AI": "Generative-AI",
+            "CTMA": "Computer Technology & Mobile Application",
+            "CSE-PWC": "CSE in association with PwC",
+            "CSE-CSBS": "Computer Science & Business Systems",
+            "CSE": "Computer Science Engineering",
+            "AI": "Artificial Intelligence",
+            "CSE-Cyber Security": "Cyber Security",
+            "CSE-DS": "Data Science",
+            "CSE-IOT": "Internet of Things",
+            "EEE": "Electrical and Electronics Engineering",
+            "ECE": "Electronics and Communication Engineering",
+            "ISE": "Information Science and Engineering",
+            "ME": "Mechanical Engineering"
+        }
+        
+        let attendeesData = {};
+        let currentBranch = '';
+        let currentStudent = null;
+        let isLocked = false;
+
+        // Check if user is already locked in
+        function checkLockStatus() {
+            const lockedData = localStorage.getItem('lockedStudent');
+            if (lockedData) {
+                const student = JSON.parse(lockedData);
+                currentStudent = student;
+                currentBranch = student.subtitle;
+                isLocked = true;
+                showLockedCard(student);
+                return true;
+            }
+            return false;
+        }
+
+        function showLockedCard(student) {
+            document.getElementById('card-name').textContent = student.title;
+            document.getElementById('card-branch').textContent = student.subtitle;
+            document.getElementById('card-app').textContent = student.code;
+            document.getElementById('barcode-display').innerHTML = generateBarcode(student.code);
+            
+            // Hide all other UIs and show locked card
+            document.getElementById('error-ui').classList.add('hidden');
+            document.getElementById('branch-ui').classList.add('hidden');
+            document.getElementById('student-ui').classList.add('hidden');
+            document.getElementById('card-ui').classList.remove('hidden');
+            
+            // Hide nav buttons and show barcode
+            document.getElementById('confirm-btn').style.display = 'none';
+            document.getElementById('back-to-students').style.display = 'none';
+            document.getElementById('id-card').classList.add('locked');
+            document.getElementById('barcode-section').classList.remove('hidden');
+        }
+
+        async function loadData() {
+            // Hide error UI
+            document.getElementById('error-ui').classList.add('hidden');
+            
+            // Check if already locked in
+            if (checkLockStatus()) {
+                return;
+            }
+            
+            try {
+                const rawData = await getAttendees();
+                if (!rawData || rawData.length === 0) {
+                    throw new Error('No data received');
+                }
+                
+                // Transform flat array into branch-organized structure
+                attendeesData = {};
+                rawData.forEach(student => {
+                    const branch = student.subtitle;
+                    if (!attendeesData[branch]) {
+                        attendeesData[branch] = [];
+                    }
+                    attendeesData[branch].push({
+                        title: student.title,
+                        subtitle: student.subtitle,
+                        code: student.code
+                    });
+                });
+                
+                renderBranches();
+            } catch (error) {
+                console.log('Error loading data:', error);
+                showError();
+            }
+        }
+
+        function showError() {
+            document.getElementById('branch-ui').classList.add('hidden');
+            document.getElementById('student-ui').classList.add('hidden');
+            document.getElementById('card-ui').classList.add('hidden');
+            document.getElementById('error-ui').classList.remove('hidden');
+        }
+
+        function showShimmer(container, count = 5) {
+            container.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const shimmerItem = document.createElement('li');
+                shimmerItem.className = 'branch-item shimmer';
+                shimmerItem.style.height = '60px';
+                container.appendChild(shimmerItem);
+            }
+        }
+
+        function renderBranches() {
+            const branchList = document.getElementById('branch-list');
+            const searchBox = document.getElementById('branch-search');
+            
+            showShimmer(branchList);
+            
+            setTimeout(() => {
+                branchList.innerHTML = '';
+                const branches = Object.keys(attendeesData);
+                
+                function displayBranches(filteredBranches) {
+                    branchList.innerHTML = '';
+                    filteredBranches.forEach(branch => {
+                        const li = document.createElement('li');
+                        li.className = 'branch-item';
+                        li.textContent = branchDisplayNames[branch];
+                        li.onclick = () => selectBranch(branch);
+                        branchList.appendChild(li);
+                    });
+                }
+                
+                displayBranches(branches);
+                
+                searchBox.oninput = (e) => {
+                    const query = e.target.value.toLowerCase();
+                    const filtered = branches.filter(branch => 
+                        branch.toLowerCase().includes(query)
+                    );
+                    displayBranches(filtered);
+                };
+            }, 100);
+        }
+
+        function selectBranch(branch) {
+            if (isLocked) return;
+            currentBranch = branch;
+            document.getElementById('selected-branch').textContent = branch;
+            document.getElementById('branch-ui').classList.add('hidden');
+            document.getElementById('student-ui').classList.remove('hidden');
+            renderStudents();
+        }
+
+        function renderStudents() {
+            const studentList = document.getElementById('student-list');
+            const searchBox = document.getElementById('student-search');
+            
+            showShimmer(studentList, 3);
+            
+            setTimeout(() => {
+                studentList.innerHTML = '';
+                const students = attendeesData[currentBranch] || [];
+                
+                function displayStudents(filteredStudents) {
+                    studentList.innerHTML = '';
+                    filteredStudents.forEach(student => {
+                        const li = document.createElement('li');
+                        li.className = 'student-item';
+                        li.innerHTML = `
+                            <div>
+                                <div class="student-name">${student.title}</div>
+                                <div class="student-app">${student.code}</div>
+                            </div>
+                        `;
+                        li.onclick = () => selectStudent(student);
+                        studentList.appendChild(li);
+                    });
+                }
+                
+                displayStudents(students);
+                
+                searchBox.oninput = (e) => {
+                    const query = e.target.value.toLowerCase();
+                    const filtered = students.filter(student => 
+                        student.title.toLowerCase().includes(query) ||
+                        student.code.toLowerCase().includes(query)
+                    );
+                    displayStudents(filtered);
+                };
+            }, 100);
+        }
+
+        function selectStudent(student) {
+            if (isLocked) return;
+            currentStudent = student;
+            document.getElementById('card-name').textContent = student.title;
+            document.getElementById('card-branch').textContent = student.subtitle;
+            document.getElementById('card-app').textContent = student.code;
+            document.getElementById('barcode-display').innerHTML = generateBarcode(student.code);
+            
+            document.getElementById('student-ui').classList.add('hidden');
+            document.getElementById('card-ui').classList.remove('hidden');
+        }
+
+        function generateBarcode(text) {
+            // Code128 patterns (simplified for alphanumeric)
+            const code128 = {
+                ' ': '212222', '!': '222122', '"': '222221', '#': '121223', '$': '121322', '%': '131222',
+                '&': '122213', "'": '122312', '(': '132212', ')': '221213', '*': '221312', '+': '231212',
+                ',': '112232', '-': '122132', '.': '122231', '/': '113222', '0': '123122', '1': '123221',
+                '2': '223211', '3': '221132', '4': '221231', '5': '213212', '6': '223112', '7': '312131',
+                '8': '311222', '9': '321122', ':': '321221', ';': '312212', '<': '322112', '=': '322211',
+                '>': '212123', '?': '212321', '@': '232121', 'A': '111323', 'B': '131123', 'C': '131321',
+                'D': '112313', 'E': '132113', 'F': '132311', 'G': '211313', 'H': '231113', 'I': '231311',
+                'J': '112133', 'K': '112331', 'L': '132131', 'M': '113123', 'N': '113321', 'O': '133121',
+                'P': '313121', 'Q': '211331', 'R': '231131', 'S': '213113', 'T': '213311', 'U': '213131',
+                'V': '311123', 'W': '311321', 'X': '331121', 'Y': '312113', 'Z': '312311', '[': '332111',
+                '\\': '314111', ']': '221411', '^': '431111', '_': '111224', '`': '111422', 'a': '121124',
+                'b': '121421', 'c': '141122', 'd': '141221', 'e': '112214', 'f': '112412', 'g': '122114',
+                'h': '122411', 'i': '142112', 'j': '142211', 'k': '241211', 'l': '221114', 'm': '413111',
+                'n': '241112', 'o': '134111', 'p': '111242', 'q': '121142', 'r': '121241', 's': '114212',
+                't': '124112', 'u': '124211', 'v': '411212', 'w': '421112', 'x': '421211', 'y': '212141',
+                'z': '214121', '{': '412121', '|': '111143', '}': '111341', '~': '131141'
+            };
+            
+            // Start Code B pattern
+            const startB = '211214';
+            // Stop pattern
+            const stop = '2331112';
+            
+            let barcodeHtml = '<div class="barcode-bars">';
+            
+            // Add start code
+            barcodeHtml += generateCode128Bars(startB);
+            
+            // Add each character
+            for (let char of text) {
+                if (code128[char]) {
+                    barcodeHtml += generateCode128Bars(code128[char]);
+                } else {
+                    // Default pattern for unknown characters
+                    barcodeHtml += generateCode128Bars('123122');
+                }
+            }
+            
+            // Add check digit (simplified - using a basic pattern)
+            barcodeHtml += generateCode128Bars('123122');
+            
+            // Add stop code
+            barcodeHtml += generateCode128Bars(stop);
+            
+            barcodeHtml += '</div>';
+            return barcodeHtml;
+        }
+        
+        function generateCode128Bars(pattern) {
+            let bars = '';
+            for (let i = 0; i < pattern.length; i++) {
+                const width = pattern[i];
+                const isBar = i % 2 === 0;
+                const className = isBar ? 'bar' : 'space';
+                bars += `<div class="${className} bar-${width}"></div>`;
+            }
+            return bars;
+        }
+
+        // Navigation
+        document.getElementById('back-to-branches').onclick = () => {
+            if (isLocked) return;
+            document.getElementById('student-ui').classList.add('hidden');
+            document.getElementById('branch-ui').classList.remove('hidden');
+        };
+
+        document.getElementById('back-to-students').onclick = () => {
+            if (isLocked) return;
+            document.getElementById('card-ui').classList.add('hidden');
+            document.getElementById('student-ui').classList.remove('hidden');
+        };
+
+        // Barcode reveal
+        document.getElementById('barcode-section').onclick = () => {
+            if (!isLocked) return;
+            const hidden = document.getElementById('barcode-hidden');
+            const visible = document.getElementById('barcode-visible');
+            if (!hidden.classList.contains('hidden')) {
+                hidden.classList.add('hidden');
+                visible.classList.remove('hidden');
+            }
+        };
+
+        // Confirm and lock
+        document.getElementById('confirm-btn').onclick = () => {
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        };
+
+        // Modal actions
+        document.getElementById('cancel-confirm').onclick = () => {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        };
+
+        // Close modal when clicking outside
+        document.getElementById('confirm-modal').onclick = (e) => {
+            if (e.target.id === 'confirm-modal') {
+                document.getElementById('confirm-modal').classList.add('hidden');
+            }
+        };
+
+        document.getElementById('final-confirm').onclick = () => {
+            // Save to localStorage
+            localStorage.setItem('lockedStudent', JSON.stringify(currentStudent));
+            
+            // Lock the interface
+            isLocked = true;
+            document.getElementById('confirm-modal').classList.add('hidden');
+            document.getElementById('confirm-btn').style.display = 'none';
+            document.getElementById('back-to-students').style.display = 'none';
+            document.getElementById('id-card').classList.add('locked');
+            document.getElementById('barcode-section').classList.remove('hidden');
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ensure modal is hidden on load
+            document.getElementById('confirm-modal').classList.add('hidden');
+            loadData();
+        });
+    </script>
+</body>
+</html>
