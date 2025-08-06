@@ -16,6 +16,7 @@ export { default as SportsPlayer } from "./sports/SportsPlayer";
 
 // Export culturals models
 export { default as CulturalActivity } from "./culturals/CulturalActivity";
+export type { ActivityConfig } from "./culturals/CulturalActivity";
 export { default as Judge } from "./culturals/Judge";
 
 // export cultural model as technical model

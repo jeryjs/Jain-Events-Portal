@@ -1,6 +1,14 @@
 import { Activity, Judge, Participant, TeamParticipant } from '@common/models';
 import { EventType } from '@common/constants';
+
+export interface ActivityConfig {
+  isSoloPerformance: boolean;
+  useSelectedTerminology: boolean; // true for "selected", false for "winners"
+}
+
 class CulturalActivity extends Activity {
+  public config: ActivityConfig;
+
   constructor(
     id: string, 
     name: string, 
@@ -13,17 +21,53 @@ class CulturalActivity extends Activity {
     public pollData: {teamId: string, votes: string[]}[] = [],
     public showPoll: boolean = false,
     public winners: { teamId: string, rank: number }[] = [],  // for solo events, teamId is the participant's usn
-    public isSoloPerformance: boolean,
+    isSoloPerformance?: boolean,
+    config?: ActivityConfig,
   ) {
     super(id, name, startTime, endTime, participants, type);
 
-    this.isSoloPerformance = this.isSoloPerformance ?? (this.teams.length === 0 || this.teams.every(t => this.getTeamParticipants(t.id).length <= 1));
+    // Backward compatibility: use config if provided, otherwise create from individual properties
+    this.config = config ?? {
+      isSoloPerformance: isSoloPerformance ?? (this.teams.length === 0 || this.teams.every(t => this.getTeamParticipants(t.id).length <= 1)),
+      useSelectedTerminology: false
+    };
+  }
+
+  // Getter for backward compatibility
+  get isSoloPerformance(): boolean {
+    return this.config.isSoloPerformance;
+  }
+
+  // Setter for backward compatibility
+  set isSoloPerformance(value: boolean) {
+    this.config.isSoloPerformance = value;
   }
 
   static parse(data: any): CulturalActivity {
     const s = super.parse({...data, type: 0});  // set type to 0 to avoid circular reference
     const judges = data.judges?.map((j: any) => Judge.parse(j));
-    return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, data.type || data.eventType, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, data.isSoloPerformance);
+    
+    // Handle both new config structure and legacy individual properties
+    const config: ActivityConfig = data.config ?? {
+      isSoloPerformance: data.isSoloPerformance ?? false,
+      useSelectedTerminology: data.useSelectedTerminology ?? false
+    };
+
+    return new CulturalActivity(
+      s.id, 
+      s.name, 
+      s.startTime, 
+      s.endTime, 
+      data.type || data.eventType, 
+      s.participants, 
+      judges, 
+      data.teams, 
+      data.pollData, 
+      data.showPoll, 
+      data.winners, 
+      undefined, // isSoloPerformance (legacy)
+      config
+    );
   }
 
   get canVote(): boolean {
