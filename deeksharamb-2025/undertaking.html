@@ -469,8 +469,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 30px;
-            padding-top: 25px;
+            margin-top: 20px;
+            padding-top: 15px;
             border-top: 2px solid #e9ecef;
         }
 
@@ -568,69 +568,90 @@
             color: #495057;
         }
 
-        /* Complete Section Styles */
+        /* Complete Modal Styles */
         .complete-section {
-            max-width: 1000px;
-            margin: 30px auto 0 auto;
-            padding: 0 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .complete-section.show {
+            display: flex;
+            opacity: 1;
         }
 
         .complete-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            background: #ffffff;
             border-radius: 20px;
             box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.9);
             overflow: hidden;
-            margin: 0 15px;
+            max-width: 450px;
+            width: 90%;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .complete-section.show .complete-container {
+            transform: scale(1);
         }
 
         .complete-content {
             text-align: center;
-            padding: 50px;
+            padding: 40px 30px;
             background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
         }
 
         .complete-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
+            font-size: 3rem;
+            margin-bottom: 15px;
             animation: bounce 2s infinite;
         }
 
         .complete-title {
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: #2c5aa0;
             font-weight: 700;
-            margin-bottom: 15px;
-            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
         }
 
         .complete-description {
             color: #495057;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-            max-width: 600px;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            max-width: 350px;
             margin-left: auto;
             margin-right: auto;
         }
 
         .complete-btn {
-            padding: 20px 40px;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
             border: none;
-            border-radius: 15px;
-            font-weight: 700;
-            font-size: 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
             position: relative;
             overflow: hidden;
-            min-width: 250px;
+            min-width: 140px;
         }
 
         .complete-btn::before {
@@ -649,9 +670,9 @@
         }
 
         .complete-btn:hover {
-            background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 35px rgba(40, 167, 69, 0.4);
+            background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
         }
 
         @keyframes bounce {
@@ -782,17 +803,17 @@
             }
 
             .complete-content {
-                padding: 30px 20px;
+                padding: 30px 25px;
             }
 
             .complete-title {
-                font-size: 1.6rem;
+                font-size: 1.3rem;
             }
 
             .complete-btn {
                 min-width: 100%;
-                padding: 18px 30px;
-                font-size: 1.1rem;
+                padding: 14px 25px;
+                font-size: 1rem;
             }
 
             .guide-dropdown {
@@ -1269,7 +1290,7 @@
                     </div>
 
                     <div class="step-actions">
-                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdyWwdrbncLhnvpm94JhECcRQmtoJKRo2fbnn7IG81IFxzPvw/viewform?usp=dialog" class="action-btn" onclick="markStepCompleted(3)" target="_blank">
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdyWwdrbncLhnvpm94JhECcRQmtoJKRo2fbnn7IG81IFxzPvw/viewform" class="action-btn" onclick="markStepCompleted(3)" target="_blank">
                             🤝 Take Student Pledge
                         </a>
                     </div>
@@ -1287,17 +1308,17 @@
             </div>
         </div>
 
-        <!-- Complete Registration Section (appears when all steps are done) -->
+        <!-- Complete Registration Modal (appears when all steps are done) -->
         <div class="complete-section" id="complete-section" style="display: none;">
             <div class="complete-container">
                 <div class="complete-content">
                     <div class="complete-icon">🎉</div>
-                    <h2 class="complete-title">Ready to Complete Registration!</h2>
+                    <h2 class="complete-title">Registration Complete!</h2>
                     <p class="complete-description">
-                        You have successfully completed all three steps. Click the button below to finalize your registration.
+                        Congratulations! You have successfully completed all registration steps. You can now navigate back to review your work or close this window.
                     </p>
-                    <button class="complete-btn" onclick="completeRegistration()">
-                        ✅ Complete Registration
+                    <button class="complete-btn" onclick="closeModal()">
+                        👍 Got it
                     </button>
                 </div>
             </div>
@@ -1305,17 +1326,61 @@
     </div>
 
     <script>
+        function completeRegistration() {
+            const completeSection = document.getElementById('complete-section');
+            if (completeSection) {
+                console.log('All steps completed! Showing modal...');
+                completeSection.style.display = 'flex';
+                // Force reflow to ensure display change takes effect
+                completeSection.offsetHeight;
+                completeSection.classList.add('show');
+            }
+        }
+
+        function closeModal() {
+            const completeSection = document.getElementById('complete-section');
+            if (completeSection) {
+                completeSection.classList.remove('show');
+                setTimeout(() => {
+                    completeSection.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const completeSection = document.getElementById('complete-section');
+            const completeContainer = document.querySelector('.complete-container');
+            
+            if (completeSection && completeSection.classList.contains('show')) {
+                if (!completeContainer.contains(e.target)) {
+                    closeModal();
+                }
+            }
+        });
+
         let currentStep = 1;
         const totalSteps = 3;
         let stepsCompleted = [false, false, false]; // Track which steps are completed
 
         function markStepCompleted(stepNumber) {
+            console.log('Marking step', stepNumber, 'as completed');
             stepsCompleted[stepNumber - 1] = true;
             const stepElement = document.getElementById(`step${stepNumber}`);
             if (stepElement) {
                 stepElement.classList.add('completed');
             }
-            checkAllStepsCompleted();
+            console.log('Steps completed array:', stepsCompleted);
+            
+            const allCompleted = stepsCompleted.every(step => step === true);
+            if (allCompleted) {
+                // If all steps are done, show the final button on the last step's content
+                const completeBtn = document.querySelector('#step3-content .next-btn');
+                if(completeBtn) {
+                    console.log('All steps complete, showing final button');
+                    completeBtn.style.display = 'inline-block';
+                }
+            }
         }
 
         function toggleGuideDropdown(stepNumber) {
@@ -1348,15 +1413,25 @@
             }
         }
 
-        function checkAllStepsCompleted() {
-            const allCompleted = stepsCompleted.every(step => step === true);
+        // Test function to show modal (for debugging)
+        function testModal() {
             const completeSection = document.getElementById('complete-section');
-            
-            if (allCompleted && completeSection) {
-                completeSection.style.display = 'block';
-                completeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (completeSection) {
+                completeSection.style.display = 'flex';
+                completeSection.offsetHeight; // Force reflow
+                completeSection.classList.add('show');
             }
         }
+
+        // Add keyboard support to close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const completeSection = document.getElementById('complete-section');
+                if (completeSection && completeSection.classList.contains('show')) {
+                    closeModal();
+                }
+            }
+        });
 
         function showStep(stepNumber) {
             // Hide all step contents
@@ -1437,10 +1512,6 @@
             }
         }
 
-        function completeRegistration() {
-            alert('🎉 Congratulations! Your registration process is complete.\n\nAll three steps have been successfully completed:\n✅ Anti-Ragging Undertaking\n✅ ABC ID Registration\n✅ Student Pledge\n\nWelcome to JAIN (Deemed-to-be-University)!');
-        }
-
         // Make steps clickable
         function initializeStepNavigation() {
             for (let i = 1; i <= totalSteps; i++) {
@@ -1465,6 +1536,17 @@
 
         // Initialize the form when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
+            console.log('Initial stepsCompleted:', stepsCompleted);
+            
+            // Hide complete section initially
+            const completeSection = document.getElementById('complete-section');
+            if (completeSection) {
+                completeSection.style.display = 'none';
+                completeSection.classList.remove('show');
+                console.log('Modal hidden on page load');
+            }
+            
             showStep(1);
             initializeStepNavigation();
         });
