@@ -42,15 +42,15 @@ function App() {
           <LoginProvider>
             <BrowserRouter>
               <Routes>
-                {/* Articles routes - specific ones first */}
-                <Route path="/articles/:articleId" element={<ArticlePage />} />
-                <Route path="/articles" element={<ArticlesPage />} />
-                {/* Timeline route */}
-                <Route path="/timeline" element={<TimelinePage />} />
-                {/* Event routes */}
-                <Route path="/:eventId/:activityId" element={<ActivityPage />} />
-                <Route path="/:eventId" element={<EventPage />} />
-                <Route path="/" element={<HomePage />} />
+                  {/* Timeline route */}
+                  <Route path="/timeline" element={<TimelinePage />} />
+                  {/* Articles routes - specific ones first */}
+                  <Route path="/articles/:articleId" element={<ArticlePage />} />
+                  <Route path="/articles" element={<ArticlesPage />} />
+                  {/* Event routes */}
+                  <Route path="/:eventId/:activityId" element={<ActivityPage />} />
+                  <Route path="/:eventId" element={<EventPage />} />
+                  <Route path="/" element={<HomePage />} />
               </Routes>
 
               {/*

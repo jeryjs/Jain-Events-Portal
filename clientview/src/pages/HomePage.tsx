@@ -18,6 +18,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } 
 import { pascalCase } from '@utils/utils';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SendNotificationsDialog from '@components/Home/admin/SendNotificationsDialog';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -69,6 +70,7 @@ function HomePage() {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [managerEmails, setManagerEmails] = useState('');
   const [assignError, setAssignError] = useState('');
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
   const { mutateAsync: assignManagers, status: assignStatus } = useAssignManagers();
   const assigning = assignStatus === 'pending';
 
@@ -233,7 +235,7 @@ function HomePage() {
               <Button variant="outlined" color="info" onClick={() => {/* Navigate to create article */ }}>
                 Create New Article
               </Button>
-              <Button variant="outlined" color="warning" onClick={() => {/* Navigate to create highlight */ }}>
+              <Button variant="outlined" color="warning" onClick={() => setNotificationDialogOpen(true)}>
                 Send Notification
               </Button>
             </Box>
@@ -372,6 +374,16 @@ function HomePage() {
             <Button onClick={() => setManageDialogOpen(false)} disabled={assigning}>Cancel</Button>
             <Button onClick={handleAssignManagers} disabled={assigning || !managerEmails.trim()} variant="contained">Assign</Button>
           </DialogActions>
+        </Dialog>
+
+        {/* Send Notifications Dialog (admin only) */}
+        <Dialog 
+          open={notificationDialogOpen} 
+          onClose={() => setNotificationDialogOpen(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <SendNotificationsDialog />
         </Dialog>
       </Container>
     </PageTransition>
