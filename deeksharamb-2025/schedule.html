@@ -329,7 +329,7 @@
                                         <div class="activity">
                                             <div class="activity-time">${activity.time}</div>
                                             <div class="activity-name">${activity.name}</div>
-                                            ${activity.venue ? `<div class="activity-venue">📍 ${activity.venue}</div>` : ''}
+                                            ${activity.venue ? `<div class="activity-venue" onclick="openMapsModal()">📍 ${activity.venue}</div>` : ''}
                                             ${activity.coordinators?.length ? `<div class="coordinators">👥 ${activity.coordinators.join(', ')}</div>` : ''}
                                         </div>
                                     `).join('')}
