@@ -201,7 +201,7 @@
         const branchDisplayNames = {
             "ANE": "Aeronautical Engineering",
             "ASE": "Aerospace Engineering",
-            "CV": "Civil Enginnering",
+            "CE": "Civil Engineering",
             "CSE - SE": "Software Engineering",
             "CSE - AIDD": "Artificial Intelligence & Dev Ops",
             "CSE-AIDE": "Artificial Intelligence & Data Engineering",
@@ -210,12 +210,12 @@
             "CSE-CTIS": "Cloud Technology & Information Security",
             "CSE-CPS": "Cyber Physical Systems",
             "GEN-AI": "Generative-AI",
-            "CTMA": "Computer Technology & Mobile Application",
+            "CSE-CTMA": "Computer Technology & Mobile Application",
             "CSE-PWC": "CSE in association with PwC",
             "CSE-CSBS": "Computer Science & Business Systems",
             "CSE": "Computer Science Engineering",
-            "AI": "Artificial Intelligence",
-            "CSE-Cyber Security": "Cyber Security",
+            "CSE-AI": "Artificial Intelligence",
+            "CSE-Cy S": "Cyber Security",
             "CSE-DS": "Data Science",
             "CSE-IOT": "Internet of Things",
             "EEE": "Electrical and Electronics Engineering",
@@ -330,7 +330,7 @@
                     filteredBranches.forEach(branch => {
                         const li = document.createElement('li');
                         li.className = 'branch-item';
-                        li.textContent = branchDisplayNames[branch];
+                        li.textContent = branchDisplayNames[branch] || branch;
                         li.onclick = () => selectBranch(branch);
                         branchList.appendChild(li);
                     });
@@ -339,10 +339,11 @@
                 displayBranches(branches);
                 
                 searchBox.oninput = (e) => {
-                    const query = e.target.value.toLowerCase();
-                    const filtered = branches.filter(branch => 
-                        branch.toLowerCase().includes(query)
-                    );
+                    const query = e.target.value.toLowerCase().trim();
+                    const filtered = branches.filter(branch => {
+                        const name = branchDisplayNames[branch];
+                        return branch.toLowerCase().includes(query) || name.toLowerCase().includes(query);
+                    });
                     displayBranches(filtered);
                 };
             }, 100);
