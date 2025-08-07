@@ -53,26 +53,11 @@
         .btn-primary:hover { background: #343a40; }
         .hidden { display: none !important; }
         .barcode-section { margin: 12px 16px 16px 16px; padding: 16px; background: rgba(0, 0, 0, 0.02); border-radius: 6px; border: 1px solid #eee; }
+        .barcode-section, .barcode-section * { background-color: white !important; color: black !important; filter: none !important; -webkit-filter: none !important; }
         .barcode-hidden { text-align: center; color: #666; font-style: italic; }
         .barcode-visible { text-align: center; }
-        .barcode { 
-            font-family: 'Courier New', monospace; 
-            font-size: 2px; 
-            letter-spacing: 0; 
-            margin: 12px 0; 
-            padding: 15px; 
-            background: white; 
-            border: 1px solid #ddd; 
-            line-height: 1; 
-            height: 75px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .barcode svg {
-            max-width: 100%;
-            height: 50px;
-        }
+        .barcode { font-family: 'Courier New', monospace; font-size: 2px; letter-spacing: 0; margin: 12px 0; padding: 15px; background: white !important; border: 1px solid #ddd; line-height: 1; height: 75px; display: flex; align-items: center; justify-content: center; background-color: white !important; color: black !important; filter: none !important; -webkit-filter: none !important; }
+        .barcode svg { max-width: 100%; height: 50px; background: white !important; background-color: white !important; color: black !important; fill: black !important; filter: none !important; -webkit-filter: none !important; }
         .locked { position: relative; overflow: hidden; }
         .locked::after { content: '🔒'; position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; }
         .error-ui { text-align: center; padding: 40px; }
