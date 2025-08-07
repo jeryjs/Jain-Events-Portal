@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5781,
-    host: "0.0.0.0"
+    host: "0.0.0.0",
+    allowedHosts: ['jeryjs.me', 'admin.jeryjs.me', '10.0.0.4', 'localhost']
   },
   resolve: {
     alias: {

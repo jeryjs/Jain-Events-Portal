@@ -85,7 +85,8 @@ export default defineConfig({
   },
   server: {
     port: 5780,
-    host: "0.0.0.0"
+    host: "0.0.0.0",
+    allowedHosts: ['jeryjs.me', 'admin.jeryjs.me', '10.0.0.4', 'localhost']
   },
 
   build: {
