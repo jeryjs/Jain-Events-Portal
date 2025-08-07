@@ -5,6 +5,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    'import.meta.env.VERCEL_ENV': JSON.stringify(process.env.VERCEL_ENV || process.env.NODE_ENV)
+  },
   plugins: [
     react(),
     VitePWA({

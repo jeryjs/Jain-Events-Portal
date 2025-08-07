@@ -72,7 +72,9 @@ app.use((0, cors_1.default)({
             'http://localhost:5780',
             'http://localhost:5781',
             'https://jain-fet-hub.web.app',
-            'https://jain-fet-hub.vercel.app'
+            'https://jain-fet-hub.vercel.app',
+            'https://jeryjs.me',
+            'https://admin.jeryjs.me',
         ];
         if (allowedOrigins.includes(origin))
             return callback(null, true);

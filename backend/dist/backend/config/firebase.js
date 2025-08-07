@@ -24,6 +24,7 @@ exports.db.settings({ ignoreUndefinedProperties: true });
  * Send push notification to all users
  */
 const sendPushNotificationToAllUsers = (title, body, imageUrl, options) => __awaiter(void 0, void 0, void 0, function* () {
+    const topic = (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV == "production") ? 'all-users' : 'all-users-test';
     const message = {
         notification: (options === null || options === void 0 ? void 0 : options.showNotification) !== false ? {
             title,
@@ -40,11 +41,11 @@ const sendPushNotificationToAllUsers = (title, body, imageUrl, options) => __awa
             link: (options === null || options === void 0 ? void 0 : options.link) || '',
             timestamp: Date.now().toString(),
         },
-        topic: (process.env.VERCEL_ENV == "preview" || process.env.NODE_ENV === "development") ? 'all-users-test' : 'all-users',
+        topic: topic,
     };
     try {
         yield exports.messaging.send(message);
-        console.log('Push notification sent successfully');
+        console.log('Push notification sent to', topic);
     }
     catch (error) {
         console.error('Error sending push notification:', error);

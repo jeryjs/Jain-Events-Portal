@@ -1,6 +1,6 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Box, CardContent, CardMedia, Chip, Container, Skeleton, Typography } from '@mui/material';
+import { Alert, Box, CardContent, CardMedia, Chip, Container, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -19,6 +19,8 @@ import { pascalCase } from '@utils/utils';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import SendNotificationsDialog from '@components/Home/admin/SendNotificationsDialog';
+import { NotificationPrompt } from '@components/shared';
+import useNotifications from '@hooks/useNotifications';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -93,6 +95,7 @@ function HomePage() {
   const { events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
   const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
+  const { isSubscribed } = useNotifications()
 
   const [catTabId, setTabId] = useState([0, -1]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
@@ -220,10 +223,10 @@ function HomePage() {
         )}
 
         {/* Prompt to enable notifications */}
-        {/* <Box sx={{display: !isSubscribed?'block':'none' }}>
+        <Box sx={{display: !isSubscribed?'block':'none' }}>
           <Alert sx={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }}>We're currently sending out announcements through the FET-Hub app! Enable notifications to stay updated!!</Alert>
           <NotificationPrompt sx={{'h6, p, div': { display: 'none' }}}/>
-        </Box> */}
+        </Box>
 
         {/* Admin Actions Section (Admin only) */}
         {userData?.role >= Role.ADMIN && (
@@ -231,9 +234,6 @@ function HomePage() {
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
               <Button variant="outlined" color="secondary" onClick={() => {/* Navigate to create activity */ }}>
                 Create New Event
-              </Button>
-              <Button variant="outlined" color="info" onClick={() => {/* Navigate to create article */ }}>
-                Create New Article
               </Button>
               <Button variant="outlined" color="warning" onClick={() => setNotificationDialogOpen(true)}>
                 Send Notification
