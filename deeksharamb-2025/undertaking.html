@@ -804,7 +804,7 @@
 
             .complete-content {
                 padding: 30px 25px;
-            }
+            }i
 
             .complete-title {
                 font-size: 1.3rem;
@@ -1302,11 +1302,12 @@
                         </button>
                         <button class="nav-btn next-btn" onclick="completeRegistration()" style="display: none;">
                             Complete Registration ✅
+                            <p>Your registration is now complete.</p>
+                            <p>Thank you!</p>
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
 
         <!-- Complete Registration Modal (appears when all steps are done) -->
         <div class="complete-section" id="complete-section" style="display: none;">
@@ -1326,6 +1327,27 @@
     </div>
 
     <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+        let stepsCompleted = [false, false, false]; // Track which steps are completed
+
+        function saveState() {
+            const state = {
+                currentStep: currentStep,
+                stepsCompleted: stepsCompleted
+            };
+            localStorage.setItem('registrationState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('registrationState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                currentStep = state.currentStep || 1;
+                stepsCompleted = state.stepsCompleted || [false, false, false];
+            }
+        }
+
         function completeRegistration() {
             const completeSection = document.getElementById('complete-section');
             if (completeSection) {
@@ -1359,10 +1381,6 @@
             }
         });
 
-        let currentStep = 1;
-        const totalSteps = 3;
-        let stepsCompleted = [false, false, false]; // Track which steps are completed
-
         function markStepCompleted(stepNumber) {
             console.log('Marking step', stepNumber, 'as completed');
             stepsCompleted[stepNumber - 1] = true;
@@ -1381,6 +1399,7 @@
                     completeBtn.style.display = 'inline-block';
                 }
             }
+            saveState();
         }
 
         function toggleGuideDropdown(stepNumber) {
@@ -1484,6 +1503,14 @@
                     btn.style.display = 'inline-block';
                 }
             });
+
+            const allCompleted = stepsCompleted.every(step => step === true);
+            if (allCompleted && stepNumber === totalSteps) {
+                const completeBtn = document.querySelector('#step3-content .next-btn');
+                if(completeBtn) {
+                    completeBtn.style.display = 'inline-block';
+                }
+            }
         }
 
         function nextStep() {
@@ -1496,6 +1523,7 @@
                     top: 0,
                     behavior: 'smooth'
                 });
+                saveState();
             }
         }
 
@@ -1509,6 +1537,7 @@
                     top: 0,
                     behavior: 'smooth'
                 });
+                saveState();
             }
         }
 
@@ -1526,6 +1555,7 @@
                             top: 0,
                             behavior: 'smooth'
                         });
+                        saveState();
                     });
                     
                     // Add hover effect
@@ -1534,8 +1564,20 @@
             }
         }
 
+        function updateAllStepVisuals() {
+            for (let i = 0; i < stepsCompleted.length; i++) {
+                if (stepsCompleted[i]) {
+                    const stepElement = document.getElementById(`step${i + 1}`);
+                    if (stepElement) {
+                        stepElement.classList.add('completed');
+                    }
+                }
+            }
+        }
+
         // Initialize the form when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            loadState();
             console.log('Page loaded, initializing...');
             console.log('Initial stepsCompleted:', stepsCompleted);
             
@@ -1547,7 +1589,8 @@
                 console.log('Modal hidden on page load');
             }
             
-            showStep(1);
+            updateAllStepVisuals();
+            showStep(currentStep);
             initializeStepNavigation();
         });
 
