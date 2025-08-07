@@ -557,7 +557,7 @@ function EventPage() {
             <BannerMedia items={event.banner || []} />
             <HeroOverlay>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                <IconButton onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
+                <IconButton onClick={() => navigate('..')} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
                   <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h5" sx={{ color: 'white', fontWeight: '500', ml: 3 }}>
