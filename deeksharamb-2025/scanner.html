@@ -58,6 +58,8 @@
         .barcode-visible { text-align: center; }
         .barcode { font-family: 'Courier New', monospace; font-size: 2px; letter-spacing: 0; margin: 12px 0; padding: 15px; background: white !important; border: 1px solid #ddd; line-height: 1; height: 75px; display: flex; align-items: center; justify-content: center; background-color: white !important; color: black !important; filter: none !important; -webkit-filter: none !important; }
         .barcode svg { max-width: 100%; height: 50px; background: white !important; background-color: white !important; color: black !important; fill: black !important; filter: none !important; -webkit-filter: none !important; }
+        .orientation-note { margin: 16px; padding: 12px; background: #fff3cd; border: 1px solid #ffecb5; border-radius: 6px; text-align: center; font-size: 0.75rem; color: #856404; line-height: 1.4; }
+        .orientation-note strong { display: block; margin-bottom: 4px; font-weight: 600; }
         .locked { position: relative; overflow: hidden; }
         .locked::after { content: '🔒'; position: absolute; top: 10px; right: 10px; background: #ef4444; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; }
         .error-ui { text-align: center; padding: 40px; }
@@ -78,6 +80,7 @@
             .branch-item, .student-item { background: #21262d; border-color: #30363d; } 
             .branch-item:hover, .student-item:hover { background: #30363d; border-color: #484f58; } 
             .modal-content { background: #21262d; color: #f0f6fc; } 
+            /* .orientation-note { background: #2d2a00; border-color: #3d3300; color: #d4c441; } */
         }
     </style>
 </head>
@@ -155,6 +158,16 @@
                         <svg id="barcode-display"></svg>
                     </div>
                     <div style="font-size: 12px; color: #666; text-align: center; margin-top: 5px;">Barcode</div>
+                </div>
+                <div class="orientation-note" style="display: flex; align-items: center; border-radius: 8px; padding: 10px 4px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="28" width="28" viewBox="0 0 24 24" fill="none" style="flex-shrink:0; margin-right: 10px;">
+                        <circle cx="12" cy="12" r="12" fill="#e3f2fd"/>
+                        <path d="M12 7.75a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zm0 4.5a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1z" fill="#1976d2"/>
+                    </svg>
+                    <span>
+                        This ID is issued only for Orientation 2025<br>
+                        Not valid for academic, hostel, or official use.
+                    </span>
                 </div>
             </div>
             <div class="nav-buttons">
