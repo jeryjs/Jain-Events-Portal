@@ -3,63 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room Allocations - Deeksharamb 2025</title>
+    <title>Room Allocations - Student Orientation 2025</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: all 0.2s ease; }
-        .light-theme { background: #fafafa; color: #1a1a1a; }
-        .dark-theme { background: #0a0a0a; color: #e5e5e5; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: all 0.2s ease; background: #fafafa; color: #1a1a1a; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0; }
         .header { text-align: center; margin-bottom: 32px; }
-        .header h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 8px; }
-        .light-theme .header h1 { color: #1a1a1a; }
-        .dark-theme .header h1 { color: #ffffff; }
-        .header p { font-size: 1.125rem; margin-bottom: 4px; }
-        .light-theme .header p { color: #666666; }
-        .dark-theme .header p { color: #a3a3a3; }
-        .header small { font-size: 0.875rem; font-style: italic; }
-        .light-theme .header small { color: #888888; }
-        .dark-theme .header small { color: #737373; }
-        .filters { display: flex; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; align-items: center; justify-content: center; padding: 24px; border-radius: 16px; }
-        .light-theme .filters { background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .dark-theme .filters { background: #1a1a1a; box-shadow: 0 1px 3px rgba(255,255,255,0.1); }
-        .filter-group { display: flex; flex-direction: column; gap: 8px; min-width: 160px; }
-        .filter-group label { font-weight: 600; font-size: 0.875rem; }
-        .light-theme .filter-group label { color: #374151; }
-        .dark-theme .filter-group label { color: #d1d5db; }
-        select { padding: 12px 16px; border-radius: 12px; font-size: 0.9rem; font-weight: 500; min-width: 160px; cursor: pointer; transition: all 0.2s ease; border: 2px solid transparent; }
-        .light-theme select { background: #f9fafb; color: #1f2937; border-color: #e5e7eb; }
-        .light-theme select:hover { border-color: #d1d5db; background: #f3f4f6; }
-        .light-theme select:focus { outline: none; border-color: #3b82f6; background: #ffffff; }
-        .dark-theme select { background: #111827; color: #f9fafb; border-color: #374151; }
-        .dark-theme select:hover { border-color: #4b5563; background: #1f2937; }
-        .dark-theme select:focus { outline: none; border-color: #60a5fa; background: #1f2937; }
+        .header h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; }
+        .header p { font-size: 1.125rem; margin-bottom: 4px; color: #666666; }
+        .header small { font-size: 0.875rem; font-style: italic; color: #888888; }
+        .filters { position: sticky; top: 0; z-index: 100; display: flex; gap: 24px; margin-bottom: 32px; flex-wrap: nowrap; align-items: center; justify-content: center; padding: 16px 24px; border-radius: 16px; backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid rgba(229, 231, 235, 0.5); }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 140px; flex-shrink: 0; }
+        .filter-group label { font-weight: 600; font-size: 0.8rem; white-space: nowrap; color: #374151; }
+        select { padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 500; min-width: 140px; cursor: pointer; transition: all 0.2s ease; border: 2px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #f9fafb; color: #1f2937; border-color: #e5e7eb; }
+        select:hover { border-color: #d1d5db; background: #f3f4f6; }
+        select:focus { outline: none; border-color: #3b82f6; background: #ffffff; }
         .content { min-height: 500px; }
         .allocation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; }
-        .allocation-card { border-radius: 16px; overflow: hidden; transition: all 0.2s ease; }
-        .light-theme .allocation-card { background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
-        .light-theme .allocation-card:hover { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .dark-theme .allocation-card { background: #1a1a1a; box-shadow: 0 1px 3px rgba(255,255,255,0.1); border: 1px solid #374151; }
-        .dark-theme .allocation-card:hover { box-shadow: 0 4px 6px rgba(255,255,255,0.1); }
-        .allocation-header { padding: 20px; font-weight: 600; font-size: 1.125rem; }
-        .light-theme .allocation-header { background: #f9fafb; color: #1f2937; border-bottom: 1px solid #e5e7eb; }
-        .dark-theme .allocation-header { background: #111827; color: #f9fafb; border-bottom: 1px solid #374151; }
+        .allocation-card { border-radius: 16px; overflow: hidden; transition: all 0.2s ease; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+        .allocation-card:hover { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .allocation-header { padding: 20px; font-weight: 600; font-size: 1.125rem; background: #f9fafb; color: #1f2937; border-bottom: 1px solid #e5e7eb; }
         .allocation-content { height: 480px; position: relative; }
         .no-data { text-align: center; padding: 80px 20px; }
-        .no-data h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; }
-        .light-theme .no-data h3 { color: #374151; }
-        .dark-theme .no-data h3 { color: #d1d5db; }
-        .no-data p { font-size: 1.125rem; }
-        .light-theme .no-data p { color: #6b7280; }
-        .dark-theme .no-data p { color: #9ca3af; }
-        @media (max-width: 768px) { .filters { flex-direction: column; align-items: stretch; padding: 20px; } .filter-group { width: 100%; } select { width: 100%; } .header h1 { font-size: 2rem; } .allocation-grid { grid-template-columns: 1fr; } }
+        .no-data h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; color: #374151; }
+        .no-data p { font-size: 1.125rem; color: #6b7280; }
+        .loading { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 1rem; color: #6b7280; }
+        @media (max-width: 768px) { .filters { padding: 12px 16px; gap: 16px; } .filter-group { min-width: 120px; } select { min-width: 120px; font-size: 0.8rem; padding: 8px 12px; } .header h1 { font-size: 2rem; } .allocation-grid { grid-template-columns: 1fr; } }
+
+        @media (prefers-color-scheme: dark) {
+            body { background: #1e1e1e; color: #e5e5e5; }
+            .header h1 { color: #ffffff; }
+            .header p { color: #a3a3a3; }
+            .header small { color: #737373; }
+            .filters { background: rgba(26, 26, 26, 0.95); box-shadow: 0 2px 8px rgba(255,255,255,0.1); border: 1px solid rgba(55, 65, 81, 0.5); }
+            .filter-group label { color: #d1d5db; }
+            select { background: #111827; color: #f9fafb; border-color: #374151; }
+            select:hover { border-color: #4b5563; background: #1f2937; }
+            select:focus { border-color: #60a5fa; background: #1f2937; }
+            .allocation-card { background: #1a1a1a; box-shadow: 0 1px 3px rgba(255,255,255,0.1); border: 1px solid #374151; }
+            .allocation-card:hover { box-shadow: 0 4px 6px rgba(255,255,255,0.1); }
+            .allocation-header { background: #111827; color: #f9fafb; border-bottom: 1px solid #374151; }
+            .no-data h3 { color: #d1d5db; }
+            .no-data p { color: #9ca3af; }
+            .loading { color: #9ca3af; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>Room Allocations</h1>
-            <p>Deeksharamb 2025 - First Year Room Allocations</p>
+            <p>Student Orientation 2025 - First Year Room Allocations</p>
             <small>Subject to change - Current month only</small>
         </div>
 
@@ -114,19 +108,6 @@
         const batchSelect = document.getElementById('batch-select');
         const branchSelect = document.getElementById('branch-select');
         const pdfViewer = document.getElementById('pdf-viewer');
-
-        // Theme management
-        function detectTheme() {
-            const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = isDark ? 'dark-theme' : 'light-theme';
-            document.body.className = theme;
-            return theme;
-        }
-
-        // Listen for theme changes
-        if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', detectTheme);
-        }
 
         // LocalStorage functions
         function saveSelections() {
@@ -274,7 +255,6 @@
         });
 
         // Initialize
-        detectTheme();
         const savedSelections = loadSelections();
         updateBranchOptions(savedSelections?.branch);
         displayPDF();
