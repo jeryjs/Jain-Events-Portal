@@ -52,9 +52,6 @@
         .no-data p { font-size: 1.125rem; }
         .light-theme .no-data p { color: #6b7280; }
         .dark-theme .no-data p { color: #9ca3af; }
-        .loading { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 1rem; }
-        .light-theme .loading { color: #6b7280; }
-        .dark-theme .loading { color: #9ca3af; }
         @media (max-width: 768px) { .filters { flex-direction: column; align-items: stretch; padding: 20px; } .filter-group { width: 100%; } select { width: 100%; } .header h1 { font-size: 2rem; } .allocation-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -102,12 +99,12 @@
         const allocations = {
             "G1": {},
             "G2": {
-                "AIDE-A": "allocations/G2/AIDE A.pdf",
-                "AIDE-B": "allocations/G2/AIDE B.pdf", 
-                "AIDE-C": "allocations/G2/AIDE C.pdf",
-                "CPS": "allocations/G2/CPS.pdf",
-                "CTIS": "allocations/G2/CTIS.pdf",
-                "CTMA": "allocations/G2/CTMA.pdf"
+                "AIDE-A": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/AIDE A.pdf",
+                "AIDE-B": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/AIDE B.pdf", 
+                "AIDE-C": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/AIDE C.pdf",
+                "CPS": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/CPS.pdf",
+                "CTIS": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/CTIS.pdf",
+                "CTMA": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/CTMA.pdf"
             },
             "G3": {},
             "G4": {},
@@ -204,7 +201,6 @@
                     <div class="allocation-card">
                         <div class="allocation-header">${selectedBatch} - ${selectedBranch}</div>
                         <div class="allocation-content">
-                            <div class="loading">Loading PDF viewer...</div>
                             <div style="width: 100%; height: 480px;" class="smallpdf-widget" data-pdf-url="${pdfPath}"></div>
                         </div>
                     </div>
@@ -239,7 +235,6 @@
                         <div class="allocation-card">
                             <div class="allocation-header">${batch} - ${branch}</div>
                             <div class="allocation-content">
-                                <div class="loading">Loading PDF viewer...</div>
                                 <div style="width: 100%; height: 480px;" class="smallpdf-widget" data-pdf-url="${pdfPath}"></div>
                             </div>
                         </div>
