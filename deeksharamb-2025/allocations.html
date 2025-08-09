@@ -3,76 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Room Allocations - Student Orientation 2025</title>
+    <title>Sections List - Student Orientation 2025</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: all 0.2s ease; background: #fafafa; color: #1a1a1a; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0; }
-        .header { padding: 32px 16px; }
-        .header h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; }
-        .header p { font-size: 1.125rem; margin-bottom: 4px; color: #666666; }
-        .header small { font-size: 0.875rem; font-style: italic; color: #888888; }
-        .filters { position: sticky; top: 0; z-index: 100; display: flex; gap: 24px; margin-bottom: 32px; flex-wrap: nowrap; align-items: center; justify-content: center; padding: 16px 24px; border-radius: 16px; backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid rgba(229, 231, 235, 0.5); }
-        .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 140px; flex-shrink: 0; }
-        .filter-group label { font-weight: 600; font-size: 0.8rem; white-space: nowrap; color: #374151; }
-        select { padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 500; min-width: 140px; cursor: pointer; transition: all 0.2s ease; border: 2px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #f9fafb; color: #1f2937; border-color: #e5e7eb; }
-        select:hover { border-color: #d1d5db; background: #f3f4f6; }
-        select:focus { outline: none; border-color: #3b82f6; background: #ffffff; }
-        .content { min-height: 500px; }
-        .allocation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; }
-        .allocation-card { border-radius: 16px; overflow: hidden; transition: all 0.2s ease; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
-        .allocation-card:hover { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .allocation-header { padding: 20px; font-weight: 600; font-size: 1.125rem; background: #f9fafb; color: #1f2937; border-bottom: 1px solid #e5e7eb; }
-        .allocation-content { height: 480px; position: relative; }
-        .no-data { text-align: center; padding: 80px 20px; }
-        .no-data h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; color: #374151; }
-        .no-data p { font-size: 1.125rem; color: #6b7280; }
-        .loading { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 1rem; color: #6b7280; }
-        @media (max-width: 768px) { .filters { padding: 12px 16px; gap: 16px; } .filter-group { min-width: 120px; } select { min-width: 120px; font-size: 0.8rem; padding: 8px 12px; } .header h1 { font-size: 2rem; } .allocation-grid { grid-template-columns: 1fr; } }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: all 0.3s ease; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #1a202c; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .header { text-align: center; padding: 48px 16px 32px; }
+        .header h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; color: #1a202c; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header p { font-size: 1.2rem; margin-bottom: 6px; color: #4a5568; font-weight: 500; }
+        .header small { font-size: 0.9rem; color: #718096; opacity: 0.8; }
+        .filters { position: sticky; top: 20px; z-index: 100; display: flex; gap: 32px; margin: 0 auto 48px; flex-wrap: nowrap; align-items: center; justify-content: center; padding: 24px 32px; border-radius: 20px; backdrop-filter: blur(20px); background: rgba(255, 255, 255, 0.85); box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .filter-group { display: flex; flex-direction: column; gap: 10px; min-width: 200px; flex-shrink: 0; }
+        .filter-group label { font-weight: 600; font-size: 0.9rem; white-space: nowrap; color: #2d3748; letter-spacing: 0.025em; margin-bottom: 4px; }
+        select { padding: 14px 18px; border-radius: 14px; font-size: 0.95rem; font-weight: 500; min-width: 200px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: linear-gradient(145deg, #ffffff, #f7fafc); color: #2d3748; border-color: #e2e8f0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6); }
+        select:hover { border-color: #cbd5e0; background: linear-gradient(145deg, #ffffff, #edf2f7); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.8); }
+        select:focus { outline: none; border-color: #667eea; background: #ffffff; transform: translateY(-1px); box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15); }
+        select:active { transform: translateY(0); }
+        .content { min-height: 500px; padding: 0 20px; }
+        .allocation-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 32px; }
+        .allocation-card { border-radius: 24px; overflow: hidden; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: linear-gradient(145deg, #ffffff, #f8fafc); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); position: relative; }
+        .allocation-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb); }
+        .allocation-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1); }
+        .allocation-header { padding: 28px 32px 24px; font-weight: 700; font-size: 1.3rem; background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); color: #2d3748; border-bottom: 1px solid rgba(226, 232, 240, 0.8); position: relative; }
+        .allocation-header::after { content: '📄'; position: absolute; right: 32px; top: 50%; transform: translateY(-50%); font-size: 1.5rem; opacity: 0.6; }
+        .allocation-content { height: 480px; position: relative; background: #ffffff; }
+        .no-data { text-align: center; padding: 100px 32px; background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); border-radius: 20px; margin: 40px 0; border: 2px dashed #cbd5e0; }
+        .no-data h3 { font-size: 1.8rem; font-weight: 700; margin-bottom: 16px; color: #2d3748; }
+        .no-data p { font-size: 1.2rem; color: #718096; line-height: 1.6; }
+        .no-data::before { content: '🏠'; font-size: 4rem; display: block; margin-bottom: 24px; opacity: 0.6; }
+        .loading { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 1.1rem; color: #718096; }
+        .loading::before { content: '⏳'; margin-right: 12px; font-size: 1.5rem; animation: spin 2s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @media (max-width: 768px) { 
+            .header { padding: 32px 16px 24px; } 
+            .header h1 { font-size: 2.2rem; } 
+            .filters { padding: 20px 24px; gap: 0; margin: 0 16px 32px; top: 16px; } 
+            .filter-group { min-width: 100%; } 
+            select { min-width: 100%; font-size: 0.9rem; padding: 12px 16px; } 
+            .allocation-grid { grid-template-columns: 1fr; gap: 24px; } 
+            .allocation-card { margin: 0 8px; }
+            .content { padding: 0 8px; }
+        }
 
         @media (prefers-color-scheme: dark) {
-            body { background: #1e1e1e; color: #e5e5e5; }
-            .header h1 { color: #ffffff; }
-            .header p { color: #a3a3a3; }
-            .header small { color: #737373; }
-            .filters { background: rgba(26, 26, 26, 0.95); box-shadow: 0 2px 8px rgba(255,255,255,0.1); border: 1px solid rgba(55, 65, 81, 0.5); }
-            .filter-group label { color: #d1d5db; }
-            select { background: #111827; color: #f9fafb; border-color: #374151; }
-            select:hover { border-color: #4b5563; background: #1f2937; }
-            select:focus { border-color: #60a5fa; background: #1f2937; }
-            .allocation-card { background: #1a1a1a; box-shadow: 0 1px 3px rgba(255,255,255,0.1); border: 1px solid #374151; }
-            .allocation-card:hover { box-shadow: 0 4px 6px rgba(255,255,255,0.1); }
-            .allocation-header { background: #111827; color: #f9fafb; border-bottom: 1px solid #374151; }
-            .no-data h3 { color: #d1d5db; }
-            .no-data p { color: #9ca3af; }
-            .loading { color: #9ca3af; }
+            body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #f1f5f9; }
+            .header h1 { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+            .header p { color: #cbd5e0; }
+            .header small { color: #94a3b8; }
+            .filters { background: rgba(15, 23, 42, 0.85); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2); border: 1px solid rgba(148, 163, 184, 0.1); }
+            .filter-group label { color: #e2e8f0; }
+            select { background: linear-gradient(145deg, #1e293b, #334155); color: #f1f5f9; border-color: #475569; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+            select:hover { border-color: #64748b; background: linear-gradient(145deg, #334155, #475569); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+            select:focus { border-color: #60a5fa; background: #1e293b; box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2), 0 4px 12px rgba(0, 0, 0, 0.4); }
+            .allocation-card { background: linear-gradient(145deg, #1e293b, #334155); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2); border: 1px solid rgba(148, 163, 184, 0.1); }
+            .allocation-card::before { background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6); }
+            .allocation-card:hover { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 8px 16px rgba(0, 0, 0, 0.2); }
+            .allocation-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #f1f5f9; border-bottom: 1px solid rgba(148, 163, 184, 0.2); }
+            .allocation-content { background: #1e293b; }
+            .no-data { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-color: #475569; }
+            .no-data h3 { color: #f1f5f9; }
+            .no-data p { color: #cbd5e0; }
+            .loading { color: #cbd5e0; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <p>Student Orientation 2025 - First Year Room Allocations</p>
+            <p>Student Orientation 2025 - First Year Sections List</p>
             <small>Subject to change - Current month only</small>
         </div>
 
         <div class="filters">
             <div class="filter-group">
-                <label for="batch-select">Select Batch:</label>
-                <select id="batch-select">
-                    <option value="all">All Batches</option>
-                    <option value="G1">G1</option>
-                    <option value="G2">G2</option>
-                    <option value="G3">G3</option>
-                    <option value="G4">G4</option>
-                    <option value="G5">G5</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
                 <label for="branch-select">Select Branch:</label>
                 <select id="branch-select">
-                    <option value="all">All Branches</option>
+                    <option value="">Select your branch...</option>
                 </select>
             </div>
         </div>
@@ -80,8 +86,8 @@
         <div class="content">
             <div id="pdf-viewer">
                 <div class="no-data">
-                    <h3>Select a batch and branch to view allocations</h3>
-                    <p>Choose from the dropdowns above to display the room allocation PDF</p>
+                    <h3>Welcome to Sections List</h3>
+                    <p>Please select your branch from the dropdown above to view your room allocation PDF</p>
                 </div>
             </div>
         </div>
@@ -90,28 +96,46 @@
     <script src="https://smallpdf.com/api/embed-widget.js"></script>
     <script>
         const allocations = {
-            "G1": {},
-            "G2": {
-                "AIDE-A": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/AIDE A.pdf",
-                "AIDE-B": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/AIDE B.pdf", 
-                "AIDE-C": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/AIDE C.pdf",
-                "CPS": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/CPS.pdf",
-                "CTIS": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/CTIS.pdf",
-                "CTMA": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/G2/CTMA.pdf"
-            },
-            "G3": {},
-            "G4": {},
-            "G5": {}
+            "AI": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AI.pdf",
+            "AIDD": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AIDD.pdf",
+            "AIDE-A": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AIDE A.pdf",
+            "AIDE-B": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AIDE B.pdf",
+            "AIDE-C": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AIDE C.pdf",
+            "AIML-A": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AIML A.pdf",
+            "AIML-B": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AIML B.pdf",
+            "AIML-C": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AIML C.pdf",
+            "AIML-D": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AIML D.pdf",
+            "AIML-E": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/AIML E.pdf",
+            "ANE": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/ANE.pdf",
+            "ASE": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/ASE.pdf",
+            "BCT": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/BCT.pdf",
+            "CE_EEE": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/CE_EEE.pdf",
+            "CPS": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/CPS.pdf",
+            "CSBS": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/CSBS.pdf",
+            "CSE-A": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/CSE A.pdf",
+            "CSE-B": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/CSE B.pdf",
+            "CTIS": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/CTIS.pdf",
+            "CTMA": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/CTMA.pdf",
+            "CyS": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/CyS.pdf",
+            "DS": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/DS.pdf",
+            "ECE": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/ECE.pdf",
+            "GEN-AI-A": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/GEN AI A.pdf",
+            "GEN-AI-B": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/GEN AI B.pdf",
+            "IOT": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/IOT.pdf",
+            "ISE": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/ISE.pdf",
+            "ME": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/ME.pdf",
+            "PWC-A": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/PWC A.pdf",
+            "PWC-B": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/PWC B.pdf",
+            "SE": "https://jeryjs.github.io/Jain-Events-Portal/deeksharamb-2025/allocations/SE.pdf"
         };
 
-        const batchSelect = document.getElementById('batch-select');
+        const batchSelect = null; // Remove batch select
         const branchSelect = document.getElementById('branch-select');
         const pdfViewer = document.getElementById('pdf-viewer');
 
         // LocalStorage functions
         function saveSelections() {
             const selections = {
-                batch: batchSelect.value,
                 branch: branchSelect.value
             };
             localStorage.setItem('roomAllocations_selections', JSON.stringify(selections));
@@ -122,9 +146,6 @@
                 const saved = localStorage.getItem('roomAllocations_selections');
                 if (saved) {
                     const selections = JSON.parse(saved);
-                    if (selections.batch && allocations.hasOwnProperty(selections.batch)) {
-                        batchSelect.value = selections.batch;
-                    }
                     return selections;
                 }
             } catch (e) {
@@ -134,30 +155,15 @@
         }
 
         function updateBranchOptions(restoreBranch = null) {
-            const selectedBatch = batchSelect.value;
-            branchSelect.innerHTML = '<option value="all">All Branches</option>';
+            branchSelect.innerHTML = '<option value="">Select your branch...</option>';
 
-            if (selectedBatch === 'all') {
-                const allBranches = new Set();
-                Object.values(allocations).forEach(batchData => {
-                    Object.keys(batchData).forEach(branch => allBranches.add(branch));
-                });
-                
-                Array.from(allBranches).sort().forEach(branch => {
-                    const option = document.createElement('option');
-                    option.value = branch;
-                    option.textContent = branch;
-                    branchSelect.appendChild(option);
-                });
-            } else {
-                const branches = Object.keys(allocations[selectedBatch] || {});
-                branches.sort().forEach(branch => {
-                    const option = document.createElement('option');
-                    option.value = branch;
-                    option.textContent = branch;
-                    branchSelect.appendChild(option);
-                });
-            }
+            // Add all available branches
+            Object.keys(allocations).sort().forEach(branch => {
+                const option = document.createElement('option');
+                option.value = branch;
+                option.textContent = branch;
+                branchSelect.appendChild(option);
+            });
 
             // Restore branch selection if provided
             if (restoreBranch && branchSelect.querySelector(`option[value="${restoreBranch}"]`)) {
@@ -166,20 +172,24 @@
         }
 
         function displayPDF() {
-            const selectedBatch = batchSelect.value;
             const selectedBranch = branchSelect.value;
 
-            if (selectedBatch === 'all' || selectedBranch === 'all') {
-                showAllAllocations(selectedBatch, selectedBranch);
+            if (!selectedBranch || selectedBranch === '') {
+                pdfViewer.innerHTML = `
+                    <div class="no-data">
+                        <h3>Welcome to Sections List</h3>
+                        <p>Please select your branch from the dropdown above to view your room allocation PDF</p>
+                    </div>
+                `;
                 return;
             }
 
-            const pdfPath = allocations[selectedBatch]?.[selectedBranch];
+            const pdfPath = allocations[selectedBranch];
             
             if (pdfPath) {
                 pdfViewer.innerHTML = `
                     <div class="allocation-card">
-                        <div class="allocation-header">${selectedBatch} - ${selectedBranch}</div>
+                        <div class="allocation-header">${selectedBranch} - Sections List</div>
                         <div class="allocation-content">
                             <div style="width: 100%; height: 480px;" class="smallpdf-widget" data-pdf-url="${pdfPath}"></div>
                         </div>
@@ -194,60 +204,13 @@
                 pdfViewer.innerHTML = `
                     <div class="no-data">
                         <h3>No allocation data available</h3>
-                        <p>Room allocations for ${selectedBatch} - ${selectedBranch} are not yet available</p>
-                    </div>
-                `;
-            }
-        }
-
-        function showAllAllocations(selectedBatch, selectedBranch) {
-            let html = '<div class="allocation-grid">';
-            let hasData = false;
-
-            Object.entries(allocations).forEach(([batch, branches]) => {
-                if (selectedBatch !== 'all' && batch !== selectedBatch) return;
-                
-                Object.entries(branches).forEach(([branch, pdfPath]) => {
-                    if (selectedBranch !== 'all' && branch !== selectedBranch) return;
-                    
-                    hasData = true;
-                    html += `
-                        <div class="allocation-card">
-                            <div class="allocation-header">${batch} - ${branch}</div>
-                            <div class="allocation-content">
-                                <div style="width: 100%; height: 480px;" class="smallpdf-widget" data-pdf-url="${pdfPath}"></div>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
-
-            html += '</div>';
-
-            if (hasData) {
-                pdfViewer.innerHTML = html;
-                
-                // Reinitialize SmallPDF widgets
-                if (window.SmallPDFWidget) {
-                    window.SmallPDFWidget.init();
-                }
-            } else {
-                pdfViewer.innerHTML = `
-                    <div class="no-data">
-                        <h3>No allocations available</h3>
-                        <p>No room allocation data found for the selected criteria</p>
+                        <p>Sections List for ${selectedBranch} are not yet available. Please contact support if this seems incorrect.</p>
                     </div>
                 `;
             }
         }
 
         // Event listeners
-        batchSelect.addEventListener('change', () => {
-            updateBranchOptions();
-            displayPDF();
-            saveSelections();
-        });
-
         branchSelect.addEventListener('change', () => {
             displayPDF();
             saveSelections();
