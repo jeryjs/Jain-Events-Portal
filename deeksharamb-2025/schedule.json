@@ -1027,6 +1027,46 @@
         "date": "18/08",
         "entries": [
             {
+                "batch": "G1 & G2",
+                "branches": [
+                    "CSE-SE",
+                    "CSBS",
+                    "CSE-IOT",
+                    "CSE-DS",
+                    "CSE-AI",
+                    "CSE-CYS",
+                    "CSE-BCT",
+                    "CSE-CTIS",
+                    "CSE-CTMA",
+                    "CSE-AIDE",
+                    "CSE-CPS"
+                ],
+                "admission_coordinators": [
+                    "Dr. RAMESHBABU (SE-7780544486)",
+                    "Prof. AISHWARYA R(CSBS-9535393751)",
+                    "Dr. PANDURANGA RAO M  V(IOT-8073254459)",
+                    "Prof. NARASIMHAYYA B E(AI-9538061042)",
+                    "Dr. N SURESH KUMAR(DS-8056744016)",
+                    "Dr. RAVIKUMAR S(CYS-9445778728)",
+                    "Dr. N PRIYA(BCT-9944052990)",
+                    "Dr. T V RAMAN(CTIS-9704193051)",
+                    "Prof. VIVEK GUPTA(AIDE-8737909973)",
+                    "Dr. NISHANT TRIPATHI(CPS-7084523614)"
+                ],
+                "student_count": "674",
+                "activities": [
+                    {
+                        "time": "08:45AM to 04:00PM",
+                        "name": "BRIDGE COURSE",
+                        "venue": "RESPECTIVE DEPARTMENT CLASSROOMS",
+                        "coordinators": [
+                            "Dr. Raghavendra D (95380 08221)",
+                            "Mr. Sandeep (88840 88257)"
+                        ]
+                    }
+                ]
+            },
+            {
                 "batch": "G3",
                 "branches": [
                     "CSE",
