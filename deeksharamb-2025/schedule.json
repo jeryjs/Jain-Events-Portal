@@ -1059,10 +1059,7 @@
                         "time": "08:45AM to 04:00PM",
                         "name": "BRIDGE COURSE",
                         "venue": "RESPECTIVE DEPARTMENT CLASSROOMS",
-                        "coordinators": [
-                            "Dr. Raghavendra D (95380 08221)",
-                            "Mr. Sandeep (88840 88257)"
-                        ]
+                        "coordinators": []
                     }
                 ]
             },
