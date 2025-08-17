@@ -1058,7 +1058,7 @@
                     {
                         "time": "08:45AM to 04:00PM",
                         "name": "BRIDGE COURSE",
-                        "venue": "RESPECTIVE DEPARTMENT CLASSROOMS",
+                        "venue": "SE (205), CSBS (305), IOT (322A), AI (106), DS (326B), CyS (210), BCT (326A), CTIS (304), CTMA (321B), AIDE-A (203), AIDE-B (204), CPS (303)",
                         "coordinators": []
                     }
                 ]
@@ -1164,15 +1164,18 @@
                         "name": "Academic Readiness Assessment",
                         "venue": "Colosseum",
                         "coordinators": [
-                            "Dr. Gabriela Sabatini S (88707 52540)",
-                            "Ms. Raveena K P (96339 36614)"
+                            "Dr. Ghanashyam (9164422960)",
+                            "Dr. Harsha S.V. (9538571172)"
                         ]
                     },
                     {
                         "time": "01:00PM to 04:00PM",
                         "name": "Literary / Oratory activity",
                         "venue": "IIAEM-Aerospace Seminar Hall (ASE, ANE, ME), CB-Civil CAD LAB (ECE, EEE, CE), FET-322 A (M.TECH)",
-                        "coordinators": []
+                        "coordinators": [
+                            "Dr. Gabriela Sabatini S (88707 52540)",
+                            "Ms. Raveena K P (96339 36614)"
+                        ]
                     }
                 ]
             }
@@ -1213,7 +1216,7 @@
                     {
                         "time": "Full Day",
                         "name": "BRIDGE COURSE",
-                        "venue": "Respective Department Classrooms",
+                        "venue": "SE (205), CSBS (305), IOT (322A), AI (106), DS (326B), CyS (210), BCT (326A), CTIS (304), CTMA (321B), AIDE-A (203), AIDE-B (204), CPS (303)",
                         "coordinators": []
                     }
                 ]
