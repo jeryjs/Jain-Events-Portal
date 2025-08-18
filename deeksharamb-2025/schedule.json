@@ -1323,7 +1323,7 @@
         "entries": [
             {
                 "batch": "ALL",
-                "branches": [],
+                "branches": ["ALL"],
                 "admission_coordinators": [
                     "Dr. Naren (96206 46116)"
                 ],
@@ -1350,7 +1350,7 @@
         "entries": [
             {
                 "batch": "ALL",
-                "branches": [],
+                "branches": ["ALL"],
                 "admission_coordinators": [],
                 "student_count": null,
                 "activities": [

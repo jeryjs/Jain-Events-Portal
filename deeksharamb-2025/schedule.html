@@ -283,7 +283,7 @@
                 if (filters.date && day.date !== filters.date) return false;
                 return day.entries.some(entry => {
                     if (filters.group && !batchMatches(entry.batch, filters.group)) return false;
-                    if (filters.branch && !entry.branches.includes(filters.branch)) return false;
+                    if (filters.branch && !entry.branches.includes(filters.branch) && !entry.branches.includes("ALL")) return false;
                     return true;
                 });
             });
@@ -303,7 +303,7 @@
             display.innerHTML = filtered.map(day => {
                 const validEntries = day.entries.filter(entry => {
                     if (filters.group && !batchMatches(entry.batch, filters.group)) return false;
-                    if (filters.branch && !entry.branches.includes(filters.branch)) return false;
+                    if (filters.branch && !entry.branches.includes(filters.branch) && !entry.branches.includes("ALL")) return false;
                     return true;
                 });
 
