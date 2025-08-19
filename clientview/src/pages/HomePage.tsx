@@ -1,26 +1,27 @@
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Alert, Box, CardContent, CardMedia, Chip, Container, Skeleton, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { motion } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState } from 'react';
-
 import { EventType, Role } from '@common/constants';
+import Event from '@common/models/Event';
+import { EventForm } from '@components/Event/admin/EventForm';
 import HighlightsCarousel from '@components/Event/HighlightsCarousel';
 import { EventCard, HomeHeader, Section } from '@components/Home';
+import SendNotificationsDialog from '@components/Home/admin/SendNotificationsDialog';
 import NoEventsDisplay from '@components/Home/NoEventsDisplay';
+import { NotificationPrompt } from '@components/shared';
 import { useLogin } from '@components/shared/LoginContext';
 import PageTransition from '@components/shared/PageTransition';
 import PhotoGallery from '@components/shared/PhotoGallery';
+import { useCreateEvent } from '@hooks/admin';
 import { useArticles, useAssignManagers, useEvents } from '@hooks/useApi';
 import useImgur from '@hooks/useImgur';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
-import { pascalCase } from '@utils/utils';
-import React from 'react';
-import { Link } from 'react-router-dom';
-import SendNotificationsDialog from '@components/Home/admin/SendNotificationsDialog';
-import { NotificationPrompt } from '@components/shared';
 import useNotifications from '@hooks/useNotifications';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Alert, Box, Button, CardContent, CardMedia, Chip, Container, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, Snackbar, TextField, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import slugify from '@utils/Slugify';
+import { pascalCase } from '@utils/utils';
+import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -72,7 +73,10 @@ function HomePage() {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [managerEmails, setManagerEmails] = useState('');
   const [assignError, setAssignError] = useState('');
+  const [formError, setError] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
+  const { mutateAsync: createEvent } = useCreateEvent();
   const { mutateAsync: assignManagers, status: assignStatus } = useAssignManagers();
   const assigning = assignStatus === 'pending';
 
@@ -210,6 +214,18 @@ function HomePage() {
   }, [events, catTabId]);
 
 
+  const handleEventSave = async (formData: Partial<Event>) => {
+    const eventData = Event.parse({ ...formData, id: slugify(formData.name) });
+      try {
+        await createEvent(eventData);
+        setSearchParams(prev => { prev.delete('create'); return prev; }, { replace: true });
+        // refetch();+
+      } catch (error) {
+        setError((error instanceof Error ? error.message : 'Failed to save event'));
+        console.error('Failed to save event:', error);
+      }
+    };
+
   return (
     <PageTransition>
       <Container maxWidth="lg">
@@ -232,7 +248,7 @@ function HomePage() {
         {userData?.role >= Role.ADMIN && (
           <Section title='Admin Actions'>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
-              <Button variant="outlined" color="secondary" onClick={() => {/* Navigate to create activity */ }}>
+              <Button variant="outlined" color="secondary" onClick={() => setSearchParams(prev => ({ ...prev, create: 'event' }))}>
                 Create New Event
               </Button>
               <Button variant="outlined" color="warning" onClick={() => setNotificationDialogOpen(true)}>
@@ -385,6 +401,27 @@ function HomePage() {
         >
           <SendNotificationsDialog />
         </Dialog>
+
+        {/* Fullscreen Edit Dialog */}
+        <Dialog open={searchParams.get('create') === 'event'} maxWidth={false} fullScreen>
+          <EventForm
+            isCreating={true}
+            onSave={handleEventSave}
+            onCancel={() => setSearchParams(prev => { prev.delete('create'); return prev; }, { replace: true })}
+          />
+        </Dialog>
+        
+        {/* Error Notification */}
+        <Snackbar
+          open={!!formError}
+          autoHideDuration={6000}
+          onClose={() => setError(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>
+            {formError}
+          </Alert>
+        </Snackbar>
       </Container>
     </PageTransition>
   );
