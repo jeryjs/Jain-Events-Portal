@@ -1412,13 +1412,7 @@
         "entries": [
             {
                 "batch": "ALL",
-                "branches": [
-                    "CSE-SE",
-                    "CSBS",
-                    "IOT",
-                    "AI",
-                    "DS"
-                ],
+                "branches": ["ALL"],
                 "admission_coordinators": [
                     "Dr. SANTHOSH S (9739040498)",
                     "Dr SANTHOSH KUMAR S (9035235491)",
