@@ -1340,6 +1340,12 @@
                         "name": "JMS TRANSFORMATION JAIN JAWAN NESAN",
                         "venue": "Colosseum",
                         "coordinators": []
+                    },
+                    {
+                        "time": "01:00PM to 03:00PM",
+                        "name": "JAIN LAUNCHPAD",
+                        "venue": "Colosseum",
+                        "coordinators": []
                     }
                 ]
             }
