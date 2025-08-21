@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; background: #f8f9fa; padding-top: 0; }
-        .tabs-container { background: white; border-radius: 16px; width: 98vw; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 0 auto; padding: 0 15px; padding-bottom: 20px; position: sticky; top: 0; }
+        .tabs-container { background: white; border-radius: 16px; width: 98vw; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 0 auto; padding: 0 15px; padding-bottom: 20px; position: sticky; top: 0; z-index: 10; }
         .tabs-wrapper { background: #f1f3f4; border-radius: 28px; padding: 4px; display: inline-flex; margin: 0 auto; justify-content: center; width: fit-content; }
         .tab-btn { padding: 10px 24px; border: none; background: none; font-size: 14px; font-weight: 500; color: #5f6368; border-radius: 24px; transition: all 0.2s; }
         .tab-btn.active { background: white; color: #1a73e8; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -71,41 +71,41 @@
         .sports-modal-close:hover::before { left: 100%; }
         .fullwidth { width: -webkit-fill-available; }
         @media (prefers-color-scheme: dark) {
-            body { background: #181a1b; }
-            .tabs-container { background: #23272a; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
-            .tabs-wrapper { background: #23272a; }
+            body { background: #121212; }
+            .tabs-container { background: #1e1e1e; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+            .tabs-wrapper { background: #1e1e1e; }
             .tab-btn { color: #bfc9d1; }
-            .tab-btn.active { background: #181a1b; color: #60aaff; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
-            .chip { background: #23272a; color: #bfc9d1; border: 1px solid #23272a; }
-            .chip.active { background: #181a1b; color: #60aaff; border: 1px solid #60aaff; }
-            .search-btn { background: #23272a; color: #bfc9d1; border: 1px solid #23272a; }
-            .search-btn:hover { background: #181a1b; color: #60aaff; border-color: #60aaff; }
-            .search-btn.active { background: #60aaff; color: #181a1b; }
-            .search-input { background: #23272a; color: #f1f3f4; border-color: #60aaff; }
+            .tab-btn.active { background: #121212; color: #60aaff; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+            .chip { background: #1e1e1e; color: #bfc9d1; border: 1px solid #1e1e1e; }
+            .chip.active { background: #121212; color: #60aaff; border: 1px solid #60aaff; }
+            .search-btn { background: #1e1e1e; color: #bfc9d1; border: 1px solid #1e1e1e; }
+            .search-btn:hover { background: #121212; color: #60aaff; border-color: #60aaff; }
+            .search-btn.active { background: #60aaff; color: #121212; }
+            .search-input { background: #1e1e1e; color: #f1f3f4; border-color: #60aaff; }
             .search-input:focus { border-color: #60aaff; }
             .search-input::placeholder { color: #8a929a; }
             .search-close { color: #bfc9d1; }
             .search-close:hover { color: #60aaff; }
             .students-container { background: transparent; }
-            .sports-modal { background: #23272a; }
+            .sports-modal { background: #1e1e1e; }
             .sports-modal h3 { color: #f1f3f4; }
             .sports-modal p { color: #bfc9d1; }
-            .student-card { background: #23272a; border-color: #23272a; box-shadow: 0 1px 4px rgba(0,0,0,0.18); }
-            .student-card:hover { background: #181a1b; transform: translateY(-2px) scale(1.01); box-shadow: 0 4px 12px rgba(0,0,0,0.22); }
+            .student-card { background: #1e1e1e; border-color: #1e1e1e; box-shadow: 0 1px 4px rgba(0,0,0,0.18); }
+            .student-card:hover { background: #121212; transform: translateY(-2px) scale(1.01); box-shadow: 0 4px 12px rgba(0,0,0,0.22); }
             .student-name { color: #f1f3f4; }
-            .student-branch { color: #8a929a; background: #181a1b; }
-            .student-category { color: #60aaff; background: #181a1b; }
+            .student-branch { color: #8a929a; background: #121212; }
+            .student-category { color: #60aaff; background: #121212; }
             .no-students { color: #8a929a; }
-            .loading-spinner { border-color: #23272a; border-top-color: #60aaff; }
+            .loading-spinner { border-color: #1e1e1e; border-top-color: #60aaff; }
             .loading-text { color: #bfc9d1; }
             .loading-subtext { color: #8a929a; }
-            .shimmer-card { background: #23272a; border-color: #23272a; }
-            .shimmer-avatar { background: linear-gradient(90deg, #181a1b 25%, #23272a 50%, #181a1b 75%); }
-            .shimmer-line { background: linear-gradient(90deg, #181a1b 25%, #23272a 50%, #181a1b 75%); }
-            .shimmer-chip { background: linear-gradient(90deg, #181a1b 25%, #23272a 50%, #181a1b 75%); }
+            .shimmer-card { background: #1e1e1e; border-color: #1e1e1e; }
+            .shimmer-avatar { background: linear-gradient(90deg, #121212 25%, #1e1e1e 50%, #121212 75%); }
+            .shimmer-line { background: linear-gradient(90deg, #121212 25%, #1e1e1e 50%, #121212 75%); }
+            .shimmer-chip { background: linear-gradient(90deg, #121212 25%, #1e1e1e 50%, #121212 75%); }
         }
         @media (min-width: 576px) { 
-            .tabs-container { width: 75%; }
+            /* .tabs-container { width: 75%; } */
             .search-input-container.active { width: 280px; } 
         }
     </style>
