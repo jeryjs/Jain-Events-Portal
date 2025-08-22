@@ -1374,6 +1374,26 @@
         "date": "22/08",
         "entries": [
             {
+                "batch": "G4",
+                "branches": [
+                    "CSE-AIML",
+                    "ISE"
+                ],
+                "admission_coordinators": [
+                    "Dr R SUGUNAR (AIML- 98949 82065)",
+                    "Dr.Shankar Dr: Kushal Chakraborty"
+                ],
+                "student_count": null,
+                "activities": [
+                    {
+                        "time": "Full Day",
+                        "name": "BRIDGE COURSE",
+                        "venue": "AIML-A (123A), AIML-B (123B), AIML-C (123C), AIML-D (114C), AIML-E (105), ISE (309)",
+                        "coordinators": []
+                    }
+                ]
+            },
+            {
                 "batch": "G5",
                 "branches": [
                     "ME",
