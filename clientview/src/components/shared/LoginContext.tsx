@@ -26,6 +26,8 @@ import {
 } from 'firebase/auth';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { app } from '../../firebaseConfig';
+import { useSession } from '../../hooks/useApi';
+import { TokenManager } from '../../utils/tokenRefresh';
 
 // Initialize Firebase auth
 const auth = getAuth(app);
@@ -137,6 +139,7 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+  const { getSession } = useSession();
 
   // Convert Firebase User to UserData
   const createUserDataFromFirebase = (user: User): UserData => {
@@ -148,24 +151,21 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // Generate token and store user data
-  const processUserLogin = (user: User): void => {
+  // Generate token and store user data (using Firebase ID token)
+  const processUserLogin = async (user: User): Promise<void> => {
     try {
-      // Create UserData from Firebase user
-      const userData = createUserDataFromFirebase(user);
-      const userEmail = user.email || '';
-
-      // Create token using UserData
-      const tokenVal = btoa(JSON.stringify(userData));
-
+      // Get Firebase ID token (JWT)
+      const idToken = await user.getIdToken();
+      // Use useSession hook to get backend user info (with correct role)
+      const backendUser = await getSession(idToken);
+      if (!backendUser) throw new Error('Failed to fetch session');
       // Store in localStorage
-      localStorage.setItem('auth_token', tokenVal);
-      localStorage.setItem('auth_user', JSON.stringify(userData));
-      localStorage.setItem('auth_username', userEmail);
-
+      localStorage.setItem('auth_token', idToken);
+      localStorage.setItem('auth_user', JSON.stringify(backendUser));
+      localStorage.setItem('auth_username', backendUser.username);
       // Update state
-      setUserData(userData);
-      setToken(tokenVal);
+      setUserData(backendUser);
+      setToken(idToken);
     } catch (error) {
       console.error('Error processing login:', error);
     }
@@ -177,24 +177,46 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     const storedUser = localStorage.getItem('auth_user');
     const storedToken = localStorage.getItem('auth_token');
 
-    if (storedUser && storedToken) {
-      try {
-        setUserData(UserData.parse(storedUser));
-        setToken(storedToken);
-      } catch (e) {
-        localStorage.removeItem('auth_user');
-        localStorage.removeItem('auth_token');
-      }
+    // Helper: check if token is a valid JWT (Firebase ID token)
+    const isJWT = (token: string) => {
+      return /^([\w-]+\.){2}[\w-]+$/.test(token);
+    };
+
+    // If old token format (not JWT), sign out user
+    if (storedToken && !isJWT(storedToken)) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_username');
+      setUserData(null);
+      setToken(null);
+      signOut(auth);
+    } else if (storedUser && storedToken) {
+      // Always refresh user from backend session for correct role
+      getSession(storedToken)
+        .then((backendUser) => {
+          if (backendUser) {
+            setUserData(backendUser);
+            setToken(storedToken);
+            localStorage.setItem('auth_user', JSON.stringify(backendUser));
+          } else {
+            localStorage.removeItem('auth_user');
+            localStorage.removeItem('auth_token');
+          }
+        })
+        .finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
     }
 
     // Listen for Firebase auth state changes
-    const unsubscribe = onAuthStateChanged(auth, user => {
+    const unsubscribe = onAuthStateChanged(auth, async user => {
       if (user) {
-        processUserLogin(user);
+        await processUserLogin(user);
       } else {
         // Clear user data on logout
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
+        localStorage.removeItem('auth_username');
         setUserData(null);
         setToken(null);
       }
@@ -204,10 +226,46 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
+  // Token refresh effect to prevent expiration (CLIENT-SIDE ONLY)
+  useEffect(() => {
+    if (!auth.currentUser) return;
+
+    const refreshToken = async () => {
+      try {
+        // Use TokenManager for consistent token management
+        if (TokenManager.needsRefresh()) {
+          await TokenManager.forceRefresh();
+          // Update local token state ONLY - no backend calls
+          const freshToken = await auth.currentUser!.getIdToken(false);
+          setToken(freshToken);
+          localStorage.setItem('auth_token', freshToken);
+          console.log('🔄 Firebase token refreshed locally');
+        }
+      } catch (error) {
+        console.error('❌ Token refresh failed:', error);
+        // If refresh fails, user might need to re-login
+        if (error instanceof Error && error.message.includes('network')) {
+          // Network error - retry later
+          return;
+        }
+        // Auth error - clear session
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        setToken(null);
+        setUserData(null);
+      }
+    };
+
+    // Refresh token every 30 minutes (Firebase tokens expire after 1 hour)
+    const intervalId = setInterval(refreshToken, 30 * 60 * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [auth.currentUser]);
+
   const loginWithGoogle = async (): Promise<void> => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      processUserLogin(result.user);
+      await processUserLogin(result.user);
     } catch (error) {
       console.error('Login error:', error);
     }

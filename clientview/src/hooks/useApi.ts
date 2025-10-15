@@ -1,11 +1,12 @@
-import { Article } from "@common/models";
+import { Article, UserData } from "@common/models";
 import Activity from "@common/models/Activity";
 import Event from "@common/models/Event";
 import { parseActivities, parseArticles, parseEvents } from "@common/utils";
 import { useLogin } from "@components/shared";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import queryClient from "@utils/QueryClient";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import * as admin from "./admin"; // Import admin API hooks
 import config from "../config";
 
 /*
@@ -44,27 +45,18 @@ const _fetchEvent = async (eventId: string): Promise<Event> => {
 
 export const useEvents = () => {
 	if (process.env.NODE_ENV === "development") {
-		return useDummyEvents(200); // Use dummy events for now while testing
+		// return useDummyEvents(200); // Use dummy events for now while testing
 	}
 
-	return useQuery({
-		queryKey: ["events"],
-		queryFn: _fetchEvents,
-		staleTime: 1000 * 60 * 5, // 5 minutes
-	});
+	return admin.useEvents();
 };
 
 export const useEvent = (eventId: string) => {
 	if (process.env.NODE_ENV === "development") {
-		return useDummyEvent(eventId); // Use dummy event for now while testing
+		// return useDummyEvent(eventId); // Use dummy event for now while testing
 	}
 
-	return useQuery({
-		queryKey: ["event", eventId],
-		queryFn: () => _fetchEvent(eventId),
-		staleTime: 1000 * 60 * 5, // 5 minutes
-		enabled: !!eventId,
-	});
+	return admin.useEvent(eventId);
 };
 
 export const useDummyEvents = (count = 100) => {
@@ -130,51 +122,19 @@ const _fetchActivity = async (eventId: string, activityId: string): Promise<Acti
 
 export const useActivities = (eventId: string) => {
 	if (process.env.NODE_ENV === "development") {
-		return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
+		// return useDummyActivities(eventId, 20); // Use dummy activities for now while testing
 	}
 
-	return useQuery({
-		queryKey: ["activities", eventId],
-		queryFn: () => _fetchActivities(eventId),
-		// staleTime: 1000 * 60 * 5, // 5 minutes
-		refetchInterval: (data) => {
-			return false	// Disable refetching for now
-			if (!data || !data.state.data) return false;
-
-			// Check if any activities are ongoing
-			const hasOngoingActivities = data.state.data.some((activity) => {
-				return activity.isOngoing;
-			});
-
-			// Only refetch if there's at least one ongoing activity
-			return hasOngoingActivities ? 60000 : false;
-		},
-	});
+	return admin.useEventActivities(eventId);
 };
 
 export const useActivity = (eventId: string, activityId: string) => {
 	if (process.env.NODE_ENV === "development") {
-		return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
+		// return useDummyActivity(eventId, activityId); // Use dummy activity for now while testing
 	}
 	// const activitiesQuery = useActivities(eventId);
 
-	return useQuery({
-		queryKey: ["activity", eventId, activityId],
-		queryFn: () => _fetchActivity(eventId, activityId),
-		// staleTime: 1000 * 60 * 5, // 5 minutes
-		enabled: !!eventId && !!activityId,
-		refetchInterval: (data) => {
-			return false	// Disable refetching for now
-			if (!data || !data.state.data) return false;
-
-			// Check if this specific activity is ongoing
-			const activity = data.state.data;
-			const isOngoing = activity.isOngoing;
-
-			// Only refetch if this activity is ongoing
-			return isOngoing ? 60000 : false;
-		},
-	});
+	return admin.useActivity(eventId, activityId);
 };
 
 export const useCastVote = (eventId: string, activityId: string) => {
@@ -259,23 +219,13 @@ export const useArticles = () => {
 		// return useDummyArticles(20); // Use dummy articles for now while testing
 	}
 
-	return useQuery({
-		queryKey: ["articles"],
-		queryFn: _fetchArticles,
-		staleTime: 1000 * 60 * 30, // 30 minutes
-		refetchOnWindowFocus: false,
-	});
+	return admin.useArticles();
 };
 
 export const useArticle = (articleId: string) => {
-	const articlesQuery = useArticles();
+	// const articlesQuery = useArticles();
 
-	return useQuery({
-		queryKey: ["article", articleId],
-		queryFn: async () => articlesQuery.data?.find((a) => a.id === articleId),
-		staleTime: 1000 * 60 * 30, // 30 minutes
-		enabled: !articlesQuery.isLoading,
-	});
+	return admin.useArticle(articleId);
 };
 
 const useDummyArticles = (count = 30) => {
@@ -340,4 +290,48 @@ export const useUpdateArticleViewCount = () => {
 	};
 
 	return { updateViewCount };
+};
+
+
+/**
+ * useSession - fetches backend session user info using Firebase ID token
+ * @returns { getSession: (idToken: string) => Promise<UserData | null> }
+ */
+export const useSession = () => {
+	// Returns a function to fetch session info from backend
+	const getSession = useCallback(async (idToken: string): Promise<UserData | null> => {
+		try {
+			const resp = await fetch(`${config.API_BASE_URL}/user/session`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				credentials: 'include', // Important: This allows the session cookie to be set
+				body: JSON.stringify({ idToken })
+			});
+			if (!resp.ok) throw new Error("Failed to fetch session");
+			const { user: backendUser } = await resp.json();
+			return backendUser;
+		} catch (e) {
+			return null;
+		}
+	}, []);
+	return { getSession };
+};
+
+
+/**
+ * useAssignManagers - returns a mutation to assign managers to an event
+ * Usage: const { mutateAsync: assignManagers, isLoading, error } = useAssignManagers();
+ */
+export const useAssignManagers = () => {
+	return useMutation({
+		mutationFn: async ({ eventId, managers }: { eventId: string, managers: string[] }) => {
+			const resp = await fetch(`${config.API_BASE_URL}/events/${eventId}/managers`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ managers })
+			});
+			if (!resp.ok) throw new Error("Failed to assign managers");
+			return resp.json();
+		}
+	});
 };

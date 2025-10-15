@@ -30,11 +30,6 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children, transitionKey
     }
   };
 
-  const pageTransition = {
-    type: "tween",
-    ease: "anticipate",
-    duration: 0.5
-  };
 
   return (
     <TransitionWrapper
@@ -43,7 +38,7 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children, transitionKey
       animate="in"
       exit="out"
       variants={pageVariants}
-      transition={pageTransition}
+      transition={{ type: "tween", ease: "anticipate", duration: 0.5 }}
     >
       {children}
     </TransitionWrapper>

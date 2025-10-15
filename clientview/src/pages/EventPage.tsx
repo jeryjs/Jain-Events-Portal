@@ -1,11 +1,21 @@
-import { EventType } from '@common/constants';
-import Event, { BannerItem } from '@common/models/Event';
+import { EventType, Role } from '@common/constants';
+import Event, { BannerItem, EventConfig } from '@common/models/Event';
+import { Activity } from '@common/models';
 import { getBaseEventType } from '@common/utils';
+import { EventForm } from '@components/Event/admin/EventForm';
+import { ActivityForm } from '@components/Activity/admin/ActivityForm';
 import ActivityCard from '@components/Event/ActivityCard';
 import HighlightsCarousel from '@components/Event/HighlightsCarousel';
+import { useLogin } from '@components/shared';
+import PageTransition from '@components/shared/PageTransition';
+import PhotoGallery from '@components/shared/PhotoGallery';
+import { useDeleteEvent, useUpdateEvent, useCreateActivity } from '@hooks/admin';
+import { useActivities, useEvent } from '@hooks/useApi';
 import useImgur from '@hooks/useImgur';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AddIcon from '@mui/icons-material/Add';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import EditIcon from '@mui/icons-material/Edit';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -15,25 +25,26 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
   alpha,
   Box,
   Chip,
   Container,
   Dialog,
   Divider,
+  Fab,
   IconButton,
   Paper,
   Skeleton,
+  Snackbar,
+  Tooltip,
   Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { generateColorFromString } from '@utils/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Suspense, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import PageTransition from '../components/shared/PageTransition';
-import PhotoGallery from '../components/shared/PhotoGallery';
-import { useActivities, useEvent } from '../hooks/useApi';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
@@ -60,7 +71,7 @@ const VideoControls = styled(Box)(({ theme }) => `
 `);
 const EventTypeChip = styled(Chip)(({ theme }) => `
   position: absolute; margin-top: -30px; left: 50%; transform: translateX(-50%);
-  width: 70%; height: 52px; font-size: 24px; font-weight: bold; border-radius: 24px;
+  min-width: 70%; height: 52px; font-size: 24px; font-weight: bold; border-radius: 24px;
   background-color: ${theme.palette.background.paper}; color: ${theme.palette.text.secondary};
 `);
 const ContentSection = styled(Box)(({ theme }) => `
@@ -109,12 +120,6 @@ const getEventTypeText = (type: number): string => {
   return 'General Event';
 };
 
-// Helper function to get default image if banner image is not set
-const getDefaultImage = (src): string => {
-  return src || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg';
-};
-
-
 // Helper function to get event type information
 const getEventTypeInfo = (type: EventType) => {
   return {
@@ -147,7 +152,7 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
   useEffect(() => {
     if (items.length <= 1) return;
     const interval = setInterval(() => {
-      const videoElm = containerRef.current.querySelector("video"); 
+      const videoElm = containerRef.current.querySelector("video");
       if (videoElm?.ended || videoElm?.paused || !videoElm)
         setCurrentIndex(prev => (prev + 1) % items.length);
     }, 5000);
@@ -253,7 +258,7 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
             </>
           ) : (
             <HeroImage
-              src={currentItem.url ? getDefaultImage(currentItem.url) : getDefaultImage('')}
+              src={currentItem.url || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg'}
               alt="Event banner"
               style={currentCssStyles}
             />
@@ -298,93 +303,65 @@ interface ActivityAccordionProps {
   activityType: EventType;
   activities: any[];
   eventId: string;
+  config?: EventConfig;
 }
 
-const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, activities, eventId }) => {
-  const [expanded, setExpanded] = useState(activities.length <= 3);
-  const [fixtureDialog, setFixtureDialog] = useState<string | Record<string, string> | null>(null);
-  const { text: activityTypeText, color } = getEventTypeInfo(activityType);
-
-  /// Hardcoding the fixture data for the sportastica-2025 event temporarily
-  const fixtures = eventId === "sportastica-2025" && {
-    [EventType.VOLLEYBALL]: "https://i.imgur.com/C67OIyz.png",
-    [EventType.FOOTBALL]: "https://i.imgur.com/82B4SjE.png",
-    [EventType.BASKETBALL]: { Boys: "https://i.imgur.com/OcsfJnF.png", Girls: "https://i.imgur.com/CVqnbyt.png" },
-    [EventType.CRICKET]: "https://i.imgur.com/EsfSrzV.png",
-    [EventType.THROWBALL]: "https://i.imgur.com/huZyVGE.png"
-  } || {};
-
-  const handleFixtureClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const fixture = fixtures[activityType];
-    fixture && setFixtureDialog(fixture);
-  };
-
-  const renderFixtureDialogContent = () =>
-    !fixtureDialog ? null : typeof fixtureDialog === "string" ? (
-      <motion.img
-        src={fixtureDialog}
-        alt={`Fixture for ${activityTypeText}`}
-        style={{ width: "100%" }}
-      />
-    ) : (
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        {Object.entries(fixtureDialog).map(([key, url]) => (
-          <Box key={key} sx={{ textAlign: "center" }}>
-            <Typography variant="subtitle2">{key}</Typography>
-            <motion.img
-              src={url}
-              alt={`Fixture ${key} for ${activityTypeText}`}
-              style={{ width: "100%" }}
-            />
-          </Box>
-        ))}
-      </Box>
-    );
+const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, activities, eventId, config }) => {
+  const [expanded, setExpanded] = useState(config?.expandedCategories?.includes(activityType));
+  const { text, color } = getEventTypeInfo(activityType);
 
   return (
-    <>
-      <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}
+    <Accordion
+      expanded={expanded}
+      onChange={() => setExpanded(!expanded)}
+      sx={{
+        mb: 2,
+        borderRadius: 2,
+        overflow: 'hidden',
+        '&:before': { display: 'none' },
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
         sx={{
-          mb: 2,
-          borderRadius: 2,
-          overflow: "hidden",
-          "&:before": { display: "none" },
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          backgroundColor: alpha(color, 0.1),
+          '& .MuiAccordionSummary-content': {
+            alignItems: 'center'
+          }
         }}
       >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ backgroundColor: alpha(color, 0.1), "& .MuiAccordionSummary-content": { alignItems: "center" } }}>
-          <Chip label={activityTypeText} size="small" sx={{ backgroundColor: alpha(color, 0.3), fontWeight: "medium", mr: 2 }} />
-
-          <Typography variant="subtitle1" sx={{ fontWeight: "medium" }}>
-            {activities.length}{" "} {getBaseEventType(activityType) === EventType.SPORTS ? "Matches" : activities.length === 1 ? "Activity" : "Activities"}
-          </Typography>
-
-          {fixtures[activityType] && (<IconButton onClick={handleFixtureClick} size="small" sx={{ ml: "auto", px: 2, backgroundColor: `${color}50`, borderRadius: "12px" }}>
-            <Typography variant="caption">Fixtures</Typography>
-          </IconButton>)}
-        </AccordionSummary>
-        <AccordionDetails sx={{ p: 1 }}>
-          {activities.map((activity, index) => (
-            <ActivityCard
-              key={activity.id}
-              activity={activity}
-              eventId={eventId}
-              delay={index}
-            />
-          ))}
-        </AccordionDetails>
-      </Accordion>
-      <Dialog open={Boolean(fixtureDialog)} onClose={() => setFixtureDialog(null)} maxWidth="xl" fullWidth>
-        {renderFixtureDialogContent()}
-      </Dialog>
-    </>
+        <Chip
+          label={text}
+          size="small"
+          sx={{
+            backgroundColor: color,
+            color: 'white',
+            fontWeight: 'medium',
+            mr: 2
+          }}
+        />
+        <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
+          {activities.length} {getBaseEventType(activityType) === EventType.SPORTS ? 'Matches' : activities.length === 1 ? 'Activity' : 'Activities'}
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ p: 1 }}>
+        {activities.map((activity, index) => (
+          <ActivityCard
+            key={activity.id}
+            activity={activity}
+            eventId={eventId}
+            delay={index}
+          />
+        ))}
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
 // Activity list component with React.Suspense
-const ActivitiesSection = ({ eventId }: { eventId: string }) => {
-  const { data: activities, isLoading } = useActivities(eventId);
+const ActivitiesSection = ({ eventId, config }: { eventId: string, config: EventConfig }) => {
+  const { activities, isLoading } = useActivities(eventId);
   const len = activities && Array.isArray(activities) ? activities.length : 0;
 
   if (isLoading) {
@@ -411,10 +388,15 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
   const infoActivities = activities.filter(activity => getBaseEventType(activity.type) === EventType.INFO);
   const nonInfoActivities = activities.filter(activity => getBaseEventType(activity.type) !== EventType.INFO);
 
-  // TODO: revert making info activities last after infinity-2025
-  // Group activities by event type for non-info activities
+  // Group activities by event type
   const groupedActivities: Record<number, any[]> = {};
 
+  // First handle INFO activities if they exist
+  if (infoActivities.length > 0) {
+    groupedActivities[EventType.INFO] = infoActivities;
+  }
+
+  // Then handle the rest of activity types
   nonInfoActivities.forEach(activity => {
     const activityType = activity.type;
     if (!groupedActivities[activityType]) {
@@ -423,26 +405,20 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
     groupedActivities[activityType].push(activity);
   });
 
-  // Prepare info activities as a separate group
-  const infoGroup = infoActivities.length > 0 ? { [EventType.INFO]: infoActivities } : {};
-
-  // Merge the groups, making sure the INFO group comes last
-  const orderedGroups = [
-    ...Object.entries(groupedActivities),
-    ...Object.entries(infoGroup)
-  ];
-
-  // Return the activities with INFO rendered last if it exists
+  // Return the activities, now with INFO guaranteed to be first if it exists
   return (
     <Box>
-      {orderedGroups.map(([type, acts]) => (
-        <ActivityAccordion
-          key={type}
-          activityType={Number(type) as EventType}
-          activities={acts}
-          eventId={eventId}
-        />
-      ))}
+      {Object.entries(groupedActivities)
+        .map(([type, acts]) => (
+          <ActivityAccordion
+            key={type}
+            activityType={Number(type) as EventType}
+            activities={acts}
+            eventId={eventId}
+            config={config}
+          />
+        ))
+      }
     </Box>
   );
 };
@@ -450,13 +426,63 @@ const ActivitiesSection = ({ eventId }: { eventId: string }) => {
 function EventPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { userData } = useLogin();
+  // const { mutateAsync: assignManagers } = useAssignManagers();
+  const { mutateAsync: updateEvent } = useUpdateEvent();
+  const { mutateAsync: deleteEvent } = useDeleteEvent();
+  const { mutateAsync: createActivity } = useCreateActivity(eventId);
 
-  const { data: event, isLoading: eventLoading } = useEvent(eventId);
-  const { data: imgur, isLoading: imgurLoading } = useImgur(event?.galleryLink || '');
+  const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId);
+  const { data: imgur, isFetched: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
+
+  // Check if user can edit this event
+  const canEdit = userData && (
+    userData.role >= Role.ADMIN ||
+    (event?.managers && event.managers.includes(userData.username))
+  );
+
+  // Handle event save
+  const handleEventSave = async (eventData: Partial<Event>) => {
+    try {
+      if (!eventId) throw new Error('Event ID is required');
+      await updateEvent(eventData);
+      setSearchParams(prev => { prev.delete('edit'); return prev; }, { replace: true });
+      refetch();
+    } catch (error) {
+      setError((error instanceof Error ? error.message : 'Failed to save event'));
+      console.error('Failed to save event:', error);
+    }
+  };
+
+  // Handle event delete
+  const handleEventDelete = async (eventId: string) => {
+    try {
+      await deleteEvent(eventId);
+      navigate('/');
+    } catch (error) {
+      setError((error instanceof Error ? error.message : 'Failed to delete event'));
+      console.error('Failed to delete event:', error);
+    }
+  };
+
+  // Handle activity save - Create new activity
+  const handleActivitySave = async (activityData: Activity) => {
+    try {
+      if (!eventId) throw new Error('Event ID is required');
+      await createActivity(activityData);
+      {() => setSearchParams(prev => { prev.delete('createActivity'); return prev; }, { replace: true })}
+      // Refetch activities (they're fetched in ActivitiesSection)
+    } catch (error) {
+      setError((error instanceof Error ? error.message : 'Failed to create activity'));
+      console.error('Failed to create activity:', error);
+    }
+  };
 
   // Check if description is truncated
   useEffect(() => {
@@ -520,11 +546,6 @@ function EventPage() {
   }
 
   // temp for ininity: Hardcode the highlights-
-  const highlights = eventId === "infinity-2025" ? [
-    'https://i.imgur.com/hnY5dx2l.jpeg',
-    'https://i.imgur.com/8oNrZuzl.jpeg',
-    'https://i.imgur.com/2W2fEIYl.jpeg'
-  ] : null;
 
   return (
     <Suspense fallback={null}>
@@ -536,7 +557,7 @@ function EventPage() {
             <BannerMedia items={event.banner || []} />
             <HeroOverlay>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                <IconButton onClick={() => navigate(-1)} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
+                <IconButton onClick={() => navigate('..')} sx={{ color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
                   <ArrowBackIcon />
                 </IconButton>
                 <Typography variant="h5" sx={{ color: 'white', fontWeight: '500', ml: 3 }}>
@@ -637,13 +658,13 @@ function EventPage() {
             )}
           </ContentSection>
 
-          {/*  Temp Infinity Highlights section */}
-          {highlights && <Box>
+          {/*  Highlights section */}
+          {event.highlights && <Box>
             <Divider sx={{ my: 3 }} />
             <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 1 }}>
               Highlights
             </Typography>
-            <HighlightsCarousel images={highlights} />
+            <HighlightsCarousel images={event.highlights.split(',').map(url => url.trim())} />
           </Box>}
 
           <Divider sx={{ my: 3 }} />
@@ -662,27 +683,83 @@ function EventPage() {
                 ))}
               </Box>
             }>
-              <ActivitiesSection eventId={eventId || ''} />
+              <ActivitiesSection eventId={eventId || ''} config={event.config} />
             </Suspense>
           </ActivitySectionContainer>
 
           <Divider sx={{ my: 3 }} />
 
           {/* Photo Gallery Section */}
-          <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', mb: 2 }}>
-            Event Gallery
-          </Typography>
-          <PhotoGallery
-            images={
-              eventId === "sportastica-2025" ?
-                (imgur ? [...imgur].reverse().map(it => it.link) : []) :
-                (imgur ? imgur.map(it => it.link) : [])
-            }
-            isLoading={imgurLoading}
-            rows={2}
-            columns={4}
-          />
+          {event.galleryLink && <Box>
+            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', mb: 2 }}>
+              Event Gallery
+            </Typography>
+            <PhotoGallery
+              images={
+                eventId === "sportastica-2025" ?
+                  (imgur ? [...imgur].reverse().map(it => it.link) : []) :
+                  (imgur ? imgur.map(it => it.link) : [])
+              }
+              isLoading={imgurLoading}
+              rows={2}
+              columns={4}
+              loadFailed={imgurError}
+            />
+          </Box>}
         </Container>
+
+        {/* Floating Action Buttons (Admin/Manager only) */}
+        {canEdit && (
+          <Box sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 1000, display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {/* Create Activity FAB */}
+            <Tooltip title="Create a new activity for this event" placement="left">
+              <Fab color="secondary" onClick={() => setSearchParams(prev => ({ ...prev, createActivity: 'true' }), { replace: true })}>
+                <AddIcon />
+              </Fab>
+            </Tooltip>
+
+            {/* Edit Event FAB */}
+            <Tooltip title="Edit event details and settings" placement="left">
+              <Fab color="primary" onClick={() => setSearchParams(prev => ({ ...prev, edit: 'true' }))}>
+                <EditIcon />
+              </Fab>
+            </Tooltip>
+          </Box>
+        )}
+
+        {/* Fullscreen Edit Dialog */}
+        <Dialog open={searchParams.get('edit') === 'true'} maxWidth={false} fullScreen>
+          <EventForm
+            event={event}
+            isCreating={false}
+            onSave={handleEventSave}
+            onDelete={handleEventDelete}
+            onCancel={() => setSearchParams(prev => { prev.delete('edit'); return prev; }, { replace: true })}
+          />
+        </Dialog>
+
+        {/* Create Activity Dialog */}
+        <Dialog open={searchParams.get('createActivity') === 'true'} maxWidth="lg" onClose={() => setSearchParams(prev => { prev.delete('createActivity'); return prev; }, { replace: true })}>
+          <ActivityForm
+            eventId={eventId}
+            activity={null}
+            managers={event?.managers}
+            isCreating={true}
+            onSave={handleActivitySave}
+          />
+        </Dialog>
+
+        {/* Error Notification */}
+        <Snackbar
+          open={!!error}
+          autoHideDuration={6000}
+          onClose={() => setError(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>
+            {error}
+          </Alert>
+        </Snackbar>
       </PageTransition>
     </Suspense>
   );

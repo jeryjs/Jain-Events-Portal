@@ -1,25 +1,37 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import EditIcon from '@mui/icons-material/Edit';
 import PeopleIcon from '@mui/icons-material/People';
 import {
+  Alert,
   Avatar, AvatarGroup,
   Box,
   Chip,
   Container,
+  Dialog,
+  Fab,
   IconButton,
+  Snackbar,
+  Tooltip,
   Typography
 } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
-import { EventType } from '@common/constants';
+import { EventType, Role } from '@common/constants';
 import { Activity, CulturalActivity, InfoActivity, SportsActivity, TechnicalActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getBaseEventType } from '@common/utils';
 import { ActivitySkeleton, CulturalsView, GeneralView, InfoView, SportsView, TechView } from '@components/Activity';
+import { ActivityForm } from '@components/Activity/admin/ActivityForm';
+import { useLogin } from '@components/shared';
 import PageTransition from '@components/shared/PageTransition';
-import { useActivity } from '@hooks/useApi';
+import { useUpdateActivity, useDeleteActivity } from '@hooks/admin';
+import { useActivity, useEvent } from '@hooks/useApi';
 import { pascalCase } from '@utils/utils';
+import { borderRadius } from '@mui/system';
+import { error } from 'console';
+import { useState } from 'react';
 
 // Styled Components
 const HeroContainer = styled(Box)(({ theme }) => ({
@@ -53,9 +65,43 @@ const ParticipantAvatar = styled(Avatar)(({ theme }) => ({
 }));
 
 function ActivityPage() {
-  const { eventId, activityId } = useParams<{ eventId: string; activityId: string }>();
-  const { data: activity, isLoading } = useActivity(eventId || '', activityId || '');
   const navigate = useNavigate();
+  const { userData } = useLogin();
+  const { eventId, activityId } = useParams<{ eventId: string; activityId: string }>();
+  const { data: event } = useEvent(eventId || '');
+  const { data: activity, isLoading } = useActivity(eventId || '', activityId || '');
+  const { mutateAsync: updateActivity } = useUpdateActivity(eventId);
+  const { mutateAsync: deleteActivity } = useDeleteActivity(eventId);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
+
+  // Get edit state from URL search params
+  const isEditMode = searchParams.get('edit') === 'true';
+
+  // Check if user can edit this activity
+  const canEdit = userData && (userData.role >= Role.ADMIN || (event?.managers?.includes(userData.username)));
+
+  // Handle activity save
+  const handleActivitySave = async (activityData: Activity) => {
+    try {
+      await updateActivity(activityData);
+      setSearchParams(prev => { prev.delete('edit'); return prev; }, { replace: true });
+    } catch (error) {
+      setError((error instanceof Error ? error.message : 'Failed to update activity'));
+      console.error('Failed to update activity:', error);
+    }
+  };
+
+  // Handle activity delete
+  const handleActivityDelete = async (activityId: string) => {
+    try {
+      await deleteActivity(activityId);
+      navigate(`/${eventId}`, { replace: true });
+    } catch (error) {
+      setError((error instanceof Error ? error.message : 'Failed to delete activity'));
+      console.error('Failed to delete activity:', error);
+    }
+  };
 
   if (isLoading) {
     return <ActivitySkeleton />;
@@ -90,6 +136,42 @@ function ActivityPage() {
           }
         })()}
       </Container>
+
+      {/* Floating Edit Button (Admin/Manager only) */}
+      {canEdit && (
+        <Tooltip title="Edit This Activity" placement='left' arrow>
+          <Fab color="primary" sx={{ position: 'fixed', bottom: 16, right: 16, zIndex: 1000 }} onClick={() => setSearchParams(prev => { prev.set('edit', 'true'); return prev; }, { replace: true })}>
+            <EditIcon />
+          </Fab>
+        </Tooltip>
+      )}
+
+      {/* Edit Activity Dialog */}
+      <Dialog 
+        open={isEditMode} 
+        maxWidth="md" 
+        fullWidth
+        onClose={() => setSearchParams(prev => { prev.delete('edit'); return prev; }, { replace: true })}
+      >
+        <ActivityForm
+          eventId={eventId}
+          activity={activity}
+          isCreating={false}
+          managers={event?.managers || []}
+          onSave={handleActivitySave}
+          onDelete={handleActivityDelete}
+        />
+      </Dialog>
+      
+      {/* Error Notification */}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>{error}</Alert>
+      </Snackbar>
     </PageTransition>
   );
 }

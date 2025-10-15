@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Grid, Skeleton, Dialog, IconButton, Backdrop, Button } from '@mui/material';
+import { Box, Grid, Skeleton, Dialog, IconButton, Backdrop, Button, Typography, Alert } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
@@ -148,6 +148,7 @@ interface PhotoGalleryProps {
   onSeeAllClick?: () => void;
   imageHeight?: number;
   imageMargin?: number;
+  loadFailed?: Error;
 }
 
 const PhotoGallery: React.FC<PhotoGalleryProps> = ({ 
@@ -157,7 +158,8 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   columns = 3,
   onSeeAllClick,
   imageHeight = 150,
-  imageMargin = 1
+  imageMargin = 1,
+  loadFailed = null
 }) => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -336,6 +338,18 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
       )}
     </AnimatePresence>
   );
+
+  if (!!loadFailed) {
+    return (
+      <GalleryContainer>
+        <Alert severity="error" variant="outlined">
+          <Typography variant="body1">
+            {loadFailed?.message || 'Failed to load the photo gallery.'}
+          </Typography>
+        </Alert>
+      </GalleryContainer>
+    );
+  }
 
   return (
     <>

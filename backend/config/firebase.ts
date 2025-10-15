@@ -26,6 +26,7 @@ export const sendPushNotificationToAllUsers = async (
     link?: string; // Optional link to redirect users
   }
 ) => {
+  const topic = (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV == "production") ? 'all-users' : 'all-users-test';
   const message: TopicMessage = {
     notification: options?.showNotification !== false ? {
       title,
@@ -42,12 +43,12 @@ export const sendPushNotificationToAllUsers = async (
       link: options?.link || '',
       timestamp: Date.now().toString(),
     },
-    topic: (process.env.VERCEL_ENV == "preview" || process.env.NODE_ENV === "development") ? 'all-users-test' : 'all-users',
+    topic: topic,
   };
 
   try {
     await messaging.send(message);
-    console.log('Push notification sent successfully');
+    console.log('Push notification sent to', topic);
   } catch (error) {
     console.error('Error sending push notification:', error);
   }

@@ -1,35 +1,43 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hasMinimumRole = exports.isAuthenticated = exports.managerMiddleware = exports.adminMiddleware = exports.authMiddleware = void 0;
 const authUtils_1 = require("@utils/authUtils");
 const constants_1 = require("@common/constants");
 /**
  * @description Middleware to authenticate user based on JWT token.
+ * Fetches complete user data from database for accurate role information.
  */
-const authMiddleware = (req, res, next) => {
-    // Check for token in Authorization header
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    // Use session cookie for authentication
+    const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.session;
+    if (!token) {
         res.status(401).json({
             message: 'Authentication required',
-            details: 'Valid Bearer token is required in Authorization header'
+            details: 'Valid session cookie is required'
         });
         return;
     }
-    const token = authHeader.split(' ')[1];
     try {
-        // Get user data directly from token
-        const userData = (0, authUtils_1.getUserFromToken)(token);
+        // Fetch complete user data from database for accurate roles
+        const userData = yield (0, authUtils_1.getUserFromToken)(token, true);
         if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
         }
-        // Attach user data to request
         req.user = userData;
         next();
     }
     catch (error) {
-        // Handle specific token errors
         if (error instanceof Error) {
             const message = error.message.includes('expired')
                 ? 'Token has expired'
@@ -39,25 +47,37 @@ const authMiddleware = (req, res, next) => {
         }
         res.status(401).json({ message: 'Authentication failed' });
     }
-};
+});
 exports.authMiddleware = authMiddleware;
 /**
  * @description Middleware to authorize user with admin role.
+ * Reuses user data from authMiddleware if available.
  */
-const adminMiddleware = (req, res, next) => {
-    // Check for token in Authorization header
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+const adminMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    // If user is already authenticated, check role directly
+    if (req.user) {
+        if (req.user.role < constants_1.Role.ADMIN) {
+            res.status(403).json({
+                message: 'Access denied',
+                details: 'This action requires administrator privileges'
+            });
+            return;
+        }
+        next();
+        return;
+    }
+    // Otherwise, authenticate first
+    const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.session;
+    if (!token) {
         res.status(401).json({
             message: 'Authentication required',
-            details: 'Valid Bearer token is required in Authorization header'
+            details: 'Valid session cookie is required'
         });
         return;
     }
-    const token = authHeader.split(' ')[1];
     try {
-        // Get user data directly from token
-        const userData = (0, authUtils_1.getUserFromToken)(token);
+        const userData = yield (0, authUtils_1.getUserFromToken)(token, true);
         if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
@@ -69,12 +89,10 @@ const adminMiddleware = (req, res, next) => {
             });
             return;
         }
-        // Attach user data to request for potential use in route handlers
         req.user = userData;
         next();
     }
     catch (error) {
-        // Handle specific token errors
         if (error instanceof Error) {
             const message = error.message.includes('expired')
                 ? 'Token has expired'
@@ -84,25 +102,37 @@ const adminMiddleware = (req, res, next) => {
         }
         res.status(401).json({ message: 'Authentication failed' });
     }
-};
+});
 exports.adminMiddleware = adminMiddleware;
 /**
  * @description Middleware to authorize user with manager or higher role.
+ * Reuses user data from authMiddleware if available.
  */
-const managerMiddleware = (req, res, next) => {
-    // Check for token in Authorization header
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+const managerMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    // If user is already authenticated, check role directly
+    if (req.user) {
+        if (req.user.role < constants_1.Role.MANAGER) {
+            res.status(403).json({
+                message: 'Access denied',
+                details: 'This action requires manager privileges'
+            });
+            return;
+        }
+        next();
+        return;
+    }
+    // Otherwise, authenticate first
+    const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.session;
+    if (!token) {
         res.status(401).json({
             message: 'Authentication required',
-            details: 'Valid Bearer token is required in Authorization header'
+            details: 'Valid session cookie is required'
         });
         return;
     }
-    const token = authHeader.split(' ')[1];
     try {
-        // Get user data directly from token
-        const userData = (0, authUtils_1.getUserFromToken)(token);
+        const userData = yield (0, authUtils_1.getUserFromToken)(token, true);
         if (!userData) {
             res.status(401).json({ message: 'Invalid token' });
             return;
@@ -114,12 +144,10 @@ const managerMiddleware = (req, res, next) => {
             });
             return;
         }
-        // Attach user data to request for potential use in route handlers
         req.user = userData;
         next();
     }
     catch (error) {
-        // Handle specific token errors
         if (error instanceof Error) {
             const message = error.message.includes('expired')
                 ? 'Token has expired'
@@ -129,7 +157,7 @@ const managerMiddleware = (req, res, next) => {
         }
         res.status(401).json({ message: 'Authentication failed' });
     }
-};
+});
 exports.managerMiddleware = managerMiddleware;
 /**
  * @description Helper function to check if a request is authenticated

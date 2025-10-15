@@ -1,6 +1,5 @@
-// filepath: y:\All-Projects\Jain-Events-Portal\backend\routes\eventRoutes.ts
 import { Request, Response, Router } from 'express';
-import { adminMiddleware } from '@middlewares/auth';
+import { adminMiddleware, managerMiddleware } from '@middlewares/auth';
 import {
     createEvent,
     deleteEvent,
@@ -8,7 +7,11 @@ import {
     getEvents,
     invalidateEventsCache,
     updateEvent,
+    assignManagersToEvent,
+    getEventManagers,
+    isUserEventManager
 } from "@services/events";
+import { Role } from '@common/constants';
 
 const router = Router();
 
@@ -17,9 +20,10 @@ const router = Router();
  */
 
 // Get all events
-router.get('/', async (_: Request, res: Response) => {
+router.get('/', async (req: Request & { user?: any }, res: Response) => {
     try {
-        const events = await getEvents();
+        const user = req.user ? { role: req.user.role, username: req.user.username } : undefined;
+        const events = await getEvents(user);
         res.json(events);
     } catch (error) {
         console.error('Error fetching events:', error);
@@ -28,9 +32,10 @@ router.get('/', async (_: Request, res: Response) => {
 });
 
 // Get event by ID
-router.get('/:eventId', async (req: Request, res: Response) => {
+router.get('/:eventId', async (req: Request & { user?: any }, res: Response) => {
     try {
-        const event = await getEventById(req.params.eventId);
+        const user = req.user ? { role: req.user.role, username: req.user.username } : undefined;
+        const event = await getEventById(req.params.eventId, user);
         if (event) {
             res.json(event);
         } else {
@@ -52,15 +57,45 @@ router.post('/', adminMiddleware, async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Error creating event', details: error });
     }
 });
-
-// Update event
-router.patch('/:eventId', adminMiddleware, async (req: Request, res: Response) => {
+router.patch('/:eventId', managerMiddleware, async (req: Request & { user?: any }, res: Response) => {
     try {
+        // Only allow if user is admin or manager for this event
+        const user = req.user;
+        if (!user) {
+            res.status(401).json({ message: 'Unauthorized' });
+            return;
+        }
+        const isManager = user.role >= Role.MANAGER || await isUserEventManager(req.params.eventId, user.username);
+        if (!isManager) {
+            res.status(403).json({ message: 'You are not a manager for this event' });
+            return;
+        }
         const updatedEvent = await updateEvent(req.params.eventId, req.body);
         res.json(updatedEvent);
     } catch (error) {
         console.error('Error updating event:', error);
         res.status(500).json({ message: 'Error updating event', details: JSON.stringify(error) });
+    }
+});
+
+// Assign managers to event (admin only)
+router.post('/:eventId/managers', adminMiddleware, async (req: Request, res: Response) => {
+    try {
+        const { managers } = req.body; // array of usernames/emails
+        await assignManagersToEvent(req.params.eventId, managers);
+        res.json({ message: 'Managers assigned successfully' });
+    } catch (error) {
+        console.error('Error assigning managers:', error);
+        res.status(500).json({ message: 'Error assigning managers', details: error });
+    }
+});
+
+router.get('/:eventId/managers', adminMiddleware, async (req: Request, res: Response) => {
+    try {
+        const managers = await getEventManagers(req.params.eventId);
+        res.json(managers);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching managers', details: error });
     }
 });
 

@@ -1,23 +1,27 @@
+import { EventType, Role } from '@common/constants';
+import Event from '@common/models/Event';
+import { EventForm } from '@components/Event/admin/EventForm';
+import HighlightsCarousel from '@components/Event/HighlightsCarousel';
+import { EventCard, HomeHeader, Section } from '@components/Home';
+import SendNotificationsDialog from '@components/Home/admin/SendNotificationsDialog';
+import NoEventsDisplay from '@components/Home/NoEventsDisplay';
+import { NotificationPrompt } from '@components/shared';
+import { useLogin } from '@components/shared/LoginContext';
+import PageTransition from '@components/shared/PageTransition';
+import PhotoGallery from '@components/shared/PhotoGallery';
+import { useCreateEvent } from '@hooks/admin';
+import { useArticles, useAssignManagers, useEvents } from '@hooks/useApi';
+import useImgur from '@hooks/useImgur';
+import useNotifications from '@hooks/useNotifications';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Alert, Box, Card, CardContent, CardMedia, Chip, Container, Skeleton, Typography } from '@mui/material';
+import { Alert, Box, Button, CardContent, CardMedia, Chip, Container, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, Snackbar, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { motion } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState } from 'react';
-
-import { EventType } from '@common/constants';
-import { EventCard, HomeHeader, Section } from '@components/Home';
-import NoEventsDisplay from '@components/Home/NoEventsDisplay';
-import PageTransition from '@components/shared/PageTransition';
-import { useArticles, useEvents } from '@hooks/useApi';
-import useImgur from '@hooks/useImgur';
+import slugify from '@utils/Slugify';
 import { pascalCase } from '@utils/utils';
-import React from 'react';
-import { Link } from 'react-router-dom';
-import PhotoGallery from '@components/shared/PhotoGallery';
-import HighlightsCarousel from '@components/Event/HighlightsCarousel';
-import { NotificationPrompt } from '@components/shared';
-import useNotifications from '@hooks/useNotifications';
+import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
   display: flex;
@@ -64,12 +68,37 @@ const ArticleCard = styled(Link)(({ theme }) => ({
 }));
 
 function HomePage() {
+  const { userData } = useLogin();
+  const [manageDialogOpen, setManageDialogOpen] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [managerEmails, setManagerEmails] = useState('');
+  const [assignError, setAssignError] = useState('');
+  const [formError, setError] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [notificationDialogOpen, setNotificationDialogOpen] = useState(false);
+  const { mutateAsync: createEvent } = useCreateEvent();
+  const { mutateAsync: assignManagers, status: assignStatus } = useAssignManagers();
+  const assigning = assignStatus === 'pending';
+
+  // Assign managers to event
+  const handleAssignManagers = async () => {
+    if (!selectedEventId) return;
+    setAssignError('');
+    try {
+      const emails = managerEmails.split(',').map(e => e.trim()).filter(Boolean);
+      await assignManagers({ eventId: selectedEventId, managers: emails });
+      setManageDialogOpen(false);
+      setManagerEmails('');
+    } catch (e) {
+      setAssignError('Failed to assign managers');
+    }
+  };
   const mounted = useRef(false);
   useEffect(() => { if (mounted.current) return; else mounted.current = true; }, []);
 
-  const { data: events, isLoading: isEventsLoading, error } = useEvents();
+  const { events, isLoading: isEventsLoading, error } = useEvents();
   const { data: articles, isLoading: isArticlesLoading } = useArticles();
-  const { data: imgur, isLoading: imgurLoading } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
+  const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur((events || []).map(it => it.galleryLink).reverse().filter(it => it.length > 0)[0] || '');
   const { isSubscribed } = useNotifications()
 
   const [catTabId, setTabId] = useState([0, -1]);
@@ -77,9 +106,9 @@ function HomePage() {
 
   const filteredEvents = (events ?? [])
     .filter(event => catTabId[1] > 0 ? event.type === catTabId[1] : true)
-    .sort((a, b) => a.time.start.getTime() - b.time.start.getTime());
+    .sort((a, b) => b.time.start.getTime() - a.time.start.getTime());
 
-  const ongoingEvents = filteredEvents?.filter((it) => it.time.start < new Date() && it.time.end > new Date()).slice(0, 6) || [];
+  const ongoingEvents = filteredEvents?.filter((it) => it.time.start < new Date() && it.time.end > new Date()).slice(0, 3) || [];
   const upcomingEvents = filteredEvents?.filter((it) => it.time.start > new Date()).slice(0, 3) || [];
   const pastEvents = filteredEvents?.filter((it) => it.time.end < new Date()).slice(0, 3) || [];
 
@@ -185,33 +214,51 @@ function HomePage() {
   }, [events, catTabId]);
 
 
-  // temp - hardcode infinity 2025 highlights
-  const highlights = [
-    'https://i.imgur.com/hnY5dx2l.jpeg',
-    'https://i.imgur.com/8oNrZuzl.jpeg',
-    'https://i.imgur.com/2W2fEIYl.jpeg'
-  ];
-
+  const handleEventSave = async (formData: Partial<Event>) => {
+    const eventData = Event.parse({ ...formData, id: slugify(formData.name) });
+      try {
+        await createEvent(eventData);
+        setSearchParams(prev => { prev.delete('create'); return prev; }, { replace: true });
+        // refetch();+
+      } catch (error) {
+        setError((error instanceof Error ? error.message : 'Failed to save event'));
+        console.error('Failed to save event:', error);
+      }
+    };
 
   return (
     <PageTransition>
       <Container maxWidth="lg">
         <HomeHeader tabValue={catTabId[0]} onTabChange={handleTabChange} />
 
-        {/* Highlights Section */}
-        {highlights && (
-          <Section title='Infinity 2025 Highlights' moreLink='/infinity-2025'>
-            <HighlightsCarousel images={highlights} />
+        {/* Highlights Section - Show latest ongoing event highlights */}
+        {ongoingEvents[0]?.highlights && (
+          <Section title={ongoingEvents[0].name + ' Highlights'} moreLink={'/' + ongoingEvents[0].id}>
+            <HighlightsCarousel images={ongoingEvents[0].highlights.split(',')} />
           </Section>
         )}
 
         {/* Prompt to enable notifications */}
-        <Box sx={{display: !isSubscribed?'block':'none' }}>
+        {/* <Box sx={{display: !isSubscribed?'block':'none' }}>
           <Alert sx={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }}>We're currently sending out announcements through the FET-Hub app! Enable notifications to stay updated!!</Alert>
           <NotificationPrompt sx={{'h6, p, div': { display: 'none' }}}/>
-        </Box>
+        </Box> */}
 
-        {/* Dynamically render the Events section with more events first (past tries to be last) */}
+        {/* Admin Actions Section (Admin only) */}
+        {userData?.role >= Role.ADMIN && (
+          <Section title='Admin Actions'>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
+              <Button variant="outlined" color="secondary" onClick={() => setSearchParams(prev => ({ ...prev, create: 'event' }))}>
+                Create New Event
+              </Button>
+              <Button variant="outlined" color="warning" onClick={() => setNotificationDialogOpen(true)}>
+                Send Notification
+              </Button>
+            </Box>
+          </Section>
+        )}
+
+        {/* Dynamically render the Events section with ongoing events first (past tries to be last) */}
         {sortedSections.map(section => (
           <React.Fragment key={section.key}>
             {section.view}
@@ -220,13 +267,13 @@ function HomePage() {
 
         {/* Photos Section */}
         <Section title='Gallery'>
-          <PhotoGallery images={imgur ? imgur.map(it => it.link) : []} isLoading={imgurLoading} rows={2} columns={4} />
+          <PhotoGallery images={imgur ? imgur.map(it => it.link) : []} isLoading={imgurLoading} rows={2} columns={4} loadFailed={imgurError} />
         </Section>
 
         {/* Articles Section */}
         <Section title='Articles' moreLink='/articles'>
           <Box sx={{ position: 'relative', px: 2, mb: 2, overflow: 'visible' }}>
-            <HorizontalScroll 
+            <HorizontalScroll
               whileTap={{ cursor: 'grabbing' }}
               // Only apply these props for non-mobile (they can interfere with native scrolling)
               {...(window.innerWidth > 600 ? {
@@ -250,25 +297,25 @@ function HomePage() {
                           height="180"
                           image={article.image.url}
                           alt={article.title}
-                          sx={{ 
+                          sx={{
                             transition: 'transform 0.6s ease-in-out',
-                            '&:hover': { transform: 'scale(1.08)' } 
+                            '&:hover': { transform: 'scale(1.08)' }
                           }}
                         />
-                        <Box sx={{ 
-                          position: 'absolute', 
-                          top: 0, 
-                          left: 0, 
-                          width: '100%', 
-                          height: '100%', 
+                        <Box sx={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
                           background: 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.4))',
-                        }}/>
-                        <Chip 
+                        }} />
+                        <Chip
                           size="small"
-                          label={pascalCase(EventType[article.relatedEventType]) || 'Article'} 
-                          sx={{ 
-                            position: 'absolute', 
-                            top: 12, 
+                          label={pascalCase(EventType[article.relatedEventType]) || 'Article'}
+                          sx={{
+                            position: 'absolute',
+                            top: 12,
                             right: 12,
                             backgroundColor: 'ButtonShadow',
                             // color: 'white',
@@ -282,8 +329,8 @@ function HomePage() {
                           <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, lineHeight: 1.2 }}>
                             {article.title}
                           </Typography>
-                          <Typography 
-                            variant="body2" 
+                          <Typography
+                            variant="body2"
                             color="text.secondary"
                             sx={{
                               display: '-webkit-box',
@@ -299,14 +346,14 @@ function HomePage() {
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <AccessTimeIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }}/>
+                            <AccessTimeIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
                             <Typography variant="caption" color="text.secondary">
                               {article.readingTimeMinutes || 1} min read
                             </Typography>
                           </Box>
-                          <Box sx={{ 
-                            color: 'primary.main', 
-                            display: 'flex', 
+                          <Box sx={{
+                            color: 'primary.main',
+                            display: 'flex',
                             alignItems: 'center',
                             fontWeight: 'bold',
                             fontSize: '0.75rem'
@@ -320,10 +367,61 @@ function HomePage() {
                   </motion.div>
                 ))}
               {/* Add empty spacer at the end for better scrolling experience */}
-              <Box sx={{ minWidth: 16 }} /> 
+              <Box sx={{ minWidth: 16 }} />
             </HorizontalScroll>
           </Box>
         </Section>
+        {/* Manager Assignment Dialog (admin only) */}
+        <Dialog open={manageDialogOpen} onClose={() => setManageDialogOpen(false)}>
+          <DialogTitle>Assign Managers (by email)</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Manager Emails (comma separated)"
+              value={managerEmails}
+              onChange={e => setManagerEmails(e.target.value)}
+              fullWidth
+              autoFocus
+              margin="dense"
+              placeholder="manager1@email.com, manager2@email.com"
+            />
+            {assignError && <Typography color="error">{assignError}</Typography>}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setManageDialogOpen(false)} disabled={assigning}>Cancel</Button>
+            <Button onClick={handleAssignManagers} disabled={assigning || !managerEmails.trim()} variant="contained">Assign</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Send Notifications Dialog (admin only) */}
+        <Dialog 
+          open={notificationDialogOpen} 
+          onClose={() => setNotificationDialogOpen(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <SendNotificationsDialog />
+        </Dialog>
+
+        {/* Fullscreen Edit Dialog */}
+        <Dialog open={searchParams.get('create') === 'event'} maxWidth={false} fullScreen>
+          <EventForm
+            isCreating={true}
+            onSave={handleEventSave}
+            onCancel={() => setSearchParams(prev => { prev.delete('create'); return prev; }, { replace: true })}
+          />
+        </Dialog>
+        
+        {/* Error Notification */}
+        <Snackbar
+          open={!!formError}
+          autoHideDuration={6000}
+          onClose={() => setError(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>
+            {formError}
+          </Alert>
+        </Snackbar>
       </Container>
     </PageTransition>
   );

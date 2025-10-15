@@ -26,20 +26,22 @@ export const initializeMessaging = async () => {
 							if (subscribedToken !== currentToken) {
 								console.log("New token received. Subscribing to topic...");
 
+								const topic = (import.meta.env.VERCEL_ENV == "production") ? 'all-users' : 'all-users-test';
+
 								// Subscribe to the 'all-users' topic
 								await fetch(`${config.API_BASE_URL}/user/subscribe`, {
 									method: "POST",
 									headers: {
 										"Content-Type": "application/json",
 									},
-									body: JSON.stringify({ token: currentToken, topic: (process.env.VERCEL_ENV == "preview" || process.env.NODE_ENV === "development") ? 'all-users-test' : 'all-users' }),
+									body: JSON.stringify({ token: currentToken, topic: topic, }),
 								})
 									.then((response) => {
 										if (response.ok) {
-											console.log("Subscribed to topic successfully");
+											console.log("Successfully subscribed to topic", topic);
 											localStorage.setItem("subscribedToken", currentToken);
 										} else {
-											console.error("Failed to subscribe to topic");
+											console.error("Failed to subscribe to topic", topic);
 											return null;
 										}
 									})

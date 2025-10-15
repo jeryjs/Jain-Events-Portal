@@ -8,11 +8,44 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.invalidateEventsCache = exports.deleteEvent = exports.updateEvent = exports.createEvent = exports.getEventById = exports.getEvents = void 0;
+exports.invalidateEventsCache = exports.deleteEvent = exports.updateEvent = exports.createEvent = exports.getEventById = exports.getEvents = exports.isUserEventManager = exports.getEventManagers = exports.assignManagersToEvent = void 0;
+// Assign managers to an event (admin only)
+const assignManagersToEvent = (eventId, managers) => __awaiter(void 0, void 0, void 0, function* () {
+    // Store managers as an array of usernames/emails in the event document
+    yield eventsCollection.doc(eventId).update({ managers });
+    cache_1.cache.del(`${ITEM_KEY_PREFIX}-${eventId}`);
+});
+exports.assignManagersToEvent = assignManagersToEvent;
+// Get managers for an event
+const getEventManagers = (eventId) => __awaiter(void 0, void 0, void 0, function* () {
+    const doc = yield eventsCollection.doc(eventId).get();
+    if (!doc.exists)
+        return [];
+    const data = doc.data();
+    return (data === null || data === void 0 ? void 0 : data.managers) || [];
+});
+exports.getEventManagers = getEventManagers;
+// Check if a user is a manager for an event
+const isUserEventManager = (eventId, username) => __awaiter(void 0, void 0, void 0, function* () {
+    const managers = yield (0, exports.getEventManagers)(eventId);
+    return managers.includes(username);
+});
+exports.isUserEventManager = isUserEventManager;
 const Event_1 = __importDefault(require("@common/models/Event"));
 const utils_1 = require("@common/utils");
 const cache_1 = require("@config/cache");
@@ -25,12 +58,21 @@ const ITEM_KEY_PREFIX = "events";
 /**
  * Get all events
  */
-const getEvents = () => __awaiter(void 0, void 0, void 0, function* () {
+// Helper to filter sensitive fields
+function filterEventForUser(event, user) {
+    // Only admins or managers for this event can see managers field
+    if (!user || (user.role < 100 && !(event.managers && event.managers.includes(user.username)))) {
+        const { managers } = event, rest = __rest(event, ["managers"]);
+        return rest;
+    }
+    return event;
+}
+const getEvents = (user) => __awaiter(void 0, void 0, void 0, function* () {
     return (0, cacheUtils_1.getCachedCollection)({
         key: COLLECTION_KEY,
         fetchFn: () => __awaiter(void 0, void 0, void 0, function* () {
             const snapshot = yield eventsCollection.get();
-            return (0, utils_1.parseEvents)(snapshot.docs.map(doc => doc.data()));
+            return (0, utils_1.parseEvents)(snapshot.docs.map(doc => filterEventForUser(doc.data(), user)));
         }),
         ttl: cache_1.TTL.EVENTS
     });
@@ -39,14 +81,14 @@ exports.getEvents = getEvents;
 /**
  * Get event by ID
  */
-const getEventById = (eventId) => __awaiter(void 0, void 0, void 0, function* () {
+const getEventById = (eventId, user) => __awaiter(void 0, void 0, void 0, function* () {
     return (0, cacheUtils_1.getCachedItem)({
         key: `${ITEM_KEY_PREFIX}-${eventId}`,
         fetchFn: () => __awaiter(void 0, void 0, void 0, function* () {
             const doc = yield eventsCollection.doc(eventId).get();
             if (!doc.exists)
                 return null;
-            return Event_1.default.parse(doc.data());
+            return Event_1.default.parse(filterEventForUser(doc.data(), user));
         }),
         ttl: cache_1.TTL.EVENTS
     });
@@ -73,16 +115,11 @@ exports.createEvent = createEvent;
  * Update existing event
  */
 const updateEvent = (eventId, eventData) => __awaiter(void 0, void 0, void 0, function* () {
-    const event = Event_1.default.parse(eventData);
-    return (0, cacheUtils_1.updateCachedItem)({
-        item: event,
-        collectionKey: COLLECTION_KEY,
-        itemKeyPrefix: ITEM_KEY_PREFIX,
-        updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () {
-            yield eventsCollection.doc(item.id).update(item.toJSON());
-        }),
-        ttl: cache_1.TTL.EVENTS
-    });
+    // Only update provided fields (patch)
+    yield eventsCollection.doc(eventId).update(eventData);
+    // Invalidate cache for this event
+    cache_1.cache.del(`${ITEM_KEY_PREFIX}-${eventId}`);
+    return (yield eventsCollection.doc(eventId).get()).data();
 });
 exports.updateEvent = updateEvent;
 /**

@@ -14,6 +14,7 @@ import HomePage from './pages/HomePage';
 import TimelinePage from './pages/TimelinePage';
 import { ColorModeContext, useColorMode } from './utils/ColorMode';
 import queryClient from './utils/QueryClient';
+import React from 'react';
 
 function App() {
   const colorMode = useColorMode();
@@ -21,6 +22,7 @@ function App() {
   const theme = useMemo(
     () =>
       createTheme({
+        shape: { borderRadius: 8 },
         palette: {
           mode: colorMode.mode,
           primary: {
@@ -40,19 +42,28 @@ function App() {
           <LoginProvider>
             <BrowserRouter>
               <Routes>
-                {/* Articles routes - specific ones first */}
-                <Route path="/articles/:articleId" element={<ArticlePage />} />
-                <Route path="/articles" element={<ArticlesPage />} />
-                {/* Timeline route */}
-                <Route path="/timeline" element={<TimelinePage />} />
-                {/* Event routes */}
-                <Route path="/:eventId/:activityId" element={<ActivityPage />} />
-                <Route path="/:eventId" element={<EventPage />} />
-                <Route path="/" element={<HomePage />} />
+                  {/* Timeline route */}
+                  <Route path="/timeline" element={<TimelinePage />} />
+                  {/* Articles routes - specific ones first */}
+                  <Route path="/articles/:articleId" element={<ArticlePage />} />
+                  <Route path="/articles" element={<ArticlesPage />} />
+                  {/* Event routes */}
+                  <Route path="/:eventId/:activityId" element={<ActivityPage />} />
+                  <Route path="/:eventId" element={<EventPage />} />
+                  <Route path="/" element={<HomePage />} />
               </Routes>
 
-              {/* Show prompt to install PWA */}
-              <InstallPrompt />
+              {/*
+                Delay showing InstallPrompt by 20 seconds
+              */}
+              {(() => {
+                const [showPrompt, setShowPrompt] = React.useState(false);
+                React.useEffect(() => {
+                  const timer = setTimeout(() => setShowPrompt(true), 20000);
+                  return () => clearTimeout(timer);
+                }, []);
+                return showPrompt ? <InstallPrompt /> : null;
+              })()}
 
               {/* Vercel Analytics */}
               <SpeedInsights />

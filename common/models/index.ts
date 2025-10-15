@@ -2,7 +2,7 @@
 export { default as UserData } from "./UserData";
 export { default as Activity, TeamActivity } from "./Activity";
 export { default as Event } from "./Event";
-export type { BannerItem } from "./Event";
+export type { BannerItem, EventConfig } from "./Event";
 export { default as Participant, TeamParticipant } from "./Participant";
 export { default as Article } from "./Article";
 
@@ -16,6 +16,7 @@ export { default as SportsPlayer } from "./sports/SportsPlayer";
 
 // Export culturals models
 export { default as CulturalActivity } from "./culturals/CulturalActivity";
+export type { ActivityConfig } from "./culturals/CulturalActivity";
 export { default as Judge } from "./culturals/Judge";
 
 // export cultural model as technical model

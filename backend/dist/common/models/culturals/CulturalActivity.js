@@ -3,22 +3,38 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const models_1 = require("@common/models");
 class CulturalActivity extends models_1.Activity {
     constructor(id, name, startTime, endTime, type, participants, judges = [], teams = [], pollData = [], showPoll = false, winners = [], // for solo events, teamId is the participant's usn
-    isSoloPerformance) {
-        var _a;
+    isSoloPerformance, config) {
         super(id, name, startTime, endTime, participants, type);
         this.judges = judges;
         this.teams = teams;
         this.pollData = pollData;
         this.showPoll = showPoll;
         this.winners = winners;
-        this.isSoloPerformance = isSoloPerformance;
-        this.isSoloPerformance = (_a = this.isSoloPerformance) !== null && _a !== void 0 ? _a : (this.teams.length === 0 || this.teams.every(t => this.getTeamParticipants(t.id).length <= 1));
+        // Backward compatibility: use config if provided, otherwise create from individual properties
+        this.config = config !== null && config !== void 0 ? config : {
+            isSoloPerformance: isSoloPerformance !== null && isSoloPerformance !== void 0 ? isSoloPerformance : (this.teams.length === 0 || this.teams.every(t => this.getTeamParticipants(t.id).length <= 1)),
+            useSelectedTerminology: false
+        };
+    }
+    // Getter for backward compatibility
+    get isSoloPerformance() {
+        return this.config.isSoloPerformance;
+    }
+    // Setter for backward compatibility
+    set isSoloPerformance(value) {
+        this.config.isSoloPerformance = value;
     }
     static parse(data) {
-        var _a;
+        var _a, _b, _c, _d;
         const s = super.parse(Object.assign(Object.assign({}, data), { type: 0 })); // set type to 0 to avoid circular reference
         const judges = (_a = data.judges) === null || _a === void 0 ? void 0 : _a.map((j) => models_1.Judge.parse(j));
-        return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, data.type || data.eventType, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, data.isSoloPerformance);
+        // Handle both new config structure and legacy individual properties
+        const config = (_b = data.config) !== null && _b !== void 0 ? _b : {
+            isSoloPerformance: (_c = data.isSoloPerformance) !== null && _c !== void 0 ? _c : false,
+            useSelectedTerminology: (_d = data.useSelectedTerminology) !== null && _d !== void 0 ? _d : false
+        };
+        return new CulturalActivity(s.id, s.name, s.startTime, s.endTime, data.type || data.eventType, s.participants, judges, data.teams, data.pollData, data.showPoll, data.winners, undefined, // isSoloPerformance (legacy)
+        config);
     }
     get canVote() {
         return this.showPoll && this.startTime <= new Date() && (!this.endTime || this.endTime >= new Date());
