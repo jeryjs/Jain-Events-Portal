@@ -239,10 +239,10 @@ function HomePage() {
         )}
 
         {/* Prompt to enable notifications */}
-        <Box sx={{display: !isSubscribed?'block':'none' }}>
+        {/* <Box sx={{display: !isSubscribed?'block':'none' }}>
           <Alert sx={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }}>We're currently sending out announcements through the FET-Hub app! Enable notifications to stay updated!!</Alert>
           <NotificationPrompt sx={{'h6, p, div': { display: 'none' }}}/>
-        </Box>
+        </Box> */}
 
         {/* Admin Actions Section (Admin only) */}
         {userData?.role >= Role.ADMIN && (
