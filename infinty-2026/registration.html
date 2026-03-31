@@ -1,0 +1,39 @@
+<!-- 
+ This will be a single file web app for implementing registration form for infinity 2026
+ which will be heavily themed on "Multiverse". This single file html webpage will also include
+ a fully featured payment integration with Razorpay. If theres any server requirements, then we
+ have an on-prem server and any deployments to it will need to be done as a separate code/project. 
+-->
+
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"/><title>Infinity 2026 | Razorpay POC</title></head>
+<body>
+  <h1>Infinity 2026 registration demo</h1>
+  <form><script src="https://checkout.razorpay.com/v1/payment-button.js" data-payment_button_id="pl_SXqRo9Zv778I40" async> </script> </form>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<button id="payBtn">Pay ₹100</button>
+<script>
+document.getElementById("payBtn").onclick = async () => {
+  const resp = await fetch("http://localhost:3000/create-order", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({amount:10000, name:"Test User"})
+  });
+  const order = await resp.json();
+  const options = {
+    key: "rzp_test_SXqOW3Iy6obVwz",
+    amount: order.amount,
+    currency: "INR",
+    name: "Infinity 2026",
+    order_id: order.id,
+    handler: function(response){
+      alert("Paid: " + response.razorpay_payment_id);
+      // 1) optionally ping server to confirm by payment_id/order_id
+    }
+  };
+  new Razorpay(options).open();
+};
+</script>
+</body>
+</html>
