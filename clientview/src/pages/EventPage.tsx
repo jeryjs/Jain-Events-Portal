@@ -434,7 +434,7 @@ function EventPage() {
   const { mutateAsync: createActivity } = useCreateActivity(eventId);
 
   const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId);
-  const { data: imgur, isFetched: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
+  const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionTruncated, setIsDescriptionTruncated] = useState(false);
