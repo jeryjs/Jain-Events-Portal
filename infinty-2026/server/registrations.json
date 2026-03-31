@@ -1,0 +1,118 @@
+[
+  {
+    "id": "reg_1774966466572_387",
+    "name": "Success Demo",
+    "email": "success@example.com",
+    "phone": "9000000002",
+    "amount": 10000,
+    "receipt": "infinty_1774966466458",
+    "order_id": "order_SXrVGfxJmXU1JZ",
+    "status": "paid",
+    "events": [
+      {
+        "status": "created",
+        "at": "2026-03-31T14:14:26.572Z",
+        "detail": {
+          "source": "register"
+        }
+      },
+      {
+        "status": "checkout_opened",
+        "at": "2026-03-31T14:14:26.585Z",
+        "detail": {
+          "source": "smoke"
+        }
+      },
+      {
+        "status": "payment_success_client",
+        "at": "2026-03-31T14:14:26.594Z",
+        "detail": {
+          "source": "smoke",
+          "payment_id": "pay_demo_123"
+        }
+      },
+      {
+        "status": "paid",
+        "at": "2026-03-31T14:14:26.608Z",
+        "detail": {
+          "source": "webhook",
+          "payment_id": "pay_demo_123"
+        }
+      }
+    ],
+    "createdAt": "2026-03-31T14:14:26.572Z",
+    "updatedAt": "2026-03-31T14:14:26.608Z",
+    "paidAt": "2026-03-31T14:14:26.608Z"
+  },
+  {
+    "id": "reg_1774966658426_249",
+    "name": "Test Student",
+    "email": "student@example.com",
+    "phone": "9876543210",
+    "amount": 10000,
+    "receipt": "infinty_1774966658113",
+    "order_id": "order_SXrYe5baGWdSyx",
+    "status": "payment_success_client",
+    "events": [
+      {
+        "status": "created",
+        "at": "2026-03-31T14:17:38.426Z",
+        "detail": {
+          "source": "register"
+        }
+      },
+      {
+        "status": "checkout_opened",
+        "at": "2026-03-31T14:17:38.433Z",
+        "detail": {
+          "source": "frontend"
+        }
+      },
+      {
+        "status": "payment_success_client",
+        "at": "2026-03-31T14:18:03.671Z",
+        "detail": {
+          "payment_id": "pay_SXrYp7pjCjAdJ0",
+          "payment_signature": "45fb22506690f362b1632f11ef1a50a0a5eb56deb9e668bbdcc23af55de4a116"
+        }
+      }
+    ],
+    "createdAt": "2026-03-31T14:17:38.426Z",
+    "updatedAt": "2026-03-31T14:18:03.671Z"
+  },
+  {
+    "id": "reg_1774966690298_362",
+    "name": "Test Student",
+    "email": "student@example.com",
+    "phone": "9876543210",
+    "amount": 10000,
+    "receipt": "infinty_1774966689951",
+    "order_id": "order_SXrZCqxIp1X7Ja",
+    "status": "checkout_cancelled",
+    "events": [
+      {
+        "status": "created",
+        "at": "2026-03-31T14:18:10.298Z",
+        "detail": {
+          "source": "register"
+        }
+      },
+      {
+        "status": "checkout_opened",
+        "at": "2026-03-31T14:18:10.304Z",
+        "detail": {
+          "source": "frontend"
+        }
+      },
+      {
+        "status": "checkout_cancelled",
+        "at": "2026-03-31T14:18:13.608Z",
+        "detail": {
+          "source": "modal.ondismiss"
+        }
+      }
+    ],
+    "createdAt": "2026-03-31T14:18:10.298Z",
+    "updatedAt": "2026-03-31T14:18:13.608Z"
+  }
+]
