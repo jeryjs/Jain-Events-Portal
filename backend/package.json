@@ -4,7 +4,7 @@
   "description": "A events management portal for Jain Universtiy",
   "main": "index.ts",
   "scripts": {
-    "start": "pnpx nodemon ./index.ts",
+    "start": "node dist/backend/index.js",
     "build": "rimraf dist && tsc",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add dist",
