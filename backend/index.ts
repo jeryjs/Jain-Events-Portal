@@ -74,13 +74,12 @@ app.use(cors<Request>({
 			'http://localhost:5781',
 			'https://jain-fet-hub.web.app',
 			'https://jain-fet-hub.vercel.app',
-			'https://jeryjs.me',
-			'https://admin.jeryjs.me',
+			'https://hub.sa-fet.com',
 		];
 		if (allowedOrigins.includes(origin))
 			return callback(null, true);
 		
-		return callback(new Error('Not allowed by CORS'));
+		return callback(new Error(`Origin '${origin}' is not allowed by CORS`));
 	},
 	credentials: true // Allow credentials (cookies, authorization headers, etc.)
 }));
