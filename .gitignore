@@ -29,5 +29,8 @@ dev-dist
 *.sln
 *.sw?
 
+# Local environment variables
+.env
+
 
 scanner_manual.html
