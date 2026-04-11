@@ -84,7 +84,8 @@ export default defineConfig({
       '@pages': path.resolve(__dirname, './src/pages'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@utils': path.resolve(__dirname, './src/utils'),
-    }
+    },
+    conditions: ['mui-modern', 'module', 'browser', 'development|production']
   },
   server: {
     port: 5780,
@@ -96,15 +97,20 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Bundle everything into fewer chunks to reduce Vercel requests
-        manualChunks: {
+        manualChunks: (id) => {
           // Single vendor chunk for all dependencies
-          vendor: ['react', 'react-dom', '@mui/material', '@mui/icons-material', '@mui/lab', '@tanstack/react-query', 'framer-motion'],
+          const vendors = ['react', 'react-dom', '@mui/material', '@mui/icons-material', '@mui/lab', '@tanstack/react-query', 'framer-motion'];
+          if (vendors.some(v => id.includes(v))) {
+            return 'vendor';
+          }
         },
         // Reduce the number of separate CSS files
         assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split('.');
+          const assetName = assetInfo.names[0];
+          if (!assetName) return 'assets/[name]-[hash][extname]';
+          const info = assetName.split('.');
           const ext = info[info.length - 1];
-          if (/\.(css)$/.test(assetInfo.name)) {
+          if (/\.(css)$/.test(assetName)) {
             return `assets/[name]-[hash].${ext}`;
           }
           return `assets/[name]-[hash].${ext}`;

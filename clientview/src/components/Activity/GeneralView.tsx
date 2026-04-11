@@ -9,7 +9,13 @@ export const GeneralView = ({ activity }) => {
     return (
       <Box>
         <Section>
-          <Typography variant="h5" component="h2" fontWeight="bold" sx={{ mb: 2 }}>
+          <Typography
+            variant="h5"
+            component="h2"
+            sx={{
+              fontWeight: "bold",
+              mb: 2
+            }}>
             Activity Details
           </Typography>
           <Paper sx={{ p: 3, borderRadius: 2 }}>
@@ -18,9 +24,14 @@ export const GeneralView = ({ activity }) => {
             </Typography>
           </Paper>
         </Section>
-        
         <Section>
-          <Typography variant="h5" component="h2" fontWeight="bold" sx={{ mb: 2 }}>
+          <Typography
+            variant="h5"
+            component="h2"
+            sx={{
+              fontWeight: "bold",
+              mb: 2
+            }}>
             Participants
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>

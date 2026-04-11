@@ -144,25 +144,37 @@ const ThrowballOverview = ({ activity, game }: { activity: SportsActivity<Sport>
         return (
             <Card elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
                 <Box sx={{ bgcolor: 'primary.dark', color: 'white', p: 2, textAlign: 'center' }}>
-                    <Typography variant="h6" fontWeight="bold">Upcoming Throwball Match</Typography>
+                    <Typography variant="h6" sx={{
+                        fontWeight: "bold"
+                    }}>Upcoming Throwball Match</Typography>
                 </Box>
                 <CardContent>
-                    <Typography variant="subtitle1" color="text.secondary" align="center">
+                    <Typography variant="subtitle1" align="center" sx={{
+                        color: "text.secondary"
+                    }}>
                         Match starts at:
                     </Typography>
-                    <Typography variant="h5" align="center" fontWeight="bold" sx={{ my: 2 }}>
+                    <Typography
+                        variant="h5"
+                        align="center"
+                        sx={{
+                            fontWeight: "bold",
+                            my: 2
+                        }}>
                         {new Date(activity.startTime).toLocaleString()}
                     </Typography>
 
                     <Box sx={{ my: 3 }}>
                         <Grid container spacing={2}>
                             {activity.teams.map(team => (
-                                <Grid item xs={6} key={team.id}>
+                                <Grid key={team.id} size={6}>
                                     <Paper elevation={1} sx={{ p: 2, textAlign: 'center' }}>
                                         <Avatar sx={{ width: 56, height: 56, mx: 'auto', mb: 1, bgcolor: 'primary.main' }}>
                                             {team.name?.charAt(0) || '?'}
                                         </Avatar>
-                                        <Typography variant="body1" fontWeight="medium">{team.name}</Typography>
+                                        <Typography variant="body1" sx={{
+                                            fontWeight: "medium"
+                                        }}>{team.name}</Typography>
                                     </Paper>
                                 </Grid>
                             ))}
@@ -176,7 +188,7 @@ const ThrowballOverview = ({ activity, game }: { activity: SportsActivity<Sport>
     return (
         <Grid container spacing={3}>
             {/* Match Summary Card */}
-            <Grid item xs={12}>
+            <Grid size={12}>
                 <Paper
                     elevation={2}
                     sx={{
@@ -204,7 +216,12 @@ const ThrowballOverview = ({ activity, game }: { activity: SportsActivity<Sport>
                     <Box sx={{ p: 3, pt: 5 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                             <SportsVolleyballIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-                            <Typography variant="h5" fontWeight="bold" color="primary.main">
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    fontWeight: "bold",
+                                    color: "primary.main"
+                                }}>
                                 Throwball Match
                             </Typography>
                         </Box>
@@ -218,9 +235,16 @@ const ThrowballOverview = ({ activity, game }: { activity: SportsActivity<Sport>
                                 color: 'success.contrastText',
                                 borderRadius: 1
                             }}>
-                                <Box display="flex" alignItems="center" justifyContent="center">
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center"
+                                    }}>
                                     <EmojiEventsIcon sx={{ mr: 1 }} />
-                                    <Typography variant="h6" fontWeight="bold">
+                                    <Typography variant="h6" sx={{
+                                        fontWeight: "bold"
+                                    }}>
                                         {winnerTeam.name} won the match
                                     </Typography>
                                 </Box>
@@ -265,7 +289,6 @@ const ThrowballOverview = ({ activity, game }: { activity: SportsActivity<Sport>
                                                         <TableCell sx={{ fontWeight: 'medium' }}>
                                                             Set {idx + 1}
                                                         </TableCell>
-
                                                         {activity.teams.map(team => {
                                                             const points = set.points.find(p => p.teamId === team.id)?.points || 0;
                                                             const isWinner = team.id === winningTeamId && points > 0;
@@ -283,7 +306,6 @@ const ThrowballOverview = ({ activity, game }: { activity: SportsActivity<Sport>
                                                                 </TableCell>
                                                             );
                                                         })}
-
                                                         <TableCell align="right">
                                                             {setWinnerTeam && maxPoints > 0 ? (
                                                                 <Chip
@@ -293,7 +315,9 @@ const ThrowballOverview = ({ activity, game }: { activity: SportsActivity<Sport>
                                                                     variant="outlined"
                                                                 />
                                                             ) : (
-                                                                <Typography variant="body2" color="text.secondary">-</Typography>
+                                                                <Typography variant="body2" sx={{
+                                                                    color: "text.secondary"
+                                                                }}>-</Typography>
                                                             )}
                                                         </TableCell>
                                                     </TableRow>
@@ -314,17 +338,30 @@ const ThrowballOverview = ({ activity, game }: { activity: SportsActivity<Sport>
 
                             <Grid container spacing={2}>
                                 {activity.teams.map(team => (
-                                    <Grid item xs={12} sm={6} key={team.id}>
+                                    <Grid
+                                        key={team.id}
+                                        size={{
+                                            xs: 12,
+                                            sm: 6
+                                        }}>
                                         <Card variant="outlined">
                                             <CardContent>
-                                                <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
+                                                <Typography variant="subtitle1" gutterBottom sx={{
+                                                    fontWeight: "medium"
+                                                }}>
                                                     {team.name}
                                                 </Typography>
 
                                                 {/* Players list */}
                                                 <Stack spacing={1}>
                                                     <Box>
-                                                        <Typography variant="body2" color="success.main" gutterBottom fontWeight="medium">
+                                                        <Typography
+                                                            variant="body2"
+                                                            gutterBottom
+                                                            sx={{
+                                                                color: "success.main",
+                                                                fontWeight: "medium"
+                                                            }}>
                                                             Playing
                                                         </Typography>
                                                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -344,7 +381,13 @@ const ThrowballOverview = ({ activity, game }: { activity: SportsActivity<Sport>
 
                                                     {activity.getTeamPlayers(team.id).filter(p => !p.isPlaying).length > 0 && (
                                                         <Box>
-                                                            <Typography variant="body2" color="text.secondary" gutterBottom fontWeight="medium">
+                                                            <Typography
+                                                                variant="body2"
+                                                                gutterBottom
+                                                                sx={{
+                                                                    color: "text.secondary",
+                                                                    fontWeight: "medium"
+                                                                }}>
                                                                 Substitutes
                                                             </Typography>
                                                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>

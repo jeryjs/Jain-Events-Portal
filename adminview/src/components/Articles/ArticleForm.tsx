@@ -9,7 +9,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid2 as Grid,
+  Grid,
   Divider,
   FormHelperText,
   CircularProgress,

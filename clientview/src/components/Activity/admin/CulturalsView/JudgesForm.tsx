@@ -173,9 +173,19 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
 
     return (
         <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 2
+                }}>
                 <Typography variant="h6">Judges</Typography>
-                <Box display="flex" alignItems="center">
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center"
+                    }}>
                     <Tooltip title={isJsonMode ? "Switch to Form View" : "Switch to JSON View"}>
                         <IconButton
                             onClick={handleToggleJsonMode}
@@ -191,7 +201,6 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
                     </Button>
                 </Box>
             </Box>
-
             {isJsonMode ? (
                 <Box>
                     <TextField
@@ -211,11 +220,23 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
                             }
                         }}
                     />
-                    <Box mt={1} px={1}>
-                        <Typography variant="caption" color="text.secondary">
+                    <Box
+                        sx={{
+                            mt: 1,
+                            px: 1
+                        }}>
+                        <Typography variant="caption" sx={{
+                            color: "text.secondary"
+                        }}>
                             {jsonError ? 'Fix the JSON error above to apply changes' : 'Changes are applied automatically when JSON is valid'}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                color: "text.secondary",
+                                display: 'block',
+                                mt: 0.5
+                            }}>
                             Required format: {'[{"name": "Judge Name", "profileUrl": "url", "description": "bio", "links": "html" }]'}
                         </Typography>
                     </Box>
@@ -223,8 +244,14 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
             ) : (
                 <>
                     {judges?.length === 0 ? (
-                        <Box py={2} textAlign="center">
-                            <Typography color="text.secondary">No judges added yet</Typography>
+                        <Box
+                            sx={{
+                                py: 2,
+                                textAlign: "center"
+                            }}>
+                            <Typography sx={{
+                                color: "text.secondary"
+                            }}>No judges added yet</Typography>
                         </Box>
                     ) : (
                         <List>
@@ -262,17 +289,20 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
                     )}
                 </>
             )}
-
             <Dialog open={isDialogOpen} onClose={handleClose} maxWidth="md" fullWidth>
                 <DialogTitle>{editIndex !== null ? 'Edit Judge' : 'Add Judge'}</DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2} sx={{ mt: 1 }}>
                         {error && (
-                            <Grid item xs={12}>
+                            <Grid size={12}>
                                 <Alert severity="error">{error}</Alert>
                             </Grid>
                         )}
-                        <Grid item xs={12} sm={6}>
+                        <Grid
+                            size={{
+                                xs: 12,
+                                sm: 6
+                            }}>
                             <TextField
                                 label="Name"
                                 value={formValues.name || ''}
@@ -281,7 +311,11 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid
+                            size={{
+                                xs: 12,
+                                sm: 6
+                            }}>
                             <TextField
                                 label="Profile Image URL"
                                 value={formValues.profilePic || ''}
@@ -290,7 +324,7 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
                                 placeholder="https://example.com/image.jpg"
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
                                 label="Description"
                                 value={formValues.description || ''}
@@ -301,9 +335,17 @@ export const JudgesForm = ({ judges, setJudges }: JudgesFormProps) => {
                                 placeholder="Brief biography or description of the judge"
                             />
                         </Grid>
-                        <Grid item xs={12}>
-                            <Box display="flex" flexDirection="column"> {/* Changed to column flex direction */}
-                                <Box display="flex" alignItems="center"> {/* Box to keep expand icon inline */}
+                        <Grid size={12}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column"
+                                }}> {/* Changed to column flex direction */}
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center"
+                                    }}> {/* Box to keep expand icon inline */}
                                     <TextField
                                         label="Portfolio (HTML)"
                                         value={formValues.portfolio || ''}

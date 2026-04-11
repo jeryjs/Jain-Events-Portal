@@ -34,7 +34,12 @@ const ManageTeamsForm = ({ teams, setTeams, participants, setParticipants, isSol
             <Card sx={{ mb: 2 }}>
                 <CardContent>
                     <Typography variant="h6">Teams</Typography>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center"
+                        }}>
                         <Typography variant="subtitle1">
                             Teams Configured: {teams.length}
                         </Typography>
@@ -46,7 +51,6 @@ const ManageTeamsForm = ({ teams, setTeams, participants, setParticipants, isSol
                     </Box>
                 </CardContent>
             </Card>
-
             {!isSoloPerformance ? (
                 <Box>
                     {teams.length > 0 ? (
@@ -110,7 +114,6 @@ const ManageTeamsForm = ({ teams, setTeams, participants, setParticipants, isSol
                     />
                 </Box>
             )}
-
             <Dialog open={isTeamsDialogOpen} onClose={handleCloseTeamsDialog} fullWidth maxWidth="sm">
                 <DialogContent>
                     <TeamsForm teams={teams} setTeams={setTeams} />

@@ -47,9 +47,8 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
       
       // Only parse to BlockNote if it's markdown content
       if (contentType === 'markdown') {
-        editor.tryParseMarkdownToBlocks(formData.content).then((blocks) => {
-          editor.replaceBlocks(editor.document, blocks);
-        });
+        const blocks = editor.tryParseMarkdownToBlocks(formData.content);
+        editor.replaceBlocks(editor.document, blocks);
       }
     } catch (error) {
       console.error('Error initializing editor:', error);
@@ -65,9 +64,8 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
 
   // Update markdown content when editor changes
   const handleEditorChange = () => {
-    editor.blocksToMarkdownLossy().then((markdown) => {
-      handleChange('content', markdown);
-    });
+    const markdown = editor.blocksToMarkdownLossy();
+    handleChange('content', markdown);
   };
 
   const handleContentTypeChange = (event: React.MouseEvent<HTMLElement>, newType: 'markdown' | 'html' | null) => {
@@ -90,7 +88,7 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
         <Typography variant="h6" gutterBottom>Information Page Details</Typography>
         
         <Grid container spacing={3}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TextField
               fullWidth
               label="Title"
@@ -102,7 +100,7 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
             />
           </Grid>
           
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                 Content
@@ -153,9 +151,8 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
                     onClick={() => {
                       setIsMarkdownMode(!isMarkdownMode);
                       if (isMarkdownMode) {
-                        editor.tryParseMarkdownToBlocks(formData.content).then((blocks) => {
-                          editor.replaceBlocks(editor.document, blocks);
-                        });
+                        const blocks = editor.tryParseMarkdownToBlocks(formData.content);
+                        editor.replaceBlocks(editor.document, blocks);
                       }
                     }}
                   >
@@ -183,7 +180,7 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
                 </>
               ) : (
                 // HTML Editor (with live preview in a spoiler)
-                <Box>
+                (<Box>
                   <TextField
                     fullWidth
                     multiline
@@ -208,7 +205,7 @@ export const InfoView = ({ formData, setFormData, errors = {} }: InfoViewProps) 
                       dangerouslySetInnerHTML={{ __html: formData.content || '' }}
                     />
                   </details>
-                </Box>
+                </Box>)
               )}
             </Paper>
             

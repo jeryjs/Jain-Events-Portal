@@ -1,5 +1,5 @@
 import db from '@config/firebase';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { cache, TTL } from '@config/cache';
 import { Activity, CulturalActivity } from '@common/models';
 import { parseActivities } from '@common/utils';
@@ -56,7 +56,7 @@ export const createActivity = async (eventId: string, activityData: any) => {
     throw new Error(`Event ${eventId} does not exist`);
   }
   
-  const activityId = activityData.id || uuidv4();
+  const activityId = activityData.id || randomUUID();
   activityData.id = activityId;
   
   return createCachedItem<Activity>({

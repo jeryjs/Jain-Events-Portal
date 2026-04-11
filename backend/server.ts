@@ -71,7 +71,7 @@ app.use(cors<Request>({
 		const allowedOrigins = [
 			'http://localhost:3000',
 			'http://localhost:5780',
-			'http://localhost:5781',
+			'http://localhost:5781','http://192.168.56.1:5780',
 			'https://jain-fet-hub.web.app',
 			'https://jain-fet-hub.vercel.app',
 			'https://hub.sa-fet.com',

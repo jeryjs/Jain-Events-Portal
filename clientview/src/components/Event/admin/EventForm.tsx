@@ -59,7 +59,7 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
     const { userData: user } = useLogin();
 
     // Show access denied if user doesn't have permission
-    if (!(user?.role >= Role.ADMIN || event?.managers?.includes(user?.username))) {
+    if (user && !(user.role >= Role.ADMIN || event?.managers?.includes(user.username))) {
         return (
             <Paper sx={{ borderRadius: 2, flexDirection: 'column', margin: 'auto auto', padding: { xs: 2, md: 3 }, minHeight: '30vh', minWidth: '60vw' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, width: '100%' }}>
@@ -68,8 +68,8 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                     <LockIcon sx={{ fontSize: 64, color: 'text.secondary' }} />
-                    <Typography variant="h6" color="text.secondary">You don't have permission to {isCreating ? 'create' : 'edit'} events.</Typography>
-                    <Typography variant="body1" color="text.secondary">Only administrators and event managers can modify events.</Typography>
+                    <Typography variant="h6" sx={{ color: "text.secondary" }}>You don't have permission to {isCreating ? 'create' : 'edit'} events.</Typography>
+                    <Typography variant="body1" sx={{ color: "text.secondary" }}>Only administrators and event managers can modify events.</Typography>
                 </Box>
             </Paper>
         );
@@ -111,7 +111,7 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
         if (!formData.venue?.trim()) errors.venue = 'Venue is required';
         if (!formData.description?.trim()) errors.description = 'Description is required';
         if (!formData.type?.toString().trim()) errors.type = 'Event type is required';
-        if (formData.timings.length < 2 || formData.timings[1] <= formData.timings[0]) {
+        if (!formData.timings || formData.timings.length < 2 || formData.timings[1] <= formData.timings[0]) {
             errors.timings = 'End time must be after start time';
         }
 
@@ -136,7 +136,7 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
         setIsSaving(true);
         try {
             // Only send changed fields for existing events
-            const changedData = isCreating ? formData : _getChangedFields(event, formData);
+            const changedData = isCreating ? formData : _getChangedFields(event!, formData);
             await onSave(changedData);
             setSaveSuccess(true);
 
@@ -245,7 +245,12 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                     }}
                 >
                     <AddPhotoAlternateIcon sx={{ fontSize: 48, color: '#999999' }} />
-                    <Typography variant="subtitle1" color="#999999" mt={1}>
+                    <Typography
+                        variant="subtitle1"
+                        sx={{
+                            color: "#999999",
+                            mt: 1
+                        }}>
                         Add Banner {item.type === 'image' ? 'Image' : 'Video'}
                     </Typography>
                 </Box>
@@ -389,7 +394,7 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setCurrentBannerIndex((prev) =>
-                                            prev === 0 ? formData.banner.length - 1 : prev - 1
+                                            prev === 0 ? formData.banner!.length - 1 : prev - 1
                                         );
                                     }}
                                     sx={{
@@ -411,7 +416,7 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setCurrentBannerIndex((prev) =>
-                                            (prev + 1) % formData.banner.length
+                                            (prev + 1) % formData.banner!.length
                                         );
                                     }}
                                     sx={{
@@ -498,7 +503,9 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                                     {/* Banner Navigation in Overlay */}
                                     {formData.banner && formData.banner.length > 1 && (
                                         <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Typography variant="body2" color="text.secondary">
+                                            <Typography variant="body2" sx={{
+                                                color: "text.secondary"
+                                            }}>
                                                 Banner {currentBannerIndex + 1} of {formData.banner.length}
                                             </Typography>
                                             <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', gap: 1 }}>
@@ -566,7 +573,7 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                                         <Button
                                             startIcon={<DeleteIcon />}
                                             color="error"
-                                            disabled={formData.banner?.length <= 1}
+                                            disabled={(formData.banner?.length ?? NaN) <= 1}
                                             onClick={() => removeCurrentBannerItem()}
                                             variant="outlined"
                                         >
@@ -695,8 +702,8 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                             <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
                                 <DateTimePicker
                                     label="Start Time"
-                                    value={dayjs(formData.timings[0])}
-                                    onChange={(newValue) => newValue && editFormData('timings', [newValue, formData.timings[1]])}
+                                    value={dayjs(formData.timings?.[0])}
+                                    onChange={(newValue) => newValue && editFormData('timings', [newValue, formData.timings?.[1]])}
                                     sx={{ flex: 1 }}
                                     viewRenderers={{
                                         hours: renderTimeViewClock,
@@ -707,8 +714,8 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                                 />
                                 <DateTimePicker
                                     label="End Time"
-                                    value={dayjs(formData.timings[1])}
-                                    onChange={(newValue) => newValue && editFormData('timings', [formData.timings[0], newValue])}
+                                    value={dayjs(formData.timings?.[1])}
+                                    onChange={(newValue) => newValue && editFormData('timings', [formData.timings?.[0], newValue])}
                                     sx={{ flex: 1 }}
                                     viewRenderers={{
                                         hours: renderTimeViewClock,
@@ -828,7 +835,7 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                         </AccordionSummary>
                         <AccordionDetails>
                             {/* Event Managers */}
-                            {(user?.role >= Role.ADMIN) && <Box sx={{ mb: 3 }}>
+                            {(user?.role || 0 >= Role.ADMIN) && <Box sx={{ mb: 3 }}>
                                 <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'medium' }}>
                                     Event Managers
                                 </Typography>
@@ -864,7 +871,12 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                             <Typography variant="subtitle1" sx={{ fontWeight: 'medium', mb: 1 }}>
                                 Expanded Categories
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "text.secondary",
+                                    mb: 2
+                                }}>
                                 Select which activity categories should be expanded by default in the event view.
                             </Typography>
                             <ToggleButtonGroup

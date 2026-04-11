@@ -117,7 +117,7 @@ const ArticlesHeader: React.FC<ArticlesHeaderProps> = ({
             }}>
             Articles & Insights
           </Typography>
-          <Typography variant="h6" color="rgba(255,255,255,0.8)" sx={{ mt: 1, textAlign: 'center' }}>
+          <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.8)", mt: 1, textAlign: 'center' }}>
             Explore the latest updates and stories from Jain FET!
           </Typography>
           <SearchBar>

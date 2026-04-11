@@ -16,7 +16,7 @@ import rehypeRaw from 'rehype-raw';
 const ContentPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
   paddingInline: theme.spacing(3),
-  borderRadius: theme.shape.borderRadius * 2,
+  borderRadius: (theme.shape.borderRadius as number) * 2,
   marginBottom: theme.spacing(3),
   boxShadow: `0 10px 30px ${alpha(theme.palette.common.black, 0.08)}`,
   [theme.breakpoints.down('sm')]: {

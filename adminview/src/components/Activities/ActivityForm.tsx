@@ -1,5 +1,5 @@
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Box, Button, CircularProgress, FormControl, Grid2 as Grid, IconButton, InputLabel, ListSubheader, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
+import { Box, Button, CircularProgress, FormControl, Grid, IconButton, InputLabel, ListSubheader, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
 import { ClearIcon, renderTimeViewClock } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';

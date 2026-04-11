@@ -16,7 +16,7 @@ export function useEventActivities(eventId?: string) {
 			if (!data || !data.state.data) return false;
 
 			// Check if any activities are ongoing
-			const hasOngoingActivities = data.state.data.some((activity) => {
+			const hasOngoingActivities = data.state.data?.some((activity) => {
 				return activity.isOngoing;
 			});
 

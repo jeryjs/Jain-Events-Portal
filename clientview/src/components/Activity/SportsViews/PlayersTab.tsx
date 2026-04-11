@@ -93,9 +93,8 @@ const PlayersTab = ({ activity }) => {
           />
         ))}
       </Tabs>
-      
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -124,7 +123,12 @@ const PlayersTab = ({ activity }) => {
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <SportsIcon fontSize="small" sx={{ mr: 1, color: theme.palette.success.main }} />
-                  <Typography variant="subtitle1" fontWeight="medium" color="success.main">
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      fontWeight: "medium",
+                      color: "success.main"
+                    }}>
                     Playing Squad ({playingPlayers.length})
                   </Typography>
                 </Box>
@@ -158,7 +162,9 @@ const PlayersTab = ({ activity }) => {
                       <ListItemText 
                         primary={
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Typography variant="body1" fontWeight="medium">
+                            <Typography variant="body1" sx={{
+                              fontWeight: "medium"
+                            }}>
                               {toPascalCase(player.name)}
                             </Typography>
                             {player.gender === Gender.FEMALE && (
@@ -178,7 +184,9 @@ const PlayersTab = ({ activity }) => {
                         secondary={
                           <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                             <TagIcon sx={{ fontSize: 16, mr: 0.5, color: theme.palette.text.secondary }} />
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant="caption" sx={{
+                              color: "text.secondary"
+                            }}>
                               {player.usn}
                             </Typography>
                           </Box>
@@ -210,7 +218,12 @@ const PlayersTab = ({ activity }) => {
                 <Box sx={{ mt: 4 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <SubdirectoryArrowRightIcon fontSize="small" sx={{ mr: 1 }} />
-                    <Typography variant="subtitle1" fontWeight="medium" color="text.secondary">
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontWeight: "medium",
+                        color: "text.secondary"
+                      }}>
                       Substitutes ({substitutePlayers.length})
                     </Typography>
                   </Box>
@@ -244,7 +257,9 @@ const PlayersTab = ({ activity }) => {
                         <ListItemText 
                           primary={
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                              <Typography variant="body1" color="text.secondary">
+                              <Typography variant="body1" sx={{
+                                color: "text.secondary"
+                              }}>
                                 {toPascalCase(player.name)}
                               </Typography>
                               {player.gender === Gender.FEMALE && (
@@ -264,7 +279,9 @@ const PlayersTab = ({ activity }) => {
                           secondary={
                             <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
                               <TagIcon sx={{ fontSize: 16, mr: 0.5, color: theme.palette.text.secondary }} />
-                              <Typography variant="caption" color="text.secondary">
+                              <Typography variant="caption" sx={{
+                                color: "text.secondary"
+                              }}>
                                 {player.usn}
                               </Typography>
                             </Box>

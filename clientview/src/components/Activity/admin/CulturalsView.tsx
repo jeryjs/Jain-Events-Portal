@@ -150,8 +150,12 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
             }
             label={
               <Box>
-                <Typography fontWeight="medium">Solo Performance Mode</Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography sx={{
+                  fontWeight: "medium"
+                }}>Solo Performance Mode</Typography>
+                <Typography variant="caption" sx={{
+                  color: "text.secondary"
+                }}>
                   {formData.config.isSoloPerformance
                     ? "Each participant is treated as an individual entry (team of 1)"
                     : "Participants compete as teams"}
@@ -170,8 +174,12 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
             }
             label={
               <Box>
-                <Typography fontWeight="medium">Use "Selected" Terminology</Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography sx={{
+                  fontWeight: "medium"
+                }}>Use "Selected" Terminology</Typography>
+                <Typography variant="caption" sx={{
+                  color: "text.secondary"
+                }}>
                   {formData.config.useSelectedTerminology
                     ? "Use 'Selected' instead of 'Winners' terminology"
                     : "Use traditional 'Winners' terminology"}
@@ -188,10 +196,8 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
           )}
         </CardContent>
       </Card>
-
       {/* Judges Section */}
       <JudgesForm judges={judges} setJudges={handleJudgesChange} />
-
       {/* Manage Teams and Participants Section */}
       <ManageTeamsForm
         teams={teams}
@@ -200,7 +206,6 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
         setParticipants={handleParticipantsChange}
         isSoloPerformance={formData.config.isSoloPerformance}
       />
-
       {/* Winners Section */}
       <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -209,7 +214,12 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
         </Typography>
         
         <Box sx={{ mb: 3 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              mb: 2
+            }}>
             Declare {formData.config.useSelectedTerminology ? 'selected participants' : 'winners'} for this activity. Select {formData.config.isSoloPerformance ? "participants" : "teams"} and assign ranks.
             Ranks will be automatically managed for consistency.
           </Typography>
@@ -303,7 +313,6 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
           </Box>
         </Box>
       </Paper>
-
       {/* Audience Polling Section */}
       <Paper elevation={1} sx={{ p: 3 }}>
         <Typography variant="h6" gutterBottom>Audience Polling</Typography>
@@ -319,7 +328,13 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
           label="Enable audience polling for this activity"
         />
 
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 2 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            mt: 1,
+            mb: 2
+          }}>
           When enabled, users will be able to vote for their favorite {formData.config.isSoloPerformance ? "participants" : "teams"} in this activity.
           Voting results will be visible in real-time to the audience.
         </Typography>

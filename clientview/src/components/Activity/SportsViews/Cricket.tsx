@@ -169,7 +169,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
     <Box>
       <Grid container spacing={3}>
         {/* Match Status Section - Replaced and Enhanced */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card sx={{
             overflow: 'hidden',
             borderRadius: 2,
@@ -200,14 +200,22 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
             </Box>
 
             <CardContent sx={{ pt: 5 }}>
-              <Typography variant="h5" gutterBottom fontWeight="bold" color="primary.main">
+              <Typography
+                variant="h5"
+                gutterBottom
+                sx={{
+                  fontWeight: "bold",
+                  color: "primary.main"
+                }}>
                 Match Status
               </Typography>
 
               {typeof matchStatus === 'string' ? (
                 <Box sx={{ textAlign: 'center', py: 2 }}>
                   <Typography variant="h6">{matchStatus}</Typography>
-                  <Typography variant="body2" color="text.secondary">The match will start at {new Date(activity.startTime).toLocaleString()}</Typography>
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>The match will start at {new Date(activity.startTime).toLocaleString()}</Typography>
                 </Box>
               ) : matchStatus.isComplete ? (
                 <Box>
@@ -221,21 +229,36 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                     border: '1px solid',
                     borderColor: 'divider'
                   }}>
-                    <Typography variant="h6" color="error.main" gutterBottom fontWeight="bold">
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{
+                        color: "error.main",
+                        fontWeight: "bold"
+                      }}>
                       MATCH COMPLETED
                     </Typography>
 
                     {matchStatus.winner && (
                       matchStatus.winner.isTie ? (
-                        <Typography variant="body1" fontWeight="medium">
+                        <Typography variant="body1" sx={{
+                          fontWeight: "medium"
+                        }}>
                           Match Tied
                         </Typography>
                       ) : (
                         <>
-                          <Typography variant="body1" fontWeight="medium">
-                            {matchStatus.winner.team.name} won by {matchStatus.winner.margin}
+                          <Typography variant="body1" sx={{
+                            fontWeight: "medium"
+                          }}>
+                            {matchStatus.winner.team?.name} won by {matchStatus.winner.margin}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "text.secondary",
+                              mt: 1
+                            }}>
                             {activity.endTime && `Finished: ${new Date(activity.endTime).toLocaleString()}`}
                           </Typography>
                         </>
@@ -246,7 +269,9 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
               ) : (
                 <>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                    <Typography variant="subtitle1" fontWeight="medium">
+                    <Typography variant="subtitle1" sx={{
+                      fontWeight: "medium"
+                    }}>
                       Current Innings: {matchStatus.currentInnings}
                     </Typography>
                     <Typography variant="subtitle1">
@@ -294,7 +319,6 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                             BATTING
                           </Box>
                         )}
-
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <Avatar sx={{
                             bgcolor: theme.palette.primary.main,
@@ -307,20 +331,30 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                             {team.name.charAt(0)}
                           </Avatar>
                           <Box>
-                            <Typography variant="h6" fontWeight="bold">
+                            <Typography variant="h6" sx={{
+                              fontWeight: "bold"
+                            }}>
                               {team.name}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" sx={{
+                              color: "text.secondary"
+                            }}>
                               RR: {runRate}
                             </Typography>
                           </Box>
                         </Box>
-
                         <Box sx={{ textAlign: 'right' }}>
-                          <Typography variant="h5" fontWeight="bold" sx={{ lineHeight: 1.2 }}>
+                          <Typography
+                            variant="h5"
+                            sx={{
+                              fontWeight: "bold",
+                              lineHeight: 1.2
+                            }}>
                             {teamScore}/{wickets}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" sx={{
+                            color: "text.secondary"
+                          }}>
                             {overs > 0 ? `${overs} overs` : 'Yet to bat'}
                           </Typography>
                         </Box>
@@ -351,7 +385,11 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
 
         {typeof matchStatus !== "string" && <>
           {/* Top Batsmen - Updated to match Basketball style */}
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
@@ -388,7 +426,9 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                                 >
                                   {player.name.charAt(0)}
                                 </Avatar>
-                                <Typography variant="body2" fontWeight={idx === 0 ? 'bold' : 'normal'}>
+                                <Typography variant="body2" sx={{
+                                  fontWeight: idx === 0 ? 'bold' : 'normal'
+                                }}>
                                   {player.name}
                                   {idx === 0 && ' 👑'}
                                 </Typography>
@@ -409,7 +449,11 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
           </Grid>
 
           {/* Top Boundaries Hitters */}
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -419,7 +463,9 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                 <Box sx={{ mb: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <LooksFourIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-                    <Typography variant="subtitle1" fontWeight="medium">
+                    <Typography variant="subtitle1" sx={{
+                      fontWeight: "medium"
+                    }}>
                       Top 4s
                     </Typography>
                   </Box>
@@ -448,7 +494,9 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                             {player.name}
                           </Typography>
                         </Box>
-                        <Typography variant="body2" fontWeight="bold">
+                        <Typography variant="body2" sx={{
+                          fontWeight: "bold"
+                        }}>
                           {count} × 4s
                         </Typography>
                       </Box>
@@ -459,7 +507,9 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                 <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                     <Filter6Icon sx={{ mr: 1, color: theme.palette.primary.main }} />
-                    <Typography variant="subtitle1" fontWeight="medium">
+                    <Typography variant="subtitle1" sx={{
+                      fontWeight: "medium"
+                    }}>
                       Top 6s
                     </Typography>
                   </Box>
@@ -488,7 +538,9 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                             {player.name}
                           </Typography>
                         </Box>
-                        <Typography variant="body2" fontWeight="bold">
+                        <Typography variant="body2" sx={{
+                          fontWeight: "bold"
+                        }}>
                           {count} × 6s
                         </Typography>
                       </Box>
@@ -501,7 +553,11 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
 
 
           {/* Innings Details */}
-          <Grid item xs={12} md={6}>
+          <Grid
+            size={{
+              xs: 12,
+              md: 6
+            }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -522,14 +578,20 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                       }}
                     >
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2" fontWeight="medium">
+                        <Typography variant="body2" sx={{
+                          fontWeight: "medium"
+                        }}>
                           {battingTeam?.name || ''} batting
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{
+                          color: "text.secondary"
+                        }}>
                           {inning.overs.length} overs
                         </Typography>
                       </Box>
-                      <Typography variant="h6" fontWeight="bold">
+                      <Typography variant="h6" sx={{
+                        fontWeight: "bold"
+                      }}>
                         {game.getTotalRuns(inning.battingTeam)} runs
                       </Typography>
                     </Box>
@@ -557,7 +619,7 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
   return (
     <Grid container spacing={3}>
       {/* Innings Breakdown */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Card>
           <CardContent>
             <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -591,10 +653,14 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                       <Box>
-                        <Typography fontWeight="medium">
+                        <Typography sx={{
+                          fontWeight: "medium"
+                        }}>
                           Innings {inningIdx + 1}: {battingTeam?.name} batting
                         </Typography>
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{
+                          color: "text.secondary"
+                        }}>
                           vs {bowlingTeam?.name}
                         </Typography>
                       </Box>
@@ -606,12 +672,16 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                   <AccordionDetails>
                     <Box sx={{ mt: 1 }}>
                       {/* Batting Section */}
-                      <Typography variant="subtitle1" gutterBottom fontWeight="medium" sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        borderBottom: `1px solid ${theme.palette.divider}`,
-                        pb: 1
-                      }}>
+                      <Typography
+                        variant="subtitle1"
+                        gutterBottom
+                        sx={{
+                          fontWeight: "medium",
+                          display: 'flex',
+                          alignItems: 'center',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          pb: 1
+                        }}>
                         Batting: {battingTeam?.name}
                       </Typography>
 
@@ -698,7 +768,9 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                               }) && (
                                 <TableRow>
                                   <TableCell colSpan={6} sx={{ py: 1 }}>
-                                    <Typography variant="subtitle2" fontWeight="medium">
+                                    <Typography variant="subtitle2" sx={{
+                                      fontWeight: "medium"
+                                    }}>
                                       Substitutes
                                     </Typography>
                                   </TableCell>
@@ -736,7 +808,9 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                   <TableRow key={player.usn} sx={{ }}>
                                     <TableCell>
                                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Typography color="text.secondary">{player.name}</Typography>
+                                        <Typography sx={{
+                                          color: "text.secondary"
+                                        }}>{player.name}</Typography>
                                         {showHalfCenturyBadge && (
                                           <Chip
                                             size="small"
@@ -763,13 +837,17 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                       </TableContainer>
 
                       {/* Bowling Section - Now update this section to separate playing and substitute bowlers */}
-                      <Typography variant="subtitle1" gutterBottom fontWeight="medium" sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        borderBottom: `1px solid ${theme.palette.divider}`,
-                        pt: 3,
-                        pb: 1
-                      }}>
+                      <Typography
+                        variant="subtitle1"
+                        gutterBottom
+                        sx={{
+                          fontWeight: "medium",
+                          display: 'flex',
+                          alignItems: 'center',
+                          borderBottom: `1px solid ${theme.palette.divider}`,
+                          pt: 3,
+                          pb: 1
+                        }}>
                         Bowling: {bowlingTeam?.name}
                       </Typography>
 
@@ -863,7 +941,11 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                 return (
                                   <TableRow>
                                     <TableCell colSpan={5} align="center">
-                                      <Typography color="text.secondary" sx={{ py: 1 }}>
+                                      <Typography
+                                        sx={{
+                                          color: "text.secondary",
+                                          py: 1
+                                        }}>
                                         No bowling data available
                                       </Typography>
                                     </TableCell>
@@ -874,18 +956,18 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                               return (
                                 <>
                                   {playingBowlers}
-                                  
                                   {/* Substitute Bowlers Header */}
                                   {substituteStats.length > 0 && (
                                     <TableRow>
                                       <TableCell colSpan={5} sx={{ py: 1 }}>
-                                        <Typography variant="subtitle2" fontWeight="medium">
+                                        <Typography variant="subtitle2" sx={{
+                                          fontWeight: "medium"
+                                        }}>
                                           Substitute Bowlers
                                         </Typography>
                                       </TableCell>
                                     </TableRow>
                                   )}
-                                  
                                   {/* Substitute Bowlers */}
                                   {substituteStats.map((stats: any) => {
                                     const player = activity.participants.find(p => p.usn === stats.playerId);
@@ -908,7 +990,9 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                                     return (
                                       <TableRow key={stats.playerId} sx={{ }}>
                                         <TableCell>
-                                          <Typography color="text.secondary">{player.name}</Typography>
+                                          <Typography sx={{
+                                            color: "text.secondary"
+                                          }}>{player.name}</Typography>
                                         </TableCell>
                                         <TableCell align="right">{oversDisplay}</TableCell>
                                         <TableCell align="right">{stats.runs}</TableCell>
@@ -935,9 +1019,8 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
           </CardContent>
         </Card>
       </Grid>
-
       {/* Team Performance Summary */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>

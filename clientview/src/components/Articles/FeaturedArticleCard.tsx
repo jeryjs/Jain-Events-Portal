@@ -17,7 +17,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
-  borderRadius: theme.shape.borderRadius * 3,
+  borderRadius: (theme.shape.borderRadius as number) * 3,
   transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
   overflow: 'hidden',
   position: 'relative',
@@ -71,7 +71,12 @@ const FeaturedArticleCard: React.FC<FeaturedArticleCardProps> = ({
           <Typography gutterBottom variant="h4" component="h2" sx={{ fontWeight: 700, mb: 2, lineHeight: 1.2 }}>
             {article.title}
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              color: "text.secondary",
+              mb: 2
+            }}>
             {article.summary}
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -79,7 +84,9 @@ const FeaturedArticleCard: React.FC<FeaturedArticleCardProps> = ({
               <Avatar src={article.author.avatar} sx={{ width: 36, height: 36, mr: 1 }} />
               <Box>
                 <Typography variant="subtitle2">{article.author.name}</Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{
+                  color: "text.secondary"
+                }}>
                   {article.lastUpdatedAt.toLocaleDateString()}
                 </Typography>
               </Box>

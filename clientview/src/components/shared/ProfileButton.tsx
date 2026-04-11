@@ -81,7 +81,7 @@ const TabPanel = styled(Box)(({ theme }) => ({
 
 const ProfileButton = ({ className }) => {
     const [anchorEl, setAnchorEl] = useState(null);
-    const [activeTab, setActiveTab] = useState(parseInt(localStorage.getItem('last-active-profile-tab')) || 0);
+    const [activeTab, setActiveTab] = useState(parseInt(localStorage.getItem('last-active-profile-tab') || '0'));
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -116,74 +116,74 @@ const ProfileButton = ({ className }) => {
     const open = Boolean(anchorEl);
 
     const ProfileContent = () => {
-        return (isAuthenticated ? (
-            <ProfileHeader>
-                <Avatar
-                    src={userData?.profilePic}
-                    alt={userData?.name}
-                    sx={{
-                        width: 60,
-                        height: 60,
-                        mr: 2,
-                        boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.1)}`,
-                    }}
-                />
-                <Box>
-                    <Typography variant="h6" fontWeight="600">
-                        {userData?.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {userData?.username}
-                    </Typography>
-
-                    <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
-                        {/* Role-specific actions */}
-                        {userData?.role >= Role.MANAGER && (
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                sx={{ borderRadius: 2, textTransform: 'none', p: '3px 8px' }}
-                                href="/admin"
-                                target="_blank"
-                            >
-                                Admin
-                            </Button>
-                        )}
-
-                        {/* Logout button */}
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            size="small"
-                            onClick={handleLogout}
-                            sx={{ borderRadius: 2, textTransform: 'none', p: '3px 8px' }}
-                        >
-                            Sign Out
-                        </Button>
-                    </Box>
-                </Box>
-            </ProfileHeader>
-        ) : (
-            <Box sx={{ p: 2, mb: 1 }}>
-                <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    textAlign="center"
-                    sx={{ mb: 2 }}
-                >
-                    Sign in to manage your profile and participate in events.
+        return (isAuthenticated ? (<ProfileHeader>
+            <Avatar
+                src={userData?.profilePic}
+                alt={userData?.name}
+                sx={{
+                    width: 60,
+                    height: 60,
+                    mr: 2,
+                    boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.1)}`,
+                }}
+            />
+            <Box>
+                <Typography variant="h6" sx={{
+                    fontWeight: "600"
+                }}>
+                    {userData?.name}
+                </Typography>
+                <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                }}>
+                    {userData?.username}
                 </Typography>
 
-                <Button
-                    variant="contained"
-                    onClick={promptLogin}
-                    fullWidth
-                    sx={{ borderRadius: 2, textTransform: 'none', py: 1 }}
-                >
-                    Sign In
-                </Button>
+                <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
+                    {/* Role-specific actions */}
+                    {userData?.role || 0 >= Role.MANAGER && (
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            sx={{ borderRadius: 2, textTransform: 'none', p: '3px 8px' }}
+                            href="/admin"
+                            target="_blank"
+                        >
+                            Admin
+                        </Button>
+                    )}
+
+                    {/* Logout button */}
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={handleLogout}
+                        sx={{ borderRadius: 2, textTransform: 'none', p: '3px 8px' }}
+                    >
+                        Sign Out
+                    </Button>
+                </Box>
             </Box>
-        ));
+        </ProfileHeader>) : (<Box sx={{ p: 2, mb: 1 }}>
+            <Typography
+                variant="body2"
+                sx={{
+                    color: "text.secondary",
+                    textAlign: "center",
+                    mb: 2
+                }}>
+                Sign in to manage your profile and participate in events.
+            </Typography>
+            <Button
+                variant="contained"
+                onClick={promptLogin}
+                fullWidth
+                sx={{ borderRadius: 2, textTransform: 'none', py: 1 }}
+            >
+                Sign In
+            </Button>
+        </Box>));
     }
 
     return (
@@ -219,7 +219,6 @@ const ProfileButton = ({ className }) => {
                     )}
                 </ProfileButtonContainer>
             </Badge>
-
             <Popover
                 open={open}
                 anchorEl={anchorEl}
@@ -232,11 +231,13 @@ const ProfileButton = ({ className }) => {
                     vertical: isMobile ? 'top' : 'top',
                     horizontal: isMobile ? 'center' : 'right',
                 }}
-                PaperProps={{
-                    style: {
-                        backgroundColor: 'transparent',
-                        boxShadow: 'none',
-                        overflow: 'visible'
+                slotProps={{
+                    paper: {
+                        style: {
+                            backgroundColor: 'transparent',
+                            boxShadow: 'none',
+                            overflow: 'visible'
+                        }
                     }
                 }}
             >

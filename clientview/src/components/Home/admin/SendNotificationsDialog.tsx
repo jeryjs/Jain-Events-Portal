@@ -35,7 +35,7 @@ import { Link } from 'react-router-dom';
 // Styled components
 const NotificationForm = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
-  borderRadius: theme.shape.borderRadius * 2,
+  borderRadius: (theme.shape.borderRadius as number) * 2,
   boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
   maxWidth: 700,
   margin: '0 auto',
@@ -120,16 +120,20 @@ const SendNotificationsDialog = () => {
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 2, md: 4 } }}>
       <Grid container spacing={4}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <NotificationForm as="form" onSubmit={handleSubmit}>
             <Box sx={{ textAlign: 'center', mb: 3 }}>
               <IconContainer>
                 <NotificationsActiveIcon sx={{ fontSize: 40, color: 'primary.contrastText' }} />
               </IconContainer>
-              <Typography variant="h5" gutterBottom fontWeight="bold">
+              <Typography variant="h5" gutterBottom sx={{
+                fontWeight: "bold"
+              }}>
                 Push Notification Manager
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={{
+                color: "text.secondary"
+              }}>
                 Send custom notifications to all users that will appear on their devices.
               </Typography>
             </Box>
@@ -172,16 +176,18 @@ const SendNotificationsDialog = () => {
               placeholder="https://example.com/image.jpg"
               sx={{ mb: 3 }}
               helperText="Leave empty to use the default app icon"
-              InputProps={{
-                endAdornment: (
-                  <IconButton 
-                    size="small" 
-                    sx={{ visibility: imageUrl ? 'visible' : 'hidden' }}
-                    onClick={() => setImageUrl('')}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <IconButton 
+                      size="small" 
+                      sx={{ visibility: imageUrl ? 'visible' : 'hidden' }}
+                      onClick={() => setImageUrl('')}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  ),
+                }
               }}
             />
 
@@ -193,22 +199,26 @@ const SendNotificationsDialog = () => {
               placeholder="https://example.com/page"
               sx={{ mb: 3 }}
               helperText="Provide a link to redirect users when they click the notification"
-              InputProps={{
-                endAdornment: (
-                  <IconButton 
-                    size="small" 
-                    sx={{ visibility: link ? 'visible' : 'hidden' }}
-                    onClick={() => setLink('')}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                ),
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <IconButton 
+                      size="small" 
+                      sx={{ visibility: link ? 'visible' : 'hidden' }}
+                      onClick={() => setLink('')}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  ),
+                }
               }}
             />
 
             {previewVisible && (
               <NotificationPreview>
-                <Typography variant="subtitle2" gutterBottom color="text.secondary">
+                <Typography variant="subtitle2" gutterBottom sx={{
+                  color: "text.secondary"
+                }}>
                   Preview
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
@@ -216,7 +226,9 @@ const SendNotificationsDialog = () => {
                     {!imageUrl && <ImageIcon />}
                   </Avatar>
                   <Box>
-                    <Typography variant="subtitle1" fontWeight="bold">
+                    <Typography variant="subtitle1" sx={{
+                      fontWeight: "bold"
+                    }}>
                       {title || 'Notification Title'}
                     </Typography>
                     <Typography variant="body2">
@@ -239,7 +251,9 @@ const SendNotificationsDialog = () => {
                       </IconButton>
                     </Tooltip>
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" sx={{
+                    color: "text.secondary"
+                  }}>
                     Display a visible popup notification to users
                   </Typography>
                 </Box>
@@ -271,7 +285,6 @@ const SendNotificationsDialog = () => {
           </NotificationForm>
         </Grid>
       </Grid>
-
       {/* Confirmation Dialog */}
       <Dialog
         open={openDialog}
@@ -286,20 +299,34 @@ const SendNotificationsDialog = () => {
           </DialogContentText>
           
           <Box sx={{ mt: 2, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
-            <Typography variant="subtitle2" fontWeight="bold">{title}</Typography>
+            <Typography variant="subtitle2" sx={{
+              fontWeight: "bold"
+            }}>{title}</Typography>
             <Typography variant="body2">{body}</Typography>
             {imageUrl && (
-              <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: "block",
+                  mt: 1
+                }}>
                 With image: {imageUrl}
               </Typography>
             )}
             {link && (
-              <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  display: "block",
+                  mt: 1
+                }}>
                 With link: {link}
               </Typography>
             )}
             <Divider sx={{ my: 1 }} />
-            <Typography variant="caption" display="block">
+            <Typography variant="caption" sx={{
+              display: "block"
+            }}>
               <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <NotificationsActiveIcon fontSize="small" />
                 {showNotification ? 'Will display a visible notification' : 'Will be silently saved to history'}
@@ -322,7 +349,6 @@ const SendNotificationsDialog = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       {/* Success Snackbar */}
       <Snackbar
         open={openSuccess}
@@ -339,7 +365,6 @@ const SendNotificationsDialog = () => {
           Notification sent successfully!
         </Alert>
       </Snackbar>
-
       {/* Error Snackbar */}
       <Snackbar
         open={!!error}

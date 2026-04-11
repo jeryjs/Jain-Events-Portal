@@ -248,7 +248,7 @@ const FastScrollbar: React.FC<FastScrollbarProps> = ({
     if (!refs.track.current || markers.length === 0) return null;
     
     const trackHeight = refs.track.current.clientHeight;
-    const visibleMarkers = [];
+    const visibleMarkers = [] as (MarkerType & { position: number })[];
     let lastYear: string | null = null;
 
     markers.forEach((marker, index) => {
@@ -268,7 +268,7 @@ const FastScrollbar: React.FC<FastScrollbarProps> = ({
         animate={{ opacity: 1 }}
         style={{ top: marker.position }}
       >
-        <Typography variant="caption" color='text.primary' fontWeight="100">
+        <Typography variant="caption" sx={{ color: 'text.primary', fontWeight: "100" }}>
           {marker.year}
         </Typography>
       </MarkerLabel>
