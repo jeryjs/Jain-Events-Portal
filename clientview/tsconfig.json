@@ -29,6 +29,7 @@
     // "strict": true,
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
+    "noImplicitAny": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   }

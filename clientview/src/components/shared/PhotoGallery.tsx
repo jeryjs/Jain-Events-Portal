@@ -148,12 +148,12 @@ interface PhotoGalleryProps {
   onSeeAllClick?: () => void;
   imageHeight?: number;
   imageMargin?: number;
-  loadFailed?: Error;
+  loadFailed?: Error | null;
 }
 
 const PhotoGallery: React.FC<PhotoGalleryProps> = ({ 
   images = placeholderImages,
-  isLoading = false,
+  isLoading = true,
   rows = 2,
   columns = 3,
   onSeeAllClick,
@@ -206,13 +206,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const goToNextImage = () => {
     setDragDirection(0);
     if (selectedImageIndex === null || !normalizedImages.length) return;
-    setSelectedImageIndex((prevIndex) => (prevIndex + 1) % normalizedImages.length);
+    setSelectedImageIndex((prevIndex) => ((prevIndex ?? NaN) + 1) % normalizedImages.length);
   };
 
   const goToPreviousImage = () => {
     setDragDirection(0);
     if (selectedImageIndex === null || !normalizedImages.length) return;
-    setSelectedImageIndex((prevIndex) => (prevIndex - 1 + normalizedImages.length) % normalizedImages.length);
+    setSelectedImageIndex((prevIndex) => ((prevIndex ?? NaN) - 1 + normalizedImages.length) % normalizedImages.length);
   };
 
   // Handle keyboard navigation - modified to also close the fullscreen gallery
@@ -357,17 +357,17 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         <Grid container spacing={imageMargin}>
           {isLoading ? (
             // Skeleton loaders
-            [...Array(calcMaxImagesCount)].map((_, index) => (
-              <Grid item xs={gridSize.xs} key={`skeleton-${index}`}>
+            ([...Array(calcMaxImagesCount)].map((_, index) => (
+              <Grid key={`skeleton-${index}`} size={gridSize.xs}>
                 <Box sx={{ height: imageHeight }}>
                   <Skeleton variant="rectangular" width="100%" height="100%" />
                 </Box>
               </Grid>
-            ))
+            )))
           ) : (
             // Image grid
-            displayedImages.map((image, index) => (
-              <Grid item xs={gridSize.xs} key={`image-${index}`}>
+            (displayedImages.map((image, index) => (
+              <Grid key={`image-${index}`} size={gridSize.xs}>
                 <PhotoItem
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -378,7 +378,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                   </Box>
                 </PhotoItem>
               </Grid>
-            ))
+            )))
           )}
         </Grid>
 
@@ -393,30 +393,32 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
           </Box>
         )}
       </GalleryContainer>
-
       {/* Fullscreen gallery that responds to URL hash */}
       {renderFullscreenGallery()}
-
       {/* Image dialog for expanded view */}
       <Dialog
         open={dialogOpen}
         onClose={handleDialogClose}
         maxWidth={false}
-        PaperProps={{
-          style: {
-            backgroundColor: 'transparent',
-            boxShadow: 'none',
-            overflow: 'hidden'
-          }
+        slots={{
+          backdrop: Backdrop
         }}
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          style: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            backdropFilter: 'blur(5px)'
+        slotProps={{
+          backdrop: {
+            style: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(5px)'
+            }
+          },
+
+          paper: {
+            style: {
+              backgroundColor: 'transparent',
+              boxShadow: 'none',
+              overflow: 'hidden'
+            }
           }
-        }}
-      >
+        }}>
         <AnimatePresence mode="wait">
           {dialogOpen && selectedImageIndex !== null && (
             <Box 

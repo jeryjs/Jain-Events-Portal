@@ -1,6 +1,6 @@
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import LockIcon from '@mui/icons-material/Lock';
-import { Box, Button, CircularProgress, FormControl, Grid2 as Grid, IconButton, InputLabel, ListSubheader, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, FormControl, Grid, IconButton, InputLabel, ListSubheader, MenuItem, Paper, Select, TextField, Typography } from '@mui/material';
 import { ClearIcon, renderTimeViewClock } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -40,13 +40,13 @@ export const ActivityForm = ({ eventId, activity, isCreating, managers, onSave, 
     const { userData } = useLogin();
 
     // Show access denied if user doesn't have permission
-    if (!(userData?.role >= Role.ADMIN || managers?.includes(userData?.username))) {
+    if (userData && !(userData?.role >= Role.ADMIN || managers?.includes(userData?.username))) {
         return (
             <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
                 <LockIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-                <Typography variant="h5" gutterBottom color="text.secondary">Access Denied</Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>You don't have permission to {isCreating ? 'create' : 'edit'} activities.</Typography>
-                <Typography variant="body2" color="text.secondary">Only administrators and activity participants can manage activities.</Typography>
+                <Typography variant="h5" gutterBottom sx={{ color: "text.secondary" }}>Access Denied</Typography>
+                <Typography variant="body1" sx={{ color: "text.secondary", mb: 2 }}>You don't have permission to {isCreating ? 'create' : 'edit'} activities.</Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>Only administrators and activity participants can manage activities.</Typography>
             </Paper>
         );
     }
@@ -60,7 +60,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, managers, onSave, 
         participants: []
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
     // Initialize form with activity data if editing - with cleanup
     useEffect(() => {
@@ -150,7 +150,7 @@ export const ActivityForm = ({ eventId, activity, isCreating, managers, onSave, 
 
     // Render different view based on activity type - memoized
     const renderActivityTypeSpecificView = useCallback(() => {
-        switch (getBaseEventType(formData.type)) {
+        switch (getBaseEventType(formData.type!)) {
             case EventType.INFO: return <MemoizedInfoView formData={formData as InfoActivity} setFormData={setFormData} />;
             case EventType.SPORTS: return <MemoizedSportsView formData={formData as SportsActivity<Sport>} setFormData={setFormData} />;
             case EventType.CULTURAL: return <MemoizedCulturalsView formData={formData as CulturalActivity} setFormData={setFormData} />;
@@ -169,7 +169,6 @@ export const ActivityForm = ({ eventId, activity, isCreating, managers, onSave, 
             <Typography variant="h5" gutterBottom>
                 {isCreating ? 'Create New Activity' : 'Edit Activity'}
             </Typography>
-
             <Box component="form" noValidate sx={{ textAlign: 'left' }}>
                 {/* Basic Details Section */}
                 <Box sx={{ mb: 4 }}>
@@ -234,7 +233,12 @@ export const ActivityForm = ({ eventId, activity, isCreating, managers, onSave, 
                         {errors.type && <Typography color="error">{errors.type}</Typography>}
                     </FormControl>
                     <Grid container spacing={2} sx={{ mt: 1 }}>
-                        <Grid size={{xs:12, md:6}} display="flex" alignItems="center">
+                        <Grid
+                            size={{xs:12, md:6}}
+                            sx={{
+                                display: "flex",
+                                alignItems: "center"
+                            }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
                                     label="Start Time"
@@ -249,7 +253,12 @@ export const ActivityForm = ({ eventId, activity, isCreating, managers, onSave, 
                             </LocalizationProvider>
                             <IconButton onClick={() => handleChange('startTime', null)}><ClearIcon /></IconButton>
                         </Grid>
-                        <Grid size={{xs:12, md:6}} display="flex" alignItems="center">
+                        <Grid
+                            size={{xs:12, md:6}}
+                            sx={{
+                                display: "flex",
+                                alignItems: "center"
+                            }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <DateTimePicker
                                     label="End Time"

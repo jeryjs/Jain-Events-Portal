@@ -83,15 +83,25 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
     return (
       <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <Box sx={{ color: 'white', p: 2, textAlign: 'center' }}>
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="h6" sx={{
+            fontWeight: "bold"
+          }}>
             Upcoming Match
           </Typography>
         </Box>
         <CardContent>
-          <Typography variant="subtitle1" color="text.secondary" align="center">
+          <Typography variant="subtitle1" align="center" sx={{
+            color: "text.secondary"
+          }}>
             Get ready! The match is scheduled for:
           </Typography>
-          <Typography variant="h5" align="center" fontWeight="bold" sx={{ my: 2 }}>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{
+              fontWeight: "bold",
+              my: 2
+            }}>
             {activity.startTime.toLocaleString(undefined, {
               year: 'numeric',
               month: 'long',
@@ -101,7 +111,14 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
             })}
           </Typography>
           <LinearProgress variant="determinate" value={0} sx={{ height: 8, borderRadius: 4 }} />
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ display: 'block', mt: 1 }}>
+          <Typography
+            variant="caption"
+            align="center"
+            sx={{
+              color: "text.secondary",
+              display: 'block',
+              mt: 1
+            }}>
             Stay tuned for live updates!
           </Typography>
         </CardContent>
@@ -112,7 +129,7 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
   return (
     <Grid container spacing={3}>
       {/* Score Card */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
           <Box
             sx={{
@@ -132,7 +149,12 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
           <Box sx={{ pt: 5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <SportsSoccerIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-              <Typography variant="h5" fontWeight="bold" color="primary.main">
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: "bold",
+                  color: "primary.main"
+                }}>
                 Football Match
               </Typography>
             </Box>
@@ -146,9 +168,16 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                 bgcolor: 'rgba(0,0,0,0.03)',
                 borderRadius: 1
               }}>
-                <Box display="flex" alignItems="center" justifyContent="center">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
                   <EmojiEventsIcon color="secondary" sx={{ mr: 1 }} />
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography variant="h6" sx={{
+                    fontWeight: "bold"
+                  }}>
                     {matchStatus.winner
                       ? `${matchStatus.winner.name} won by ${Math.abs(
                         (game.getTotalGoals(matchStatus.winner.id) || 0) -
@@ -170,14 +199,16 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                 bgcolor: 'rgba(76, 175, 80, 0.08)',
                 borderRadius: 1
               }}>
-                <Typography variant="body1" color="success.main">
+                <Typography variant="body1" sx={{
+                  color: "success.main"
+                }}>
                   Match in progress
                 </Typography>
               </Box>
             )}
 
             {/* Player Statistics Table */}
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Card elevation={4} sx={{ borderRadius: 8 }}>
                 <CardContent>
                   {/* <Typography variant="h6" gutterBottom>
@@ -304,7 +335,9 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                           }) && (
                           <TableRow>
                             <TableCell colSpan={7} sx={{ py: 1 }}>
-                              <Typography variant="subtitle2" fontWeight="medium">
+                              <Typography variant="subtitle2" sx={{
+                                fontWeight: "medium"
+                              }}>
                                 Substitutes
                               </Typography>
                             </TableCell>
@@ -358,7 +391,9 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                                     <Avatar sx={{ width: 24, height: 24, mr: 1, opacity: 0.8 }}>
                                       {player.name.charAt(0)}
                                     </Avatar>
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography variant="body2" sx={{
+                                      color: "text.secondary"
+                                    }}>
                                       {player.name}
                                     </Typography>
                                   </Box>
@@ -399,7 +434,11 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                         {(!game.stats || game.stats.every(s => !s.goals?.length && !s.assists?.length && !s.yellowCards?.length && !s.redCards?.length)) && (
                           <TableRow>
                             <TableCell colSpan={7} sx={{ textAlign: 'center' }}>
-                              <Typography color="text.secondary" sx={{ py: 2 }}>
+                              <Typography
+                                sx={{
+                                  color: "text.secondary",
+                                  py: 2
+                                }}>
                                 No player statistics recorded yet
                               </Typography>
                             </TableCell>
@@ -452,7 +491,9 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                         </Avatar>
                         <Typography>
                           <strong>{goal?.player}</strong>
-                          <Typography component="span" color="text.secondary">
+                          <Typography component="span" sx={{
+                            color: "text.secondary"
+                          }}>
                             {' '}({goal?.teamName})
                           </Typography>
                         </Typography>
@@ -461,7 +502,12 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                     ))}
                   </Box>
                 ) : (
-                  <Typography color="text.secondary" align="center" py={2}>
+                  <Typography
+                    align="center"
+                    sx={{
+                      color: "text.secondary",
+                      py: 2
+                    }}>
                     No goals recorded yet
                   </Typography>
                 )}
@@ -476,10 +522,20 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                 </Typography>
                 <Grid container spacing={2}>
                   {/* Yellow cards */}
-                  <Grid item xs={12} md={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      md: 6
+                    }}>
                     <Card variant="outlined" sx={{ height: '100%' }}>
                       <CardContent>
-                        <Typography variant="subtitle1" fontWeight="medium" sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            fontWeight: "medium",
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}>
                           <Box component="span" sx={{ display: 'inline-block', width: 16, height: 22, bgcolor: '#ffeb3b', mr: 1 }} />
                           Yellow Cards
                         </Typography>
@@ -501,7 +557,9 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                               <Box key={idx} sx={{ display: 'flex', mb: 1 }}>
                                 <Typography>
                                   <strong>{card?.player}</strong>
-                                  <Typography component="span" color="text.secondary">
+                                  <Typography component="span" sx={{
+                                    color: "text.secondary"
+                                  }}>
                                     {' '}({card.teamName})
                                   </Typography>
                                 </Typography>
@@ -509,7 +567,11 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                             ))}
                           </List>
                         ) : (
-                          <Typography color="text.secondary" sx={{ mt: 1 }}>
+                          <Typography
+                            sx={{
+                              color: "text.secondary",
+                              mt: 1
+                            }}>
                             No yellow cards issued
                           </Typography>
                         )}
@@ -518,10 +580,20 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                   </Grid>
 
                   {/* Red cards */}
-                  <Grid item xs={12} md={6}>
+                  <Grid
+                    size={{
+                      xs: 12,
+                      md: 6
+                    }}>
                     <Card variant="outlined" sx={{ height: '100%' }}>
                       <CardContent>
-                        <Typography variant="subtitle1" fontWeight="medium" sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{
+                            fontWeight: "medium",
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}>
                           <Box component="span" sx={{ display: 'inline-block', width: 16, height: 22, bgcolor: '#f44336', mr: 1 }} />
                           Red Cards
                         </Typography>
@@ -543,7 +615,9 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                               <Box key={idx} sx={{ display: 'flex', mb: 1 }}>
                                 <Typography>
                                   <strong>{card?.player}</strong>
-                                  <Typography component="span" color="text.secondary">
+                                  <Typography component="span" sx={{
+                                    color: "text.secondary"
+                                  }}>
                                     {' '}({card?.teamName})
                                   </Typography>
                                 </Typography>
@@ -551,7 +625,11 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                             ))}
                           </List>
                         ) : (
-                          <Typography color="text.secondary" sx={{ mt: 1 }}>
+                          <Typography
+                            sx={{
+                              color: "text.secondary",
+                              mt: 1
+                            }}>
                             No red cards issued
                           </Typography>
                         )}
@@ -564,9 +642,12 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
           </Box>
         </Paper>
       </Grid>
-
       {/* Top Scorers */}
-      <Grid item xs={12} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6
+        }}>
         <Card>
           <CardContent>
             <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
@@ -600,7 +681,9 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                             <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
                               {player.name.charAt(0)}
                             </Avatar>
-                            <Typography variant="body2" fontWeight={idx === 0 ? 'bold' : 'normal'}>
+                            <Typography variant="body2" sx={{
+                              fontWeight: idx === 0 ? 'bold' : 'normal'
+                            }}>
                               {player.name}
                               {idx === 0 && ' 👑'}
                             </Typography>
@@ -617,7 +700,11 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                   {(!game.stats || game.stats.every(s => (s.goals?.length || 0) === 0)) && (
                     <TableRow>
                       <TableCell colSpan={3} sx={{ textAlign: 'center' }}>
-                        <Typography color="text.secondary" sx={{ py: 2 }}>
+                        <Typography
+                          sx={{
+                            color: "text.secondary",
+                            py: 2
+                          }}>
                           No goals scored yet
                         </Typography>
                       </TableCell>
@@ -629,9 +716,12 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
           </CardContent>
         </Card>
       </Grid>
-
       {/* Top Assists */}
-      <Grid item xs={12} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6
+        }}>
         <Card>
           <CardContent>
             <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
@@ -665,7 +755,9 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                             <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
                               {player.name.charAt(0)}
                             </Avatar>
-                            <Typography variant="body2" fontWeight={idx === 0 ? 'bold' : 'normal'}>
+                            <Typography variant="body2" sx={{
+                              fontWeight: idx === 0 ? 'bold' : 'normal'
+                            }}>
                               {player.name}
                               {idx === 0 && ' 🎯'}
                             </Typography>
@@ -682,7 +774,11 @@ const FootballOverview = ({ activity, game }: { activity: SportsActivity<Sport>,
                   {(!game.stats || game.stats.every(s => (s.assists?.length || 0) === 0)) && (
                     <TableRow>
                       <TableCell colSpan={3} sx={{ textAlign: 'center' }}>
-                        <Typography color="text.secondary" sx={{ py: 2 }}>
+                        <Typography
+                          sx={{
+                            color: "text.secondary",
+                            py: 2
+                          }}>
                           No assists recorded yet
                         </Typography>
                       </TableCell>
@@ -705,7 +801,7 @@ const StatisticsTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
   return (
     <Grid container spacing={3}>
       {/* Team Stats Comparison */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -772,9 +868,8 @@ const StatisticsTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
           </CardContent>
         </Card>
       </Grid>
-
       {/* Player Statistics Table */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -881,7 +976,11 @@ const StatisticsTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
                   {(!game.stats || game.stats.every(s => !s.goals?.length && !s.assists?.length && !s.yellowCards?.length && !s.redCards?.length)) && (
                     <TableRow>
                       <TableCell colSpan={7} sx={{ textAlign: 'center' }}>
-                        <Typography color="text.secondary" sx={{ py: 2 }}>
+                        <Typography
+                          sx={{
+                            color: "text.secondary",
+                            py: 2
+                          }}>
                           No player statistics recorded yet
                         </Typography>
                       </TableCell>

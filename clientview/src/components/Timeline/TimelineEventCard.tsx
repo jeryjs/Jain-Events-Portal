@@ -17,7 +17,7 @@ interface TimelineEventCardProps {
 const CardContainer = styled(motion.create(Paper))(({ theme }) => ({
   position: 'relative',
   overflow: 'hidden',
-  borderRadius: theme.shape.borderRadius * 2,
+  borderRadius: (theme.shape.borderRadius as number) * 2,
   boxShadow: theme.shadows[2],
   cursor: 'pointer',
   transition: 'transform 0.3s, box-shadow 0.3s',

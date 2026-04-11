@@ -147,7 +147,6 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
           </Paper>
         </Section>
       </Fade>
-
       {/* Winners Section - Enhanced */}
       {hasWinners && (
         <Zoom in={true} style={{ transitionDelay: '100ms' }}>
@@ -188,7 +187,9 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
                           {winner.rank}
                         </Avatar>
                         <Box sx={{ flexGrow: 1 }}>
-                          <Typography variant="body1" fontWeight="medium">
+                          <Typography variant="body1" sx={{
+                            fontWeight: "medium"
+                          }}>
                             {details.name}
                           </Typography>
                           {details.isSolo && (
@@ -223,7 +224,12 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
                             </Box>
                           )}
                           {!details.isSolo && details.members && (
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: "text.secondary",
+                                display: 'block'
+                              }}>
                               Team ({details.members.length} members)
                             </Typography>
                           )}
@@ -246,7 +252,6 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
           </Section>
         </Zoom>
       )}
-
       {/* Solo Participants Section (Only for Solo Events) */}
       {isSoloEvent && (
         <Fade in={true} timeout={700} style={{ transitionDelay: '200ms' }}>
@@ -295,7 +300,9 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
                         <ListItemText
                           primary={
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                              <Typography variant="body1" fontWeight={500}>
+                              <Typography variant="body1" sx={{
+                                fontWeight: 500
+                              }}>
                                 {participant.name}
                               </Typography>
                               {isWinner && (
@@ -336,8 +343,10 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
                               )}
                             </Box>
                           }
-                          secondaryTypographyProps={{
-                            component: 'div',
+                          slotProps={{
+                            secondary: {
+                              component: 'div',
+                            }
                           }}
                         />
                       </ListItem>
@@ -349,7 +358,6 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
           </Section>
         </Fade>
       )}
-
       {/* Teams Section (Only for Team Events) */}
       {isTeamEvent && (
         <Fade in={true} timeout={700} style={{ transitionDelay: '200ms' }}>
@@ -394,7 +402,9 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
                         <ListItemText
                           primary={
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                              <Typography variant="body1" fontWeight="medium">
+                              <Typography variant="body1" sx={{
+                                fontWeight: "medium"
+                              }}>
                                 {team.name}
                               </Typography>
                               {isWinner && (
@@ -415,7 +425,6 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
                         />
                         {isOpen ? <ExpandLess /> : <ExpandMore />}
                       </ListItem>
-
                       <Collapse in={isOpen} timeout="auto" unmountOnExit>
                         <Box sx={{ pl: 2, pr: 2, pt: 1, pb: 2, bgcolor: 'background.default' }}>
                           <List dense>
@@ -450,8 +459,10 @@ export const TechView = ({ activity }: {activity: TechnicalActivity}) => {
                                       )}
                                     </Box>
                                   }
-                                  secondaryTypographyProps={{
-                                    component: 'div',
+                                  slotProps={{
+                                    secondary: {
+                                      component: 'div',
+                                    }
                                   }}
                                 />
                               </ListItem>

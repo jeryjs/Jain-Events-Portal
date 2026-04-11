@@ -198,7 +198,12 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
               <Typography variant="h6" sx={{ fontWeight: 'bold', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', textOverflow: 'ellipsis' }}>
                 {event.name}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  mt: 0.5
+                }}>
                 {formattedDate}, {formattedTime}
               </Typography>
               <LocationWrapper>
@@ -223,7 +228,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
           <StyledCard sx={{ position: 'relative' }}>
             <ManagerBadge />
             {day && <DateBadge>
-              <Typography variant="h6" fontWeight="bold">{day}</Typography>
+              <Typography variant="h6" sx={{
+                fontWeight: "bold"
+              }}>{day}</Typography>
               <Typography variant="caption">{month}</Typography>
             </DateBadge>}
             <Box sx={{ height: 200, position: 'relative' }}>
@@ -243,7 +250,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
                 <AccessTimeIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   {formattedDate}, {formattedTime}
                 </Typography>
               </Box>

@@ -152,8 +152,8 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
   useEffect(() => {
     if (items.length <= 1) return;
     const interval = setInterval(() => {
-      const videoElm = containerRef.current.querySelector("video");
-      if (videoElm?.ended || videoElm?.paused || !videoElm)
+      const videoElm = containerRef?.current?.querySelector("video");
+      if (!videoElm || videoElm?.ended || videoElm?.paused)
         setCurrentIndex(prev => (prev + 1) % items.length);
     }, 5000);
     return () => clearInterval(interval);
@@ -379,7 +379,9 @@ const ActivitiesSection = ({ eventId, config }: { eventId: string, config: Event
   if (!activities || len === 0) {
     return (
       <Paper sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
-        <Typography color="text.secondary">No activities found for this event</Typography>
+        <Typography sx={{
+          color: "text.secondary"
+        }}>No activities found for this event</Typography>
       </Paper>
     );
   }
@@ -433,7 +435,7 @@ function EventPage() {
   const { mutateAsync: deleteEvent } = useDeleteEvent();
   const { mutateAsync: createActivity } = useCreateActivity(eventId);
 
-  const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId);
+  const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId!);
   const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -581,10 +583,17 @@ function EventPage() {
               <CalendarTodayIcon sx={{ color: 'primary.main', fontSize: 24 }} />
             </IconSquircle>
             <Box>
-              <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "text.primary",
+                  fontWeight: 'bold'
+                }}>
                 {formattedDate.date}
               </Typography>
-              <Typography variant="subtitle1" color="text.secondary">
+              <Typography variant="subtitle1" sx={{
+                color: "text.secondary"
+              }}>
                 {formattedDate.dayTime}
               </Typography>
             </Box>
@@ -595,7 +604,12 @@ function EventPage() {
               <LocationOnIcon sx={{ color: 'primary.main', fontSize: 24 }} />
             </IconSquircle>
             <Box>
-              <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "text.primary",
+                  fontWeight: 'bold'
+                }}>
                 {event.venue}
               </Typography>
               {/* <Typography variant="subtitle1" color="text.secondary">
@@ -612,7 +626,12 @@ function EventPage() {
               About Event
             </Typography>
             {showFullDescription ? (
-              <Typography variant="body1" color="text.secondary" paragraph>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "text.secondary",
+                  marginBottom: "16px"
+                }}>
                 {event.description}
                 {isDescriptionTruncated && (
                   <Typography
@@ -661,7 +680,13 @@ function EventPage() {
           {/*  Highlights section */}
           {event.highlights && <Box>
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 1 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: 'text.primary',
+                fontWeight: 'bold',
+                mb: 1
+              }}>
               Highlights
             </Typography>
             <HighlightsCarousel images={event.highlights.split(',').map(url => url.trim())} />
@@ -671,7 +696,13 @@ function EventPage() {
 
           {/* Activities Section */}
           <ActivitySectionContainer>
-            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: 'text.primary',
+                fontWeight: 'bold',
+                mb: 2
+              }}>
               {getBaseEventType(event.type) === EventType.SPORTS ? 'Matches' : 'Activities'}
             </Typography>
             <Suspense fallback={
@@ -691,7 +722,13 @@ function EventPage() {
 
           {/* Photo Gallery Section */}
           {event.galleryLink && <Box>
-            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', mb: 2 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "text.primary",
+                fontWeight: 'bold',
+                mb: 2
+              }}>
               Event Gallery
             </Typography>
             <PhotoGallery

@@ -116,7 +116,9 @@ export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) =
     return (
       <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
         <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography variant="h6" color="text.secondary">
+          <Typography variant="h6" sx={{
+            color: "text.secondary"
+          }}>
             At least two teams are required to set up the match.
           </Typography>
         </Box>
@@ -127,19 +129,30 @@ export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) =
   return (
     <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', color: 'primary.main' }}>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: "bold",
+            display: 'flex',
+            alignItems: 'center',
+            color: 'primary.main'
+          }}>
           <SportsVolleyballIcon sx={{ mr: 1 }} /> Generic Sport Match
         </Typography>
         <Divider sx={{ mt: 1 }} />
       </Box>
-
       {/* Scoreboard - Side by Side */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         {teams.map((team) => {
           const teamPoints = game.points?.find(p => p.teamId === team.id)?.points || 0;
 
           return (
-            <Grid item xs={12} sm={6} key={team.id}>
+            <Grid
+              key={team.id}
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <Card variant="outlined" sx={{
                 height: '100%',
                 borderWidth: 2,
@@ -156,7 +169,9 @@ export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) =
                   }
                   action={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, pr: 2 }}>
-                      <Typography variant="h4" fontWeight="bold">
+                      <Typography variant="h4" sx={{
+                        fontWeight: "bold"
+                      }}>
                         {teamPoints}
                       </Typography>
                       <Tooltip title={`Add Points for ${team.name || 'Team'}`}>
@@ -181,7 +196,6 @@ export const GenericSport = ({ formData, setFormData }: GenericSportFormProps) =
           );
         })}
       </Grid>
-
       {/* Notification */}
       <Snackbar
         open={!!notification}

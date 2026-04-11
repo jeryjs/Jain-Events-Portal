@@ -188,9 +188,19 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
 
     return (
         <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    mb: 2
+                }}>
                 <Typography variant="h6">Participants</Typography>
-                <Box display="flex" alignItems="center">
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center"
+                    }}>
                     <Tooltip title={isJsonMode ? "Switch to Form View" : "Switch to JSON View"}>
                         <IconButton
                             onClick={handleToggleJsonMode}
@@ -206,10 +216,9 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                     </Button>
                 </Box>
             </Box>
-
             {isJsonMode ? (
                 // JSON Editor View
-                <Box>
+                (<Box>
                     <TextField
                         fullWidth
                         multiline
@@ -227,24 +236,41 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                             }
                         }}
                     />
-                    <Box mt={1} px={1}>
-                        <Typography variant="caption" color="text.secondary">
+                    <Box
+                        sx={{
+                            mt: 1,
+                            px: 1
+                        }}>
+                        <Typography variant="caption" sx={{
+                            color: "text.secondary"
+                        }}>
                             {jsonError ? 'Fix the JSON error above to apply changes' : 'Changes are applied automatically when JSON is valid'}
                         </Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                color: "text.secondary",
+                                display: 'block',
+                                mt: 0.5
+                            }}>
                             Required format: {'[{ "name": "Name", ... }, ...]'}
                         </Typography>
                     </Box>
-                </Box>
+                </Box>)
             ) : (
                 // UI View
-                <>
+                (<>
                     {participants.length === 0 && (
-                        <Box py={2} textAlign="center">
-                            <Typography color="text.secondary">No participants added yet</Typography>
+                        <Box
+                            sx={{
+                                py: 2,
+                                textAlign: "center"
+                            }}>
+                            <Typography sx={{
+                                color: "text.secondary"
+                            }}>No participants added yet</Typography>
                         </Box>
                     )}
-
                     {participants.length > 0 && (
                         <List>
                             {participants.map((p, index) => (
@@ -270,20 +296,19 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                             ))}
                         </List>
                     )}
-                </>
+                </>)
             )}
-
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>{editIndex !== null ? 'Edit Participant' : 'Add Participant'}</DialogTitle>
                 <DialogContent>
                     {formValues && (
                         <Grid container spacing={2} sx={{ mt: 1 }}>
                             {error && (
-                                <Grid item xs={12}>
+                                <Grid size={12}>
                                     <Alert severity="error">{error}</Alert>
                                 </Grid>
                             )}
-                            <Grid item xs={12}>
+                            <Grid size={12}>
                                 <TextField
                                     label="Name"
                                     value={formValues.name || ''}
@@ -292,7 +317,11 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                                     required
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid
+                                size={{
+                                    xs: 12,
+                                    sm: 6
+                                }}>
                                 <TextField
                                     label="USN"
                                     value={formValues.usn || ''}
@@ -301,7 +330,11 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                                     required
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid
+                                size={{
+                                    xs: 12,
+                                    sm: 6
+                                }}>
                                 <TextField
                                     label="Branch"
                                     value={formValues.branch || ''}
@@ -309,7 +342,11 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                                     fullWidth
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid
+                                size={{
+                                    xs: 12,
+                                    sm: 6
+                                }}>
                                 <TextField
                                     label="Phone"
                                     value={formValues.phone || ''}
@@ -318,7 +355,11 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                                     placeholder="Phone number"
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid
+                                size={{
+                                    xs: 12,
+                                    sm: 6
+                                }}>
                                 <TextField
                                     label="Email"
                                     type="email"
@@ -331,7 +372,11 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                             
                             {/* Team field shown only if teams are provided */}
                             {teams.length > 0 && (
-                                <Grid item xs={12} sm={6}>
+                                <Grid
+                                    size={{
+                                        xs: 12,
+                                        sm: 6
+                                    }}>
                                     <FormControl fullWidth>
                                         <InputLabel id="team-select-label">Team</InputLabel>
                                         <Select
@@ -353,7 +398,11 @@ export const ParticipantsForm = ({ participants, setParticipants, teams = [], de
                             
                             {/* Position field shown only if position prop is supported */}
                             {'position' in formValues && (
-                                <Grid item xs={12} sm={6}>
+                                <Grid
+                                    size={{
+                                        xs: 12,
+                                        sm: 6
+                                    }}>
                                     <FormControl fullWidth>
                                         <ToggleButtonGroup
                                             value={formValues.position || 'playing'}

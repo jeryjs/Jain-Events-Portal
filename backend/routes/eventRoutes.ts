@@ -35,7 +35,7 @@ router.get('/', async (req: Request & { user?: any }, res: Response) => {
 router.get('/:eventId', async (req: Request & { user?: any }, res: Response) => {
     try {
         const user = req.user ? { role: req.user.role, username: req.user.username } : undefined;
-        const event = await getEventById(req.params.eventId, user);
+        const event = await getEventById(req.params.eventId as string, user);
         if (event) {
             res.json(event);
         } else {
@@ -65,12 +65,12 @@ router.patch('/:eventId', managerMiddleware, async (req: Request & { user?: any 
             res.status(401).json({ message: 'Unauthorized' });
             return;
         }
-        const isManager = user.role >= Role.MANAGER || await isUserEventManager(req.params.eventId, user.username);
+        const isManager = user.role >= Role.MANAGER || await isUserEventManager(req.params.eventId as string, user.username);
         if (!isManager) {
             res.status(403).json({ message: 'You are not a manager for this event' });
             return;
         }
-        const updatedEvent = await updateEvent(req.params.eventId, req.body);
+        const updatedEvent = await updateEvent(req.params.eventId as string, req.body);
         res.json(updatedEvent);
     } catch (error) {
         console.error('Error updating event:', error);
@@ -82,7 +82,7 @@ router.patch('/:eventId', managerMiddleware, async (req: Request & { user?: any 
 router.post('/:eventId/managers', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const { managers } = req.body; // array of usernames/emails
-        await assignManagersToEvent(req.params.eventId, managers);
+        await assignManagersToEvent(req.params.eventId as string, managers);
         res.json({ message: 'Managers assigned successfully' });
     } catch (error) {
         console.error('Error assigning managers:', error);
@@ -92,7 +92,7 @@ router.post('/:eventId/managers', adminMiddleware, async (req: Request, res: Res
 
 router.get('/:eventId/managers', adminMiddleware, async (req: Request, res: Response) => {
     try {
-        const managers = await getEventManagers(req.params.eventId);
+        const managers = await getEventManagers(req.params.eventId as string);
         res.json(managers);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching managers', details: error });
@@ -102,7 +102,7 @@ router.get('/:eventId/managers', adminMiddleware, async (req: Request, res: Resp
 // Delete event
 router.delete('/:eventId', adminMiddleware, async (req: Request, res: Response) => {
     try {
-        const result = await deleteEvent(req.params.eventId);
+        const result = await deleteEvent(req.params.eventId as string);
         if (result) {
             res.json({ message: 'Event successfully deleted' });
         } else {

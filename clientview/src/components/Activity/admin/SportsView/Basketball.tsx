@@ -76,7 +76,7 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
     const initializeGameStats = useCallback(() => {
         if (!game.stats || game.stats.length === 0) {
             // Make sure we validate team IDs before creating stats
-            const initialStats = teams.map(team => ({
+            const initialStats: Basketball['stats'] = teams.map(team => ({
                 teamId: team.id || '', // Ensure teamId is never undefined
                 points: [],
             }));
@@ -88,13 +88,7 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                 return false;
             }
 
-            setFormData({
-                ...formData,
-                game: {
-                    ...game,
-                    stats: initialStats
-                },
-            } as SportsActivity<Sport>);
+            setFormData({ ...formData, game: {...game, stats: initialStats}} as SportsActivity<Sport>);
             return true;
         } else {
             // Verify existing stats have valid team IDs
@@ -227,18 +221,29 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
     return (
         <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
             <Box sx={{ mb: 3 }}>
-                <Typography variant="h5" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', color: theme.palette.primary.main }}>
+                <Typography
+                    variant="h5"
+                    sx={{
+                        fontWeight: "bold",
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: theme.palette.primary.main
+                    }}>
                     <SportsBasketballIcon sx={{ mr: 1 }} /> Basketball Scoring
                 </Typography>
                 <Divider sx={{ mt: 1 }} />
             </Box>
-
             {/* Scoreboard - Side by Side */}
             <Grid container spacing={3} sx={{ mb: 3 }}>
                 {teams.map((team) => {
                     const teamTotal = getTeamTotal(team.id);
                     return (
-                        <Grid item xs={12} md={6} key={team.id}>
+                        <Grid
+                            key={team.id}
+                            size={{
+                                xs: 12,
+                                md: 6
+                            }}>
                             <Card variant="outlined" sx={{
                                 height: '100%',
                                 borderWidth: 2,
@@ -254,7 +259,12 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                                         </Box>
                                     }
                                     action={
-                                        <Typography variant="h4" fontWeight="bold" sx={{ pr: 2 }}>
+                                        <Typography
+                                            variant="h4"
+                                            sx={{
+                                                fontWeight: "bold",
+                                                pr: 2
+                                            }}>
                                             {teamTotal}
                                         </Typography>
                                     }
@@ -264,13 +274,17 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                     );
                 })}
             </Grid>
-
             {/* Teams and Players - Side by Side */}
             <Grid container spacing={3}>
                 {teams.map((team) => {
                     const teamPlayers = getTeamPlayers(team.id);
                     return (
-                        <Grid item xs={12} md={6} key={team.id}>
+                        <Grid
+                            key={team.id}
+                            size={{
+                                xs: 12,
+                                md: 6
+                            }}>
                             <Card>
                                 <CardContent>
                                     <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -296,7 +310,9 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                                                         bgcolor: isHovered ? `${theme.palette.primary.main}15` : 'transparent'
                                                     }}
                                                 >
-                                                    <Box display="flex">
+                                                    <Box sx={{
+                                                        display: "flex"
+                                                    }}>
                                                         <ListItemAvatar>
                                                             <Avatar sx={{
                                                                 bgcolor: isHovered ? theme.palette.primary.main : theme.palette.grey[400],
@@ -313,7 +329,6 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                                                             }}
                                                         />
                                                     </Box>
-
                                                     {/* Point chips with smooth transition */}
                                                     <Box sx={{
                                                         height: isHovered ? '40px' : '0px',
@@ -358,7 +373,12 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                                             );
                                         })}
                                         {teamPlayers.length === 0 && (
-                                            <Typography color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
+                                            <Typography
+                                                sx={{
+                                                    color: "text.secondary",
+                                                    p: 2,
+                                                    textAlign: 'center'
+                                                }}>
                                                 No players in this team
                                             </Typography>
                                         )}
@@ -369,7 +389,6 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                     );
                 })}
             </Grid>
-
             {/* Points History Table */}
             <Card sx={{ mt: 3 }}>
                 <CardHeader title="Points History" />
@@ -435,7 +454,11 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                                 {(!game.stats || game.stats.every(s => s.points.length === 0)) && (
                                     <TableRow>
                                         <TableCell colSpan={4} align="center">
-                                            <Typography color="text.secondary" py={2}>
+                                            <Typography
+                                                sx={{
+                                                    color: "text.secondary",
+                                                    py: 2
+                                                }}>
                                                 No points recorded yet
                                             </Typography>
                                         </TableCell>
@@ -446,7 +469,6 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                     </TableContainer>
                 </CardContent>
             </Card>
-
             {/* Edit Point Dialog */}
             <Dialog open={!!editPoint} onClose={() => setEditPoint(null)}>
                 <DialogTitle>Edit Points</DialogTitle>
@@ -469,7 +491,6 @@ export const BasketballForm = ({ formData, setFormData }: BasketballFormProps) =
                     <Button onClick={saveEditedPoint} variant="contained">Save</Button>
                 </DialogActions>
             </Dialog>
-
             {/* Notification */}
             <Snackbar
                 open={!!notification}

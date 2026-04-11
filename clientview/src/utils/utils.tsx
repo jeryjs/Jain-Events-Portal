@@ -1,5 +1,5 @@
 import { EventType } from "@common/constants";
-import useTheme from "@mui/material/styles/useTheme";
+import { useTheme } from "@mui/material/styles";
 
 // Helper function to generate a unique color based on a string
 export const generateColorFromString = (str: string): string => {
