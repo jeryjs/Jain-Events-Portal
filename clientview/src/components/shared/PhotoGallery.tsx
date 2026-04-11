@@ -6,6 +6,7 @@ import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ProgressiveImage from '@components/shared/ProgressiveImage';
 
 // Styled components
 const GalleryContainer = styled(Box)(({ theme }) => ({
@@ -20,13 +21,6 @@ const PhotoItem = styled(motion.div)(({ theme }) => ({
   overflow: 'hidden',
   cursor: 'pointer',
 }));
-
-const Image = styled('img')({
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  display: 'block',
-});
 
 const ExpandedImage = styled(motion.img)(() => ({
   minWidth: '60vw',
@@ -138,6 +132,7 @@ interface NormalizedImage {
   link: string;
   thumbnail: string;
 }
+
 
 interface PhotoGalleryProps {
   title?: string;
@@ -329,7 +324,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Image src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
+                  <ProgressiveImage src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
                 </StaggeredItem>
               );
             })}
@@ -374,7 +369,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                   onClick={() => handleImageClick(index)}
                 >
                   <Box sx={{ height: imageHeight }}>
-                    <Image src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
+                    <ProgressiveImage src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
                   </Box>
                 </PhotoItem>
               </Grid>
@@ -441,10 +436,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 exit={{ opacity: 0, x: dragDirection * -200 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
-                <ExpandedImage 
-                  src={normalizedImages[selectedImageIndex].link} 
-                  alt={`Expanded view ${selectedImageIndex + 1}`}
-                />
+                <Box sx={{ position: 'relative', width: 'min(90vw, 1200px)', height: 'min(90vh, 800px)' }}>
+                  <ProgressiveImage
+                    src={normalizedImages[selectedImageIndex].link}
+                    alt={`Expanded view ${selectedImageIndex + 1}`}
+                    placeholderSrc={normalizedImages[selectedImageIndex].thumbnail}
+                  />
+                </Box>
               </motion.div>
               
               <CloseButton onClick={handleDialogClose}>
