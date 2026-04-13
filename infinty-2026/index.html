@@ -8,157 +8,26 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --text: #f6efe6;
-      --accent: #d7b46a;
-      --card-border: rgba(255, 255, 255, 0.08);
-    }
-
+    :root { --text: #f6efe6; --accent: #d7b46a; --card-border: rgba(255, 255, 255, 0.08); }
     * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      width: 100%;
-      min-height: 100%;
-      overflow-x: hidden;
-      font-family: "Work Sans", "Segoe UI", sans-serif;
-      background: #050608;
-      color: var(--text);
-      scrollbar-width: none;
-    }
-
-    body::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-      display: none;
-    }
-
-    .logo-corner {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 3;
-      width: 80px;
-      height: auto;
-      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.55));
-      pointer-events: none;
-    }
-
-    .panel {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 24px;
-      transition: opacity 0.1s linear;
-      pointer-events: none;
-    }
-
-    .panel-a {
-      background-image: url("assets/bg.png");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transform: scale(1.04);
-    }
-
-    .panel-b {
-      background:
-        radial-gradient(circle at top, rgba(215, 180, 106, 0.08), rgba(5, 6, 8, 0.9) 60%),
-        linear-gradient(180deg, #0b0c10, #040405);
-    }
-
-    .panel-c {
-      background-image: url("assets/bg.png");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transform: scale(1.03);
-    }
-
-    .vignette {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      background: radial-gradient(
-        circle at center,
-        rgba(0, 0, 0, 0.05),
-        rgba(0, 0, 0, 0.35) 60%,
-        rgba(0, 0, 0, 0.5)
-      );
-      opacity: 0.35;
-      pointer-events: none;
-    }
-
-    .title {
-      font-family: "Bebas Neue", "Work Sans", sans-serif;
-      font-size: clamp(3rem, 12vw, 9rem);
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      line-height: 0.9;
-      color: var(--text);
-      text-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
-      transform: translate3d(0, 40px, 0) scale(0.7);
-      opacity: 0;
-      will-change: transform, opacity;
-    }
-
+    html, body { margin: 0; width: 100%; min-height: 100%; overflow-x: hidden; font-family: "Work Sans", "Segoe UI", sans-serif; background: #050608; color: var(--text); scrollbar-width: none; }
+    body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+    .logo-corner { position: fixed; top: 20px; left: 20px; z-index: 3; width: 80px; height: auto; filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.55)); pointer-events: none; }
+    .panel { position: fixed; inset: 0; z-index: 0; display: grid; place-items: center; text-align: center; padding: 24px; transition: opacity 0.1s linear; pointer-events: none; }
+    .panel-a { background-image: url("assets/bg.png"); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.04); }
+    .panel-b { background: radial-gradient(circle at top, rgba(215, 180, 106, 0.08), rgba(5, 6, 8, 0.9) 60%), linear-gradient(180deg, #0b0c10, #040405); }
+    .panel-c { background-image: url("assets/bg.png"); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.03); }
+    .vignette { position: fixed; inset: 0; z-index: 1; background: radial-gradient( circle at center,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.35) 60%,rgba(0, 0, 0, 0.5) ); opacity: 0.35; pointer-events: none; } .title { font-family: "Bebas Neue", "Work Sans", sans-serif; font-size: clamp(3rem, 12vw, 9rem); letter-spacing: 0.22em; text-transform: uppercase; line-height: 0.9; color: var(--text); text-shadow: 0 18px 60px rgba(0, 0, 0, 0.7); transform: translate3d(0, 40px, 0) scale(0.7); opacity: 0; will-change: transform, opacity; }
     .title span { display: block; }
     .title .accent { color: var(--accent); }
-
-    .hint {
-      margin-top: 16px;
-      font-size: 0.85rem;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: rgba(246, 239, 230, 0.75);
-    }
-
-    .card {
-      max-width: 900px;
-      text-align: left;
-      padding: 36px 32px;
-      border-radius: 22px;
-      background: rgba(8, 10, 12, 0.7);
-      border: 1px solid var(--card-border);
-      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(8px);
-      opacity: 0;
-      transform: translate3d(0, 30px, 0) scale(0.96);
-      will-change: transform, opacity;
-    }
-
-    .card h2 {
-      margin: 0 0 16px 0;
-      font-family: "Bebas Neue", "Work Sans", sans-serif;
-      font-size: clamp(2rem, 6vw, 3.6rem);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #ffe7b0;
-      text-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-    }
-
-    .card p {
-      margin: 0;
-      font-size: 1.05rem;
-      line-height: 1.85;
-      color: rgba(246, 239, 230, 0.9);
-    }
-
-    .scroll-space {
-      height: 600vh;
-    }
-
+    .hint { margin-top: 16px; font-size: 0.85rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(246, 239, 230, 0.75); }
+    .card { max-width: 900px; text-align: left; padding: 36px 32px; border-radius: 22px; background: rgba(8, 10, 12, 0.7); border: 1px solid var(--card-border); box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); opacity: 0; transform: translate3d(0, 30px, 0) scale(0.96); will-change: transform, opacity; }
+    .card h2 { margin: 0 0 16px 0; font-family: "Bebas Neue", "Work Sans", sans-serif; font-size: clamp(2rem, 6vw, 3.6rem); letter-spacing: 0.18em; text-transform: uppercase; color: #ffe7b0; text-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); }
+    .card p { margin: 0; font-size: 1.05rem; line-height: 1.85; color: rgba(246, 239, 230, 0.9); }
+    .scroll-space {height: 600vh;}
     @media (max-width: 768px) {
-      .card {
-        padding: 28px 22px;
-      }
-
-      .card h2 {
-        letter-spacing: 0.12em;
-      }
+      .card { padding: 28px 22px; } 
+      .card h2 { letter-spacing: 0.12em; } 
     }
   </style>
 </head>
@@ -194,6 +63,15 @@
 
   <div class="vignette"></div>
   <div class="scroll-space"></div>
+
+  <script>
+    const eventsData = [
+      {inRegisterLink: "", outRegisterLink: "", name: "Event 1", club: "", css: "", type: "cultural"},
+      {inRegisterLink: "", outRegisterLink: "", name: "Event 2", club: "", css: "", type: "technical"},
+      {inRegisterLink: "", outRegisterLink: "", name: "Event 3", club: "", css: "", type: "cultural"},
+      {inRegisterLink: "", outRegisterLink: "", name: "Event 4", club: "", css: "", type: "technical"},
+    ]
+  </script>
 
   <script>
     const panelA = document.querySelector(".panel-a");
