@@ -45,6 +45,11 @@ export enum ArticleStatus {
 	ARCHIVED = "archived",
 }
 
+export enum ItemVisibility {
+	PUBLIC = "public",
+	PRIVATE = "private",
+}
+
 export enum Role {
 	GUEST = 0, // Lowest privileges
 	USER = 1,

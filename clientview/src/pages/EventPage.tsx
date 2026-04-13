@@ -1,4 +1,4 @@
-import { EventType, Role } from '@common/constants';
+import { EventType, ItemVisibility, Role } from '@common/constants';
 import Event, { BannerItem, EventConfig } from '@common/models/Event';
 import { Activity } from '@common/models';
 import { getBaseEventType } from '@common/utils';
@@ -142,9 +142,11 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
   // Toggle fullscreen for video
   const toggleFullscreen = () => {
     if (videoRef.current) {
-      document.fullscreenElement
-        ? document.exitFullscreen()
-        : videoRef.current.requestFullscreen();
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        videoRef.current.requestFullscreen();
+      }
     }
   };
 
@@ -362,7 +364,12 @@ const ActivityAccordion: React.FC<ActivityAccordionProps> = ({ activityType, act
 // Activity list component with React.Suspense
 const ActivitiesSection = ({ eventId, config }: { eventId: string, config: EventConfig }) => {
   const { activities, isLoading } = useActivities(eventId);
-  const len = activities && Array.isArray(activities) ? activities.length : 0;
+  const { userData } = useLogin();
+  const isAdmin = (userData?.role ?? Role.GUEST) >= Role.ADMIN;
+  const visibleActivities = (activities || []).filter((activity) => (
+    isAdmin || activity.visibility !== ItemVisibility.PRIVATE
+  ));
+  const len = Array.isArray(visibleActivities) ? visibleActivities.length : 0;
 
   if (isLoading) {
     return (
@@ -376,7 +383,7 @@ const ActivitiesSection = ({ eventId, config }: { eventId: string, config: Event
     );
   }
 
-  if (!activities || len === 0) {
+  if (len === 0) {
     return (
       <Paper sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
         <Typography sx={{
@@ -387,8 +394,8 @@ const ActivitiesSection = ({ eventId, config }: { eventId: string, config: Event
   }
 
   // Separate info activities from other activities
-  const infoActivities = activities.filter(activity => getBaseEventType(activity.type) === EventType.INFO);
-  const nonInfoActivities = activities.filter(activity => getBaseEventType(activity.type) !== EventType.INFO);
+  const infoActivities = visibleActivities.filter(activity => getBaseEventType(activity.type) === EventType.INFO);
+  const nonInfoActivities = visibleActivities.filter(activity => getBaseEventType(activity.type) !== EventType.INFO);
 
   // Group activities by event type
   const groupedActivities: Record<number, any[]> = {};
@@ -435,7 +442,7 @@ function EventPage() {
   const { mutateAsync: deleteEvent } = useDeleteEvent();
   const { mutateAsync: createActivity } = useCreateActivity(eventId);
 
-  const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId!);
+  const { data: event, isLoading: eventLoading, error: eventError, refetch } = useEvent(eventId!);
   const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -478,7 +485,10 @@ function EventPage() {
     try {
       if (!eventId) throw new Error('Event ID is required');
       await createActivity(activityData);
-      {() => setSearchParams(prev => { prev.delete('createActivity'); return prev; }, { replace: true })}
+      setSearchParams(prev => {
+        prev.delete('createActivity');
+        return prev;
+      }, { replace: true });
       // Refetch activities (they're fetched in ActivitiesSection)
     } catch (error) {
       setError((error instanceof Error ? error.message : 'Failed to create activity'));
@@ -515,7 +525,7 @@ function EventPage() {
   const eventTypeText = event ? getEventTypeText(event.type) : 'Event';
 
   // Loading skeleton for event details
-  if (eventLoading || !event) {
+  if (eventLoading) {
     return (
       <PageTransition>
         <Container maxWidth="lg" sx={{ pt: 2, pb: 8 }}>
@@ -547,11 +557,32 @@ function EventPage() {
     );
   }
 
+  if (eventError || !event) {
+    return (
+      <PageTransition>
+        <Container maxWidth="md" sx={{ pt: 8, pb: 8, textAlign: 'center' }}>
+          <Typography variant="h4" sx={{ mb: 2 }}>Event not found</Typography>
+          <Typography color="text.secondary">
+            This event may be private or unavailable.
+          </Typography>
+        </Container>
+      </PageTransition>
+    );
+  }
+
+  const isPrivateEventForAdmin = event.visibility === ItemVisibility.PRIVATE && (userData?.role ?? Role.GUEST) >= Role.ADMIN;
+
   // temp for ininity: Hardcode the highlights-
 
   return (
     <Suspense fallback={null}>
       <PageTransition>
+        {isPrivateEventForAdmin && (
+          <Container maxWidth="lg" sx={{ pt: 2 }}>
+            <Alert severity="warning">Private event preview (visible to admins only)</Alert>
+          </Container>
+        )}
+        <Box sx={isPrivateEventForAdmin ? { opacity: 0.72, filter: 'grayscale(1)' } : undefined}>
         {/* Hero Section with Background Image */}
         <Box>
           <HeroContainer initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
@@ -744,6 +775,7 @@ function EventPage() {
             />
           </Box>}
         </Container>
+        </Box>
 
         {/* Floating Action Buttons (Admin/Manager only) */}
         {canEdit && (

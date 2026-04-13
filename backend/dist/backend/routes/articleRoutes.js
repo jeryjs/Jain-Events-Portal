@@ -45,6 +45,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const articles_1 = require("@services/articles");
 const auth_1 = require("@middlewares/auth");
+const authUtils_1 = require("@utils/authUtils");
 const express_rate_limit_1 = __importStar(require("express-rate-limit"));
 const router = (0, express_1.Router)();
 // Rate limiter to prevent abuse (1 request per minute per article)
@@ -62,9 +63,11 @@ const viewCountLimiter = (0, express_rate_limit_1.default)({
  * Article Routes
  */
 // Get all articles
-router.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const articles = yield (0, articles_1.getArticles)();
+        const userData = yield (0, authUtils_1.getUserFromRequest)(req, true);
+        const user = userData ? { role: userData.role, username: userData.username } : undefined;
+        const articles = yield (0, articles_1.getArticles)(user);
         res.json(articles);
     }
     catch (error) {
@@ -75,7 +78,9 @@ router.get('/', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
 // Get article by ID
 router.get('/:articleId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const article = yield (0, articles_1.getArticleById)(req.params.articleId);
+        const userData = yield (0, authUtils_1.getUserFromRequest)(req, true);
+        const user = userData ? { role: userData.role, username: userData.username } : undefined;
+        const article = yield (0, articles_1.getArticleById)(req.params.articleId, user);
         if (article) {
             res.json(article);
         }
@@ -129,7 +134,9 @@ router.delete('/:articleId', auth_1.adminMiddleware, (req, res) => __awaiter(voi
 // Update article view count
 router.post('/:articleId/view', viewCountLimiter, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const article = yield (0, articles_1.updateArticleViewCount)(req.params.articleId);
+        const userData = yield (0, authUtils_1.getUserFromRequest)(req, true);
+        const user = userData ? { role: userData.role, username: userData.username } : undefined;
+        const article = yield (0, articles_1.updateArticleViewCount)(req.params.articleId, user);
         if (article) {
             res.json({ message: 'View count updated successfully' });
         }

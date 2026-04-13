@@ -45,7 +45,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserFromToken = exports.verifyToken = exports.generateToken = void 0;
+exports.getUserFromRequest = exports.getTokenFromRequest = exports.getUserFromToken = exports.verifyToken = exports.generateToken = void 0;
 const models_1 = require("@common/models");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const firebase_admin_1 = __importDefault(require("firebase-admin"));
@@ -115,3 +115,19 @@ const getUserFromToken = (token_1, ...args_1) => __awaiter(void 0, [token_1, ...
     }
 });
 exports.getUserFromToken = getUserFromToken;
+const getTokenFromRequest = (req) => {
+    var _a, _b;
+    const authHeader = (_a = req.headers) === null || _a === void 0 ? void 0 : _a.authorization;
+    if (authHeader === null || authHeader === void 0 ? void 0 : authHeader.startsWith("Bearer ")) {
+        return authHeader.slice(7).trim();
+    }
+    return ((_b = req.cookies) === null || _b === void 0 ? void 0 : _b.session) || null;
+};
+exports.getTokenFromRequest = getTokenFromRequest;
+const getUserFromRequest = (req_1, ...args_1) => __awaiter(void 0, [req_1, ...args_1], void 0, function* (req, fetchFromDb = true) {
+    const token = getTokenFromRequest(req);
+    if (!token)
+        return null;
+    return getUserFromToken(token, fetchFromDb);
+});
+exports.getUserFromRequest = getUserFromRequest;

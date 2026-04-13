@@ -1,4 +1,4 @@
-import { EventType } from "@common/constants";
+import { EventType, ItemVisibility } from "@common/constants";
 
 export interface BannerItem {
 	url?: string;
@@ -25,7 +25,8 @@ export default class Event {
 		public highlights: string,
 		public banner: BannerItem[] = [],
 		public managers: string[] = [],
-		public config: EventConfig = {}
+		public config: EventConfig = {},
+		public visibility: ItemVisibility = ItemVisibility.PUBLIC,
 	) {
 	// Convert Timestamp-like objects (from firestore) to Date
 	this.timings = timings.map((t) => {
@@ -63,7 +64,8 @@ export default class Event {
 			data.highlights || "",
 			banner,
 			data.managers || [],
-			data.config || {}
+			data.config || {},
+			data.visibility || ItemVisibility.PUBLIC,
 		);
 	}
 
@@ -84,6 +86,7 @@ export default class Event {
 			banner: this.banner,
 			managers: this.managers,
 			config: this.config,
+			visibility: this.visibility,
 		};
 	}
 

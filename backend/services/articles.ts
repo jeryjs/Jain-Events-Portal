@@ -1,4 +1,5 @@
 import Article from '@common/models/Article';
+import { ItemVisibility, Role } from '@common/constants';
 import { parseArticles } from '@common/utils';
 import { cache, TTL } from '@config/cache';
 import db from '@config/firebase';
@@ -15,15 +16,32 @@ const articlesCollection = db.collection('articles');
 const COLLECTION_KEY = "articles";
 const ITEM_KEY_PREFIX = "articles";
 
+type RequestUser = { role: number; username: string };
+
+const getVisibilityScope = (user?: RequestUser) => ((user?.role ?? Role.GUEST) >= Role.ADMIN ? 'admin' : 'public');
+const getCollectionKey = (user?: RequestUser) => `${COLLECTION_KEY}-${getVisibilityScope(user)}`;
+const getItemKey = (articleId: string, user?: RequestUser) => `${ITEM_KEY_PREFIX}-${articleId}-${getVisibilityScope(user)}`;
+
+const filterArticleForUser = (article: any, user?: RequestUser) => {
+  if (article?.visibility === ItemVisibility.PRIVATE && (user?.role ?? Role.GUEST) < Role.ADMIN) {
+    return null;
+  }
+  return article;
+};
+
 /**
  * Get all articles
  */
-export const getArticles = async () => {
+export const getArticles = async (user?: RequestUser) => {
   return getCachedCollection<Article>({
-    key: COLLECTION_KEY,
+    key: getCollectionKey(user),
     fetchFn: async () => {
       const snapshot = await articlesCollection.get();
-      return parseArticles(snapshot.docs.map(doc => doc.data()));
+      return parseArticles(
+        snapshot.docs
+          .map(doc => filterArticleForUser(doc.data(), user))
+          .filter(Boolean)
+      );
     },
     ttl: TTL.ARTICLES
   });
@@ -32,13 +50,15 @@ export const getArticles = async () => {
 /**
  * Get article by ID
  */
-export const getArticleById = async (articleId: string) => {
+export const getArticleById = async (articleId: string, user?: RequestUser) => {
   return getCachedItem<Article>({
-    key: `${ITEM_KEY_PREFIX}-${articleId}`,
+    key: getItemKey(articleId, user),
     fetchFn: async () => {
       const doc = await articlesCollection.doc(articleId).get();
       if (!doc.exists) return null;
-      return Article.parse(doc.data());
+      const filtered = filterArticleForUser(doc.data(), user);
+      if (!filtered) return null;
+      return Article.parse(filtered);
     },
     ttl: TTL.ARTICLES
   });
@@ -47,28 +67,38 @@ export const getArticleById = async (articleId: string) => {
 /**
  * Update article view count
  */
-export const updateArticleViewCount = async (articleId: string) => {
-  const articleKey = `${ITEM_KEY_PREFIX}-${articleId}`;
+export const updateArticleViewCount = async (articleId: string, user?: RequestUser) => {
+  const articleKey = getItemKey(articleId, user);
   let articleData: Article | null = cache.get(articleKey) as Article;
   
   if (!articleData) {
     console.log(`🔥 Database: Fetching article by ID for view count update: ${articleId}`);
     const doc = await articlesCollection.doc(articleId).get();
     if (!doc.exists) return null;
-    articleData = Article.parse(doc.data());
+    const filtered = filterArticleForUser(doc.data(), user);
+    if (!filtered) return null;
+    articleData = Article.parse(filtered);
   }
   
   articleData.viewCount = (articleData.viewCount || 0) + 1;
   
-  return updateCachedItem<Article>({
+  const updated = await updateCachedItem<Article>({
     item: articleData,
-    collectionKey: COLLECTION_KEY,
+    collectionKey: getCollectionKey(user),
     itemKeyPrefix: ITEM_KEY_PREFIX,
     updateFn: async (item) => {
       await articlesCollection.doc(item.id).update({ viewCount: item.viewCount });
     },
     ttl: TTL.ARTICLES
   });
+
+  cache.keys().forEach(key => {
+    if (key.startsWith(`${ITEM_KEY_PREFIX}-${articleId}-`) || key.startsWith(`${COLLECTION_KEY}-`)) {
+      cache.del(key);
+    }
+  });
+
+  return updated;
 };
 
 /**
@@ -77,32 +107,38 @@ export const updateArticleViewCount = async (articleId: string) => {
 export const createArticle = async (articleData: any) => {
   const article = Article.parse(articleData);
   
-  return createCachedItem<Article>({
+  const created = await createCachedItem<Article>({
     item: article,
-    collectionKey: COLLECTION_KEY,
+    collectionKey: `${COLLECTION_KEY}-public`,
     itemKeyPrefix: ITEM_KEY_PREFIX,
     saveFn: async (item) => {
       await articlesCollection.doc(item.id).set(item.toJSON());
     },
     ttl: TTL.ARTICLES
   });
+
+  invalidateArticlesCache();
+  return created;
 };
 
 /**
  * Update existing article
  */
-export const updateArticle = async (articleId: string, articleData: any) => {
+export const updateArticle = async (_articleId: string, articleData: any) => {
   const article = Article.parse(articleData);
   
-  return updateCachedItem<Article>({
+  const updated = await updateCachedItem<Article>({
     item: article,
-    collectionKey: COLLECTION_KEY,
+    collectionKey: `${COLLECTION_KEY}-public`,
     itemKeyPrefix: ITEM_KEY_PREFIX,
     updateFn: async (item) => {
       await articlesCollection.doc(item.id).update(item.toJSON());
     },
     ttl: TTL.ARTICLES
   });
+
+  invalidateArticlesCache();
+  return updated;
 };
 
 /**
@@ -114,24 +150,26 @@ export const deleteArticle = async (articleId: string) => {
   
   if (!doc.exists) return false;
   
-  return deleteCachedItem<Article>({
+  const deleted = await deleteCachedItem<Article>({
     id: articleId,
-    collectionKey: COLLECTION_KEY,
+    collectionKey: `${COLLECTION_KEY}-public`,
     itemKeyPrefix: ITEM_KEY_PREFIX,
     deleteFn: async () => {
       await articleDoc.delete();
     },
     ttl: TTL.ARTICLES
   });
+
+  invalidateArticlesCache();
+  return deleted;
 };
 
 /**
  * Invalidate cache for articles
  */
 export const invalidateArticlesCache = () => {
-  cache.del(COLLECTION_KEY);
   cache.keys().forEach(key => {
-    if (key.startsWith(ITEM_KEY_PREFIX)) {
+    if (key.startsWith(ITEM_KEY_PREFIX) || key.startsWith(COLLECTION_KEY)) {
       cache.del(key);
     }
   });

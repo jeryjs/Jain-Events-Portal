@@ -18,7 +18,7 @@ import {
 import { alpha, styled } from '@mui/material/styles';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
-import { EventType, Role } from '@common/constants';
+import { EventType, ItemVisibility, Role } from '@common/constants';
 import { Activity, CulturalActivity, InfoActivity, SportsActivity, TechnicalActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getBaseEventType } from '@common/utils';
@@ -109,6 +109,8 @@ function ActivityPage() {
     return <ActivityNotFound eventId={eventId || ''} />;
   }
 
+  const isPrivateActivityForAdmin = activity.visibility === ItemVisibility.PRIVATE && (userData?.role ?? Role.GUEST) >= Role.ADMIN;
+
   const handleBack = () => {
     navigate(`/${eventId}`);
   };
@@ -118,7 +120,19 @@ function ActivityPage() {
 
   return (
     <PageTransition>
-      <Container maxWidth="lg" sx={{ py: 4, color: 'text.primary' }}>
+      {isPrivateActivityForAdmin && (
+        <Container maxWidth="lg" sx={{ pt: 2 }}>
+          <Alert severity="warning">Private activity preview (visible to admins only)</Alert>
+        </Container>
+      )}
+      <Container
+        maxWidth="lg"
+        sx={{
+          py: 4,
+          color: 'text.primary',
+          ...(isPrivateActivityForAdmin ? { opacity: 0.72, filter: 'grayscale(1)' } : {}),
+        }}
+      >
         {/* Activity Hero Section */}
         <ActivityHero activity={activity!} baseType={baseType} handleBack={handleBack} />
 

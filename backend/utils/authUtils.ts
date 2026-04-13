@@ -2,6 +2,7 @@ import { UserData } from "@common/models";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import admin from "firebase-admin";
 import { Role } from "@common/constants";
+import { Request } from "express";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
@@ -67,4 +68,21 @@ const getUserFromToken = async (token: string, fetchFromDb: boolean = false): Pr
 	}
 };
 
-export { generateToken, verifyToken, getUserFromToken };
+const getTokenFromRequest = (req: Pick<Request, "headers"> & { cookies?: Record<string, any> }): string | null => {
+	const authHeader = req.headers?.authorization;
+	if (authHeader?.startsWith("Bearer ")) {
+		return authHeader.slice(7).trim();
+	}
+	return req.cookies?.session || null;
+};
+
+const getUserFromRequest = async (
+	req: Pick<Request, "headers"> & { cookies?: Record<string, any> },
+	fetchFromDb: boolean = true,
+): Promise<UserData | null> => {
+	const token = getTokenFromRequest(req);
+	if (!token) return null;
+	return getUserFromToken(token, fetchFromDb);
+};
+
+export { generateToken, verifyToken, getUserFromToken, getTokenFromRequest, getUserFromRequest };

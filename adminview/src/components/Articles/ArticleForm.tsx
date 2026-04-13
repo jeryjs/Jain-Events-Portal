@@ -22,7 +22,7 @@ import {
   DialogTitle
 } from '@mui/material';
 
-import { EventType } from '@common/constants';
+import { EventType, ItemVisibility } from '@common/constants';
 import { Article } from '@common/models';
 import "@blocknote/core/fonts/inter.css";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -50,6 +50,7 @@ export const ArticleForm = ({ article, isCreating, onSave, onDelete }: ArticleFo
       tags: [],
       author: { id: 'admin', name: 'Administrator' },
       relatedEventType: undefined,
+      visibility: ItemVisibility.PUBLIC,
     }
   );
   const editor = useCreateBlockNote({});
@@ -351,6 +352,22 @@ export const ArticleForm = ({ article, isCreating, onSave, onDelete }: ArticleFo
             onChange={e => handleChange('tags', e.target.value.split(',').map(tag => tag.trim()))}
             helperText="Comma-separated list of tags"
           />
+        </Grid>
+
+        <Grid size={{xs: 12, md: 6}}>
+          <FormControl fullWidth>
+            <InputLabel id="visibility-label">Visibility</InputLabel>
+            <Select
+              labelId="visibility-label"
+              value={formData.visibility || ItemVisibility.PUBLIC}
+              onChange={e => handleChange('visibility', e.target.value)}
+              label="Visibility"
+            >
+              <MenuItem value={ItemVisibility.PUBLIC}>Public</MenuItem>
+              <MenuItem value={ItemVisibility.PRIVATE}>Private (Admins only)</MenuItem>
+            </Select>
+            <FormHelperText>Private articles are visible to admins only</FormHelperText>
+          </FormControl>
         </Grid>
         
         <Grid size={{xs: 12}} mt={2} sx={{ textAlign: 'start' }}>

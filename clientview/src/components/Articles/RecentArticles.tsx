@@ -1,4 +1,7 @@
 import { Article } from '@common/models';
+import { ItemVisibility, Role } from '@common/constants';
+import { useLogin } from '@components/shared';
+import LockIcon from '@mui/icons-material/Lock';
 import { Box, Button, Chip, Paper, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { motion } from 'framer-motion';
@@ -47,12 +50,18 @@ const RecentArticleImg = styled('img')(({ theme }) => ({
 }));
 
 const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
+    const { userData } = useLogin();
+    const isAdmin = (userData?.role ?? Role.GUEST) >= Role.ADMIN;
+
     return (
         <Paper elevation={2} sx={{ p: 3, borderRadius: 4 }}>
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
                 <SidebarTitle variant="h5">Recent Articles</SidebarTitle>
                 {articles.map((article) => (
-                    <RecentArticleItem key={article.id}>
+                    <RecentArticleItem
+                        key={article.id}
+                        sx={article.visibility === ItemVisibility.PRIVATE && isAdmin ? { opacity: 0.72, filter: 'grayscale(1)' } : undefined}
+                    >
                         <Link to={`/articles/${article.id}`} style={{ textDecoration: 'none', display: 'flex', width: '100%' }}>
                             <RecentArticleImg src={article.image.url} alt={article.title} style={article.imageStyles} />
                             <RecentArticleContent>
@@ -71,7 +80,17 @@ const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
                                     <Typography variant="caption" sx={{
                                         color: "text.secondary"
                                     }}>{article.dateString}</Typography>
-                                    {article.eventTypeString && <Chip label={article.eventTypeString} size="small" sx={{ height: 20, fontSize: '0.625rem' }} variant="outlined" />}
+                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                        {article.visibility === ItemVisibility.PRIVATE && isAdmin && (
+                                            <Chip
+                                                icon={<LockIcon sx={{ fontSize: '0.75rem !important' }} />}
+                                                label="PRIVATE"
+                                                size="small"
+                                                sx={{ height: 20, fontSize: '0.55rem', backgroundColor: 'grey.800', color: 'common.white' }}
+                                            />
+                                        )}
+                                        {article.eventTypeString && <Chip label={article.eventTypeString} size="small" sx={{ height: 20, fontSize: '0.625rem' }} variant="outlined" />}
+                                    </Box>
                                 </Box>
                             </RecentArticleContent>
                         </Link>

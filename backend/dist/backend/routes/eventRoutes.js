@@ -13,6 +13,7 @@ const express_1 = require("express");
 const auth_1 = require("@middlewares/auth");
 const events_1 = require("@services/events");
 const constants_1 = require("@common/constants");
+const authUtils_1 = require("@utils/authUtils");
 const router = (0, express_1.Router)();
 /**
  * Event Routes
@@ -20,7 +21,8 @@ const router = (0, express_1.Router)();
 // Get all events
 router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = req.user ? { role: req.user.role, username: req.user.username } : undefined;
+        const userData = yield (0, authUtils_1.getUserFromRequest)(req, true);
+        const user = userData ? { role: userData.role, username: userData.username } : undefined;
         const events = yield (0, events_1.getEvents)(user);
         res.json(events);
     }
@@ -32,7 +34,8 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 // Get event by ID
 router.get('/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = req.user ? { role: req.user.role, username: req.user.username } : undefined;
+        const userData = yield (0, authUtils_1.getUserFromRequest)(req, true);
+        const user = userData ? { role: userData.role, username: userData.username } : undefined;
         const event = yield (0, events_1.getEventById)(req.params.eventId, user);
         if (event) {
             res.json(event);

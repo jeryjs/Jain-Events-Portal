@@ -25,7 +25,7 @@ import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import dayjs from 'dayjs';
 import { Suspense, useEffect, useState } from 'react';
 
-import { EventType } from '@common/constants';
+import { EventType, ItemVisibility } from '@common/constants';
 import { BannerItem, Event } from '@common/models';
 import { getAllBaseEventTypes } from '@common/utils';
 import { ActivityButton } from './ActivityButton';
@@ -688,6 +688,32 @@ export function EventForm({ event, isCreating, onSave, onDelete }: EventFormProp
               onChange={(e) => editFormData('galleryLink', e.target.value)}
               sx={{ mb: 4 }}
             />
+          </Box>
+
+          {/* Visibility Section */}
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mb: 2,
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                pb: 1
+              }}
+            >
+              Visibility
+            </Typography>
+
+            <Select
+              fullWidth
+              value={formData.visibility || ItemVisibility.PUBLIC}
+              onChange={(e) => editFormData('visibility', e.target.value)}
+            >
+              <MenuItem value={ItemVisibility.PUBLIC}>Public</MenuItem>
+              <MenuItem value={ItemVisibility.PRIVATE}>Private (Admins only)</MenuItem>
+            </Select>
           </Box>
 
           {/* Save and Delete Buttons */}

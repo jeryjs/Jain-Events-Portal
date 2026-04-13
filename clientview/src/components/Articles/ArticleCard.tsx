@@ -20,10 +20,13 @@ import { styled } from '@mui/material/styles';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
+import LockIcon from '@mui/icons-material/Lock';
 import VisibilityIcon from '@mui/icons-material/VisibilityOutlined';
 
 // Article Model
 import { Article } from '@common/models';
+import { ItemVisibility, Role } from '@common/constants';
+import { useLogin } from '@components/shared';
 
 
 type variant = 'featured' | 'list';
@@ -73,26 +76,60 @@ const TruncatedText = styled(Typography)({
 });
 
 // Sub-components
-const StatusChips: React.FC<{ article: Article, variant: variant }> = ({ article, variant }) => {
+const StatusChips: React.FC<{ article: Article, variant: variant, showPrivateBadge: boolean }> = ({ article, variant, showPrivateBadge }) => {
   if (variant === 'featured' && article.eventTypeString) {
     return (
-      <Chip
-        label={article.eventTypeString}
-        color="primary"
-        size="small"
-        sx={{ position: 'absolute', top: 16, left: 16, zIndex: 2, fontWeight: 'bold' }}
-      />
+      <>
+        <Chip
+          label={article.eventTypeString}
+          color="primary"
+          size="small"
+          sx={{ position: 'absolute', top: 16, left: 16, zIndex: 2, fontWeight: 'bold' }}
+        />
+        {showPrivateBadge && (
+          <Chip
+            icon={<LockIcon sx={{ fontSize: '0.85rem !important' }} />}
+            label="PRIVATE"
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 50,
+              left: 16,
+              zIndex: 2,
+              fontWeight: 'bold',
+              backgroundColor: 'grey.800',
+              color: 'common.white',
+            }}
+          />
+        )}
+      </>
     );
   }
 
   return (
     <>
+      {showPrivateBadge && (
+        <Chip
+          icon={<LockIcon sx={{ fontSize: '0.85rem !important' }} />}
+          label="PRIVATE"
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            zIndex: 2,
+            fontWeight: 'bold',
+            backgroundColor: 'grey.800',
+            color: 'common.white',
+          }}
+        />
+      )}
       {variant === 'list' && article.isRecent && (
         <Chip
           label="NEW"
           color="error"
           size="small"
-          sx={{ position: 'absolute', top: 8, left: 8, zIndex: 2, fontWeight: 'bold' }}
+          sx={{ position: 'absolute', top: showPrivateBadge ? 42 : 8, left: 8, zIndex: 2, fontWeight: 'bold' }}
         />
       )}
       {variant === 'list' && article.isTrending && (
@@ -102,7 +139,7 @@ const StatusChips: React.FC<{ article: Article, variant: variant }> = ({ article
           size="small"
           sx={{
             position: 'absolute',
-            top: article.isRecent ? 42 : 8,
+            top: article.isRecent ? (showPrivateBadge ? 76 : 42) : (showPrivateBadge ? 42 : 8),
             left: 8,
             zIndex: 2,
             fontWeight: 'bold'
@@ -119,7 +156,9 @@ const ArticleCard = memo<ArticleCardProps>(({
   bookmarked,
   onToggleBookmark
 }) => {
+  const { userData } = useLogin();
   const isWideScreen = useMediaQuery('(min-width:600px)');
+  const showPrivateBadge = article.visibility === ItemVisibility.PRIVATE && (userData?.role ?? Role.GUEST) >= Role.ADMIN;
 
   const handleBookmarkClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -133,9 +172,12 @@ const ArticleCard = memo<ArticleCardProps>(({
       transition={{ duration: variant === 'featured' ? 0.6 : 0.4 }}
     >
       <Link to={`/articles/${article.id}`} style={{ textDecoration: 'none' }}>
-        <StyledCard cardVariant={variant}>
+        <StyledCard
+          cardVariant={variant}
+          sx={showPrivateBadge ? { opacity: 0.72, filter: 'grayscale(1)', border: '1px solid', borderColor: 'divider' } : undefined}
+        >
           <Box sx={{ position: 'relative' }}></Box>
-          <StatusChips article={article} variant={variant} />
+          <StatusChips article={article} variant={variant} showPrivateBadge={showPrivateBadge} />
 
           <IconButton
             onClick={handleBookmarkClick}

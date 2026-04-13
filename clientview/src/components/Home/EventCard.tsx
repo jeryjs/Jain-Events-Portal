@@ -5,9 +5,10 @@ import { styled } from '@mui/material/styles';
 import { Box, Typography, Card, CardMedia, CardContent, Chip } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import LockIcon from '@mui/icons-material/Lock';
 import Event from '@common/models/Event';
 import { motion } from 'framer-motion';
-import { Role } from '@common/constants';
+import { ItemVisibility, Role } from '@common/constants';
 import { useLogin } from '@components/shared';
 
 // Styled components
@@ -88,9 +89,20 @@ interface EventCardProps {
 const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', delay = 0 }) => {
   // Get user data from context
   const { userData: user } = useLogin();
+  const isAdmin = (user?.role ?? Role.GUEST) >= Role.ADMIN;
+  const isPrivate = isAdmin && event.visibility === ItemVisibility.PRIVATE;
 
   // Determine if user is admin or manager for this event
   const isManager = (event.managers && user && event.managers.includes(user.username));
+
+  const privateCardStyles = isPrivate
+    ? {
+      opacity: 0.72,
+      filter: 'grayscale(1)',
+      border: '1px solid',
+      borderColor: 'divider',
+    }
+    : undefined;
 
   // Check the start date year and set date/time accordingly
   const startDate = new Date(event.time.start);
@@ -147,25 +159,40 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
     }
   };
 
-  // Manager badge component
-  const ManagerBadge = () => (
-    isManager ? (
-      <Chip
-        label="M"
-        size="small"
-        sx={{
-          position: 'absolute',
-          top: 8,
-          right: 8,
-          zIndex: 2,
-          backgroundColor: 'secondary.main',
-          color: 'white',
-          fontWeight: 'bold',
-          fontSize: '0.7rem'
-        }}
-      />
-    ) : null
-  );
+  const managerBadge = isManager ? (
+    <Chip
+      label="M"
+      size="small"
+      sx={{
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        zIndex: 2,
+        backgroundColor: 'secondary.main',
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: '0.7rem'
+      }}
+    />
+  ) : null;
+
+  const privateBadge = isPrivate ? (
+    <Chip
+      icon={<LockIcon sx={{ fontSize: '0.85rem !important' }} />}
+      label="PRIVATE"
+      size="small"
+      sx={{
+        position: 'absolute',
+        top: isManager ? 42 : 8,
+        right: 8,
+        zIndex: 2,
+        backgroundColor: 'grey.800',
+        color: 'common.white',
+        fontWeight: 'bold',
+        fontSize: '0.65rem'
+      }}
+    />
+  ) : null;
 
   if (variant === 'horizontal') {
     return (
@@ -178,8 +205,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
         sx={{ width: '100%' }}
       >
         <Link to={`/${event.id}`} style={{ textDecoration: 'none' }}>
-          <StyledCard sx={{ display: 'flex', mb: 2, borderRadius: 2, width: '100%', position: 'relative' }}>
-            <ManagerBadge />
+          <StyledCard sx={{ display: 'flex', mb: 2, borderRadius: 2, width: '100%', position: 'relative', ...privateCardStyles }}>
+            {managerBadge}
+            {privateBadge}
             <Box sx={{
               width: { xs: 130, sm: 220 },
               height: { xs: 130, sm: 160 },
@@ -225,8 +253,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
         whileTap={{ scale: 0.98 }}
       >
         <Link to={`/${event.id}`} style={{ textDecoration: 'none' }}>
-          <StyledCard sx={{ position: 'relative' }}>
-            <ManagerBadge />
+          <StyledCard sx={{ position: 'relative', ...privateCardStyles }}>
+            {managerBadge}
+            {privateBadge}
             {day && <DateBadge>
               <Typography variant="h6" sx={{
                 fontWeight: "bold"

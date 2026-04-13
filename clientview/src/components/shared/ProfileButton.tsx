@@ -141,7 +141,7 @@ const ProfileButton = ({ className }) => {
 
                 <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
                     {/* Role-specific actions */}
-                    {userData?.role || 0 >= Role.MANAGER && (
+                    {(userData?.role || 0 >= Role.MANAGER) && (
                         <Button
                             variant="outlined"
                             size="small"
