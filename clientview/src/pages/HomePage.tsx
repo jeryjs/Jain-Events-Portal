@@ -223,6 +223,7 @@ function HomePage() {
 
 
   const handleEventSave = async (formData: Partial<Event>) => {
+    formData = Event.parse(formData);
     if (!formData.name || !formData.time || !formData.time.start || !formData.time.end) {
       setError('Please fill in all required fields');
       return;
