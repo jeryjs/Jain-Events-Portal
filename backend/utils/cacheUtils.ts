@@ -101,34 +101,34 @@ export async function createCachedItem<T extends Identifiable>({
  * Update item with cache update
  */
 export async function updateCachedItem<T extends Identifiable>({
-	item,
+	oldItem,
 	collectionKey,
 	itemKeyPrefix,
 	updateFn,
 	ttl,
 }: {
-	item: T;
+	oldItem: T;
 	collectionKey: string;
 	itemKeyPrefix: string;
-	updateFn: (item: T) => Promise<any>;
+	updateFn: (oldItem: T) => Promise<T>;
 	ttl: number;
 }): Promise<T> {
-	console.log(`🔥 Database: Updating ${typeof item} item with ID ${item.id}`);
-	await updateFn(item);
+	console.log(`🔥 Database: Updating ${typeof oldItem} item with ID ${oldItem.id}`);
+	const updatedItem = await updateFn(oldItem);
 
-	const itemKey = `${itemKeyPrefix}-${item.id}`;
+	const itemKey = `${itemKeyPrefix}-${oldItem.id}`;
 
 	// Update individual item cache
-	cache.set(itemKey, item, ttl);
+	cache.set(itemKey, updatedItem, ttl);
 
 	// Update collection cache if it exists
 	const cachedCollection = cache.get(collectionKey) as T[] | undefined;
 	if (cachedCollection) {
-		const updatedCollection = cachedCollection.map((cachedItem) => (cachedItem.id === item.id ? { ...cachedItem, ...item } : cachedItem));
+		const updatedCollection = cachedCollection.map((cachedItem) => (cachedItem.id === oldItem.id ? { ...cachedItem, ...updatedItem } : cachedItem));
 		cache.set(collectionKey, updatedCollection, ttl);
 	}
 
-	return item;
+	return updatedItem;
 }
 
 /**

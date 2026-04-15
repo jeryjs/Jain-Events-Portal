@@ -78,18 +78,17 @@ exports.createActivity = createActivity;
  * Update existing activity
  */
 const updateActivity = (eventId, activityId, activityData) => __awaiter(void 0, void 0, void 0, function* () {
-    const activityDoc = activitiesCollection(eventId).doc(activityId);
-    const doc = yield activityDoc.get();
-    if (!doc.exists)
+    const existingActivity = yield (0, exports.getActivityById)(eventId, activityId);
+    if (!existingActivity)
         return null;
-    // Ensure the ID is set correctly
-    activityData.id = activityId;
     return (0, cacheUtils_1.updateCachedItem)({
-        item: activityData,
+        oldItem: existingActivity,
         collectionKey: `activities-${eventId}`,
         itemKeyPrefix: `activities-${eventId}`,
-        updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () {
-            yield activityDoc.update(activityData);
+        updateFn: (existingItem) => __awaiter(void 0, void 0, void 0, function* () {
+            const updatedItem = Object.assign(Object.assign({}, existingItem), activityData);
+            yield activitiesCollection(eventId).doc(activityId).update(updatedItem);
+            return models_1.Activity.parse(updatedItem);
         }),
         ttl: cache_1.TTL.ACTIVITIES
     });
@@ -178,10 +177,13 @@ const castVote = (eventId, activityId, teamId, username) => __awaiter(void 0, vo
     teamPoll.votes.push(username);
     activity.pollData = pollData;
     yield (0, cacheUtils_1.updateCachedItem)({
-        item: activity,
+        oldItem: activity,
         collectionKey: `activities-${eventId}`,
         itemKeyPrefix: `activities-${eventId}`,
-        updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () { return yield activityDoc.update(JSON.parse(JSON.stringify(item))); }),
+        updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () {
+            yield activityDoc.update({ pollData: item.pollData });
+            return models_1.CulturalActivity.parse(activity);
+        }),
         ttl: cache_1.TTL.ACTIVITIES
     });
     return {

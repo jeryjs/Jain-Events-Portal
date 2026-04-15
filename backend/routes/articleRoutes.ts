@@ -69,7 +69,11 @@ router.post('', adminMiddleware, async (req: Request, res: Response) => {
 router.patch('/:articleId', adminMiddleware, async (req: Request, res: Response) => {
     try {
         const updatedArticle = await updateArticle(req.params.articleId as string, req.body);
-        res.json(updatedArticle);
+        if (!updatedArticle) {
+            res.status(404).json({ message: 'Article not found' });
+        } else {
+            res.json(updatedArticle);
+        }
     } catch (error) {
         console.error('Error updating article:', error);
         res.status(500).json({ message: 'Error updating article', details: JSON.stringify(error) });

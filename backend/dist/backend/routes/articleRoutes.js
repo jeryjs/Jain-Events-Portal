@@ -103,7 +103,12 @@ router.post('', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, 
 router.patch('/:articleId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updatedArticle = yield (0, articles_1.updateArticle)(req.params.articleId, req.body);
-        res.json(updatedArticle);
+        if (!updatedArticle) {
+            res.status(404).json({ message: 'Article not found' });
+        }
+        else {
+            res.json(updatedArticle);
+        }
     }
     catch (error) {
         console.error('Error updating article:', error);

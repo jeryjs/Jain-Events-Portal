@@ -67,11 +67,12 @@ const updateArticleViewCount = (articleId) => __awaiter(void 0, void 0, void 0, 
     }
     articleData.viewCount = (articleData.viewCount || 0) + 1;
     return (0, cacheUtils_1.updateCachedItem)({
-        item: articleData,
+        oldItem: articleData,
         collectionKey: COLLECTION_KEY,
         itemKeyPrefix: ITEM_KEY_PREFIX,
         updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () {
             yield articlesCollection.doc(item.id).update({ viewCount: item.viewCount });
+            return Article_1.default.parse(item);
         }),
         ttl: cache_1.TTL.ARTICLES
     });
@@ -97,13 +98,16 @@ exports.createArticle = createArticle;
  * Update existing article
  */
 const updateArticle = (articleId, articleData) => __awaiter(void 0, void 0, void 0, function* () {
-    const article = Article_1.default.parse(articleData);
+    const existingArticle = yield (0, exports.getArticleById)(articleId);
+    if (!existingArticle)
+        return null;
     return (0, cacheUtils_1.updateCachedItem)({
-        item: article,
+        oldItem: existingArticle,
         collectionKey: COLLECTION_KEY,
         itemKeyPrefix: ITEM_KEY_PREFIX,
         updateFn: (item) => __awaiter(void 0, void 0, void 0, function* () {
             yield articlesCollection.doc(item.id).update(item.toJSON());
+            return Article_1.default.parse(item);
         }),
         ttl: cache_1.TTL.ARTICLES
     });
