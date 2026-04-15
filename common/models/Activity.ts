@@ -1,5 +1,5 @@
 import Participant from './Participant';
-import { EventType, ItemVisibility } from '../constants';
+import { EventType } from '../constants';
 import { getBaseEventType } from '@common/utils';
 import { SportsActivity, CulturalActivity, InfoActivity, TechnicalActivity } from '@common/models';
 
@@ -10,8 +10,7 @@ export default class Activity {
       public startTime: Date,
       public endTime: Date,   // can be null until the activity ends
       public participants: Participant[],
-      public type: EventType,
-      public visibility: ItemVisibility = ItemVisibility.PUBLIC,
+      public type: EventType
   ) {
       if(!this.startTime) this.startTime = new Date();  // TODO: Remove this line once testing is done.
 
@@ -37,7 +36,7 @@ export default class Activity {
               if (data.teams) return TeamActivity.parse(data);
               // Default Activity parsing logic
               const participants = data.participants.map((p: any) => Participant.parse(p));
-              return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.type, data.visibility || ItemVisibility.PUBLIC);
+              return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.type);
       }
   }
 
@@ -73,13 +72,12 @@ export class TeamActivity extends Activity {
     startTime: Date,
     endTime: Date,
     type: EventType,
-    visibility: ItemVisibility,
     participants: Participant[],
     public teams: { id: string; name: string }[] = [],
     public winners: { id: string; name: string }[] = [],
     
   ) {
-    super(id, name, startTime, endTime, participants, type, visibility);
+    super(id, name, startTime, endTime, participants, type);
   }
 
   static parse(data: any): TeamActivity {
@@ -89,7 +87,6 @@ export class TeamActivity extends Activity {
       data.startTime,
       data.endTime,
       data.type || data.eventType,
-      data.visibility || ItemVisibility.PUBLIC,
       data.participants.map((p: any) => Participant.parse(p)),
       data.teams,
       data.winners,

@@ -12,7 +12,6 @@ import {
     isUserEventManager
 } from "@services/events";
 import { Role } from '@common/constants';
-import { getUserFromRequest } from '@utils/authUtils';
 
 const router = Router();
 
@@ -23,8 +22,7 @@ const router = Router();
 // Get all events
 router.get('/', async (req: Request & { user?: any }, res: Response) => {
     try {
-        const userData = await getUserFromRequest(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
+        const user = req.user ? { role: req.user.role, username: req.user.username } : undefined;
         const events = await getEvents(user);
         res.json(events);
     } catch (error) {
@@ -36,8 +34,7 @@ router.get('/', async (req: Request & { user?: any }, res: Response) => {
 // Get event by ID
 router.get('/:eventId', async (req: Request & { user?: any }, res: Response) => {
     try {
-        const userData = await getUserFromRequest(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
+        const user = req.user ? { role: req.user.role, username: req.user.username } : undefined;
         const event = await getEventById(req.params.eventId as string, user);
         if (event) {
             res.json(event);

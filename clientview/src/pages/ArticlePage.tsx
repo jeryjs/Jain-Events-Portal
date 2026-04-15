@@ -1,9 +1,7 @@
 import {
-  Alert,
   Box,
   Container,
-  Grid,
-  Typography
+  Grid
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,16 +11,12 @@ import ArticleContent from '@components/Article/ArticleContent';
 import ArticleHero from '@components/Article/ArticleHero';
 import ArticleSkeleton from '@components/Article/ArticleSkeleton';
 import RecentArticles from '@components/Articles/RecentArticles';
-import { useLogin } from '@components/shared';
 import PageTransition from '@components/shared/PageTransition';
 import { useArticles, useUpdateArticleViewCount } from '@hooks/useApi';
-import { ItemVisibility, Role } from '@common/constants';
 
 const ArticlePage: React.FC = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const navigate = useNavigate();
-  const { userData } = useLogin();
-  const isAdmin = (userData?.role ?? Role.GUEST) >= Role.ADMIN;
 
   const { data: allArticles, isLoading: articleLoading } = useArticles();
   const article = allArticles?.find(a => a.id === articleId);
@@ -80,34 +74,9 @@ const ArticlePage: React.FC = () => {
     return <ArticleSkeleton />;
   }
 
-  if (!article) {
-    return (
-      <PageTransition>
-        <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-          <Typography variant="h4" sx={{ mb: 2 }}>Article not found</Typography>
-          <Typography color="text.secondary">
-            This article may be private or unavailable.
-          </Typography>
-        </Container>
-      </PageTransition>
-    );
-  }
-
-  const isPrivateArticleForAdmin = article.visibility === ItemVisibility.PRIVATE && isAdmin;
-
   return (
     <PageTransition>
-      {isPrivateArticleForAdmin && (
-        <Container maxWidth="lg" sx={{ pt: 2 }}>
-          <Alert severity="warning">Private article preview (visible to admins only)</Alert>
-        </Container>
-      )}
-      <Box
-        sx={{
-          position: 'relative',
-          ...(isPrivateArticleForAdmin ? { opacity: 0.72, filter: 'grayscale(1)' } : {}),
-        }}
-      >
+      <Box sx={{ position: 'relative' }}>
         <ArticleHero
           article={article}
           onBack={handleBack}

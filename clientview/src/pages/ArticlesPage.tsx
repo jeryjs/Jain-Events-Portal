@@ -2,21 +2,17 @@ import ArticleCard from '@components/Articles/ArticleCard';
 import ArticleList from '@components/Articles/ArticleList';
 import ArticlesHeader from '@components/Articles/ArticlesHeader';
 import RecentArticles from '@components/Articles/RecentArticles';
-import { useLogin } from '@components/shared';
 import PageTransition from '@components/shared/PageTransition';
 import { useArticles } from '@hooks/useApi';
 import { Box, Container, Skeleton, Typography } from '@mui/material';
 import Grid2 from '@mui/material/Grid';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useColorMode } from '@utils/ColorMode';
-import { ItemVisibility, Role } from '@common/constants';
 
 const ArticlesPage: React.FC = () => {
   const colorMode = useColorMode();
   const navigate = useNavigate();
-  const { userData } = useLogin();
-  const isAdmin = (userData?.role ?? Role.GUEST) >= Role.ADMIN;
   const { data, isLoading, error } = useArticles();
   const [searchTerm, setSearchTerm] = useState('');
   const [bookmarked, setBookmarked] = useState<string[]>([]);
@@ -54,7 +50,6 @@ const ArticlesPage: React.FC = () => {
 
   // Filter and sort articles
   const articles = data!
-    .filter(article => isAdmin || article.visibility !== ItemVisibility.PRIVATE)
     .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
     .filter(article => {
       const searchText = searchTerm.toLowerCase();

@@ -7,7 +7,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import { memo, useCallback, useEffect, useState } from 'react';
 
-import { EventType, ItemVisibility } from '@common/constants';
+import { EventType } from '@common/constants';
 import { Activity, CulturalActivity, InfoActivity, SportsActivity, TeamActivity, TechnicalActivity } from '@common/models';
 import { Sport } from '@common/models/sports/SportsActivity';
 import { getActivityTypes, getAllBaseEventTypes, getBaseEventType } from '@common/utils';
@@ -40,7 +40,6 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
         type: EventType.GENERAL,
         startTime: new Date(),
         endTime: undefined,  // Add endTime field with default undefined
-        visibility: ItemVisibility.PUBLIC,
         participants: []
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,7 +59,6 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                 type: EventType.GENERAL,
                 startTime: new Date(),
                 endTime: undefined,
-                visibility: ItemVisibility.PUBLIC,
                 participants: [],
             }));
         }
@@ -216,19 +214,6 @@ export const ActivityForm = ({ eventId, activity, isCreating, onSave, onDelete }
                         </Select>
                         {errors.type && <Typography color="error">{errors.type}</Typography>}
                     </FormControl>
-
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel>Visibility</InputLabel>
-                        <Select
-                            value={formData.visibility || ItemVisibility.PUBLIC}
-                            label="Visibility"
-                            onChange={(e) => handleChange('visibility', e.target.value)}
-                        >
-                            <MenuItem value={ItemVisibility.PUBLIC}>Public</MenuItem>
-                            <MenuItem value={ItemVisibility.PRIVATE}>Private (Admins only)</MenuItem>
-                        </Select>
-                    </FormControl>
-
                     <Grid container spacing={2} sx={{ mt: 1 }}>
                         <Grid size={{xs:12, md:6}} display="flex" alignItems="center">
                             <LocalizationProvider dateAdapter={AdapterDayjs}>

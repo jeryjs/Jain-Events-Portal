@@ -1,4 +1,4 @@
-import { EventType, ItemVisibility, Role } from '@common/constants';
+import { EventType, Role } from '@common/constants';
 import Event from '@common/models/Event';
 import { EventForm } from '@components/Event/admin/EventForm';
 import HighlightsCarousel from '@components/Event/HighlightsCarousel';
@@ -15,13 +15,12 @@ import useImgur from '@hooks/useImgur';
 import useNotifications from '@hooks/useNotifications';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import LockIcon from '@mui/icons-material/Lock';
 import { Alert, Box, Button, CardContent, CardMedia, Chip, Container, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, Snackbar, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import slugify from '@utils/Slugify';
 import { pascalCase } from '@utils/utils';
 import { motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 const HorizontalScroll = styled(motion.div)(({ theme }) => `
@@ -105,17 +104,7 @@ function HomePage() {
   const [catTabId, setTabId] = useState([0, -1]);
   const handleTabChange = (newTabId, newCatId) => setTabId([newTabId, newCatId]);
 
-  const isAdmin = (userData?.role ?? Role.GUEST) >= Role.ADMIN;
-
-  const visibleEvents = (events ?? []).filter((event) => (
-    isAdmin || event.visibility !== ItemVisibility.PRIVATE
-  ));
-
-  const visibleArticles = (articles ?? []).filter((article) => (
-    isAdmin || article.visibility !== ItemVisibility.PRIVATE
-  ));
-
-  const filteredEvents = visibleEvents
+  const filteredEvents = (events ?? [])
     .filter(event => catTabId[1] > 0 ? event.type === catTabId[1] : true)
     .sort((a, b) => b.time.start.getTime() - a.time.start.getTime());
 
@@ -215,11 +204,14 @@ function HomePage() {
     )
   }
 
-  const sortedSections = [
-    { items: ongoingEvents, view: <EventSection.ongoing />, key: 'ongoing' },
-    { items: upcomingEvents, view: <EventSection.upcoming />, key: 'upcoming' },
-    { items: pastEvents, view: <EventSection.past />, key: 'past' },
-  ].sort((a, b) => (a.items.length === 0 ? 1 : 0) - (b.items.length === 0 ? 1 : 0));
+  // Memoize the sections to prevent unnecessary re-creation
+  const sortedSections = useMemo(() => {
+    return [
+      { items: ongoingEvents, view: <EventSection.ongoing />, key: 'ongoing' },
+      { items: upcomingEvents, view: <EventSection.upcoming />, key: 'upcoming' },
+      { items: pastEvents, view: <EventSection.past />, key: 'past' },
+    ].sort((a, b) => (a.items.length === 0 ? 1 : 0) - (b.items.length === 0 ? 1 : 0));
+  }, [events, catTabId]);
 
 
   const handleEventSave = async (formData: Partial<Event>) => {
@@ -296,15 +288,12 @@ function HomePage() {
             >
               {isArticlesLoading
                 ? renderEventCardShimmers(3)
-                : visibleArticles.map((article, idx) => (
+                : (articles || []).map((article, idx) => (
                   <motion.div
                     key={article.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: idx * 0.1 }}
-                    style={article.visibility === ItemVisibility.PRIVATE && isAdmin
-                      ? { opacity: 0.72, filter: 'grayscale(1)' }
-                      : undefined}
                   >
                     <ArticleCard to={`/articles/${article.id}`}>
                       <Box sx={{ position: 'relative', overflow: 'hidden' }}>
@@ -339,22 +328,6 @@ function HomePage() {
                             fontSize: '0.7rem'
                           }}
                         />
-                          {article.visibility === ItemVisibility.PRIVATE && isAdmin && (
-                            <Chip
-                              icon={<LockIcon sx={{ fontSize: '0.85rem !important' }} />}
-                              size="small"
-                              label="PRIVATE"
-                              sx={{
-                                position: 'absolute',
-                                top: 12,
-                                left: 12,
-                                backgroundColor: 'grey.800',
-                                color: 'common.white',
-                                fontWeight: 'bold',
-                                fontSize: '0.65rem'
-                              }}
-                            />
-                          )}
                       </Box>
                       <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <Box>

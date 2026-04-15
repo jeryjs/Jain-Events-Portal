@@ -1,10 +1,9 @@
-import { EventType, ItemVisibility } from '@common/constants';
+import { EventType } from '@common/constants';
 import { Activity, CulturalActivity, SportsActivity } from '@common/models';
 import { getBaseEventType } from '@common/utils';
 import { useEventActivities } from '@hooks/App';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AddIcon from '@mui/icons-material/Add';
-import LockIcon from '@mui/icons-material/Lock';
 import PeopleIcon from '@mui/icons-material/People';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { Box, Button, Chip, Divider, IconButton, LinearProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material';
@@ -120,7 +119,6 @@ const ActivityItem = memo(({
   const hasEnded = activity.endTime && activity.endTime < now;
   const isStarted = activity.startTime < now;
   const isOngoing = isStarted && !hasEnded;
-  const isPrivate = activity.visibility === ItemVisibility.PRIVATE;
 
   // Determine status for timeline dot
   const status = hasEnded ? 'completed' : isOngoing ? 'ongoing' : 'upcoming';
@@ -157,25 +155,12 @@ const ActivityItem = memo(({
         selected={isSelected}
         onClick={onSelect}
         elevation={isSelected ? 2 : 1}
-        sx={isPrivate ? { opacity: 0.72, filter: 'grayscale(1)', borderColor: 'divider' } : undefined}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <Typography textAlign='left' sx={{ mr: 2 }}>
               {activity.name}
             </Typography>
-            {isPrivate && (
-              <Chip
-                size="small"
-                icon={<LockIcon sx={{ fontSize: '0.85rem !important' }} />}
-                label="PRIVATE"
-                sx={{
-                  bgcolor: 'grey.800',
-                  color: 'common.white',
-                  fontWeight: 'bold',
-                }}
-              />
-            )}
           </Box>
         </Box>
 

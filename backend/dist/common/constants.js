@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Gender = exports.Role = exports.ItemVisibility = exports.ArticleStatus = exports.EventType = void 0;
+exports.Gender = exports.Role = exports.ArticleStatus = exports.EventType = void 0;
 /**
  * Represents the different types of events available in the system.
  *
@@ -43,11 +43,6 @@ var ArticleStatus;
     ArticleStatus["PUBLISHED"] = "published";
     ArticleStatus["ARCHIVED"] = "archived";
 })(ArticleStatus || (exports.ArticleStatus = ArticleStatus = {}));
-var ItemVisibility;
-(function (ItemVisibility) {
-    ItemVisibility["PUBLIC"] = "public";
-    ItemVisibility["PRIVATE"] = "private";
-})(ItemVisibility || (exports.ItemVisibility = ItemVisibility = {}));
 var Role;
 (function (Role) {
     Role[Role["GUEST"] = 0] = "GUEST";

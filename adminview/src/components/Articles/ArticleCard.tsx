@@ -1,7 +1,6 @@
 import { Box, Card, CardContent, Typography, alpha } from '@mui/material';
 import { Article } from '@common/models';
-import { EventType, ItemVisibility } from '@common/constants';
-import LockIcon from '@mui/icons-material/Lock';
+import { EventType } from '@common/constants';
 
 interface ArticleCardProps {
   article: Article;
@@ -22,7 +21,6 @@ export const ArticleCard = ({ article, isSelected, collapsed, onClick }: Article
   const eventTypeColor = article.relatedEventType !== undefined 
     ? eventTypeColors[article.relatedEventType] || '#6B7280' // Default gray
     : '#6B7280';
-  const isPrivate = article.visibility === ItemVisibility.PRIVATE;
     
   return (
     <Card 
@@ -32,7 +30,6 @@ export const ArticleCard = ({ article, isSelected, collapsed, onClick }: Article
         transition: 'all 0.2s ease',
         backgroundColor: isSelected ? alpha(eventTypeColor, 0.1) : 'background.paper',
         borderLeft: `4px solid ${isSelected ? eventTypeColor : 'transparent'}`,
-        ...(isPrivate ? { opacity: 0.72, filter: 'grayscale(1)', border: '1px solid', borderColor: 'divider' } : {}),
         '&:hover': {
           backgroundColor: isSelected ? alpha(eventTypeColor, 0.15) : alpha('#000', 0.02),
         },
@@ -67,41 +64,21 @@ export const ArticleCard = ({ article, isSelected, collapsed, onClick }: Article
                 {article.dateString}
               </Typography>
               
-              <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                {isPrivate && (
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 0.25,
-                      backgroundColor: 'grey.800',
-                      color: 'common.white',
-                      px: 1,
-                      py: 0.25,
-                      borderRadius: 1,
-                      fontWeight: 700,
-                    }}
-                  >
-                    <LockIcon sx={{ fontSize: '0.75rem' }} /> PRIVATE
-                  </Typography>
-                )}
-                {article.relatedEventType !== undefined && (
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      backgroundColor: alpha(eventTypeColor, 0.1), 
-                      color: eventTypeColor,
-                      px: 1,
-                      py: 0.25,
-                      borderRadius: 1,
-                      fontWeight: 500
-                    }}
-                  >
-                    {article.eventTypeString}
-                  </Typography>
-                )}
-              </Box>
+              {article.relatedEventType !== undefined && (
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    backgroundColor: alpha(eventTypeColor, 0.1), 
+                    color: eventTypeColor,
+                    px: 1,
+                    py: 0.25,
+                    borderRadius: 1,
+                    fontWeight: 500
+                  }}
+                >
+                  {article.eventTypeString}
+                </Typography>
+              )}
             </Box>
             
             <Typography 

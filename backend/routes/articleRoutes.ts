@@ -9,7 +9,6 @@ import {
     invalidateArticlesCache,
 } from "@services/articles";
 import { adminMiddleware } from '@middlewares/auth';
-import { getUserFromRequest } from '@utils/authUtils';
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 
 const router = Router();
@@ -30,11 +29,9 @@ const viewCountLimiter = rateLimit({
  */
 
 // Get all articles
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', async (_: Request, res: Response) => {
     try {
-        const userData = await getUserFromRequest(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
-        const articles = await getArticles(user);
+        const articles = await getArticles();
         res.json(articles);
     } catch (error) {
         console.error('Error fetching articles:', error);
@@ -45,9 +42,7 @@ router.get('/', async (req: Request, res: Response) => {
 // Get article by ID
 router.get('/:articleId', async (req: Request, res: Response) => {
     try {
-        const userData = await getUserFromRequest(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
-        const article = await getArticleById(req.params.articleId as string, user);
+        const article = await getArticleById(req.params.articleId as string);
         if (article) {
             res.json(article);
         } else {
@@ -99,9 +94,7 @@ router.delete('/:articleId', adminMiddleware, async (req: Request, res: Response
 // Update article view count
 router.post('/:articleId/view', viewCountLimiter, async (req: Request, res: Response) => {
     try {
-        const userData = await getUserFromRequest(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
-        const article = await updateArticleViewCount(req.params.articleId as string, user);
+        const article = await updateArticleViewCount(req.params.articleId as string);
         if (article) {
             res.json({ message: 'View count updated successfully' });
         } else {

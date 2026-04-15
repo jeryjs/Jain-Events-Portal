@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("@common/constants");
 class Event {
-    constructor(id, name, type, timings, description, venue, galleryLink, highlights, banner = [], managers = [], config = {}, visibility = constants_1.ItemVisibility.PUBLIC) {
+    constructor(id, name, type, timings, description, venue, galleryLink, highlights, banner = [], managers = [], config = {}) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -13,7 +13,6 @@ class Event {
         this.banner = banner;
         this.managers = managers;
         this.config = config;
-        this.visibility = visibility;
         // Convert Timestamp-like objects (from firestore) to Date
         this.timings = timings.map((t) => {
             // If already a Date object
@@ -38,7 +37,7 @@ class Event {
                     type: 'image'
                 }];
         }
-        return new Event(data.id || "", data.name || "", data.type || constants_1.EventType.GENERAL, data.timings || [], data.description || "", data.venue || "", data.galleryLink || "", data.highlights || "", banner, data.managers || [], data.config || {}, data.visibility || constants_1.ItemVisibility.PUBLIC);
+        return new Event(data.id || "", data.name || "", data.type || constants_1.EventType.GENERAL, data.timings || [], data.description || "", data.venue || "", data.galleryLink || "", data.highlights || "", banner, data.managers || [], data.config || {});
     }
     toJSON() {
         // If there are timings, ensure they're stored as Firestore timestamps
@@ -57,7 +56,6 @@ class Event {
             banner: this.banner,
             managers: this.managers,
             config: this.config,
-            visibility: this.visibility,
         };
     }
     get time() {

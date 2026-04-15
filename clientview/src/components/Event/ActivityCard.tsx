@@ -1,4 +1,4 @@
-import { EventType, ItemVisibility, Role } from '@common/constants';
+import { EventType } from '@common/constants';
 import { CulturalActivity, InfoActivity } from '@common/models';
 import Activity from '@common/models/Activity';
 import SportsActivity, { Athletics, Sport } from '@common/models/sports/SportsActivity';
@@ -11,7 +11,6 @@ import DirectionsRunIcon from '@mui/icons-material/DirectionsRun';
 import EditIcon from '@mui/icons-material/Edit';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import LiveTvIcon from '@mui/icons-material/LiveTv';
-import LockIcon from '@mui/icons-material/Lock';
 import SportsBasketballIcon from '@mui/icons-material/SportsBasketball';
 import SportsCricketIcon from '@mui/icons-material/SportsCricket';
 import SportsSharpIcon from '@mui/icons-material/SportsSharp';
@@ -19,7 +18,6 @@ import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import PersonIcon from '@mui/icons-material/Person';
 import { Avatar, Badge, Box, Card, CardContent, Chip, Divider, Fab, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useLogin } from '@components/shared';
 import { generateColorFromString } from '@utils/utils';
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
@@ -187,24 +185,12 @@ const MotionLink = styled(motion.div)`
 `;
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 0 }) => {
-  const { userData } = useLogin();
-
   const activityType = getActivityType(activity.type);
   const chipColor = getChipColor(activity.type);
   const participantCount = activity.participants?.length || 0;
   const isSports = isSportsActivity(activity);
   const isInfo = isInfoActivity(activity);
   const status = getActivityStatus(activity);
-  const isPrivate = activity.visibility === ItemVisibility.PRIVATE && (userData?.role ?? Role.GUEST) >= Role.ADMIN;
-
-  const privateCardSx = isPrivate
-    ? {
-      opacity: 0.72,
-      filter: 'grayscale(1)',
-      border: '1px solid',
-      borderColor: 'divider',
-    }
-    : undefined;
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -218,26 +204,6 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
       }
     }
   };
-
-  const PrivateBadge = () => (
-    isPrivate ? (
-      <Chip
-        icon={<LockIcon sx={{ fontSize: '0.85rem !important' }} />}
-        label="PRIVATE"
-        size="small"
-        sx={{
-          position: 'absolute',
-          top: 6,
-          left: 6,
-          zIndex: 4,
-          backgroundColor: 'grey.800',
-          color: 'common.white',
-          fontWeight: 'bold',
-          fontSize: '0.65rem',
-        }}
-      />
-    ) : null
-  );
 
   // Athletics Card Component
   const AthleticsCard = ({ sportActivity, status, eventId }: { sportActivity: SportsActivity<Sport>, status: 'upcoming' | 'ongoing' | 'completed', eventId: string }) => {
@@ -279,8 +245,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
         whileTap={{ scale: 0.98 }}
       >
         <Link to={`/${eventId}/${sportActivity.id}`} style={{ textDecoration: 'none' }}>
-          <StyledCard elevation={4} sx={privateCardSx}>
-            <PrivateBadge />
+          <StyledCard elevation={4}>
             <MatchStatus status={status}>
               {getStatusIcon(status)}
               <Typography>{status}</Typography>
@@ -559,8 +524,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
         whileTap={{ scale: 0.98 }}
       >
         <Link to={`/${eventId}/${activity.id}`} style={{ textDecoration: 'none' }}>
-          <StyledCard elevation={4} sx={privateCardSx}>
-            <PrivateBadge />
+          <StyledCard elevation={4}>
             <MatchStatus status={status}>
               {getStatusIcon(status)}
               <Typography>{status}</Typography>
@@ -698,8 +662,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
     return (
       <MotionLink variants={cardVariants} initial="hidden" animate="visible" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
         <Link to={`/${eventId}/${activity.id}`} style={{ textDecoration: 'none' }}>
-          <StyledCard sx={{ borderLeft: `4px solid ${chipColor}`, ...privateCardSx }}>
-            <PrivateBadge />
+          <StyledCard sx={{ borderLeft: `4px solid ${chipColor}` }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar sx={{ bgcolor: `${chipColor}22`, color: chipColor, width: 36, height: 36, mr: 1.5 }}>
@@ -755,8 +718,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
     return (
       <MotionLink variants={cardVariants} initial="hidden" animate="visible" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
         <Link to={`/${eventId}/${activity.id}`} style={{ textDecoration: 'none' }}>
-          <StyledCard sx={{ overflow: 'hidden', position: 'relative', ...privateCardSx }}>
-            <PrivateBadge />
+          <StyledCard sx={{ overflow: 'hidden', position: 'relative' }}>
             <MatchStatus status={status}>
               {getStatusIcon(status)}
               <Typography>{status}</Typography>
@@ -847,8 +809,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
       whileTap={{ scale: 0.98 }}
     >
       <Link to={`/${eventId}/${activity.id}`} style={{ textDecoration: 'none' }}>
-        <StyledCard sx={privateCardSx}>
-          <PrivateBadge />
+        <StyledCard>
           <MatchStatus status={status}>
             {getStatusIcon(status)}
             <Typography>{status}</Typography>

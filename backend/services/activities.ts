@@ -2,7 +2,6 @@ import db from '@config/firebase';
 import { randomUUID } from 'crypto';
 import { cache, TTL } from '@config/cache';
 import { Activity, CulturalActivity } from '@common/models';
-import { ItemVisibility, Role } from '@common/constants';
 import { parseActivities } from '@common/utils';
 import { 
   getCachedItem, 
@@ -16,34 +15,17 @@ import {
 const eventsCollection = db.collection('events');
 const activitiesCollection = (eventId: string) => eventsCollection.doc(eventId).collection('activities');
 
-type RequestUser = { role: number; username: string };
-
-const getVisibilityScope = (user?: RequestUser) => ((user?.role ?? Role.GUEST) >= Role.ADMIN ? 'admin' : 'public');
-const getCollectionKey = (eventId: string, user?: RequestUser) => `activities-${eventId}-${getVisibilityScope(user)}`;
-const getItemKey = (eventId: string, activityId: string, user?: RequestUser) => `activities-${eventId}-${activityId}-${getVisibilityScope(user)}`;
-
-const filterActivityForUser = (activity: any, user?: RequestUser) => {
-  if (activity?.visibility === ItemVisibility.PRIVATE && (user?.role ?? Role.GUEST) < Role.ADMIN) {
-    return null;
-  }
-  return activity;
-};
-
 /**
  * Get all activities for an event
  */
-export const getActivities = async (eventId: string, user?: RequestUser) => {
-  const collectionKey = getCollectionKey(eventId, user);
+export const getActivities = async (eventId: string) => {
+  const collectionKey = `activities-${eventId}`;
   
   return getCachedCollection<Activity>({
     key: collectionKey,
     fetchFn: async () => {
       const snapshot = await activitiesCollection(eventId).get();
-      return parseActivities(
-        snapshot.docs
-          .map(doc => filterActivityForUser(doc.data(), user))
-          .filter(Boolean)
-      );
+      return parseActivities(snapshot.docs.map(doc => doc.data()));
     },
     ttl: TTL.ACTIVITIES
   });
@@ -52,15 +34,13 @@ export const getActivities = async (eventId: string, user?: RequestUser) => {
 /**
  * Get specific activity by ID
  */
-export const getActivityById = async (eventId: string, activityId: string, user?: RequestUser) => {
+export const getActivityById = async (eventId: string, activityId: string) => {
   return getCachedItem<Activity>({
-    key: getItemKey(eventId, activityId, user),
+    key: `activities-${eventId}-${activityId}`,
     fetchFn: async () => {
       const doc = await activitiesCollection(eventId).doc(activityId).get();
       if (!doc.exists) return null;
-      const filtered = filterActivityForUser(doc.data(), user);
-      if (!filtered) return null;
-      return Activity.parse(filtered);
+      return Activity.parse(doc.data());
     },
     ttl: TTL.ACTIVITIES
   });
@@ -78,20 +58,16 @@ export const createActivity = async (eventId: string, activityData: any) => {
   
   const activityId = activityData.id || randomUUID();
   activityData.id = activityId;
-  activityData.visibility = activityData.visibility || ItemVisibility.PUBLIC;
   
-  const created = await createCachedItem<Activity>({
+  return createCachedItem<Activity>({
     item: activityData,
-    collectionKey: getCollectionKey(eventId),
+    collectionKey: `activities-${eventId}`,
     itemKeyPrefix: `activities-${eventId}`,
     saveFn: async (item) => {
       await activitiesCollection(eventId).doc(activityId).set(item);
     },
     ttl: TTL.ACTIVITIES
   });
-
-  invalidateActivitiesCache();
-  return created;
 };
 
 /**
@@ -105,20 +81,16 @@ export const updateActivity = async (eventId: string, activityId: string, activi
   
   // Ensure the ID is set correctly
   activityData.id = activityId;
-  activityData.visibility = activityData.visibility || ItemVisibility.PUBLIC;
   
-  const updated = await updateCachedItem<Activity>({
+  return updateCachedItem<Activity>({
     item: activityData,
-    collectionKey: getCollectionKey(eventId),
+    collectionKey: `activities-${eventId}`,
     itemKeyPrefix: `activities-${eventId}`,
     updateFn: async (item) => {
       await activityDoc.update(activityData);
     },
     ttl: TTL.ACTIVITIES
   });
-
-  invalidateActivitiesCache();
-  return updated;
 };
 
 /**
@@ -127,18 +99,15 @@ export const updateActivity = async (eventId: string, activityId: string, activi
 export const deleteActivity = async (eventId: string, activityId: string) => {
   const activityDoc = activitiesCollection(eventId).doc(activityId);
   
-  const deleted = await deleteCachedItem<Activity>({
+  return deleteCachedItem<Activity>({
     id: activityId,
-    collectionKey: getCollectionKey(eventId),
+    collectionKey: `activities-${eventId}`,
     itemKeyPrefix: `activities-${eventId}`,
     deleteFn: async () => {
       await activityDoc.delete();
     },
     ttl: TTL.ACTIVITIES
   });
-
-  invalidateActivitiesCache();
-  return deleted;
 };
 
 /*
@@ -157,8 +126,8 @@ export const invalidateActivitiesCache = async () => {
 /**
  * Get poll results for an activity
  */
-export const getPollResults = async (eventId: string, activityId: string, user?: RequestUser) => {
-  const activityKey = getItemKey(eventId, activityId, user);
+export const getPollResults = async (eventId: string, activityId: string) => {
+  const activityKey = `activities-${eventId}-${activityId}`;
   
   // Get activity with poll data
   const activity = await getCachedItem<Activity>({
@@ -166,14 +135,10 @@ export const getPollResults = async (eventId: string, activityId: string, user?:
     fetchFn: async () => {
       const doc = await activitiesCollection(eventId).doc(activityId).get();
       if (!doc.exists) return null;
-      const filtered = filterActivityForUser(doc.data(), user);
-      if (!filtered) return null;
-      return Activity.parse(filtered);
+      return Activity.parse(doc.data());
     },
     ttl: TTL.ACTIVITIES
   });
-
-  if (!activity) return null;
   
   if (!(activity instanceof CulturalActivity)) {
     throw new Error(`Invalid activity type for poll results: ${typeof activity}`);
@@ -185,24 +150,15 @@ export const getPollResults = async (eventId: string, activityId: string, user?:
 /**
  * Cast a vote for a team (or participant)
  */
-export const castVote = async (eventId: string, activityId: string, teamId: string, username: string, user?: RequestUser) => {
-  const activityKey = getItemKey(eventId, activityId, user);
+export const castVote = async (eventId: string, activityId: string, teamId: string, username: string) => {
+  const activityKey = `activities-${eventId}-${activityId}`;
   const activityDoc = activitiesCollection(eventId).doc(activityId);
 
   const activity = await getCachedItem<Activity>({
     key: activityKey,
-    fetchFn: async () => {
-      const doc = await activityDoc.get();
-      const data = doc.data();
-      if (!data) return null;
-      const filtered = filterActivityForUser(data, user);
-      if (!filtered) return null;
-      return Activity.parse(filtered);
-    },
+    fetchFn: async () => Activity.parse((await activityDoc.get()).data()),
     ttl: TTL.ACTIVITIES
   });
-
-  if (!activity) throw new Error('Activity not found');
 
   if (!(activity instanceof CulturalActivity)) throw new Error(`Invalid activity type for voting: ${typeof activity}`);
   if (!activity.showPoll) throw new Error('Poll is not enabled for this activity');
@@ -229,13 +185,11 @@ export const castVote = async (eventId: string, activityId: string, teamId: stri
 
   await updateCachedItem<CulturalActivity>({
     item: activity,
-    collectionKey: getCollectionKey(eventId, user),
+    collectionKey: `activities-${eventId}`,
     itemKeyPrefix: `activities-${eventId}`,
     updateFn: async (item) => await activityDoc.update(JSON.parse(JSON.stringify(item))),
     ttl: TTL.ACTIVITIES
   });
-
-  invalidateActivitiesCache();
   
   return { 
     success: true, 

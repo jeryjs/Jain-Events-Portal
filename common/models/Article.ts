@@ -1,4 +1,4 @@
-import { EventType, ArticleStatus, ItemVisibility } from "@common/constants";
+import { EventType, ArticleStatus } from "@common/constants";
 
 export default class Article {
   constructor(
@@ -21,7 +21,6 @@ export default class Article {
     public relatedEventType?: EventType,
     public tags: string[] = [],
     public status: ArticleStatus = ArticleStatus.PUBLISHED,
-    public visibility: ItemVisibility = ItemVisibility.PUBLIC,
     public viewCount: number = 0,
     public relatedArticleIds: string[] = [],
   ) {}
@@ -39,7 +38,6 @@ export default class Article {
       data.relatedEventType || undefined,
       data.tags || [],
       data.status || ArticleStatus.PUBLISHED,
-      data.visibility || ItemVisibility.PUBLIC,
       data.viewCount || 0,
       data.relatedArticleIds || []
     );
@@ -58,7 +56,6 @@ export default class Article {
       relatedEventType: this.relatedEventType,
       tags: this.tags,
       status: this.status,
-      visibility: this.visibility,
       viewCount: this.viewCount,
       relatedArticleIds: this.relatedArticleIds,
     };

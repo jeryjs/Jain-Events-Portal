@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("@common/constants");
 class Article {
-    constructor(id, title, summary, content, publishedAt, lastUpdatedAt, author, image, relatedEventType, tags = [], status = constants_1.ArticleStatus.PUBLISHED, visibility = constants_1.ItemVisibility.PUBLIC, viewCount = 0, relatedArticleIds = []) {
+    constructor(id, title, summary, content, publishedAt, lastUpdatedAt, author, image, relatedEventType, tags = [], status = constants_1.ArticleStatus.PUBLISHED, viewCount = 0, relatedArticleIds = []) {
         this.id = id;
         this.title = title;
         this.summary = summary;
@@ -14,12 +14,11 @@ class Article {
         this.relatedEventType = relatedEventType;
         this.tags = tags;
         this.status = status;
-        this.visibility = visibility;
         this.viewCount = viewCount;
         this.relatedArticleIds = relatedArticleIds;
     }
     static parse(data) {
-        return new Article(data.id || '', data.title || '', data.summary || '', data.content || '', data.publishedAt ? new Date(data.publishedAt) : new Date(), data.lastUpdatedAt ? new Date(data.lastUpdatedAt) : new Date(), data.author || { id: '', name: '' }, data.image || { url: '' }, data.relatedEventType || undefined, data.tags || [], data.status || constants_1.ArticleStatus.PUBLISHED, data.visibility || constants_1.ItemVisibility.PUBLIC, data.viewCount || 0, data.relatedArticleIds || []);
+        return new Article(data.id || '', data.title || '', data.summary || '', data.content || '', data.publishedAt ? new Date(data.publishedAt) : new Date(), data.lastUpdatedAt ? new Date(data.lastUpdatedAt) : new Date(), data.author || { id: '', name: '' }, data.image || { url: '' }, data.relatedEventType || undefined, data.tags || [], data.status || constants_1.ArticleStatus.PUBLISHED, data.viewCount || 0, data.relatedArticleIds || []);
     }
     toJSON() {
         return {
@@ -34,7 +33,6 @@ class Article {
             relatedEventType: this.relatedEventType,
             tags: this.tags,
             status: this.status,
-            visibility: this.visibility,
             viewCount: this.viewCount,
             relatedArticleIds: this.relatedArticleIds,
         };

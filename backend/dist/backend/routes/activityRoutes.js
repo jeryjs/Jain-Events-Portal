@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const activities_1 = require("@services/activities");
 const auth_1 = require("@middlewares/auth");
-const authUtils_1 = require("@utils/authUtils");
 const router = express_1.default.Router();
 /**
  * Activity Routes
@@ -23,9 +22,7 @@ const router = express_1.default.Router();
 // Get all activities for an event
 router.get('/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userData = yield (0, authUtils_1.getUserFromRequest)(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
-        const activities = yield (0, activities_1.getActivities)(req.params.eventId, user);
+        const activities = yield (0, activities_1.getActivities)(req.params.eventId);
         res.json(activities || []);
     }
     catch (error) {
@@ -36,9 +33,7 @@ router.get('/:eventId', (req, res) => __awaiter(void 0, void 0, void 0, function
 // Get specific activity by ID
 router.get('/:eventId/:activityId', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userData = yield (0, authUtils_1.getUserFromRequest)(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
-        const activity = yield (0, activities_1.getActivityById)(req.params.eventId, req.params.activityId, user);
+        const activity = yield (0, activities_1.getActivityById)(req.params.eventId, req.params.activityId);
         if (activity) {
             res.json(activity);
         }
@@ -108,13 +103,7 @@ router.post('/invalidate-cache', auth_1.adminMiddleware, (req, res) => __awaiter
 // Get poll results for an activity
 router.get('/:eventId/:activityId/poll', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userData = yield (0, authUtils_1.getUserFromRequest)(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
-        const results = yield (0, activities_1.getPollResults)(req.params.eventId, req.params.activityId, user);
-        if (!results) {
-            res.status(404).json({ message: 'Activity not found' });
-            return;
-        }
+        const results = yield (0, activities_1.getPollResults)(req.params.eventId, req.params.activityId);
         res.json(results);
     }
     catch (error) {
@@ -130,7 +119,7 @@ router.post('/:eventId/:activityId/vote/:teamId', auth_1.authMiddleware, (req, r
             res.status(400).json({ message: 'User data missing from token' });
             return;
         }
-        const result = yield (0, activities_1.castVote)(req.params.eventId, req.params.activityId, req.params.teamId, userdata.username, { role: userdata.role, username: userdata.username });
+        const result = yield (0, activities_1.castVote)(req.params.eventId, req.params.activityId, req.params.teamId, userdata.username);
         res.status(200).json(result);
     }
     catch (error) {
@@ -138,10 +127,6 @@ router.post('/:eventId/:activityId/vote/:teamId', auth_1.authMiddleware, (req, r
         const errorMessage = error instanceof Error ? error.message : 'Error casting vote';
         if (errorMessage.includes('already voted')) {
             res.status(400).json({ message: errorMessage });
-            return;
-        }
-        if (errorMessage.toLowerCase().includes('not found')) {
-            res.status(404).json({ message: errorMessage });
             return;
         }
         res.status(500).json({ message: errorMessage });

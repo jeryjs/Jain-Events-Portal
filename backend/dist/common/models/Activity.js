@@ -10,14 +10,13 @@ const utils_1 = require("@common/utils");
 const models_1 = require("@common/models");
 class Activity {
     constructor(id, name, startTime, endTime, // can be null until the activity ends
-    participants, type, visibility = constants_1.ItemVisibility.PUBLIC) {
+    participants, type) {
         this.id = id;
         this.name = name;
         this.startTime = startTime;
         this.endTime = endTime;
         this.participants = participants;
         this.type = type;
-        this.visibility = visibility;
         if (!this.startTime)
             this.startTime = new Date(); // TODO: Remove this line once testing is done.
         // Convert Timestamp-like objects (from firestore) to Date
@@ -43,7 +42,7 @@ class Activity {
                     return TeamActivity.parse(data);
                 // Default Activity parsing logic
                 const participants = data.participants.map((p) => Participant_1.default.parse(p));
-                return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.type, data.visibility || constants_1.ItemVisibility.PUBLIC);
+                return new Activity(data.id, data.name, data.startTime, data.endTime, participants, data.type);
         }
     }
     get isOngoing() {
@@ -76,13 +75,13 @@ class Activity {
 }
 exports.default = Activity;
 class TeamActivity extends Activity {
-    constructor(id, name, startTime, endTime, type, visibility, participants, teams = [], winners = []) {
-        super(id, name, startTime, endTime, participants, type, visibility);
+    constructor(id, name, startTime, endTime, type, participants, teams = [], winners = []) {
+        super(id, name, startTime, endTime, participants, type);
         this.teams = teams;
         this.winners = winners;
     }
     static parse(data) {
-        return new TeamActivity(data.id, data.name, data.startTime, data.endTime, data.type || data.eventType, data.visibility || constants_1.ItemVisibility.PUBLIC, data.participants.map((p) => Participant_1.default.parse(p)), data.teams, data.winners);
+        return new TeamActivity(data.id, data.name, data.startTime, data.endTime, data.type || data.eventType, data.participants.map((p) => Participant_1.default.parse(p)), data.teams, data.winners);
     }
 }
 exports.TeamActivity = TeamActivity;

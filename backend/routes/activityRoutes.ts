@@ -10,7 +10,7 @@ import {
     castVote,
 } from '@services/activities';
 import { adminMiddleware, authMiddleware, managerMiddleware } from '@middlewares/auth';
-import { getUserFromRequest } from '@utils/authUtils';
+import { getUserFromToken } from '@utils/authUtils';
 import { UserData } from '@common/models';
 
 const router = express.Router();
@@ -22,9 +22,7 @@ const router = express.Router();
 // Get all activities for an event
 router.get('/:eventId', async (req: Request, res: Response) => {
     try {
-        const userData = await getUserFromRequest(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
-        const activities = await getActivities(req.params.eventId as string, user);
+        const activities = await getActivities(req.params.eventId as string);
         res.json(activities || []);
     } catch (error) {
         console.error('Error fetching activities:', error);
@@ -35,9 +33,7 @@ router.get('/:eventId', async (req: Request, res: Response) => {
 // Get specific activity by ID
 router.get('/:eventId/:activityId', async (req: Request, res: Response) => {
     try {
-        const userData = await getUserFromRequest(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
-        const activity = await getActivityById(req.params.eventId as string, req.params.activityId as string, user);
+        const activity = await getActivityById(req.params.eventId as string, req.params.activityId as string);
         if (activity) {
             res.json(activity);
         } else {
@@ -108,13 +104,7 @@ router.post('/invalidate-cache', adminMiddleware, async (req: Request, res: Resp
 // Get poll results for an activity
 router.get('/:eventId/:activityId/poll', async (req: Request, res: Response) => {
     try {
-        const userData = await getUserFromRequest(req, true);
-        const user = userData ? { role: userData.role, username: userData.username } : undefined;
-        const results = await getPollResults(req.params.eventId as string, req.params.activityId as string, user);
-        if (!results) {
-            res.status(404).json({ message: 'Activity not found' });
-            return;
-        }
+        const results = await getPollResults(req.params.eventId as string, req.params.activityId as string);
         res.json(results);
     } catch (error) {
         console.error('Error fetching poll results:', error);
@@ -130,13 +120,7 @@ router.post('/:eventId/:activityId/vote/:teamId', authMiddleware, async (req: Re
             res.status(400).json({ message: 'User data missing from token' });
             return;
         }
-        const result = await castVote(
-            req.params.eventId as string,
-            req.params.activityId as string,
-            req.params.teamId as string,
-            userdata.username,
-            { role: userdata.role, username: userdata.username },
-        );
+        const result = await castVote(req.params.eventId as string, req.params.activityId as string, req.params.teamId as string, userdata.username);
         res.status(200).json(result);
     } catch (error) {
         console.error('Error casting vote:', error);
@@ -144,11 +128,6 @@ router.post('/:eventId/:activityId/vote/:teamId', authMiddleware, async (req: Re
 
         if (errorMessage.includes('already voted')) {
             res.status(400).json({ message: errorMessage });
-            return;
-        }
-
-        if (errorMessage.toLowerCase().includes('not found')) {
-            res.status(404).json({ message: errorMessage });
             return;
         }
 

@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Card, CardContent, Typography, Box, Chip, CardMedia } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import LockIcon from '@mui/icons-material/Lock';
 
 import Event from '@common/models/Event';
-import { EventType, ItemVisibility } from '@common/constants';
+import { EventType } from '@common/constants';
 
 interface EventCardProps {
   event: Event;
@@ -85,7 +84,6 @@ export const EventCard = ({ event, isSelected, collapsed, onClick }: EventCardPr
   }
 
   const firstLetter = event.name.charAt(0).toUpperCase();
-  const isPrivate = event.visibility === ItemVisibility.PRIVATE;
 
   const formatDate = (date: Date) => {
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -93,12 +91,7 @@ export const EventCard = ({ event, isSelected, collapsed, onClick }: EventCardPr
   };
 
   return (
-    <StyledCard
-      isSelected={isSelected}
-      collapsed={collapsed}
-      onClick={handleClick}
-      sx={isPrivate ? { opacity: 0.72, filter: 'grayscale(1)', border: '1px solid', borderColor: 'divider' } : undefined}
-    >
+    <StyledCard isSelected={isSelected} collapsed={collapsed} onClick={handleClick}>
       {event.activeBanner?.url && <StyledCardMedia image={event.activeBanner.url} title={event.name} />}
       {collapsed ? (
         <Box
@@ -125,29 +118,15 @@ export const EventCard = ({ event, isSelected, collapsed, onClick }: EventCardPr
               {event.name}
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Chip
-                  label={EventType[event.type]}
-                  size="small"
-                  sx={{
-                    bgcolor: isSelected ? 'rgba(255, 255, 255, 0.3)' : 'primary.dark',
-                    color: 'white',
-                    fontWeight: 'bold',
-                  }}
-                />
-                {isPrivate && (
-                  <Chip
-                    icon={<LockIcon sx={{ fontSize: '0.85rem !important' }} />}
-                    label="PRIVATE"
-                    size="small"
-                    sx={{
-                      bgcolor: 'grey.800',
-                      color: 'common.white',
-                      fontWeight: 'bold',
-                    }}
-                  />
-                )}
-              </Box>
+              <Chip
+                label={EventType[event.type]}
+                size="small"
+                sx={{
+                  bgcolor: isSelected ? 'rgba(255, 255, 255, 0.3)' : 'primary.dark',
+                  color: 'white',
+                  fontWeight: 'bold',
+                }}
+              />
               <Typography variant="caption" sx={{ opacity: 0.9, fontWeight: 500 }}>
                 {formatDate(event.time.start)}
               </Typography>
