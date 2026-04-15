@@ -141,7 +141,7 @@ const ProfileButton = ({ className }) => {
 
                 <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
                     {/* Role-specific actions */}
-                    {userData?.role || 0 >= Role.MANAGER && (
+                    {(userData?.role || 0) >= Role.MANAGER && (
                         <Button
                             variant="outlined"
                             size="small"
@@ -283,7 +283,7 @@ const ProfileButton = ({ className }) => {
                         {/* Tab Panels */}
                         <TabPanel>
                             {/* Profile Tab Content */}
-                            <Fade in={activeTab === 0} timeout={{ enter: 500, exit: 300 }} style={{ 
+                            <Fade in={activeTab === 0} timeout={{ enter: 500, exit: 300 }} style={{
                                 display: activeTab === 0 ? 'block' : 'none',
                                 transitionProperty: 'opacity, transform',
                                 transform: activeTab === 0 ? 'translateY(0)' : 'translateY(10px)'
@@ -305,7 +305,7 @@ const ProfileButton = ({ className }) => {
                             </Fade>
 
                             {/* Notifications Tab Content */}
-                            <Fade in={activeTab === 1} timeout={{ enter: 500, exit: 300 }} style={{ 
+                            <Fade in={activeTab === 1} timeout={{ enter: 500, exit: 300 }} style={{
                                 display: activeTab === 1 ? 'block' : 'none',
                                 transitionProperty: 'opacity, transform',
                                 transform: activeTab === 1 ? 'translateY(0)' : 'translateY(10px)'
