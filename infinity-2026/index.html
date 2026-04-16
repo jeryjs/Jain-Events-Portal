@@ -174,8 +174,156 @@
       color: rgba(246, 239, 230, 0.9);
     }
 
+    /* Events Grid */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .event-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      text-align: left;
+    }
+
+    .event-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-4px);
+    }
+
+    .event-card h3 {
+      margin: 0 0 8px 0;
+      color: #ffe7b0;
+      font-size: 1.2rem;
+    }
+
+    .event-card p {
+      font-size: 0.9rem;
+      margin: 0 0 8px 0;
+    }
+
+    .event-type {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: rgba(215, 180, 106, 0.2);
+      color: var(--accent);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: #111;
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      transform: scale(0.95);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .modal-title {
+      color: #ffe7b0;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 2.5rem;
+      margin: 0 0 8px 0;
+      letter-spacing: 0.1em;
+    }
+
+    .modal-club {
+      color: rgba(246, 239, 230, 0.7);
+      margin: 0 0 24px 0;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: center;
+      flex: 1;
+      min-width: 140px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      line-height: 1.4;
+      box-sizing: border-box;
+    }
+
+    .btn:hover {
+      opacity: 0.8;
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
     .scroll-space {
-      height: 800vh;
+      height: 1000vh;
     }
 
     @media (max-width: 768px) {
@@ -208,11 +356,68 @@
 
   <script>
     const eventsData = [
-      { inRegisterLink: "", outRegisterLink: "", name: "Event 1", club: "", css: "", type: "cultural" },
-      { inRegisterLink: "", outRegisterLink: "", name: "Event 2", club: "", css: "", type: "technical" },
-      { inRegisterLink: "", outRegisterLink: "", name: "Event 3", club: "", css: "", type: "cultural" },
-      { inRegisterLink: "", outRegisterLink: "", name: "Event 4", club: "", css: "", type: "technical" },
-    ]
+      // Technical Events
+      { inRegisterLink: "#", outRegisterLink: "#", name: "GRID GAMBIT", club: "AI-Devops, CPS", css: "", type: "technical" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "BID & BYTE", club: "CRYPTO COLLAB CE, TURING CLUB", css: "", type: "technical" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "AMONG US", club: "FOSS CLUB, DATA AI CLUB", css: "", type: "technical" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "JAINS GOT TALENT", club: "CLOUD CLUB, ENIGMA CLUB", css: "", type: "technical" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "OPERATION RED TROPHY", club: "SALUS CLUB, NEURON CLUB, COGNITO CLUB", css: "", type: "technical" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "BID TO BUILD", club: "ZIGBEE CLUB, ANOVA CLUB", css: "", type: "technical" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "SHARK TANK REVERSED", club: "ECHO CLUB, GDG CLUB", css: "", type: "technical" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "FORGE & FLUX", club: "CORE TEAM", css: "", type: "technical" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "UAV DESIGN COMP", club: "AEROSPACE TEAM", css: "", type: "technical" },
+      
+      // Cultural Events
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Multiverse Conclave", club: "Literature club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Origin Protocol", club: "Literature club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Film Festival", club: "Celluloid Club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Indian cinema Day", club: "Theatre Club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Game of Thrones", club: "Gravel & Globe", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Micdrop", club: "Oraters Club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "What If? (Debate)", club: "Oraters Club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Monologue", club: "Symphony Club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Frequency frenzy", club: "Symphony Club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Battle of Bands", club: "Symphony Club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Capture the Moment", club: "Photography Club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Veil Of Verse", club: "Fashion Club", css: "", type: "cultural" },
+      { inRegisterLink: "#", outRegisterLink: "#", name: "Treasure Hunt", club: "Art and Crafts Club", css: "", type: "cultural" },
+    ];
+
+    // --- Modal Logic ---
+    function openModal(eventIndex) {
+      const event = eventsData[eventIndex];
+      const modal = document.querySelector('.modal-overlay');
+      modal.querySelector('.modal-title').textContent = event.name;
+      modal.querySelector('.modal-club').textContent = 'By: ' + event.club;
+      
+      const inLink = modal.querySelector('.btn-primary');
+      inLink.href = event.inRegisterLink;
+      
+      const outLink = modal.querySelector('.btn-secondary');
+      outLink.href = event.outRegisterLink;
+      
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      document.querySelector('.modal-overlay').classList.remove('active');
+    }
+
+    // Modal HTML
+    const modalHTML = `
+      <div class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+          <h2 class="modal-title"></h2>
+          <p class="modal-club"></p>
+          <div class="modal-buttons">
+            <a href="#" class="btn btn-primary" target="_blank">REGISTER</a>
+            <a href="#" class="btn btn-secondary" target="_blank">VIEW EVENT DETAILS</a>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
   </script>
 
   <script>
@@ -277,10 +482,42 @@
           Infinity Fest is a vibrant celebration where culture meets innovation, filled with energy, excitement, and creativity. It provides students a platform to showcase their talents, connect with diverse backgrounds, and experience an unforgettable journey of learning and expression.
         </p>
 
-        <h2 style="margin-top: 36px;">About The Cultural Club at FET-JU</h2>
+        <h2>About The Cultural Club at FET-JU</h2>
         <p>
           The Cultural Club at FET-JU nurtures creativity and celebrates diverse talents by offering a platform for students to explore, showcase, and enhance their skills. Through various events and competitions, it promotes confidence, teamwork, and a vibrant community spirit.
         </p>
+      `;
+      
+      panel.appendChild(card);
+      panel.cardElement = card;
+      
+      return panel;
+    }
+
+    function createPanelE() {
+      const panel = document.createElement('section');
+      panel.className = 'panel panel-c'; 
+      
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.maxWidth = '1100px'; // wider for the grid
+      
+      let eventsHTML = '<div class="events-grid">';
+      eventsData.forEach((ev, index) => {
+        eventsHTML += `
+          <div class="event-card" onclick="openModal(${index})">
+            <h3>${ev.name}</h3>
+            <p>${ev.club}</p>
+            <span class="event-type">${ev.type}</span>
+          </div>
+        `;
+      });
+      eventsHTML += '</div>';
+
+      card.innerHTML = `
+        <h2>Explore Infinity Events</h2>
+        <p>Discover technical and cultural events curated by various clubs.</p>
+        ${eventsHTML}
       `;
       
       panel.appendChild(card);
@@ -295,6 +532,7 @@
     const panelB = createPanelB();
     const panelC = createPanelC();
     const panelD = createPanelD();
+    const panelE = createPanelE();
 
     // Insert panels into the document (before the vignette/scroll-space)
     const vignette = document.querySelector('.vignette');
@@ -302,6 +540,7 @@
     document.body.insertBefore(panelB, vignette);
     document.body.insertBefore(panelC, vignette);
     document.body.insertBefore(panelD, vignette);
+    document.body.insertBefore(panelE, vignette);
     
     // --- 3. Animation Logic ---
 
@@ -313,63 +552,82 @@
       return a + (b - a) * t;
     }
 
-    let currentT1 = 0;
-    let currentT2 = 0;
-    let currentT3 = 0;
+    // Group panels into an array to dynamically handle N panels
+    const panels = [panelA, panelB, panelC, panelD, panelE];
+    const numTransitions = panels.length - 1;
+
+    // A dynamic array to keep track of current progress for each transition
+    let currents = new Array(numTransitions).fill(0);
 
     function update() {
       const scroll = window.scrollY;
       const h = window.innerHeight;
-
       const SCROLL_FACTOR = 1.2;
       
-      // Calculate scroll progression for each phase sequentially
-      const targetT1 = clamp01(scroll / h);
-      const targetT2 = clamp01((scroll - h) / (h * SCROLL_FACTOR));
-      const targetT3 = clamp01((scroll - h - (h * SCROLL_FACTOR)) / (h * SCROLL_FACTOR));
+      let prevEnd = 0;
 
-      currentT1 = lerp(currentT1, targetT1, 0.03);
-      currentT2 = lerp(currentT2, targetT2, 0.03);
-      currentT3 = lerp(currentT3, targetT3, 0.03);
+      // 1. Calculate step targets dynamically
+      for (let i = 0; i < numTransitions; i++) {
+        // The first transition happens over `h`, subsequent ones take `h * SCROLL_FACTOR`
+        const duration = i === 0 ? h : h * SCROLL_FACTOR;
+        const target = clamp01((scroll - prevEnd) / duration);
+        
+        // Lerp to specific target
+        currents[i] = lerp(currents[i], target, 0.03);
+        
+        // Shift start point for next transition
+        prevEnd += duration; 
+      }
 
-      // Calculate opacities
-      const opA = 1 - currentT1;
-      const opB = currentT1 * (1 - currentT2);
-      const opC = currentT2 * (1 - currentT3);
-      const opD = currentT3;
+      // 2. Map transition currents to panel opacities dynamically
+      const opacities = panels.map((_, i) => {
+        if (i === 0) return 1 - currents[0]; // First panel fades out
+        if (i === panels.length - 1) return currents[i - 1]; // Last panel fades in and stays
+        
+        // Middle panels: depend on previous transition finishing and next starting
+        return currents[i - 1] * (1 - currents[i]);
+      });
 
-      // Animate Panel Backgrounds
-      panelA.style.opacity = String(opA);
-      panelB.style.opacity = String(opB);
-      panelC.style.opacity = String(opC);
-      panelD.style.opacity = String(opD);
+      // 3. Apply opacity and visibility dynamically
+      panels.forEach((panel, i) => {
+        const op = opacities[i];
+        panel.style.opacity = op.toString();
+        panel.style.visibility = op > 0.05 ? 'visible' : 'hidden';
+      });
 
-      // Toggle visibility so invisible panels don't block mouse clicks/scrolls
-      panelA.style.visibility = opA > 0.05 ? 'visible' : 'hidden';
-      panelB.style.visibility = opB > 0.05 ? 'visible' : 'hidden';
-      panelC.style.visibility = opC > 0.05 ? 'visible' : 'hidden';
-      panelD.style.visibility = opD > 0.05 ? 'visible' : 'hidden';
+      // 4. Panel-specific transforms
+      // Apply transforms using the related transition index in our `currents` array (0 = T1, 1 = T2, 2 = T3)
+      if (panels.length > 1 && panelB.titleElement) {
+        const scaleB = 0.7 + (currents[0] * 0.6);
+        const yB = (1 - currents[0]) * 40;
+        panelB.titleElement.style.opacity = String(opacities[1]);
+        panelB.titleElement.style.transform = `translate3d(0, ${yB}px, 0) scale(${scaleB})`;
+      }
 
-      // Animate Panel B's Title
-      const scaleB = 0.7 + (currentT1 * 0.6);
-      const yB = (1 - currentT1) * 40;
-      panelB.titleElement.style.opacity = String(opB);
-      panelB.titleElement.style.transform = `translate3d(0, ${yB}px, 0) scale(${scaleB})`;
+      if (panels.length > 2 && panelC.cardElement) {
+        const cardScaleC = 0.96 + (currents[1] * 0.06);
+        const cardYC = (1 - currents[1]) * 30;
+        panelC.cardElement.style.opacity = String(opacities[2]);
+        panelC.cardElement.style.transform = `translate3d(0, ${cardYC}px, 0) scale(${cardScaleC})`;
+      }
 
-      // Animate Panel C's Card
-      const cardScaleC = 0.96 + (currentT2 * 0.06);
-      const cardYC = (1 - currentT2) * 30;
-      panelC.cardElement.style.opacity = String(opC);
-      panelC.cardElement.style.transform = `translate3d(0, ${cardYC}px, 0) scale(${cardScaleC})`;
+      if (panels.length > 3 && panelD.cardElement) {
+        const cardScaleD = 0.96 + (currents[2] * 0.06);
+        const cardYD = (1 - currents[2]) * 30;
+        panelD.cardElement.style.opacity = String(opacities[3]);
+        panelD.cardElement.style.transform = `translate3d(0, ${cardYD}px, 0) scale(${cardScaleD})`;
+      }
 
-      // Animate Panel D's Card
-      const cardScaleD = 0.96 + (currentT3 * 0.06);
-      const cardYD = (1 - currentT3) * 30;
-      panelD.cardElement.style.opacity = String(opD);
-      panelD.cardElement.style.transform = `translate3d(0, ${cardYD}px, 0) scale(${cardScaleD})`;
+      if (panels.length > 4 && panelE.cardElement) {
+        const cardScaleE = 0.96 + (currents[3] * 0.06);
+        const cardYE = (1 - currents[3]) * 30;
+        panelE.cardElement.style.opacity = String(opacities[4]);
+        panelE.cardElement.style.transform = `translate3d(0, ${cardYE}px, 0) scale(${cardScaleE})`;
+      }
 
       requestAnimationFrame(update);
     }
+    
     requestAnimationFrame(update);
   </script>
 
