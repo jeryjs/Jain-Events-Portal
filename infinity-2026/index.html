@@ -1,90 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Infinity 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;600&display=swap"
+    rel="stylesheet">
   <style>
-    :root { --text: #f6efe6; --accent: #d7b46a; --card-border: rgba(255, 255, 255, 0.08); --logo-size: 80px; --logo-gap: 20px; }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; width: 100%; min-height: 100%; overflow-x: hidden; font-family: "Work Sans", "Segoe UI", sans-serif; background: #050608; color: var(--text); scrollbar-width: none; }
-    body::-webkit-scrollbar { width: 0; height: 0; display: none; }
-    .logo-corner { position: fixed; top: var(--logo-gap); left: var(--logo-gap); z-index: 3; width: var(--logo-size); height: auto; filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.55)); pointer-events: none; }
-    .panel { position: fixed; inset: 0; z-index: 0; display: grid; place-items: center; text-align: center; padding: 24px; transition: opacity 0.1s linear; pointer-events: none; }
-    .panel-a { background-image: url("assets/bg.png"); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.04); }
-    .panel-b { background: radial-gradient(circle at top, rgba(215, 180, 106, 0.08), rgba(5, 6, 8, 0.9) 60%), linear-gradient(180deg, #0b0c10, #040405); }
-    .panel-c { background-image: url("assets/bg.png"); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.03); }
-    .vignette { position: fixed; inset: 0; z-index: 1; background: radial-gradient( circle at center,rgba(0, 0, 0, 0.05),rgba(0, 0, 0, 0.35) 60%,rgba(0, 0, 0, 0.5) ); opacity: 0.35; pointer-events: none; } .title { font-family: "Bebas Neue", "Work Sans", sans-serif; font-size: clamp(3rem, 12vw, 9rem); letter-spacing: 0.22em; text-transform: uppercase; line-height: 0.9; color: var(--text); text-shadow: 0 18px 60px rgba(0, 0, 0, 0.7); transform: translate3d(0, 40px, 0) scale(0.7); opacity: 0; will-change: transform, opacity; }
-    .title span { display: block; }
-    .title .accent { color: var(--accent); }
-    .hint { margin-top: 16px; font-size: 0.85rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(246, 239, 230, 0.75); }
-    .card { max-width: 900px; max-height: calc(100vh - 96px); overflow-y: auto; scrollbar-gutter: stable; pointer-events: auto; text-align: left; padding: 36px 32px; border-radius: 22px; background: rgba(8, 10, 12, 0.7); border: 1px solid var(--card-border); box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); opacity: 0; transform: translate3d(0, 30px, 0) scale(0.96); will-change: transform, opacity; }
-    .card::-webkit-scrollbar { width: 8px; }
-    .card::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); border-radius: 999px; }
-    .card::-webkit-scrollbar-thumb { background: rgba(215, 180, 106, 0.45); border-radius: 999px; }
-    .card::-webkit-scrollbar-thumb:hover { background: rgba(215, 180, 106, 0.65); }
-    .card h2 { margin: 0 0 16px 0; font-family: "Bebas Neue", "Work Sans", sans-serif; font-size: clamp(2rem, 6vw, 3.6rem); letter-spacing: 0.18em; text-transform: uppercase; color: #ffe7b0; text-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); }
-    .card p { margin: 0; font-size: 1.05rem; line-height: 1.85; color: rgba(246, 239, 230, 0.9); }
-    .scroll-space {height: 600vh;}
+    :root {
+      --text: #f6efe6;
+      --accent: #d7b46a;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --logo-size: 80px;
+      --logo-gap: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+      font-family: "Work Sans", "Segoe UI", sans-serif;
+      background: #050608;
+      color: var(--text);
+      scrollbar-width: none;
+    }
+
+    body::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+
+    .logo-corner {
+      position: fixed;
+      top: var(--logo-gap);
+      left: var(--logo-gap);
+      z-index: 3;
+      width: var(--logo-size);
+      height: auto;
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.55));
+      pointer-events: none;
+    }
+
+    .panel {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 24px;
+      transition: opacity 0.1s linear;
+      pointer-events: none;
+    }
+
+    .panel-a {
+      background-image: url("assets/bg.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: scale(1.04);
+    }
+
+    .panel-b {
+      background: radial-gradient(circle at top, rgba(215, 180, 106, 0.08), rgba(5, 6, 8, 0.9) 60%), linear-gradient(180deg, #0b0c10, #040405);
+    }
+
+    .panel-c {
+      background-image: url("assets/bg.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: scale(1.03);
+    }
+
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35) 60%, rgba(0, 0, 0, 0.5));
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .title {
+      font-family: "Bebas Neue", "Work Sans", sans-serif;
+      font-size: clamp(3rem, 12vw, 9rem);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      line-height: 0.9;
+      color: var(--text);
+      text-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
+      transform: translate3d(0, 40px, 0) scale(0.7);
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    .title span {
+      display: block;
+    }
+
+    .title .accent {
+      color: var(--accent);
+    }
+
+    .hint {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(246, 239, 230, 0.75);
+    }
+
+    .card {
+      max-width: 900px;
+      max-height: calc(100vh - 96px);
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+      pointer-events: auto;
+      text-align: left;
+      padding: 36px 32px;
+      border-radius: 22px;
+      background: rgba(8, 10, 12, 0.7);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      transform: translate3d(0, 30px, 0) scale(0.96);
+      will-change: transform, opacity;
+    }
+
+    .card::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .card::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 999px;
+    }
+
+    .card::-webkit-scrollbar-thumb {
+      background: rgba(215, 180, 106, 0.45);
+      border-radius: 999px;
+    }
+
+    .card::-webkit-scrollbar-thumb:hover {
+      background: rgba(215, 180, 106, 0.65);
+    }
+
+    .card h2 {
+      margin: 0 0 16px 0;
+      font-family: "Bebas Neue", "Work Sans", sans-serif;
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #ffe7b0;
+      text-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: rgba(246, 239, 230, 0.9);
+    }
+
+    .scroll-space {
+      height: 800vh;
+    }
+
     @media (max-width: 768px) {
-      :root { --logo-size: 52px; --logo-gap: 12px; }
-      .panel-c { padding: 112px 20px 24px 20px; }
-      .card { max-height: calc(100vh - 156px); padding: 28px 22px; } 
-      .card h2 { letter-spacing: 0.12em; } 
+      :root {
+        --logo-size: 52px;
+        --logo-gap: 12px;
+      }
+
+      .panel-c {
+        padding: 112px 20px 24px 20px;
+      }
+
+      .card {
+        max-height: calc(100vh - 156px);
+        padding: 28px 22px;
+      }
+
+      .card h2 {
+        letter-spacing: 0.12em;
+      }
     }
   </style>
 </head>
+
 <body>
   <img class="logo-corner" src="assets/infinity.png" alt="Infinity logo">
-
-  <section class="panel panel-a">
-    <div class="hint">Scroll down</div>
-  </section>
-
-  <section class="panel panel-b">
-    <div id="title" class="title">
-      <span>INFINITY</span>
-      <span class="accent">2026</span>
-    </div>
-  </section>
-
-  <section class="panel panel-c">
-    <div id="card" class="card">
-      <h2>About Faculty of Engineering &amp; Technology</h2>
-      <p>
-        With a decade of experience, the Faculty of Engineering &amp; Technology at JAIN
-        (Deemed-to-be University) (JU-FET) is the prominent engineering institution in Bengaluru.
-        B.Tech., M.Tech., and specialised programmes are available at JU-FET. JU-FET is committed
-        to delivering an education of the highest calibre. By utilising the practical and
-        forward-thinking approach, in addition to the superior teaching and research facilities,
-        students will receive a unique and high-caliber academic experience that is centred on
-        skill and knowledge development. This will facilitate a seamless transition from
-        academia to the business world.
-      </p>
-    </div>
-  </section>
 
   <div class="vignette"></div>
   <div class="scroll-space"></div>
 
   <script>
     const eventsData = [
-      {inRegisterLink: "", outRegisterLink: "", name: "Event 1", club: "", css: "", type: "cultural"},
-      {inRegisterLink: "", outRegisterLink: "", name: "Event 2", club: "", css: "", type: "technical"},
-      {inRegisterLink: "", outRegisterLink: "", name: "Event 3", club: "", css: "", type: "cultural"},
-      {inRegisterLink: "", outRegisterLink: "", name: "Event 4", club: "", css: "", type: "technical"},
+      { inRegisterLink: "", outRegisterLink: "", name: "Event 1", club: "", css: "", type: "cultural" },
+      { inRegisterLink: "", outRegisterLink: "", name: "Event 2", club: "", css: "", type: "technical" },
+      { inRegisterLink: "", outRegisterLink: "", name: "Event 3", club: "", css: "", type: "cultural" },
+      { inRegisterLink: "", outRegisterLink: "", name: "Event 4", club: "", css: "", type: "technical" },
     ]
   </script>
 
   <script>
-    const panelA = document.querySelector(".panel-a");
-    const panelB = document.querySelector(".panel-b");
-    const panelC = document.querySelector(".panel-c");
-    const title = document.getElementById("title");
-    const card = document.getElementById("card");
+    // --- 1. Panel Creation Functions ---
+
+    function createPanelA() {
+      const panel = document.createElement('section');
+      panel.className = 'panel panel-a';
+      panel.innerHTML = `<div class="hint">Scroll down</div>`;
+      return panel;
+    }
+
+    function createPanelB() {
+      const panel = document.createElement('section');
+      panel.className = 'panel panel-b';
+      
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.innerHTML = `<span>INFINITY</span><span class="accent">2026</span>`;
+      
+      panel.appendChild(title);
+      panel.titleElement = title; 
+      
+      return panel;
+    }
+
+    function createPanelC() {
+      const panel = document.createElement('section');
+      panel.className = 'panel panel-c';
+      
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h2>About Faculty of Engineering &amp; Technology</h2>
+        <p>
+          With a decade of experience, the Faculty of Engineering &amp; Technology at JAIN
+          (Deemed-to-be University) (JU-FET) is the prominent engineering institution in Bengaluru.
+          B.Tech., M.Tech., and specialised programmes are available at JU-FET. JU-FET is committed
+          to delivering an education of the highest calibre. By utilising the practical and
+          forward-thinking approach, in addition to the superior teaching and research facilities,
+          students will receive a unique and high-caliber academic experience that is centred on
+          skill and knowledge development. This will facilitate a seamless transition from
+          academia to the business world.
+        </p>
+      `;
+      
+      panel.appendChild(card);
+      panel.cardElement = card;
+      
+      return panel;
+    }
+
+    function createPanelD() {
+      const panel = document.createElement('section');
+      panel.className = 'panel panel-c'; // Reusing panel-c background styling
+      
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h2>About Infinity Fest</h2>
+        <p>
+          Infinity Fest is a vibrant celebration where culture meets innovation, filled with energy, excitement, and creativity. It provides students a platform to showcase their talents, connect with diverse backgrounds, and experience an unforgettable journey of learning and expression.
+        </p>
+
+        <h2 style="margin-top: 36px;">About The Cultural Club at FET-JU</h2>
+        <p>
+          The Cultural Club at FET-JU nurtures creativity and celebrates diverse talents by offering a platform for students to explore, showcase, and enhance their skills. Through various events and competitions, it promotes confidence, teamwork, and a vibrant community spirit.
+        </p>
+      `;
+      
+      panel.appendChild(card);
+      panel.cardElement = card;
+      
+      return panel;
+    }
+
+    // --- 2. Initialize Panels ---
+
+    const panelA = createPanelA();
+    const panelB = createPanelB();
+    const panelC = createPanelC();
+    const panelD = createPanelD();
+
+    // Insert panels into the document (before the vignette/scroll-space)
+    const vignette = document.querySelector('.vignette');
+    document.body.insertBefore(panelA, vignette);
+    document.body.insertBefore(panelB, vignette);
+    document.body.insertBefore(panelC, vignette);
+    document.body.insertBefore(panelD, vignette);
+    
+    // --- 3. Animation Logic ---
 
     function clamp01(v) {
       return Math.min(Math.max(v, 0), 1);
@@ -96,36 +315,64 @@
 
     let currentT1 = 0;
     let currentT2 = 0;
+    let currentT3 = 0;
 
     function update() {
       const scroll = window.scrollY;
       const h = window.innerHeight;
 
+      const SCROLL_FACTOR = 1.2;
+      
+      // Calculate scroll progression for each phase sequentially
       const targetT1 = clamp01(scroll / h);
-      const targetT2 = clamp01((scroll - h) / h);
+      const targetT2 = clamp01((scroll - h) / (h * SCROLL_FACTOR));
+      const targetT3 = clamp01((scroll - h - (h * SCROLL_FACTOR)) / (h * SCROLL_FACTOR));
 
       currentT1 = lerp(currentT1, targetT1, 0.03);
       currentT2 = lerp(currentT2, targetT2, 0.03);
+      currentT3 = lerp(currentT3, targetT3, 0.03);
 
-      panelA.style.opacity = String(1 - currentT1);
-      panelB.style.opacity = String(currentT1 * (1 - currentT2));
-      panelC.style.opacity = String(currentT2);
+      // Calculate opacities
+      const opA = 1 - currentT1;
+      const opB = currentT1 * (1 - currentT2);
+      const opC = currentT2 * (1 - currentT3);
+      const opD = currentT3;
 
-      const scale = 0.7 + (currentT1 * 0.6);
-      const y = (1 - currentT1) * 40;
-      title.style.opacity = String(currentT1 * (1 - currentT2));
-      title.style.transform = "translate3d(0," + y + "px,0) scale(" + scale + ")";
+      // Animate Panel Backgrounds
+      panelA.style.opacity = String(opA);
+      panelB.style.opacity = String(opB);
+      panelC.style.opacity = String(opC);
+      panelD.style.opacity = String(opD);
 
-      const cardOpacity = currentT2;
-      const cardScale = 0.96 + (currentT2 * 0.06);
-      const cardY = (1 - currentT2) * 30;
-      card.style.opacity = String(cardOpacity);
-      card.style.transform = "translate3d(0," + cardY + "px,0) scale(" + cardScale + ")";
+      // Toggle visibility so invisible panels don't block mouse clicks/scrolls
+      panelA.style.visibility = opA > 0.05 ? 'visible' : 'hidden';
+      panelB.style.visibility = opB > 0.05 ? 'visible' : 'hidden';
+      panelC.style.visibility = opC > 0.05 ? 'visible' : 'hidden';
+      panelD.style.visibility = opD > 0.05 ? 'visible' : 'hidden';
+
+      // Animate Panel B's Title
+      const scaleB = 0.7 + (currentT1 * 0.6);
+      const yB = (1 - currentT1) * 40;
+      panelB.titleElement.style.opacity = String(opB);
+      panelB.titleElement.style.transform = `translate3d(0, ${yB}px, 0) scale(${scaleB})`;
+
+      // Animate Panel C's Card
+      const cardScaleC = 0.96 + (currentT2 * 0.06);
+      const cardYC = (1 - currentT2) * 30;
+      panelC.cardElement.style.opacity = String(opC);
+      panelC.cardElement.style.transform = `translate3d(0, ${cardYC}px, 0) scale(${cardScaleC})`;
+
+      // Animate Panel D's Card
+      const cardScaleD = 0.96 + (currentT3 * 0.06);
+      const cardYD = (1 - currentT3) * 30;
+      panelD.cardElement.style.opacity = String(opD);
+      panelD.cardElement.style.transform = `translate3d(0, ${cardYD}px, 0) scale(${cardScaleD})`;
 
       requestAnimationFrame(update);
     }
-
     requestAnimationFrame(update);
   </script>
+
 </body>
+
 </html>
