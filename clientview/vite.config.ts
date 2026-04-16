@@ -16,6 +16,8 @@ export default defineConfig({
         enabled: true,
       },
       workbox: {
+        // Keep backend routes out of the SPA shell so /api/* always reaches Express.
+        navigateFallbackDenylist: [/^\/api(?:\/|$)/],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
         runtimeCaching: [

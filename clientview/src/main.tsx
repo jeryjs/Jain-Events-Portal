@@ -6,6 +6,12 @@ import './index.css'
 import './firebaseConfig.ts'
 
 const updateSW = registerSW({
+  onRegisterError(error) {
+    console.error('SW registration failed: ', error);
+  },
+  onRegisteredSW(swUrl, r) {
+    console.log(`Service worker registered at ${swUrl}`);
+  },
   onNeedRefresh() {
     // Optional: prompt user to update app
     console.log('New content is available; please refresh.');
