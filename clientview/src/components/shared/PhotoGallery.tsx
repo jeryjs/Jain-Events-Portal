@@ -334,7 +334,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
     </AnimatePresence>
   );
 
-  if (!!loadFailed) {
+  if (loadFailed) {
     return (
       <GalleryContainer>
         <Alert severity="error" variant="outlined">
