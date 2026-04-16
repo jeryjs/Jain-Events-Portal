@@ -13,8 +13,10 @@ const updateSW = registerSW({
     console.log(`Service worker registered at ${swUrl}`);
   },
   onNeedRefresh() {
-    // Optional: prompt user to update app
-    console.log('New content is available; please refresh.');
+    const shouldReload = window.confirm('A new version is available. Reload now?');
+    if (shouldReload) {
+      void updateSW(true);
+    }
   },
   onOfflineReady() {
     console.log('App is ready to work offline');

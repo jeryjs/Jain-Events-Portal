@@ -13,7 +13,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
       workbox: {
         // Keep backend routes out of the SPA shell so /api/* always reaches Express.
