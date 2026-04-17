@@ -21,31 +21,72 @@
     * { box-sizing: border-box; }
 
     html,
-    body { margin: 0; width: 100%; min-height: 100%; overflow-x: hidden; font-family: "Work Sans", "Segoe UI", sans-serif; background: #050608; color: var(--text); scrollbar-width: none; }
+    body { margin: 0; width: 100%; min-height: 100%; overflow: hidden; overscroll-behavior: none; font-family: "Work Sans", "Segoe UI", sans-serif; background: #050608; color: var(--text); scrollbar-width: none; }
     body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
     .logo-corner { position: fixed; top: var(--logo-gap); left: var(--logo-gap); z-index: 3; width: var(--logo-size); height: auto; filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.55)); pointer-events: none; }
 
-    .panel { position: fixed; inset: 0; z-index: 0; display: grid; place-items: center; text-align: center; padding: 24px; transition: opacity 0.1s linear; pointer-events: none; }
-    .panel-a { background-image: url("assets/bg.webp"); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.04); }
-    .panel-b { background: radial-gradient(circle at top, rgba(215, 180, 106, 0.08), rgba(5, 6, 8, 0.9) 60%), linear-gradient(180deg, #0b0c10, #040405); }
-    .panel-c { background-image: url("assets/bg.webp"); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.03); }
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: url("assets/bg.webp");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: scale(1.05);
+      pointer-events: none;
+    }
 
-    .vignette { position: fixed; inset: 0; z-index: 1; background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35) 60%, rgba(0, 0, 0, 0.5)); opacity: 0.35; pointer-events: none; }
+    .panel { position: fixed; inset: 0; width: 100%; height: 100dvh; overflow: hidden; display: grid; place-items: center; text-align: center; padding: 24px; pointer-events: none; isolation: isolate; z-index: 1; opacity: 0; transform: translate3d(0, 100%, 0) scale(0.985); transition: transform 1.05s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.95s ease; will-change: transform, opacity; }
+    .panel.is-visible { opacity: 1; transform: translate3d(0, 0, 0) scale(1); pointer-events: auto; }
+    .panel::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .panel > * { position: relative; z-index: 1; }
+    .panel-a::before { background: linear-gradient(180deg, rgba(5, 6, 8, 0.18), rgba(5, 6, 8, 0.48)); }
+    .panel-b::before { background: radial-gradient(circle at top, rgba(215, 180, 106, 0.08), rgba(5, 6, 8, 0.9) 60%), linear-gradient(180deg, #0b0c10, #040405); }
+    .panel-c::before { background: linear-gradient(180deg, rgba(5, 6, 8, 0.12), rgba(5, 6, 8, 0.42)); }
 
-    .title { font-family: "Bebas Neue", "Work Sans", sans-serif; font-size: clamp(3rem, 12vw, 9rem); letter-spacing: 0.22em; text-transform: uppercase; line-height: 0.9; color: var(--text); text-shadow: 0 18px 60px rgba(0, 0, 0, 0.7); transform: translate3d(0, 40px, 0) scale(0.7); opacity: 0; will-change: transform, opacity; }
+    .vignette { position: fixed; inset: 0; z-index: 2; background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35) 60%, rgba(0, 0, 0, 0.5)); opacity: 0.35; pointer-events: none; }
+
+    .title { font-family: "Bebas Neue", "Work Sans", sans-serif; font-size: clamp(3rem, 12vw, 9rem); letter-spacing: 0.22em; text-transform: uppercase; line-height: 0.9; color: var(--text); text-shadow: 0 18px 60px rgba(0, 0, 0, 0.7); transform: translate3d(0, 40px, 0) scale(0.85); opacity: 0; transition: transform 1.05s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 1.05s ease-out; }
+    .panel.is-visible .title { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
     .title span { display: block; }
     .title .accent { color: var(--accent); }
 
-    .hint { margin-top: 16px; font-size: 0.85rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(246, 239, 230, 0.75); }
+    .hint { margin-top: 16px; font-size: 0.85rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(246, 239, 230, 0.75); opacity: 0; transform: translateY(10px); transition: transform 1.05s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s, opacity 1.05s ease 0.15s; }
+    .panel.is-visible .hint { opacity: 1; transform: translateY(0); }
 
-    .card { max-width: 900px; max-height: calc(100vh - 96px); overflow-y: auto; scrollbar-gutter: stable; pointer-events: auto; text-align: left; padding: 36px 32px; border-radius: 22px; background: rgba(8, 10, 12, 0.7); border: 1px solid var(--card-border); box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); opacity: 0; transform: translate3d(0, 30px, 0) scale(0.96); will-change: transform, opacity; }
+    .card { max-width: 900px; max-height: calc(100dvh - 96px); overflow-y: auto; scrollbar-gutter: stable; pointer-events: auto; text-align: left; padding: 36px 32px; border-radius: 22px; background: rgba(8, 10, 12, 0.7); border: 1px solid var(--card-border); box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); opacity: 0; transform: translate3d(0, 30px, 0) scale(0.965); transition: transform 1.05s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 1.05s ease-out; position: relative; z-index: 2; overscroll-behavior: contain; }
+    .panel.is-visible .card { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
     .card::-webkit-scrollbar { width: 8px; }
     .card::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); border-radius: 999px; }
     .card::-webkit-scrollbar-thumb { background: rgba(215, 180, 106, 0.45); border-radius: 999px; }
     .card::-webkit-scrollbar-thumb:hover { background: rgba(215, 180, 106, 0.65); }
     .card h2 { margin: 0 0 16px 0; font-family: "Bebas Neue", "Work Sans", sans-serif; font-size: clamp(2rem, 6vw, 3.6rem); letter-spacing: 0.18em; text-transform: uppercase; color: #ffe7b0; text-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); }
     .card p { margin: 0; font-size: 1.05rem; line-height: 1.85; color: rgba(246, 239, 230, 0.9); }
+
+    .event-section {
+      margin-top: 18px;
+    }
+
+    .event-section-title {
+      margin: 0 0 10px 0;
+      font-family: "Bebas Neue", "Work Sans", sans-serif;
+      font-size: 1.45rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #ffe7b0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .event-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(215, 180, 106, 0.7), rgba(215, 180, 106, 0));
+    }
 
     /* Events Grid & Tabs */
     .filter-tabs { display: flex; gap: 12px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
@@ -66,6 +107,29 @@
     .event-card.technical h3 { color: #f7f3ce; font-family: 'Orbitron', sans-serif; font-size: 1.05rem; letter-spacing: 0.05em; }
     .event-card.technical p { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 0.05em; }
     .event-card.technical .event-kind { background: rgba(215, 210, 150, 0.2); color: #f7f3ce; }
+
+    .event-card.concert {
+      background: linear-gradient(145deg, rgba(255, 204, 112, 0.12), rgba(255, 255, 255, 0.02));
+      border-color: rgba(255, 204, 112, 0.35);
+    }
+    .event-card.concert:hover {
+      background: linear-gradient(145deg, rgba(255, 204, 112, 0.2), rgba(255, 255, 255, 0.05));
+    }
+    .event-card.concert h3 {
+      color: #ffd98a;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.06em;
+    }
+    .event-card.concert p {
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+    }
+    .event-card.concert .event-kind {
+      background: rgba(255, 204, 112, 0.2);
+      color: #ffd98a;
+    }
 
     .event-card:hover { transform: translateY(-2px); }
     .event-card h3 { margin: 0 0 4px 0; color: #ffe7b0; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -101,24 +165,21 @@
     .banner-popover-close { position: absolute; top: 10px; right: 12px; z-index: 3; width: 42px; height: 42px; border: 0; border-radius: 999px; background: rgba(5, 6, 8, 0.55); backdrop-filter: blur(10px); color: var(--text); font-size: 1.5rem; cursor: pointer; }
     body.overlay-open { overflow: hidden; }
 
-    .scroll-space { height: 1000vh; }
-
-    @media (max-width: 768px) { 
-      :root { 
-        --logo-size: 52px; 
-        --logo-gap: 12px; 
+    @media (max-width: 768px) {
+      :root {
+        --logo-size: 52px;
+        --logo-gap: 12px;
       }
 
       .panel-c { padding: 112px 20px 24px 20px; }
       .panel-c > .card { margin-top: -100px; }
-      
-      .events-grid { grid-template-columns: auto-fit; }
-      @media (min-width: 380px) {
-        .events-grid { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
-      }
-      
+      .events-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); }
       .card { max-height: calc(100vh - 156px); padding: 28px 22px; }
       .card h2 { letter-spacing: 0.12em; }
+    }
+
+    @media (min-width: 380px) and (max-width: 768px) {
+      .events-grid { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
     }
   </style>
 </head>
@@ -126,8 +187,8 @@
 <body>
   <img class="logo-corner" src="assets/infinity.webp" alt="Infinity logo">
 
+  <div class="bg-layer" aria-hidden="true"></div>
   <div class="vignette"></div>
-  <div class="scroll-space"></div>
 
   <script>
     const eventsData = [
@@ -157,14 +218,22 @@
       { registerLink: "https://forms.gle/55YAsCEydnbEQ7qh6", src: "28-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID TO BUILD", club: "ZIGBEE CLUB, ANOVA CLUB", css: "", type: "technical", kind: "problem_solving" },
       { registerLink: "https://forms.gle/jwsazFWvLLPoyqHX9", src: "29-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID & BYTE", club: "CRYPTO COLLAB CE, TURING CLUB", css: "", type: "technical", kind: "technical" },
       { registerLink: "https://forms.gle/dBoRwHxPwneCTNj76", src: "34-of-44.webp", date: "25.04.2026", prize: "Cash prize", name: "FORGE & FLUX", club: "CORE TEAM", css: "", type: "technical", kind: "technical" },
-      { registerLink: "https://forms.gle/eTWLkGocm3aZtYxw6", src: "36-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "UAV DESIGN COMP", club: "AEROSPACE TEAM", css: "", type: "technical", kind: "technical" } 
+      { registerLink: "https://forms.gle/eTWLkGocm3aZtYxw6", src: "36-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "UAV DESIGN COMP", club: "AEROSPACE TEAM", css: "", type: "technical", kind: "technical" },
+      // Concert Events
+      { registerLink: "#", src: "6-of-44.webp", date: "29.04.2026", prize: "", name: "Ragg The Band", club: "Concert Showcase", css: "", type: "concert", kind: "concert" },
+      { registerLink: "#", src: "7-of-44.webp", date: "30.04.2026", prize: "", name: "DJ Kayra", club: "Concert Showcase", css: "", type: "concert", kind: "concert" }
     ]
      // sort to show cultural events first and all alphabetically within their type
     .sort((a, b) => {
+      const typeOrder = { cultural: 0, technical: 1, concert: 2 };
+      const typeDiff = (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99);
+      if (typeDiff !== 0) {
+        return typeDiff;
+      }
       if (a.type === b.type) {
         return a.name.localeCompare(b.name);
       }
-      return a.type === "cultural" ? -1 : 1;
+      return 0;
     });
 
     // --- Modal Logic ---
@@ -177,6 +246,9 @@
       
       const inLink = modal.querySelector('.btn-primary');
       inLink.href = event.registerLink;
+
+      const modalButtons = modal.querySelector('.modal-buttons');
+      modalButtons.style.display = event.type === 'concert' ? 'none' : 'flex';
 
       const banner = modal.querySelector('.modal-banner');
       banner.src = bannerSrc;
@@ -301,19 +373,36 @@
           <button class="filter-btn active" onclick="filterEvents('all', this)">All</button>
           <button class="filter-btn" onclick="filterEvents('cultural', this)">Cultural</button>
           <button class="filter-btn" onclick="filterEvents('technical', this)">Technical</button>
+          <button class="filter-btn" onclick="filterEvents('concert', this)">Concert</button>
         </div>
-        <div class="events-grid" id="eventsContainer">
       `;
-      eventsData.forEach((ev, index) => {
+
+      const eventGroups = [
+        { label: 'Cultural Events', type: 'cultural' },
+        { label: 'Technical Events', type: 'technical' },
+        { label: 'Concert Events', type: 'concert' },
+      ];
+
+      eventGroups.forEach(group => {
+        const groupEvents = eventsData
+          .map((event, index) => ({ event, index }))
+          .filter(item => item.event.type === group.type);
+
         eventsHTML += `
-          <div class="event-card ${ev.type}" data-type="${ev.type}" onclick="openModal(${index})">
-            <h3>${ev.name}</h3>
-            <p>${ev.club}</p>
-            <span class="event-kind">${ev.kind}</span>
-          </div>
+          <section class="event-section" data-section="${group.type}">
+            <h3 class="event-section-title">${group.label}</h3>
+            <div class="events-grid" id="eventsContainer-${group.type}">
+              ${groupEvents.map(({ event, index }) => `
+                <div class="event-card ${event.type}" data-type="${event.type}" onclick="openModal(${index})">
+                  <h3>${event.name}</h3>
+                  <p>${event.club}</p>
+                  <span class="event-kind">${event.kind}</span>
+                </div>
+              `).join('')}
+            </div>
+          </section>
         `;
       });
-      eventsHTML += '</div>';
 
       card.innerHTML = `
         <h2>Explore Infinity Events</h2>
@@ -332,12 +421,14 @@
       if (btnElement) btnElement.classList.add('active');
       
       const cards = document.querySelectorAll('.event-card');
+      const sections = document.querySelectorAll('.event-section');
       cards.forEach(card => {
-        if (type === 'all' || card.dataset.type === type) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
+        card.style.display = type === 'all' || card.dataset.type === type ? 'block' : 'none';
+      });
+      sections.forEach(section => {
+        const sectionCards = section.querySelectorAll('.event-card');
+        const hasVisibleCard = Array.from(sectionCards).some(card => card.style.display !== 'none');
+        section.style.display = hasVisibleCard ? 'block' : 'none';
       });
     }
 
@@ -349,7 +440,7 @@
     const panelD = createPanelD();
     const panelE = createPanelE();
 
-    // Insert panels into the document (before the vignette/scroll-space)
+    // Insert panels into the document (before the vignette)
     const vignette = document.querySelector('.vignette');
     document.body.insertBefore(panelA, vignette);
     document.body.insertBefore(panelB, vignette);
@@ -359,98 +450,141 @@
     
     // --- 3. Animation Logic ---
 
-    function clamp01(v) {
-      return Math.min(Math.max(v, 0), 1);
-    }
-
-    function lerp(a, b, t) {
-      return a + (b - a) * t;
-    }
-
-    // Group panels into an array to dynamically handle N panels
     const panels = [panelA, panelB, panelC, panelD, panelE];
-    const numTransitions = panels.length - 1;
 
-    // A dynamic array to keep track of current progress for each transition
-    let currents = new Array(numTransitions).fill(0);
+    let activePanelIndex = 0;
+    let slideLocked = false;
+    const slideLockMs = 1100;
 
-    function update() {
-      const scroll = window.scrollY;
-      const h = window.innerHeight;
-      const SCROLL_FACTOR = 1.1;
-      
-      let prevEnd = 0;
-
-      // 1. Calculate step targets dynamically
-      for (let i = 0; i < numTransitions; i++) {
-        // The first transition happens over `h`, subsequent ones take `h * SCROLL_FACTOR`
-        const duration = i === 0 ? h : h * SCROLL_FACTOR;
-        const target = clamp01((scroll - prevEnd) / duration);
-        
-        // Lerp to specific target
-        currents[i] = lerp(currents[i], target, 0.03);
-        
-        // Shift start point for next transition
-        prevEnd += duration; 
+    function isScrollableElement(element, deltaY) {
+      if (!element) {
+        return false;
       }
 
-      // 2. Map transition currents to panel opacities dynamically
-      const opacities = panels.map((_, i) => {
-        if (i === 0) return 1 - currents[0]; // First panel fades out
-        if (i === panels.length - 1) return currents[i - 1]; // Last panel fades in and stays
-        
-        // Middle panels: depend on previous transition finishing and next starting
-        return currents[i - 1] * (1 - currents[i]);
-      });
-
-      // 3. Apply opacity and visibility dynamically
-      panels.forEach((panel, i) => {
-        const op = opacities[i];
-        panel.style.opacity = op.toString();
-        // Give fully opaque panels a higher z-index so they don't get covered by transparent siblings
-        panel.style.zIndex = op > 0.90 ? '2' : '0';
-        panel.style.visibility = op > 0.05 ? 'visible' : 'hidden';
-        
-        // Only allow scrolling/interaction when the panel is fully bright/active
-        if (panel.cardElement) {
-          panel.cardElement.style.pointerEvents = op > 0.90 ? 'auto' : 'none';
-        }
-      });
-
-      // 4. Panel-specific transforms
-      // Apply transforms using the related transition index in our `currents` array (0 = T1, 1 = T2, 2 = T3)
-      if (panels.length > 1 && panelB.titleElement) {
-        const scaleB = 0.7 + (currents[0] * 0.6);
-        const yB = (1 - currents[0]) * 40;
-        panelB.titleElement.style.opacity = String(opacities[1]);
-        panelB.titleElement.style.transform = `translate3d(0, ${yB}px, 0) scale(${scaleB})`;
+      const maxScrollTop = element.scrollHeight - element.clientHeight;
+      if (maxScrollTop <= 0) {
+        return false;
       }
 
-      if (panels.length > 2 && panelC.cardElement) {
-        const cardScaleC = 0.96 + (currents[1] * 0.06);
-        const cardYC = (1 - currents[1]) * 30;
-        panelC.cardElement.style.opacity = String(opacities[2]);
-        panelC.cardElement.style.transform = `translate3d(0, ${cardYC}px, 0) scale(${cardScaleC})`;
+      if (deltaY > 0) {
+        return element.scrollTop < maxScrollTop - 1;
       }
 
-      if (panels.length > 3 && panelD.cardElement) {
-        const cardScaleD = 0.96 + (currents[2] * 0.06);
-        const cardYD = (1 - currents[2]) * 30;
-        panelD.cardElement.style.opacity = String(opacities[3]);
-        panelD.cardElement.style.transform = `translate3d(0, ${cardYD}px, 0) scale(${cardScaleD})`;
-      }
-
-      if (panels.length > 4 && panelE.cardElement) {
-        const cardScaleE = 0.96 + (currents[3] * 0.06);
-        const cardYE = (1 - currents[3]) * 30;
-        panelE.cardElement.style.opacity = String(opacities[4]);
-        panelE.cardElement.style.transform = `translate3d(0, ${cardYE}px, 0) scale(${cardScaleE})`;
-      }
-
-      requestAnimationFrame(update);
+      return element.scrollTop > 1;
     }
-    
-    requestAnimationFrame(update);
+
+    function applyPanelState() {
+      panels.forEach((panel, index) => {
+        const offset = index - activePanelIndex;
+        const clampedOffset = Math.max(-1, Math.min(1, offset));
+
+        panel.style.transform = `translate3d(0, ${clampedOffset * 100}%, 0) scale(${index === activePanelIndex ? 1 : 0.985})`;
+        panel.style.opacity = index === activePanelIndex ? '1' : '0';
+        panel.style.zIndex = index === activePanelIndex ? '4' : '1';
+        panel.style.pointerEvents = index === activePanelIndex ? 'auto' : 'none';
+        panel.classList.toggle('is-visible', index === activePanelIndex);
+      });
+    }
+
+    function setActivePanel(nextIndex) {
+      const clampedIndex = Math.min(Math.max(nextIndex, 0), panels.length - 1);
+      if (clampedIndex === activePanelIndex || slideLocked) {
+        return;
+      }
+
+      activePanelIndex = clampedIndex;
+      slideLocked = true;
+      applyPanelState();
+
+      window.setTimeout(() => {
+        slideLocked = false;
+      }, slideLockMs);
+    }
+
+    applyPanelState();
+
+    window.addEventListener('wheel', (event) => {
+      if (bannerState.open || document.body.classList.contains('overlay-open')) {
+        return;
+      }
+
+      const scrollable = event.target.closest('.card, .modal-content');
+      if (scrollable && isScrollableElement(scrollable, event.deltaY)) {
+        return;
+      }
+
+      if (Math.abs(event.deltaY) < 12) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (slideLocked) {
+        return;
+      }
+
+      setActivePanel(activePanelIndex + (event.deltaY > 0 ? 1 : -1));
+    }, { passive: false });
+
+    let swipeState = null;
+
+    window.addEventListener('touchstart', (event) => {
+      if (bannerState.open || document.body.classList.contains('overlay-open')) {
+        return;
+      }
+
+      const touch = event.touches[0];
+      swipeState = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startedInsideCard: Boolean(event.target.closest('.card, .modal-content'))
+      };
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (event) => {
+      if (!swipeState || swipeState.startedInsideCard) {
+        return;
+      }
+
+      const touch = event.touches[0];
+      const deltaX = touch.clientX - swipeState.startX;
+      const deltaY = touch.clientY - swipeState.startY;
+
+      if (Math.abs(deltaY) > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', (event) => {
+      if (!swipeState || swipeState.startedInsideCard || bannerState.open || document.body.classList.contains('overlay-open')) {
+        swipeState = null;
+        return;
+      }
+
+      const touch = event.changedTouches[0];
+      const deltaX = touch.clientX - swipeState.startX;
+      const deltaY = touch.clientY - swipeState.startY;
+
+      if (Math.abs(deltaY) > 60 && Math.abs(deltaY) > Math.abs(deltaX)) {
+        setActivePanel(activePanelIndex + (deltaY < 0 ? 1 : -1));
+      }
+
+      swipeState = null;
+    }, { passive: true });
+
+    window.addEventListener('keydown', (event) => {
+      if (bannerState.open || document.body.classList.contains('overlay-open')) {
+        return;
+      }
+
+      if (event.key === 'ArrowDown' || event.key === 'PageDown') {
+        setActivePanel(activePanelIndex + 1);
+      }
+
+      if (event.key === 'ArrowUp' || event.key === 'PageUp') {
+        setActivePanel(activePanelIndex - 1);
+      }
+    });
 
     // --- 4. Banner Popover ---
 
