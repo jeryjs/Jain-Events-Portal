@@ -473,6 +473,19 @@
       return element.scrollTop > 1;
     }
 
+    function isScrollableAtEdge(element, deltaY) {
+      if (!element) {
+        return true;
+      }
+
+      const maxScrollTop = element.scrollHeight - element.clientHeight;
+      if (maxScrollTop <= 0) {
+        return true;
+      }
+
+      return deltaY < 0 ? element.scrollTop >= maxScrollTop - 1 : element.scrollTop <= 1;
+    }
+
     function applyPanelState() {
       panels.forEach((panel, index) => {
         const offset = index - activePanelIndex;
@@ -534,15 +547,18 @@
       }
 
       const touch = event.touches[0];
+      const scrollableElement = event.target.closest('.card, .modal-content');
       swipeState = {
         startX: touch.clientX,
         startY: touch.clientY,
-        startedInsideCard: Boolean(event.target.closest('.card, .modal-content'))
+        startedInsideCard: Boolean(scrollableElement),
+        scrollableElement: scrollableElement,
+        panelSwipeEnabled: false
       };
     }, { passive: true });
 
     window.addEventListener('touchmove', (event) => {
-      if (!swipeState || swipeState.startedInsideCard) {
+      if (!swipeState) {
         return;
       }
 
@@ -556,7 +572,7 @@
     }, { passive: false });
 
     window.addEventListener('touchend', (event) => {
-      if (!swipeState || swipeState.startedInsideCard || bannerState.open || document.body.classList.contains('overlay-open')) {
+      if (!swipeState || bannerState.open || document.body.classList.contains('overlay-open')) {
         swipeState = null;
         return;
       }
@@ -565,7 +581,10 @@
       const deltaX = touch.clientX - swipeState.startX;
       const deltaY = touch.clientY - swipeState.startY;
 
-      if (Math.abs(deltaY) > 60 && Math.abs(deltaY) > Math.abs(deltaX)) {
+      const isVerticalSwipe = Math.abs(deltaY) > 60 && Math.abs(deltaY) > Math.abs(deltaX);
+      const atEdge = isScrollableAtEdge(swipeState.scrollableElement, deltaY);
+
+      if (isVerticalSwipe && (!swipeState.startedInsideCard || atEdge)) {
         setActivePanel(activePanelIndex + (deltaY < 0 ? 1 : -1));
       }
 
