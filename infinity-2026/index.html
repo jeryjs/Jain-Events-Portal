@@ -75,17 +75,31 @@
     /* Modal */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(5px); }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
-    .modal-content { background: #111; border: 1px solid var(--accent); border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; position: relative; transform: scale(0.95); transition: transform 0.3s, opacity 0.3s; }
+    .modal-content { background: rgba(10, 12, 16, 0.92); border: 1px solid rgba(215, 180, 106, 0.35); border-radius: 22px; padding: clamp(18px, 4vw, 32px); max-width: min(560px, calc(100vw - 24px)); width: min(560px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow-y: auto; scrollbar-gutter: stable; position: relative; display: flex; flex-direction: column; gap: 16px; transform: scale(0.95); transition: transform 0.3s, opacity 0.3s; box-shadow: 0 28px 110px rgba(0, 0, 0, 0.62); }
     .modal-overlay.active .modal-content { transform: scale(1); }
     .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
     .modal-title { color: #ffe7b0; font-family: "Bebas Neue", sans-serif; font-size: 2.5rem; margin: 0 0 8px 0; letter-spacing: 0.1em; }
     .modal-club { color: rgba(246, 239, 230, 0.7); margin: 0 0 24px 0; }
+    .modal-banner-trigger { position: relative; width: 100%; padding: 0; border: 0; background: none; border-radius: 20px; overflow: hidden; cursor: zoom-in; text-align: left; }
+    .modal-banner { width: 100%; aspect-ratio: 4 / 3; display: block; object-fit: cover; background: linear-gradient(135deg, rgba(215, 180, 106, 0.35), rgba(246, 239, 230, 0.1)); transform: scale(1.02); transition: transform 0.25s ease; }
+    .modal-banner-trigger:hover .modal-banner { transform: scale(1.05); }
+    .modal-banner-trigger::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), rgba(5, 6, 8, 0.02) 55%, rgba(5, 6, 8, 0.42) 100%); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); pointer-events: none; z-index: 1; }
+    .modal-banner-trigger::after { content: 'Tap to zoom'; position: absolute; right: 12px; bottom: 12px; z-index: 2; padding: 8px 10px; border-radius: 999px; background: rgba(5, 6, 8, 0.55); backdrop-filter: blur(8px); color: #ffe7b0; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; pointer-events: none; }
     .modal-buttons { display: flex; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
 
     .btn { display: flex; justify-content: center; align-items: center; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; flex: 1; min-width: 140px; transition: all 0.2s; border: 1px solid transparent; line-height: 1.4; box-sizing: border-box; }
     .btn:hover { opacity: 0.8; transform: translateY(-2px); }
     .btn-primary { background: var(--accent); border-color: var(--accent); color: #000; }
     .btn-secondary { background: transparent; border-color: var(--accent); color: var(--accent); }
+
+    .banner-popover { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 12px; background: rgba(3, 4, 7, 0.38); backdrop-filter: blur(18px) saturate(120%); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .banner-popover.active { opacity: 1; pointer-events: auto; }
+    .banner-popover-stage { position: fixed; inset: 0; overflow: hidden; touch-action: none; cursor: grab; }
+    .banner-popover-stage:active { cursor: grabbing; }
+    .banner-popover-stage::before { content: ''; position: absolute; left: 50%; top: 50%; width: min(100vw, calc(75dvh * 4 / 3)); height: min(75dvh, calc(100vw * 3 / 4)); transform: translate3d(-50%, -50%, 0) translate3d(calc(var(--banner-x, 0px) * 0.12), calc(var(--banner-y, 0px) * 0.12), 0) scale(calc(var(--banner-scale, 1.08) * 1.01)); background: radial-gradient(circle at center, rgba(215, 180, 106, 0.18), rgba(215, 180, 106, 0.08) 50%, rgba(5, 6, 8, 0) 78%); filter: blur(18px); opacity: 0.9; pointer-events: none; z-index: 0; }
+    .banner-popover-media { position: absolute; left: 50%; top: 50%; width: min(100vw, calc(75dvh * 4 / 3)); height: min(75dvh, calc(100vw * 3 / 4)); object-fit: cover; user-select: none; -webkit-user-drag: none; pointer-events: none; transform-origin: var(--banner-origin-x, 50%) var(--banner-origin-y, 50%); transform: translate3d(calc(-50% + var(--banner-x, 0px)), calc(-50% + var(--banner-y, 0px)), 0) scale(var(--banner-scale, 1.08)); will-change: transform; z-index: 1; filter: contrast(1.05) saturate(1.04); -webkit-mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 1) 86%, rgba(0, 0, 0, 0.94) 92%, rgba(0, 0, 0, 0.55) 97%, rgba(0, 0, 0, 0) 100%); mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 1) 86%, rgba(0, 0, 0, 0.94) 92%, rgba(0, 0, 0, 0.55) 97%, rgba(0, 0, 0, 0) 100%); }
+    .banner-popover-close { position: absolute; top: 10px; right: 12px; z-index: 3; width: 42px; height: 42px; border: 0; border-radius: 999px; background: rgba(5, 6, 8, 0.55); backdrop-filter: blur(10px); color: var(--text); font-size: 1.5rem; cursor: pointer; }
+    body.overlay-open { overflow: hidden; }
 
     .scroll-space { height: 1000vh; }
 
@@ -118,32 +132,32 @@
   <script>
     const eventsData = [
       // Cultural Events
-      { inRegisterLink: "https://forms.gle/cuHQVWQPioBD6k6w5", outRegisterLink: "#", src: "19-of-44.webp", date: "23.04.2026", prize: "5000", name: "Multiverse Conclave", club: "Literature club", css: "", type: "cultural", kind: "acting" },
-      { inRegisterLink: "https://forms.gle/TzaNxrYwGMiVJG248", outRegisterLink: "#", src: "18-of-44.webp", date: "22.04.2026", prize: "8000", name: "Origin Protocol", club: "Literature club", css: "", type: "cultural", kind: "writing" },
-      { inRegisterLink: "https://forms.gle/pZ2XWvNW9g4LGxGP8", outRegisterLink: "#", src: "15-of-44.webp", date: "29.04.2026", prize: "13000", name: "Film Festival", club: "Celluloid Club", css: "", type: "cultural", kind: "film" },
-      { inRegisterLink: "https://forms.gle/X83AgFbGgbHv2pwi8", outRegisterLink: "#", src: "21-of-44.webp", date: "27.04.2026", prize: "", name: "Indian cinema Day", club: "Theatre Club", css: "", type: "cultural", kind: "acting" },
-      { inRegisterLink: "https://forms.gle/K8FA8vV41veV8EpY8", outRegisterLink: "#", src: "25-of-44.webp", date: "25.04.2026", prize: "8000", name: "Game of Thrones", club: "Gravel & Globe", css: "", type: "cultural", kind: "debate" },
-      { inRegisterLink: "https://forms.gle/qPawpU5Nwtm8f7Bx5", outRegisterLink: "#", src: "17-of-44.webp", date: "23.04.2026", prize: "2000", name: "Micdrop", club: "Oraters Club", css: "", type: "cultural", kind: "singing" },
-      { inRegisterLink: "https://forms.gle/fm39U5SCUEjkzsEw7", outRegisterLink: "#", src: "16-of-44.webp", date: "23.04.2026", prize: "6000", name: "What If?", club: "Oraters Club", css: "", type: "cultural", kind: "debate" },
-      { inRegisterLink: "https://forms.gle/ULrLiFjpi1okPrdd9", outRegisterLink: "#", src: "10-of-44.webp", date: "30.04.2026", prize: "5000", name: "Monologue", club: "Symphony Club", css: "", type: "cultural", kind: "singing" },
-      { inRegisterLink: "https://forms.gle/1nicEh1nd4sYeJvi6", outRegisterLink: "#", src: "11-of-44.webp", date: "30.04.2026", prize: "7500", name: "Frequency frenzy", club: "Symphony Club", css: "", type: "cultural", kind: "singing" },
-      { inRegisterLink: "https://forms.gle/C2BkpHt15KZKrts6A", outRegisterLink: "#", src: "12-of-44.webp", date: "29.04.2026", prize: "15000", name: "Battle of Bands", club: "Symphony Club", css: "", type: "cultural", kind: "singing" },
-      { inRegisterLink: "https://forms.gle/Q3zUc21dRBix6muY9", outRegisterLink: "#", src: "20-of-44.webp", date: "23.04.2026", prize: "3000", name: "Capture the Moment", club: "Photography Club", css: "", type: "cultural", kind: "photography" },
-      { inRegisterLink: "https://forms.gle/fD8Trb5wHX6WSADS7", outRegisterLink: "#", src: "9-of-44.webp", date: "29.04.2026", prize: "25000", name: "Veil Of Verse", club: "Fashion Club", css: "", type: "cultural", kind: "acting" },
-      { inRegisterLink: "https://forms.gle/ZTLE5G1h2bhoMEEg7", outRegisterLink: "#", src: "23-of-44.webp", date: "24.04.2026", prize: "3000", name: "Treasure Hunt", club: "Art and Crafts Club", css: "", type: "cultural", kind: "treasure hunt" },
-      { inRegisterLink: "https://forms.gle/k7GzPzBpZevkp8dt7", outRegisterLink: "#", src: "24-of-44.webp", date: "24.04.2026", prize: "", name: "Paper Fashion", club: "Art and Crafts Club", css: "", type: "cultural", kind: "fashion" },
-      { inRegisterLink: "https://forms.gle/vGrbXP86wsbiz5MZ6", outRegisterLink: "#", src: "13-of-44.webp", date: "29.04.2026", prize: "5000", name: "Solo Street Battle", club: "Dance Club", css: "", type: "cultural", kind: "dance" },
-      { inRegisterLink: "https://forms.gle/YJ7LrtAYLC7rJ9sz9", outRegisterLink: "#", src: "14-of-44.webp", date: "30.04.2026", prize: "15000", name: "Cosmic Conversion", club: "Dance Club", css: "", type: "cultural", kind: "dance" },
+      { registerLink: "https://forms.gle/cuHQVWQPioBD6k6w5", src: "19-of-44.webp", date: "23.04.2026", prize: "5000", name: "Multiverse Conclave", club: "Literature club", css: "", type: "cultural", kind: "acting" },
+      { registerLink: "https://forms.gle/TzaNxrYwGMiVJG248", src: "18-of-44.webp", date: "22.04.2026", prize: "8000", name: "Origin Protocol", club: "Literature club", css: "", type: "cultural", kind: "writing" },
+      { registerLink: "https://forms.gle/pZ2XWvNW9g4LGxGP8", src: "15-of-44.webp", date: "29.04.2026", prize: "13000", name: "Film Festival", club: "Celluloid Club", css: "", type: "cultural", kind: "film" },
+      { registerLink: "https://forms.gle/X83AgFbGgbHv2pwi8", src: "21-of-44.webp", date: "27.04.2026", prize: "", name: "Indian cinema Day", club: "Theatre Club", css: "", type: "cultural", kind: "acting" },
+      { registerLink: "https://forms.gle/K8FA8vV41veV8EpY8", src: "25-of-44.webp", date: "25.04.2026", prize: "8000", name: "Game of Thrones", club: "Gravel & Globe", css: "", type: "cultural", kind: "debate" },
+      { registerLink: "https://forms.gle/qPawpU5Nwtm8f7Bx5", src: "17-of-44.webp", date: "23.04.2026", prize: "2000", name: "Micdrop", club: "Oraters Club", css: "", type: "cultural", kind: "singing" },
+      { registerLink: "https://forms.gle/fm39U5SCUEjkzsEw7", src: "16-of-44.webp", date: "23.04.2026", prize: "6000", name: "What If?", club: "Oraters Club", css: "", type: "cultural", kind: "debate" },
+      { registerLink: "https://forms.gle/ULrLiFjpi1okPrdd9", src: "10-of-44.webp", date: "30.04.2026", prize: "5000", name: "Monologue", club: "Symphony Club", css: "", type: "cultural", kind: "singing" },
+      { registerLink: "https://forms.gle/1nicEh1nd4sYeJvi6", src: "11-of-44.webp", date: "30.04.2026", prize: "7500", name: "Frequency frenzy", club: "Symphony Club", css: "", type: "cultural", kind: "singing" },
+      { registerLink: "https://forms.gle/C2BkpHt15KZKrts6A", src: "12-of-44.webp", date: "29.04.2026", prize: "15000", name: "Battle of Bands", club: "Symphony Club", css: "", type: "cultural", kind: "singing" },
+      { registerLink: "https://forms.gle/Q3zUc21dRBix6muY9", src: "20-of-44.webp", date: "23.04.2026", prize: "3000", name: "Capture the Moment", club: "Photography Club", css: "", type: "cultural", kind: "photography" },
+      { registerLink: "https://forms.gle/fD8Trb5wHX6WSADS7", src: "9-of-44.webp", date: "29.04.2026", prize: "25000", name: "Veil Of Verse", club: "Fashion Club", css: "", type: "cultural", kind: "acting" },
+      { registerLink: "https://forms.gle/ZTLE5G1h2bhoMEEg7", src: "23-of-44.webp", date: "24.04.2026", prize: "3000", name: "Treasure Hunt", club: "Art and Crafts Club", css: "", type: "cultural", kind: "treasure hunt" },
+      { registerLink: "https://forms.gle/k7GzPzBpZevkp8dt7", src: "24-of-44.webp", date: "24.04.2026", prize: "", name: "Paper Fashion", club: "Art and Crafts Club", css: "", type: "cultural", kind: "fashion" },
+      { registerLink: "https://forms.gle/vGrbXP86wsbiz5MZ6", src: "13-of-44.webp", date: "29.04.2026", prize: "5000", name: "Solo Street Battle", club: "Dance Club", css: "", type: "cultural", kind: "dance" },
+      { registerLink: "https://forms.gle/YJ7LrtAYLC7rJ9sz9", src: "14-of-44.webp", date: "30.04.2026", prize: "15000", name: "Cosmic Conversion", club: "Dance Club", css: "", type: "cultural", kind: "dance" },
       // Technical Events
-      { inRegisterLink: "https://forms.gle/JnAjWFS9mE2eZxkNA", outRegisterLink: "#", src: "31-of-44.webp", date: "28.04.2026", prize: "Cash prize", name: "GRID GAMBIT", club: "AI-Devops, CPS", css: "", type: "technical", kind: "technical" },
-      { inRegisterLink: "https://forms.gle/jwsazFWvLLPoyqHX9", outRegisterLink: "#", src: "29-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID & BYTE", club: "CRYPTO COLLAB CE, TURING CLUB", css: "", type: "technical", kind: "technical" },
-      { inRegisterLink: "https://forms.gle/AfnowyLmzuAR4XX59", outRegisterLink: "#", src: "30-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "AMONG US", club: "FOSS CLUB, DATA AI CLUB", css: "", type: "technical", kind: "competitive" },
-      { inRegisterLink: "https://forms.gle/wEBFRdDLQTfa32Pe6", outRegisterLink: "#", src: "32-of-44.webp", date: "28.04.2026", prize: "Cash prize", name: "JAINS GOT TALENT", club: "CLOUD CLUB, ENIGMA CLUB", css: "", type: "technical", kind: "technical" },
-      { inRegisterLink: "https://forms.gle/wXSWL32CWE9Vtnrt6", outRegisterLink: "#", src: "27-of-44.webp", date: "28.04.2026", prize: "Cash prize", name: "OPERATION RED TROPHY", club: "SALUS CLUB, NEURON CLUB, COGNITO CLUB", css: "", type: "technical", kind: "problem_solving" },
-      { inRegisterLink: "https://forms.gle/55YAsCEydnbEQ7qh6", outRegisterLink: "#", src: "28-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID TO BUILD", club: "ZIGBEE CLUB, ANOVA CLUB", css: "", type: "technical", kind: "problem_solving" },
-      { inRegisterLink: "https://forms.gle/jwsazFWvLLPoyqHX9", outRegisterLink: "#", src: "29-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID & BYTE", club: "CRYPTO COLLAB CE, TURING CLUB", css: "", type: "technical", kind: "technical" },
-      { inRegisterLink: "https://forms.gle/dBoRwHxPwneCTNj76", outRegisterLink: "#", src: "34-of-44.webp", date: "25.04.2026", prize: "Cash prize", name: "FORGE & FLUX", club: "CORE TEAM", css: "", type: "technical", kind: "technical" },
-      { inRegisterLink: "https://forms.gle/eTWLkGocm3aZtYxw6", outRegisterLink: "#", src: "36-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "UAV DESIGN COMP", club: "AEROSPACE TEAM", css: "", type: "technical", kind: "technical" } 
+      { registerLink: "https://forms.gle/JnAjWFS9mE2eZxkNA", src: "31-of-44.webp", date: "28.04.2026", prize: "Cash prize", name: "GRID GAMBIT", club: "AI-Devops, CPS", css: "", type: "technical", kind: "technical" },
+      { registerLink: "https://forms.gle/jwsazFWvLLPoyqHX9", src: "29-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID & BYTE", club: "CRYPTO COLLAB CE, TURING CLUB", css: "", type: "technical", kind: "technical" },
+      { registerLink: "https://forms.gle/AfnowyLmzuAR4XX59", src: "30-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "AMONG US", club: "FOSS CLUB, DATA AI CLUB", css: "", type: "technical", kind: "competitive" },
+      { registerLink: "https://forms.gle/wEBFRdDLQTfa32Pe6", src: "32-of-44.webp", date: "28.04.2026", prize: "Cash prize", name: "JAINS GOT TALENT", club: "CLOUD CLUB, ENIGMA CLUB", css: "", type: "technical", kind: "technical" },
+      { registerLink: "https://forms.gle/wXSWL32CWE9Vtnrt6", src: "27-of-44.webp", date: "28.04.2026", prize: "Cash prize", name: "OPERATION RED TROPHY", club: "SALUS CLUB, NEURON CLUB, COGNITO CLUB", css: "", type: "technical", kind: "problem_solving" },
+      { registerLink: "https://forms.gle/55YAsCEydnbEQ7qh6", src: "28-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID TO BUILD", club: "ZIGBEE CLUB, ANOVA CLUB", css: "", type: "technical", kind: "problem_solving" },
+      { registerLink: "https://forms.gle/jwsazFWvLLPoyqHX9", src: "29-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID & BYTE", club: "CRYPTO COLLAB CE, TURING CLUB", css: "", type: "technical", kind: "technical" },
+      { registerLink: "https://forms.gle/dBoRwHxPwneCTNj76", src: "34-of-44.webp", date: "25.04.2026", prize: "Cash prize", name: "FORGE & FLUX", club: "CORE TEAM", css: "", type: "technical", kind: "technical" },
+      { registerLink: "https://forms.gle/eTWLkGocm3aZtYxw6", src: "36-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "UAV DESIGN COMP", club: "AEROSPACE TEAM", css: "", type: "technical", kind: "technical" } 
     ]
      // sort to show cultural events first and all alphabetically within their type
     .sort((a, b) => {
@@ -157,20 +171,28 @@
     function openModal(eventIndex) {
       const event = eventsData[eventIndex];
       const modal = document.querySelector('.modal-overlay');
+      const bannerSrc = `assets/brochure/${event.src}`;
       modal.querySelector('.modal-title').textContent = event.name;
       modal.querySelector('.modal-club').textContent = 'By: ' + event.club;
       
       const inLink = modal.querySelector('.btn-primary');
-      inLink.href = event.inRegisterLink;
-      
-      const outLink = modal.querySelector('.btn-secondary');
-      outLink.href = event.outRegisterLink;
+      inLink.href = event.registerLink;
+
+      const banner = modal.querySelector('.modal-banner');
+      banner.src = bannerSrc;
+      banner.alt = `${event.name} banner`;
+
+      const bannerTrigger = modal.querySelector('.modal-banner-trigger');
+      bannerTrigger.onclick = (clickEvent) => openBannerPopover(bannerSrc, `${event.name} banner`, clickEvent);
       
       modal.classList.add('active');
+      document.body.classList.add('overlay-open');
     }
 
     function closeModal() {
+      closeBannerPopover();
       document.querySelector('.modal-overlay').classList.remove('active');
+      document.body.classList.remove('overlay-open');
     }
 
     // Modal HTML
@@ -180,9 +202,11 @@
           <button class="modal-close" onclick="closeModal()">&times;</button>
           <h2 class="modal-title"></h2>
           <p class="modal-club"></p>
+          <button class="modal-banner-trigger" type="button" aria-label="Open larger banner preview">
+            <img class="modal-banner" alt="" />
+          </button>
           <div class="modal-buttons">
             <a href="#" class="btn btn-primary" target="_blank">REGISTER</a>
-            <a href="#" class="btn btn-secondary" target="_blank">VIEW EVENT DETAILS</a>
           </div>
         </div>
       </div>
@@ -384,12 +408,12 @@
         const op = opacities[i];
         panel.style.opacity = op.toString();
         // Give fully opaque panels a higher z-index so they don't get covered by transparent siblings
-        panel.style.zIndex = op > 0.98 ? '2' : '0';
+        panel.style.zIndex = op > 0.90 ? '2' : '0';
         panel.style.visibility = op > 0.05 ? 'visible' : 'hidden';
         
         // Only allow scrolling/interaction when the panel is fully bright/active
         if (panel.cardElement) {
-          panel.cardElement.style.pointerEvents = op > 0.98 ? 'auto' : 'none';
+          panel.cardElement.style.pointerEvents = op > 0.90 ? 'auto' : 'none';
         }
       });
 
@@ -427,6 +451,74 @@
     }
     
     requestAnimationFrame(update);
+
+    // --- 4. Banner Popover ---
+
+    const bannerPopover = document.createElement('div');
+    bannerPopover.className = 'banner-popover';
+    bannerPopover.setAttribute('aria-hidden', 'true');
+    bannerPopover.innerHTML = `
+      <button class="banner-popover-close" type="button" aria-label="Close banner preview">&times;</button>
+      <div class="banner-popover-stage" role="dialog" aria-modal="true" aria-label="Banner preview">
+        <img class="banner-popover-media" alt="" />
+      </div>
+    `;
+    document.body.insertAdjacentElement('beforeend', bannerPopover);
+
+    const bannerPopoverStage = bannerPopover.querySelector('.banner-popover-stage');
+    const bannerPopoverMedia = bannerPopover.querySelector('.banner-popover-media');
+    const bannerPopoverClose = bannerPopover.querySelector('.banner-popover-close');
+    const bannerState = { open: false, zoom: 1, x: 0, y: 0, vx: 0, vy: 0, dragging: false, pointerId: null, dragX: 0, dragY: 0, startX: 0, startY: 0, lastMoveX: 0, lastMoveY: 0, raf: 0, originX: '50%', originY: '50%', tapTs: 0 };
+
+    function syncBannerTransform() {
+      bannerPopoverStage.style.setProperty('--banner-x', `${bannerState.x}px`);
+      bannerPopoverStage.style.setProperty('--banner-y', `${bannerState.y}px`);
+      bannerPopoverStage.style.setProperty('--banner-scale', bannerState.zoom.toFixed(3));
+      bannerPopoverStage.style.setProperty('--banner-origin-x', bannerState.originX);
+      bannerPopoverStage.style.setProperty('--banner-origin-y', bannerState.originY);
+    }
+
+    function clampBannerOffset() {
+      const { width, height } = bannerPopoverStage.getBoundingClientRect();
+      const dx = Math.max(0, (bannerState.zoom - 1) * width / 2), dy = Math.max(0, (bannerState.zoom - 1) * height / 2);
+      bannerState.x = Math.min(Math.max(bannerState.x, -dx), dx);
+      bannerState.y = Math.min(Math.max(bannerState.y, -dy), dy);
+    }
+
+    function openBannerPopover(src, alt, clickEvent) {
+      bannerState.open = true; bannerState.zoom = 1.08; bannerState.x = bannerState.y = bannerState.vx = bannerState.vy = 0; bannerState.dragging = false;
+      const rect = clickEvent?.currentTarget?.getBoundingClientRect?.();
+      bannerState.originX = rect ? `${Math.min(92, Math.max(8, ((clickEvent.clientX - rect.left) / rect.width) * 100))}%` : '50%';
+      bannerState.originY = rect ? `${Math.min(92, Math.max(8, ((clickEvent.clientY - rect.top) / rect.height) * 100))}%` : '50%';
+      bannerPopoverMedia.src = src; bannerPopoverMedia.alt = alt; syncBannerTransform(); bannerPopover.classList.add('active'); bannerPopover.setAttribute('aria-hidden', 'false');
+      if (!bannerState.raf) bannerState.raf = requestAnimationFrame(stepBannerPopover);
+    }
+
+    function closeBannerPopover() { bannerState.open = false; bannerState.dragging = false; bannerState.pointerId = null; bannerPopover.classList.remove('active'); bannerPopover.setAttribute('aria-hidden', 'true'); }
+
+    function stepBannerPopover() {
+      if (!bannerState.open) return bannerState.raf = 0;
+      if (!bannerState.dragging) {
+        bannerState.vx *= 0.92; bannerState.vy *= 0.92; bannerState.x += bannerState.vx; bannerState.y += bannerState.vy;
+        const { width, height } = bannerPopoverStage.getBoundingClientRect();
+        const dx = Math.max(0, (bannerState.zoom - 1) * width / 2), dy = Math.max(0, (bannerState.zoom - 1) * height / 2);
+        if (bannerState.x < -dx || bannerState.x > dx) { bannerState.x = Math.min(Math.max(bannerState.x, -dx), dx); bannerState.vx *= -0.4; }
+        if (bannerState.y < -dy || bannerState.y > dy) { bannerState.y = Math.min(Math.max(bannerState.y, -dy), dy); bannerState.vy *= -0.4; }
+      }
+      syncBannerTransform();
+      bannerState.raf = requestAnimationFrame(stepBannerPopover);
+    }
+
+    const zoomBanner = (delta) => { bannerState.zoom = Math.max(0.25, bannerState.zoom + delta); clampBannerOffset(); syncBannerTransform(); };
+    const zoomAtPoint = (nextZoom, x, y) => { const r = bannerPopoverStage.getBoundingClientRect(); bannerState.originX = `${Math.min(92, Math.max(8, ((x - r.left) / r.width) * 100))}%`; bannerState.originY = `${Math.min(92, Math.max(8, ((y - r.top) / r.height) * 100))}%`; bannerState.zoom = Math.max(0.25, nextZoom); clampBannerOffset(); syncBannerTransform(); };
+
+    bannerPopoverClose.onclick = closeBannerPopover;
+    bannerPopoverStage.onpointerdown = (event) => { if (!bannerState.open) return; bannerState.dragging = true; bannerState.tapTs = event.timeStamp; bannerState.pointerId = event.pointerId; bannerState.dragX = bannerState.x; bannerState.dragY = bannerState.y; bannerState.startX = event.clientX; bannerState.startY = event.clientY; bannerState.lastMoveX = event.clientX; bannerState.lastMoveY = event.clientY; bannerState.vx = bannerState.vy = 0; bannerPopoverStage.setPointerCapture(event.pointerId); };
+    bannerPopoverStage.onpointermove = (event) => { if (!bannerState.dragging || event.pointerId !== bannerState.pointerId) return; const r = 0.8; bannerState.x = bannerState.dragX + (event.clientX - bannerState.startX) * r; bannerState.y = bannerState.dragY + (event.clientY - bannerState.startY) * r; bannerState.vx = (event.clientX - bannerState.lastMoveX) * r; bannerState.vy = (event.clientY - bannerState.lastMoveY) * r; bannerState.lastMoveX = event.clientX; bannerState.lastMoveY = event.clientY; clampBannerOffset(); syncBannerTransform(); };
+    bannerPopoverStage.onpointerup = (event) => { if (event.pointerId !== bannerState.pointerId) return; if (Math.abs(event.clientX - bannerState.startX) + Math.abs(event.clientY - bannerState.startY) < 8 && event.timeStamp - bannerState.tapTs < 250) zoomAtPoint(bannerState.zoom > 1.15 ? 1.08 : 1.7, event.clientX, event.clientY); bannerState.dragging = false; bannerState.pointerId = null; try { bannerPopoverStage.releasePointerCapture(event.pointerId); } catch {} };
+    bannerPopoverStage.onpointercancel = (event) => { if (event.pointerId !== bannerState.pointerId) return; bannerState.dragging = false; bannerState.pointerId = null; try { bannerPopoverStage.releasePointerCapture(event.pointerId); } catch {} };
+    bannerPopoverStage.onwheel = (event) => { if (!bannerState.open) return; event.preventDefault(); zoomBanner(event.deltaY > 0 ? -0.08 : 0.08); };
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && bannerState.open) closeBannerPopover(); });
   </script>
 
 </body>
