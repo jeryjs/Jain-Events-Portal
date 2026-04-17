@@ -31,6 +31,7 @@ import {
 import { styled } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import ProgressiveImage from '@components/shared/ProgressiveImage';
 
 // Styled components
 const NotificationForm = styled(Paper)(({ theme }) => ({
@@ -222,9 +223,20 @@ const SendNotificationsDialog = () => {
                   Preview
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                  <Avatar src={imageUrl} sx={{ bgcolor: 'primary.main' }}>
-                    {!imageUrl && <ImageIcon />}
-                  </Avatar>
+                  <Box sx={{ width: 56, height: 56, borderRadius: 1.5, overflow: 'hidden', flexShrink: 0, bgcolor: 'background.default' }}>
+                    {imageUrl ? (
+                      <ProgressiveImage
+                        src={imageUrl}
+                        alt="Notification image preview"
+                        placeholderSrc={imageUrl}
+                        loading="eager"
+                      />
+                    ) : (
+                      <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
+                        <ImageIcon />
+                      </Avatar>
+                    )}
+                  </Box>
                   <Box>
                     <Typography variant="subtitle1" sx={{
                       fontWeight: "bold"

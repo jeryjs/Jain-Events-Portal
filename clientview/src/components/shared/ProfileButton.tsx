@@ -126,7 +126,9 @@ const ProfileButton = ({ className }) => {
                     mr: 2,
                     boxShadow: `0 2px 10px ${alpha(theme.palette.common.black, 0.1)}`,
                 }}
-            />
+                >
+                    {userData?.profilePic ? null : (userData?.name?.charAt(0)?.toUpperCase() || <PersonIcon />)}
+                </Avatar>
             <Box>
                 <Typography variant="h6" sx={{
                     fontWeight: "600"
@@ -211,7 +213,9 @@ const ProfileButton = ({ className }) => {
                                 border: '1px solid',
                                 borderColor: theme.palette.divider
                             }}
-                        />
+                        >
+                            {userData?.profilePic ? null : (userData?.name?.charAt(0)?.toUpperCase() || <PersonIcon />)}
+                        </Avatar>
                     ) : (
                         isSubscribed
                             ? <NotificationsActiveIcon color="primary" sx={{ fontSize: 20 }} />

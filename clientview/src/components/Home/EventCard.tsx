@@ -1,14 +1,14 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
-import { Box, Typography, Card, CardMedia, CardContent, Chip } from '@mui/material';
+import { Box, Typography, Card, CardContent, Chip } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Event from '@common/models/Event';
 import { motion } from 'framer-motion';
 import { Role } from '@common/constants';
 import { useLogin } from '@components/shared';
+import ProgressiveImage from '@components/shared/ProgressiveImage';
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => `
@@ -42,31 +42,6 @@ const DateBadge = styled(motion.div)(({ theme }) => `
     transition: transform 0.2s ease-in-out;
   }
 `);
-
-const StyledCardMedia = styled(CardMedia)(`
-  height: 200px;
-  position: relative;
-  border-radius: 16px;
-  object-fit: cover;
-`);
-
-const Shimmer = styled('div')`
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 16px;
-
-  @keyframes shimmer {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
-  }
-`;
 
 const LocationWrapper = styled(Box)(({ theme }) => `
   display: flex;
@@ -121,18 +96,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
     month = startDate.toLocaleString('default', { month: 'short' });
   }
 
-  // Load the event image and show shimmer while loading
-  const getEventImage = async () => {
-    const imageSrc = event.activeBanner?.url ?? `https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg`;
-    try { await fetch(imageSrc) } catch { return imageSrc };  // To figure out how long to show the shimmer for the image on load
-    return imageSrc;
-  };
-
-  const { isLoading, error, data: imageSrc } = useQuery({
-    queryKey: ['eventImage', event.id],
-    queryFn: getEventImage,
-    staleTime: Infinity,
-  });
+  const imageSrc = event.activeBanner?.url ?? `https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg`;
 
   const cardVariants = {
     hidden: { opacity: 0, y: 50 },
@@ -186,12 +150,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
               position: 'relative',
               flexShrink: 0
             }}>
-              {isLoading && <Shimmer />}
-              <StyledCardMedia
-                sx={{ width: '100%', height: '100%', display: 'block' }}
-                style={event.activeBannerStyles}
-                image={imageSrc}
-                title={event.name}
+              <ProgressiveImage
+                sx={{ display: 'block' }}
+                src={imageSrc}
+                alt={event.name}
+                placeholderSrc={imageSrc}
+                loading="lazy"
+                imageStyle={event.activeBannerStyles}
               />
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', p: 2, overflow: 'hidden', flexGrow: 1 }}>
@@ -234,15 +199,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, variant = 'vertical', dela
               <Typography variant="caption">{month}</Typography>
             </DateBadge>}
             <Box sx={{ height: 200, position: 'relative' }}>
-              {isLoading
-                ? <Shimmer />
-                : <StyledCardMedia
-                  sx={{ height: '100%', display: 'block' }}
-                  style={event.activeBannerStyles}
-                  image={imageSrc}
-                  title={event.name}
-                />
-              }
+              <ProgressiveImage
+                src={imageSrc}
+                alt={event.name}
+                placeholderSrc={imageSrc}
+                loading="lazy"
+                imageStyle={event.activeBannerStyles}
+              />
             </Box>
             <CardContent>
               <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: 'bold' }}>

@@ -8,6 +8,7 @@ import { EventType } from '@common/constants';
 import { Link } from 'react-router-dom';
 import { getBaseEventType } from '@common/utils';
 import { Event } from '@common/models';
+import ProgressiveImage from '@components/shared/ProgressiveImage';
 
 interface TimelineEventCardProps {
   event: Event;
@@ -33,9 +34,8 @@ const CardBackground = styled(Box)(({ theme }) => ({
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
   zIndex: 0,
+  overflow: 'hidden',
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -124,11 +124,15 @@ const TimelineEventCard: React.FC<TimelineEventCardProps> = ({ event, sx }) => {
     >
       <Link to={`/${event.id}`} >
         <CardBackground
-          style={{
-            backgroundImage: `url(${bannerUrl})`,
-            ...event.activeBannerStyles
-          }}
-        />
+        >
+          <ProgressiveImage
+            src={bannerUrl}
+            alt={event.name}
+            placeholderSrc={bannerUrl}
+            loading="lazy"
+            imageStyle={event.activeBannerStyles}
+          />
+        </CardBackground>
         <CardContent>
           <EventTypeChip
             label={EventType[event.type].charAt(0).toUpperCase() + EventType[event.type].slice(1).toLowerCase()}

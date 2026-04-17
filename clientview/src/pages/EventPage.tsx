@@ -12,6 +12,7 @@ import PhotoGallery from '@components/shared/PhotoGallery';
 import { useDeleteEvent, useUpdateEvent, useCreateActivity } from '@hooks/admin';
 import { useActivities, useEvent } from '@hooks/useApi';
 import useImgur from '@hooks/useImgur';
+import ProgressiveImage from '@components/shared/ProgressiveImage';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -49,9 +50,6 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
   height: 30vh; min-height: 250px; max-height: 350px; width: 100%; overflow: hidden;
-`);
-const HeroImage = styled(motion.img)(({ theme }) => `
-  width: 100%; height: 100%; object-fit: cover; border-radius: 0 0 36px 36px;
 `);
 const HeroVideo = styled(motion.video)(({ theme }) => `
   width: 100%; height: 100%; border-radius: 0 0 36px 36px;
@@ -257,10 +255,14 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
               </Box>
             </>
           ) : (
-            <HeroImage
+            <ProgressiveImage
+              sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: "0 0 36px 36px", }}
               src={currentItem.url || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg'}
               alt="Event banner"
-              style={currentCssStyles}
+              placeholderSrc={currentItem.url || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg'}
+              objectFit="cover"
+              loading="eager"
+              imageStyle={currentCssStyles}
             />
           )}
         </motion.div>

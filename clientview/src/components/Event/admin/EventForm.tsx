@@ -41,6 +41,7 @@ import { EventType, Role } from '@common/constants';
 import { BannerItem, Event } from '@common/models';
 import { getActivityTypes, getAllBaseEventTypes } from '@common/utils';
 import { useLogin } from '@components/shared';
+import ProgressiveImage from '@components/shared/ProgressiveImage';
 
 const EventTypeInput = styled(Box)`
   margin-block: 0px; left: 0;
@@ -282,12 +283,12 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
         }
 
         return (
-            <Box
-                component="img"
+            <ProgressiveImage
                 src={item.url}
                 alt="Banner image"
-                sx={{ width: '100%', height: '100%' }}
-                style={
+                placeholderSrc={item.url}
+                loading="eager"
+                imageStyle={
                     item.customCss
                         ? Object.fromEntries(
                             item.customCss.split(';')
@@ -297,7 +298,7 @@ export function EventForm({ event, isCreating, onSave, onDelete, onCancel }: Eve
                                     return [key.replace(/-([a-z])/g, (g) => g[1].toUpperCase()), value];
                                 })
                         )
-                        : {}
+                        : undefined
                 }
             />
         );
