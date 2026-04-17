@@ -11,6 +11,11 @@ const updateSW = registerSW({
   },
   onRegisteredSW(swUrl, r) {
     console.log(`Service worker registered at ${swUrl}`);
+
+    // Update the service worker when the app gains focus or becomes visible
+    void r?.update(); // Initial update check
+    window.addEventListener('focus', () => void r?.update());
+    document.addEventListener('visibilitychange', () => (document.visibilityState === 'visible') && void r?.update());
   },
   onNeedRefresh() {
     const shouldReload = window.confirm('A new version is available. Reload now?');
