@@ -135,7 +135,13 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
   const touchStartRef = useRef<number | null>(null);
 
   const currentItem = items[currentIndex];
-  const currentCssStyles = Event.parse().getBannerStyles(currentItem);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const currentCssStyles = {
+    ...Event.parse().getBannerStyles(currentItem),
+    objectFit: isFullscreen ? 'contain' : (Event.parse().getBannerStyles(currentItem)?.objectFit || 'cover'),
+    width: '100%',
+    height: '100%',
+  } as Event['getBannerStyles'] extends (item: BannerItem) => infer R ? R : never;
 
   // Toggle fullscreen for video
   const toggleFullscreen = () => {
@@ -145,6 +151,17 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
         : videoRef.current.requestFullscreen();
     }
   };
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
 
   // Auto switch banner items
   useEffect(() => {
