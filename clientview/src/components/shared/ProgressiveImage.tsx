@@ -14,7 +14,8 @@ export interface ProgressiveImageProps {
 
 function ProgressiveImage({ src, alt, placeholderSrc, objectFit = 'cover', loading = 'lazy', imageStyle, sx }: ProgressiveImageProps) {
   const [loaded, setLoaded] = useState(false);
-
+  placeholderSrc = placeholderSrc || src;
+  
   useEffect(() => {
     setLoaded(false);
   }, [src, placeholderSrc]);
@@ -55,7 +56,7 @@ function ProgressiveImage({ src, alt, placeholderSrc, objectFit = 'cover', loadi
             // create illusion of side-to-side loading instead of browser default top-to-bottom loading
             backgroundPosition: 'center',
             backgroundSize: 'cover',
-            rotate: '-90deg',
+            rotate: src === placeholderSrc ? '-90deg' : '0deg',
           }}
         />
       )}
