@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Box, Grid, Skeleton, Dialog, IconButton, Backdrop, Button, Typography, Alert } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
@@ -160,6 +160,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dragDirection, setDragDirection] = useState<number>(0);
   const [fullGalleryOpen, setFullGalleryOpen] = useState(false);
+  const preloadedImages = useRef(new Set<string>());
 
   // Normalize the images to have consistent format
   const normalizeImages = (imgs: (string | ImageItem)[]): NormalizedImage[] => {
@@ -184,9 +185,29 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
 
   // Calculate the maximum number of images to display
   const calcMaxImagesCount = rows * columns;
-  const normalizedImages = normalizeImages(images);
+  const normalizedImages = useMemo(() => normalizeImages(images), [images]);
   const hasMoreImages = normalizedImages.length > calcMaxImagesCount;
   const displayedImages = normalizedImages.slice(0, calcMaxImagesCount);
+
+  // Preload adjacent images when an image is selected
+  useEffect(() => {
+    if (!dialogOpen || selectedImageIndex === null || !normalizedImages.length) return;
+
+    const indices = [
+      selectedImageIndex,
+      (selectedImageIndex - 1 + normalizedImages.length) % normalizedImages.length,
+      (selectedImageIndex + 1) % normalizedImages.length,
+    ];
+
+    indices.forEach((index) => {
+      const url = normalizedImages[index]?.link;
+      if (!url || preloadedImages.current.has(url)) return;
+
+      preloadedImages.current.add(url);
+      const image = new Image();
+      image.src = url;
+    });
+  }, [dialogOpen, selectedImageIndex, normalizedImages]);
 
   const handleImageClick = (index: number) => {
     setSelectedImageIndex(index);
@@ -436,11 +457,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 exit={{ opacity: 0, x: dragDirection * -200 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
-                <Box sx={{ position: 'relative', width: 'min(90vw, 1200px)', height: 'min(90vh, 800px)' }}>
+                <Box sx={{ position: 'relative', display: 'inline-block', width: 'fit-content', height: 'fit-content', maxWidth: '90vw', maxHeight: '90vh' }}>
                   <ProgressiveImage
                     src={normalizedImages[selectedImageIndex].link}
                     alt={`Expanded view ${selectedImageIndex + 1}`}
                     placeholderSrc={normalizedImages[selectedImageIndex].thumbnail}
+                    loading="eager"
+                    style={{ width: 'auto', height: 'auto', maxWidth: '90vw', maxHeight: '90vh' }}
                   />
                 </Box>
               </motion.div>

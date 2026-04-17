@@ -190,16 +190,14 @@ export default function HighlightsCarousel({
                             backgroundColor: 'rgba(0,0,0,0.03)'
                         }}
                     >
-                        <img
+                        <ProgressiveImage
                             src={images[current]}
                             alt={`Current image ${current + 1}`}
+                            placeholderSrc={images[current]}
+                            objectFit="contain"
                             loading="eager"
-                            style={{
-                                objectFit: 'contain',
-                                width: '100%',
-                                height: '100%',
-                                margin: '0 auto', // Ensure the image is centered within its container
-                            }}
+                            style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
+                            sx={{ backgroundColor: 'rgba(0,0,0,0.03)' }}
                         />
                     </motion.div>
 

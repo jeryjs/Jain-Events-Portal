@@ -1,20 +1,50 @@
 import { Box, Paper, Skeleton, SxProps, Theme } from '@mui/material';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ComponentPropsWithoutRef } from 'react';
 import { useEffect, useState } from 'react';
 
-export interface ProgressiveImageProps {
+type NativeImgProps = Omit<
+  ComponentPropsWithoutRef<'img'>,
+  'src' | 'alt' | 'style' | 'onLoad' | 'onError'
+>;
+
+export interface ProgressiveImageProps extends NativeImgProps {
   src: string;
   alt: string;
   placeholderSrc?: string;
   objectFit?: CSSProperties['objectFit'];
   loading?: 'eager' | 'lazy';
   imageStyle?: CSSProperties;
+  style?: CSSProperties;
   sx?: SxProps<Theme>;
+  onLoad?: ComponentPropsWithoutRef<'img'>['onLoad'];
+  onError?: ComponentPropsWithoutRef<'img'>['onError'];
 }
 
-function ProgressiveImage({ src, alt, placeholderSrc, objectFit = 'cover', loading = 'lazy', imageStyle, sx }: ProgressiveImageProps) {
+function ProgressiveImage({
+  src,
+  alt,
+  placeholderSrc: placeholderSrcProp,
+  objectFit = 'cover',
+  loading = 'lazy',
+  imageStyle,
+  style,
+  sx,
+  width,
+  height,
+  onLoad,
+  onError,
+  ...imgProps
+}: ProgressiveImageProps) {
   const [loaded, setLoaded] = useState(false);
-  placeholderSrc = placeholderSrc || src;
+  const placeholderSrc = placeholderSrcProp || src;
+  const hasNativeSizing =
+    width !== undefined ||
+    height !== undefined ||
+    style?.width === 'auto' ||
+    style?.height === 'auto' ||
+    imageStyle?.width === 'auto' ||
+    imageStyle?.height === 'auto';
+  const useNativeLayout = hasNativeSizing;
   
   useEffect(() => {
     setLoaded(false);
@@ -35,7 +65,18 @@ function ProgressiveImage({ src, alt, placeholderSrc, objectFit = 'cover', loadi
 
 
   return (
-    <Paper key={key()+'-paper'} sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', bgcolor: 'rgba(0, 0, 0, 0.04)', ...sx }}>
+    <Paper
+      key={key()+'-paper'}
+      sx={{
+        position: 'relative',
+        display: useNativeLayout ? 'inline-block' : 'block',
+        width: useNativeLayout ? 'fit-content' : '100%',
+        height: useNativeLayout ? 'fit-content' : '100%',
+        overflow: 'hidden',
+        bgcolor: 'rgba(0, 0, 0, 0.04)',
+        ...sx,
+      }}
+    >
       {placeholderSrc && (
         <Box
           key={key()+'-placeholder'}
@@ -77,21 +118,38 @@ function ProgressiveImage({ src, alt, placeholderSrc, objectFit = 'cover', loadi
         component="img"
         src={src}
         alt={alt}
+        width={width}
+        height={height}
         loading={loading}
         decoding="async"
-        onLoad={() => setLoaded(true)}
-        onError={() => setLoaded(true)}
+        onLoad={(event) => {
+          setLoaded(true);
+          onLoad?.(event);
+        }}
+        onError={(event) => {
+          setLoaded(true);
+          onError?.(event);
+        }}
         sx={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
+          position: useNativeLayout ? 'relative' : 'absolute',
+          inset: useNativeLayout ? 'auto' : 0,
+          display: 'block',
+          ...(useNativeLayout
+            ? {
+                ...(width === undefined ? { width: 'auto' } : {}),
+                ...(height === undefined ? { height: 'auto' } : {}),
+              }
+            : {
+                width: '100%',
+                height: '100%',
+              }),
           objectFit,
           opacity: loaded ? 1 : 0,
           transform: loaded ? 'scale(1)' : 'scale(1.01)',
           transition: 'opacity 260ms ease, transform 260ms ease',
         }}
-        style={imageStyle}
+        style={{ ...imageStyle, ...style }}
+        {...imgProps}
       />
     </Paper>
   );
