@@ -10,452 +10,148 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@500&family=Playfair+Display:ital,wght@0,500;1,500&family=Work+Sans:wght@300;400;600&display=swap"
     rel="stylesheet">
   <style>
-    :root {
-      --text: #f6efe6;
-      --accent: #d7b46a;
-      --card-border: rgba(255, 255, 255, 0.08);
-      --logo-size: 80px;
-      --logo-gap: 20px;
+    :root { 
+      --text: #f6efe6; 
+      --accent: #d7b46a; 
+      --card-border: rgba(255, 255, 255, 0.08); 
+      --logo-size: 80px; 
+      --logo-gap: 20px; 
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html,
-    body {
-      margin: 0;
-      width: 100%;
-      min-height: 100%;
-      overflow-x: hidden;
-      font-family: "Work Sans", "Segoe UI", sans-serif;
-      background: #050608;
-      color: var(--text);
-      scrollbar-width: none;
-    }
+    body { margin: 0; width: 100%; min-height: 100%; overflow-x: hidden; font-family: "Work Sans", "Segoe UI", sans-serif; background: #050608; color: var(--text); scrollbar-width: none; }
+    body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
-    body::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-      display: none;
-    }
+    .logo-corner { position: fixed; top: var(--logo-gap); left: var(--logo-gap); z-index: 3; width: var(--logo-size); height: auto; filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.55)); pointer-events: none; }
 
-    .logo-corner {
-      position: fixed;
-      top: var(--logo-gap);
-      left: var(--logo-gap);
-      z-index: 3;
-      width: var(--logo-size);
-      height: auto;
-      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.55));
-      pointer-events: none;
-    }
+    .panel { position: fixed; inset: 0; z-index: 0; display: grid; place-items: center; text-align: center; padding: 24px; transition: opacity 0.1s linear; pointer-events: none; }
+    .panel-a { background-image: url("assets/bg.webp"); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.04); }
+    .panel-b { background: radial-gradient(circle at top, rgba(215, 180, 106, 0.08), rgba(5, 6, 8, 0.9) 60%), linear-gradient(180deg, #0b0c10, #040405); }
+    .panel-c { background-image: url("assets/bg.webp"); background-size: cover; background-position: center; background-repeat: no-repeat; transform: scale(1.03); }
 
-    .panel {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 24px;
-      transition: opacity 0.1s linear;
-      pointer-events: none;
-    }
+    .vignette { position: fixed; inset: 0; z-index: 1; background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35) 60%, rgba(0, 0, 0, 0.5)); opacity: 0.35; pointer-events: none; }
 
-    .panel-a {
-      background-image: url("assets/bg.webp");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transform: scale(1.04);
-    }
+    .title { font-family: "Bebas Neue", "Work Sans", sans-serif; font-size: clamp(3rem, 12vw, 9rem); letter-spacing: 0.22em; text-transform: uppercase; line-height: 0.9; color: var(--text); text-shadow: 0 18px 60px rgba(0, 0, 0, 0.7); transform: translate3d(0, 40px, 0) scale(0.7); opacity: 0; will-change: transform, opacity; }
+    .title span { display: block; }
+    .title .accent { color: var(--accent); }
 
-    .panel-b {
-      background: radial-gradient(circle at top, rgba(215, 180, 106, 0.08), rgba(5, 6, 8, 0.9) 60%), linear-gradient(180deg, #0b0c10, #040405);
-    }
+    .hint { margin-top: 16px; font-size: 0.85rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(246, 239, 230, 0.75); }
 
-    .panel-c {
-      background-image: url("assets/bg.webp");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transform: scale(1.03);
-    }
-
-    .vignette {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35) 60%, rgba(0, 0, 0, 0.5));
-      opacity: 0.35;
-      pointer-events: none;
-    }
-
-    .title {
-      font-family: "Bebas Neue", "Work Sans", sans-serif;
-      font-size: clamp(3rem, 12vw, 9rem);
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      line-height: 0.9;
-      color: var(--text);
-      text-shadow: 0 18px 60px rgba(0, 0, 0, 0.7);
-      transform: translate3d(0, 40px, 0) scale(0.7);
-      opacity: 0;
-      will-change: transform, opacity;
-    }
-
-    .title span {
-      display: block;
-    }
-
-    .title .accent {
-      color: var(--accent);
-    }
-
-    .hint {
-      margin-top: 16px;
-      font-size: 0.85rem;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: rgba(246, 239, 230, 0.75);
-    }
-
-    .card {
-      max-width: 900px;
-      max-height: calc(100vh - 96px);
-      overflow-y: auto;
-      scrollbar-gutter: stable;
-      pointer-events: auto;
-      text-align: left;
-      padding: 36px 32px;
-      border-radius: 22px;
-      background: rgba(8, 10, 12, 0.7);
-      border: 1px solid var(--card-border);
-      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55);
-      backdrop-filter: blur(8px);
-      opacity: 0;
-      transform: translate3d(0, 30px, 0) scale(0.96);
-      will-change: transform, opacity;
-    }
-
-    .card::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .card::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 999px;
-    }
-
-    .card::-webkit-scrollbar-thumb {
-      background: rgba(215, 180, 106, 0.45);
-      border-radius: 999px;
-    }
-
-    .card::-webkit-scrollbar-thumb:hover {
-      background: rgba(215, 180, 106, 0.65);
-    }
-
-    .card h2 {
-      margin: 0 0 16px 0;
-      font-family: "Bebas Neue", "Work Sans", sans-serif;
-      font-size: clamp(2rem, 6vw, 3.6rem);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #ffe7b0;
-      text-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-    }
-
-    .card p {
-      margin: 0;
-      font-size: 1.05rem;
-      line-height: 1.85;
-      color: rgba(246, 239, 230, 0.9);
-    }
+    .card { max-width: 900px; max-height: calc(100vh - 96px); overflow-y: auto; scrollbar-gutter: stable; pointer-events: auto; text-align: left; padding: 36px 32px; border-radius: 22px; background: rgba(8, 10, 12, 0.7); border: 1px solid var(--card-border); box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); opacity: 0; transform: translate3d(0, 30px, 0) scale(0.96); will-change: transform, opacity; }
+    .card::-webkit-scrollbar { width: 8px; }
+    .card::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); border-radius: 999px; }
+    .card::-webkit-scrollbar-thumb { background: rgba(215, 180, 106, 0.45); border-radius: 999px; }
+    .card::-webkit-scrollbar-thumb:hover { background: rgba(215, 180, 106, 0.65); }
+    .card h2 { margin: 0 0 16px 0; font-family: "Bebas Neue", "Work Sans", sans-serif; font-size: clamp(2rem, 6vw, 3.6rem); letter-spacing: 0.18em; text-transform: uppercase; color: #ffe7b0; text-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); }
+    .card p { margin: 0; font-size: 1.05rem; line-height: 1.85; color: rgba(246, 239, 230, 0.9); }
 
     /* Events Grid & Tabs */
-    .filter-tabs {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+    .filter-tabs { display: flex; gap: 12px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
+    .filter-btn { padding: 8px 20px; border-radius: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text); cursor: pointer; font-weight: 600; letter-spacing: 0.05em; transition: all 0.2s; }
+    .filter-btn:hover, .filter-btn.active { background: rgba(215, 180, 106, 0.2); border-color: var(--accent); color: #ffe7b0; }
 
-    .filter-btn {
-      padding: 8px 20px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      cursor: pointer;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      transition: all 0.2s;
-    }
+    .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+    .event-card { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; cursor: pointer; transition: background 0.2s, transform 0.2s; text-align: center; display: block; }
 
-    .filter-btn:hover, .filter-btn.active {
-      background: rgba(215, 180, 106, 0.2);
-      border-color: var(--accent);
-      color: #ffe7b0;
-    }
+    .event-card.cultural { background: linear-gradient(145deg, rgba(215, 120, 30, 0.1), rgba(255, 255, 255, 0.02)); border-color: rgba(215, 120, 30, 0.3); }
+    .event-card.cultural:hover { background: linear-gradient(145deg, rgba(215, 120, 30, 0.2), rgba(255, 255, 255, 0.05)); }
+    .event-card.cultural h3 { color: #ffb75e; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.25rem; }
+    .event-card.cultural p { font-family: 'Playfair Display', serif; }
+    .event-card.cultural .event-kind { background: rgba(215, 120, 30, 0.2); color: #ffb75e; }
 
-    .events-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 12px;
-    }
+    .event-card.technical { background: linear-gradient(145deg, rgba(215, 210, 150, 0.1), rgba(255, 255, 255, 0.02)); border-color: rgba(215, 210, 150, 0.3); }
+    .event-card.technical:hover { background: linear-gradient(145deg, rgba(215, 210, 150, 0.2), rgba(255, 255, 255, 0.05)); }
+    .event-card.technical h3 { color: #f7f3ce; font-family: 'Orbitron', sans-serif; font-size: 1.05rem; letter-spacing: 0.05em; }
+    .event-card.technical p { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 0.05em; }
+    .event-card.technical .event-kind { background: rgba(215, 210, 150, 0.2); color: #f7f3ce; }
 
-    .event-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 12px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.2s;
-      text-align: center;
-      display: block;
-    }
-
-    .event-card.cultural {
-      background: linear-gradient(145deg, rgba(215, 120, 30, 0.1), rgba(255, 255, 255, 0.02));
-      border-color: rgba(215, 120, 30, 0.3);
-    }
-    .event-card.cultural:hover {
-      background: linear-gradient(145deg, rgba(215, 120, 30, 0.2), rgba(255, 255, 255, 0.05));
-    }
-    .event-card.cultural h3 {
-      color: #ffb75e;
-      font-family: 'Playfair Display', serif;
-      font-style: italic;
-      font-size: 1.25rem;
-    }
-    .event-card.cultural p {
-      font-family: 'Playfair Display', serif;
-    }
-    .event-card.cultural .event-type {
-      background: rgba(215, 120, 30, 0.2);
-      color: #ffb75e;
-    }
-
-    .event-card.technical {
-      background: linear-gradient(145deg, rgba(215, 210, 150, 0.1), rgba(255, 255, 255, 0.02));
-      border-color: rgba(215, 210, 150, 0.3);
-    }
-    .event-card.technical:hover {
-      background: linear-gradient(145deg, rgba(215, 210, 150, 0.2), rgba(255, 255, 255, 0.05));
-    }
-    .event-card.technical h3 {
-      color: #f7f3ce;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.05rem;
-      letter-spacing: 0.05em;
-    }
-    .event-card.technical p {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.05em;
-    }
-    .event-card.technical .event-type {
-      background: rgba(215, 210, 150, 0.2);
-      color: #f7f3ce;
-    }
-
-    .event-card:hover {
-      transform: translateY(-2px);
-    }
-
-    .event-card h3 {
-      margin: 0 0 4px 0;
-      color: #ffe7b0;
-      font-size: 1.1rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .event-card p {
-      font-size: 0.8rem;
-      margin: 0 0 8px 0;
-      color: rgba(246, 239, 230, 0.7);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .event-type {
-      display: inline-block;
-      padding: 3px 6px;
-      border-radius: 3px;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
+    .event-card:hover { transform: translateY(-2px); }
+    .event-card h3 { margin: 0 0 4px 0; color: #ffe7b0; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .event-card p { font-size: 0.8rem; margin: 0 0 8px 0; color: rgba(246, 239, 230, 0.7); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .event-kind { display: inline-block; padding: 3px 6px; border-radius: 3px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; }
 
     /* Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 100;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-      backdrop-filter: blur(5px);
-    }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(5px); }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content { background: #111; border: 1px solid var(--accent); border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; position: relative; transform: scale(0.95); transition: transform 0.3s, opacity 0.3s; }
+    .modal-overlay.active .modal-content { transform: scale(1); }
+    .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
+    .modal-title { color: #ffe7b0; font-family: "Bebas Neue", sans-serif; font-size: 2.5rem; margin: 0 0 8px 0; letter-spacing: 0.1em; }
+    .modal-club { color: rgba(246, 239, 230, 0.7); margin: 0 0 24px 0; }
+    .modal-buttons { display: flex; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
 
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .btn { display: flex; justify-content: center; align-items: center; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; flex: 1; min-width: 140px; transition: all 0.2s; border: 1px solid transparent; line-height: 1.4; box-sizing: border-box; }
+    .btn:hover { opacity: 0.8; transform: translateY(-2px); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #000; }
+    .btn-secondary { background: transparent; border-color: var(--accent); color: var(--accent); }
 
-    .modal-content {
-      background: #111;
-      border: 1px solid var(--accent);
-      border-radius: 16px;
-      padding: 32px;
-      max-width: 500px;
-      width: 90%;
-      position: relative;
-      transform: scale(0.95);
-      transition: transform 0.3s, opacity 0.3s;
-    }
+    .scroll-space { height: 1000vh; }
 
-    .modal-overlay.active .modal-content {
-      transform: scale(1);
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-
-    .modal-title {
-      color: #ffe7b0;
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 2.5rem;
-      margin: 0 0 8px 0;
-      letter-spacing: 0.1em;
-    }
-
-    .modal-club {
-      color: rgba(246, 239, 230, 0.7);
-      margin: 0 0 24px 0;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 16px;
-      margin-top: 24px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 12px 24px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      text-align: center;
-      flex: 1;
-      min-width: 140px;
-      transition: all 0.2s;
-      border: 1px solid transparent;
-      line-height: 1.4;
-      box-sizing: border-box;
-    }
-
-    .btn:hover {
-      opacity: 0.8;
-      transform: translateY(-2px);
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #000;
-    }
-
-    .btn-secondary {
-      background: transparent;
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .scroll-space {
-      height: 1000vh;
-    }
-
-    @media (max-width: 768px) {
-      :root {
-        --logo-size: 52px;
-        --logo-gap: 12px;
+    @media (max-width: 768px) { 
+      :root { 
+        --logo-size: 52px; 
+        --logo-gap: 12px; 
       }
 
-      .panel-c {
-        padding: 112px 20px 24px 20px;
+      .panel-c { padding: 112px 20px 24px 20px; }
+      .panel-c > .card { margin-top: -100px; }
+      
+      .events-grid { grid-template-columns: auto-fit; }
+      @media (min-width: 380px) {
+        .events-grid { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
       }
-
-      .card {
-        max-height: calc(100vh - 156px);
-        padding: 28px 22px;
-      }
-
-      .card h2 {
-        letter-spacing: 0.12em;
-      }
+      
+      .card { max-height: calc(100vh - 156px); padding: 28px 22px; }
+      .card h2 { letter-spacing: 0.12em; }
     }
   </style>
 </head>
 
 <body>
-  <img class="logo-corner" src="assets/infinity.png" alt="Infinity logo">
+  <img class="logo-corner" src="assets/infinity.webp" alt="Infinity logo">
 
   <div class="vignette"></div>
   <div class="scroll-space"></div>
 
   <script>
     const eventsData = [
-      // Technical Events
-      { inRegisterLink: "#", outRegisterLink: "#", name: "GRID GAMBIT", club: "AI-Devops, CPS", css: "", type: "technical" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "BID & BYTE", club: "CRYPTO COLLAB CE, TURING CLUB", css: "", type: "technical" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "AMONG US", club: "FOSS CLUB, DATA AI CLUB", css: "", type: "technical" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "JAINS GOT TALENT", club: "CLOUD CLUB, ENIGMA CLUB", css: "", type: "technical" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "OPERATION RED TROPHY", club: "SALUS CLUB, NEURON CLUB, COGNITO CLUB", css: "", type: "technical" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "BID TO BUILD", club: "ZIGBEE CLUB, ANOVA CLUB", css: "", type: "technical" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "SHARK TANK REVERSED", club: "ECHO CLUB, GDG CLUB", css: "", type: "technical" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "FORGE & FLUX", club: "CORE TEAM", css: "", type: "technical" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "UAV DESIGN COMP", club: "AEROSPACE TEAM", css: "", type: "technical" },
-      
       // Cultural Events
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Multiverse Conclave", club: "Literature club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Origin Protocol", club: "Literature club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Film Festival", club: "Celluloid Club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Indian cinema Day", club: "Theatre Club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Game of Thrones", club: "Gravel & Globe", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Micdrop", club: "Oraters Club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "What If? (Debate)", club: "Oraters Club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Monologue", club: "Symphony Club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Frequency frenzy", club: "Symphony Club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Battle of Bands", club: "Symphony Club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Capture the Moment", club: "Photography Club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Veil Of Verse", club: "Fashion Club", css: "", type: "cultural" },
-      { inRegisterLink: "#", outRegisterLink: "#", name: "Treasure Hunt", club: "Art and Crafts Club", css: "", type: "cultural" },
-    ];
+      { inRegisterLink: "https://forms.gle/cuHQVWQPioBD6k6w5", outRegisterLink: "#", src: "19-of-44.webp", date: "23.04.2026", prize: "5000", name: "Multiverse Conclave", club: "Literature club", css: "", type: "cultural", kind: "acting" },
+      { inRegisterLink: "https://forms.gle/TzaNxrYwGMiVJG248", outRegisterLink: "#", src: "18-of-44.webp", date: "22.04.2026", prize: "8000", name: "Origin Protocol", club: "Literature club", css: "", type: "cultural", kind: "writing" },
+      { inRegisterLink: "https://forms.gle/pZ2XWvNW9g4LGxGP8", outRegisterLink: "#", src: "15-of-44.webp", date: "29.04.2026", prize: "13000", name: "Film Festival", club: "Celluloid Club", css: "", type: "cultural", kind: "film" },
+      { inRegisterLink: "https://forms.gle/X83AgFbGgbHv2pwi8", outRegisterLink: "#", src: "21-of-44.webp", date: "27.04.2026", prize: "", name: "Indian cinema Day", club: "Theatre Club", css: "", type: "cultural", kind: "acting" },
+      { inRegisterLink: "https://forms.gle/K8FA8vV41veV8EpY8", outRegisterLink: "#", src: "25-of-44.webp", date: "25.04.2026", prize: "8000", name: "Game of Thrones", club: "Gravel & Globe", css: "", type: "cultural", kind: "debate" },
+      { inRegisterLink: "https://forms.gle/qPawpU5Nwtm8f7Bx5", outRegisterLink: "#", src: "17-of-44.webp", date: "23.04.2026", prize: "2000", name: "Micdrop", club: "Oraters Club", css: "", type: "cultural", kind: "singing" },
+      { inRegisterLink: "https://forms.gle/fm39U5SCUEjkzsEw7", outRegisterLink: "#", src: "16-of-44.webp", date: "23.04.2026", prize: "6000", name: "What If?", club: "Oraters Club", css: "", type: "cultural", kind: "debate" },
+      { inRegisterLink: "https://forms.gle/ULrLiFjpi1okPrdd9", outRegisterLink: "#", src: "10-of-44.webp", date: "30.04.2026", prize: "5000", name: "Monologue", club: "Symphony Club", css: "", type: "cultural", kind: "singing" },
+      { inRegisterLink: "https://forms.gle/1nicEh1nd4sYeJvi6", outRegisterLink: "#", src: "11-of-44.webp", date: "30.04.2026", prize: "7500", name: "Frequency frenzy", club: "Symphony Club", css: "", type: "cultural", kind: "singing" },
+      { inRegisterLink: "https://forms.gle/C2BkpHt15KZKrts6A", outRegisterLink: "#", src: "12-of-44.webp", date: "29.04.2026", prize: "15000", name: "Battle of Bands", club: "Symphony Club", css: "", type: "cultural", kind: "singing" },
+      { inRegisterLink: "https://forms.gle/Q3zUc21dRBix6muY9", outRegisterLink: "#", src: "20-of-44.webp", date: "23.04.2026", prize: "3000", name: "Capture the Moment", club: "Photography Club", css: "", type: "cultural", kind: "photography" },
+      { inRegisterLink: "https://forms.gle/fD8Trb5wHX6WSADS7", outRegisterLink: "#", src: "9-of-44.webp", date: "29.04.2026", prize: "25000", name: "Veil Of Verse", club: "Fashion Club", css: "", type: "cultural", kind: "acting" },
+      { inRegisterLink: "https://forms.gle/ZTLE5G1h2bhoMEEg7", outRegisterLink: "#", src: "23-of-44.webp", date: "24.04.2026", prize: "3000", name: "Treasure Hunt", club: "Art and Crafts Club", css: "", type: "cultural", kind: "treasure hunt" },
+      { inRegisterLink: "https://forms.gle/k7GzPzBpZevkp8dt7", outRegisterLink: "#", src: "24-of-44.webp", date: "24.04.2026", prize: "", name: "Paper Fashion", club: "Art and Crafts Club", css: "", type: "cultural", kind: "fashion" },
+      { inRegisterLink: "https://forms.gle/vGrbXP86wsbiz5MZ6", outRegisterLink: "#", src: "13-of-44.webp", date: "29.04.2026", prize: "5000", name: "Solo Street Battle", club: "Dance Club", css: "", type: "cultural", kind: "dance" },
+      { inRegisterLink: "https://forms.gle/YJ7LrtAYLC7rJ9sz9", outRegisterLink: "#", src: "14-of-44.webp", date: "30.04.2026", prize: "15000", name: "Cosmic Conversion", club: "Dance Club", css: "", type: "cultural", kind: "dance" },
+      // Technical Events
+      { inRegisterLink: "https://forms.gle/JnAjWFS9mE2eZxkNA", outRegisterLink: "#", src: "31-of-44.webp", date: "28.04.2026", prize: "Cash prize", name: "GRID GAMBIT", club: "AI-Devops, CPS", css: "", type: "technical", kind: "technical" },
+      { inRegisterLink: "https://forms.gle/jwsazFWvLLPoyqHX9", outRegisterLink: "#", src: "29-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID & BYTE", club: "CRYPTO COLLAB CE, TURING CLUB", css: "", type: "technical", kind: "technical" },
+      { inRegisterLink: "https://forms.gle/AfnowyLmzuAR4XX59", outRegisterLink: "#", src: "30-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "AMONG US", club: "FOSS CLUB, DATA AI CLUB", css: "", type: "technical", kind: "competitive" },
+      { inRegisterLink: "https://forms.gle/wEBFRdDLQTfa32Pe6", outRegisterLink: "#", src: "32-of-44.webp", date: "28.04.2026", prize: "Cash prize", name: "JAINS GOT TALENT", club: "CLOUD CLUB, ENIGMA CLUB", css: "", type: "technical", kind: "technical" },
+      { inRegisterLink: "https://forms.gle/wXSWL32CWE9Vtnrt6", outRegisterLink: "#", src: "27-of-44.webp", date: "28.04.2026", prize: "Cash prize", name: "OPERATION RED TROPHY", club: "SALUS CLUB, NEURON CLUB, COGNITO CLUB", css: "", type: "technical", kind: "problem_solving" },
+      { inRegisterLink: "https://forms.gle/55YAsCEydnbEQ7qh6", outRegisterLink: "#", src: "28-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID TO BUILD", club: "ZIGBEE CLUB, ANOVA CLUB", css: "", type: "technical", kind: "problem_solving" },
+      { inRegisterLink: "https://forms.gle/jwsazFWvLLPoyqHX9", outRegisterLink: "#", src: "29-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "BID & BYTE", club: "CRYPTO COLLAB CE, TURING CLUB", css: "", type: "technical", kind: "technical" },
+      { inRegisterLink: "https://forms.gle/dBoRwHxPwneCTNj76", outRegisterLink: "#", src: "34-of-44.webp", date: "25.04.2026", prize: "Cash prize", name: "FORGE & FLUX", club: "CORE TEAM", css: "", type: "technical", kind: "technical" },
+      { inRegisterLink: "https://forms.gle/eTWLkGocm3aZtYxw6", outRegisterLink: "#", src: "36-of-44.webp", date: "27.04.2026", prize: "Cash prize", name: "UAV DESIGN COMP", club: "AEROSPACE TEAM", css: "", type: "technical", kind: "technical" } 
+    ]
+     // sort to show cultural events first and all alphabetically within their type
+    .sort((a, b) => {
+      if (a.type === b.type) {
+        return a.name.localeCompare(b.name);
+      }
+      return a.type === "cultural" ? -1 : 1;
+    });
 
     // --- Modal Logic ---
     function openModal(eventIndex) {
@@ -589,7 +285,7 @@
           <div class="event-card ${ev.type}" data-type="${ev.type}" onclick="openModal(${index})">
             <h3>${ev.name}</h3>
             <p>${ev.club}</p>
-            <span class="event-type">${ev.type}</span>
+            <span class="event-kind">${ev.kind}</span>
           </div>
         `;
       });
