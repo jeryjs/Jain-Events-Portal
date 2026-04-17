@@ -592,7 +592,14 @@
       panels.forEach((panel, i) => {
         const op = opacities[i];
         panel.style.opacity = op.toString();
+        // Give fully opaque panels a higher z-index so they don't get covered by transparent siblings
+        panel.style.zIndex = op > 0.98 ? '2' : '0';
         panel.style.visibility = op > 0.05 ? 'visible' : 'hidden';
+        
+        // Only allow scrolling/interaction when the panel is fully bright/active
+        if (panel.cardElement) {
+          panel.cardElement.style.pointerEvents = op > 0.98 ? 'auto' : 'none';
+        }
       });
 
       // 4. Panel-specific transforms
