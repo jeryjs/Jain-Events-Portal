@@ -56,7 +56,7 @@
     .hint { margin-top: 16px; font-size: 0.85rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(246, 239, 230, 0.75); opacity: 0; transform: translateY(10px); transition: transform 1.05s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s, opacity 1.05s ease 0.15s; }
     .panel.is-visible .hint { opacity: 1; transform: translateY(0); }
 
-    .card { max-width: 900px; max-height: calc(100dvh - 96px); overflow-y: auto; scrollbar-gutter: stable; pointer-events: auto; text-align: left; padding: 36px 32px; border-radius: 22px; background: rgba(8, 10, 12, 0.7); border: 1px solid var(--card-border); box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); opacity: 0; transform: translate3d(0, 30px, 0) scale(0.965); transition: transform 1.05s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 1.05s ease-out; position: relative; z-index: 2; overscroll-behavior: contain; }
+    .card { max-width: 900px; max-height: calc(100dvh - 96px); overflow-y: auto; scrollbar-gutter: stable; pointer-events: auto; text-align: left; padding: 36px 32px; border-radius: 22px; background: rgba(8, 10, 12, 0.7); border: 1px solid var(--card-border); box-shadow: 0 40px 120px rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); opacity: 0; transform: translate3d(0, 30px, 0) scale(0.965); transition: transform 1.05s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 1.05s ease-out; position: relative; z-index: 2; overscroll-behavior: contain; touch-action: pan-y; -webkit-overflow-scrolling: touch; }
     .panel.is-visible .card { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
     .card::-webkit-scrollbar { width: 8px; }
     .card::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); border-radius: 999px; }
@@ -566,7 +566,7 @@
       const deltaX = touch.clientX - swipeState.startX;
       const deltaY = touch.clientY - swipeState.startY;
 
-      if (Math.abs(deltaY) > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
+      if (!swipeState.startedInsideCard && Math.abs(deltaY) > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
         event.preventDefault();
       }
     }, { passive: false });
