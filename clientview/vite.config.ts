@@ -94,35 +94,18 @@ export default defineConfig({
     host: "0.0.0.0",
     allowedHosts: ['jeryjs.me', 'admin.jeryjs.me', '10.0.0.4', 'localhost']
   },
-
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        // Bundle everything into fewer chunks to reduce Vercel requests
-        manualChunks: (id) => {
-          // Single vendor chunk for all dependencies
-          const vendors = ['react', 'react-dom', '@mui/material', '@mui/icons-material', '@mui/lab', '@tanstack/react-query', 'framer-motion'];
-          if (vendors.some(v => id.includes(v))) {
-            return 'vendor';
-          }
+        codeSplitting: {
+          // combine all packages into single vendor chunk to reduce number of vercel requests
+          groups: [
+            { name: 'styles', test: /\.css$/, priority: 2 }, // all CSS in one chunk
+            { name: 'app', test: /./, priority: 1, maxSize: 5000000, minSize: 2000000 },  // 2-5 MiB, compression should reduce it to around 500 KiB
+          ],
         },
-        // Reduce the number of separate CSS files
-        assetFileNames: (assetInfo) => {
-          const assetName = assetInfo.names[0];
-          if (!assetName) return 'assets/[name]-[hash][extname]';
-          const info = assetName.split('.');
-          const ext = info[info.length - 1];
-          if (/\.(css)$/.test(assetName)) {
-            return `assets/[name]-[hash].${ext}`;
-          }
-          return `assets/[name]-[hash].${ext}`;
-        },
-        // Bundle JS files more aggressively
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
-    // Increase chunk size limit to allow larger bundles
-    chunkSizeWarningLimit: 5000,
+    chunkSizeWarningLimit: 3000, // 3 MiB
   },
 })
