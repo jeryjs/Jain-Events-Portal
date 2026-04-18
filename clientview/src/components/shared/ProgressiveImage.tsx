@@ -46,13 +46,13 @@ function ProgressiveImage({
     imageStyle?.height === 'auto';
   const useNativeLayout = hasNativeSizing;
   
-  useEffect(() => {
-    setLoaded(false);
-  }, [src, placeholderSrc]);
+  // useEffect(() => {
+  //   setLoaded(false);
+  // }, [src, placeholderSrc]);
 
   // Create a short hash for the key to improve performance and avoid long strings
   const key = () => {
-    const str = `${src}-${placeholderSrc}-${objectFit}-${JSON.stringify(imageStyle)}`;
+    const str = `${src}-${placeholderSrc}-${objectFit}-${alt}`;
     let hash = 0, i, chr;
     if (str.length === 0) return '0';
     for (i = 0; i < str.length; i++) {

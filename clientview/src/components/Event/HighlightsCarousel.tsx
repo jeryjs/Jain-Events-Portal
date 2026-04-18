@@ -91,7 +91,7 @@ export default function HighlightsCarousel({
             position: 'relative',
             height,
             my: 2,
-            overflow: 'visible'
+            overflowX: 'clip'
         }}>
             {/* Main carousel container */}
             <Box
@@ -178,6 +178,7 @@ export default function HighlightsCarousel({
                         style={{
                             position: 'relative',
                             width: 'auto',
+                            maxWidth: '95%',
                             height: '100%',
                             zIndex: 2,
                             boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
