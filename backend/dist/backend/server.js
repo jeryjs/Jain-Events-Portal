@@ -94,9 +94,7 @@ app.use("/api/events", eventRoutes_1.default);
 app.use("/api/activities", activityRoutes_1.default);
 app.use("/api/articles", articleRoutes_1.default);
 app.use("/api/user", authRoutes_1.default);
-const PORT = process.env.NODE_ENV === "production"
-    ? (process.env.PORT || 3000)
-    : 4011;
+const PORT = (process.env.PORT || 3000);
 app.listen(PORT, "0.0.0.0", () => {
     const serverUrl = `http://localhost:${PORT}`;
     console.log(`✅ API server running successfully!`);
