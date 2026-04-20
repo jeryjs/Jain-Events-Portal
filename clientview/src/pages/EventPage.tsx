@@ -12,6 +12,7 @@ import PhotoGallery from '@components/shared/PhotoGallery';
 import { useDeleteEvent, useUpdateEvent, useCreateActivity } from '@hooks/admin';
 import { useActivities, useEvent } from '@hooks/useApi';
 import useImgur from '@hooks/useImgur';
+import ProgressiveImage from '@components/shared/ProgressiveImage';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -49,9 +50,6 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 const HeroContainer = styled(motion.div)(({ theme }) => `
   position: relative;
   height: 30vh; min-height: 250px; max-height: 350px; width: 100%; overflow: hidden;
-`);
-const HeroImage = styled(motion.img)(({ theme }) => `
-  width: 100%; height: 100%; object-fit: cover; border-radius: 0 0 36px 36px;
 `);
 const HeroVideo = styled(motion.video)(({ theme }) => `
   width: 100%; height: 100%; border-radius: 0 0 36px 36px;
@@ -137,7 +135,13 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
   const touchStartRef = useRef<number | null>(null);
 
   const currentItem = items[currentIndex];
-  const currentCssStyles = Event.parse().getBannerStyles(currentItem);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const currentCssStyles = {
+    ...Event.parse().getBannerStyles(currentItem),
+    objectFit: isFullscreen ? 'contain' : (Event.parse().getBannerStyles(currentItem)?.objectFit || 'cover'),
+    width: '100%',
+    height: '100%',
+  } as Event['getBannerStyles'] extends (item: BannerItem) => infer R ? R : never;
 
   // Toggle fullscreen for video
   const toggleFullscreen = () => {
@@ -148,12 +152,23 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
     }
   };
 
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
   // Auto switch banner items
   useEffect(() => {
     if (items.length <= 1) return;
     const interval = setInterval(() => {
-      const videoElm = containerRef.current.querySelector("video");
-      if (videoElm?.ended || videoElm?.paused || !videoElm)
+      const videoElm = containerRef?.current?.querySelector("video");
+      if (!videoElm || videoElm?.ended || videoElm?.paused)
         setCurrentIndex(prev => (prev + 1) % items.length);
     }, 5000);
     return () => clearInterval(interval);
@@ -257,10 +272,14 @@ const BannerMedia = ({ items }: { items: BannerItem[] }) => {
               </Box>
             </>
           ) : (
-            <HeroImage
+            <ProgressiveImage
+              sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: "0 0 36px 36px", }}
               src={currentItem.url || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg'}
               alt="Event banner"
-              style={currentCssStyles}
+              placeholderSrc={currentItem.url || 'https://admissioncart.in/new-assets/img/university/jain-deemed-to-be-university-online-ju-online_banner.jpeg'}
+              objectFit="cover"
+              loading="eager"
+              imageStyle={currentCssStyles}
             />
           )}
         </motion.div>
@@ -379,7 +398,9 @@ const ActivitiesSection = ({ eventId, config }: { eventId: string, config: Event
   if (!activities || len === 0) {
     return (
       <Paper sx={{ p: 3, textAlign: 'center', bgcolor: 'background.default' }}>
-        <Typography color="text.secondary">No activities found for this event</Typography>
+        <Typography sx={{
+          color: "text.secondary"
+        }}>No activities found for this event</Typography>
       </Paper>
     );
   }
@@ -433,7 +454,7 @@ function EventPage() {
   const { mutateAsync: deleteEvent } = useDeleteEvent();
   const { mutateAsync: createActivity } = useCreateActivity(eventId);
 
-  const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId);
+  const { data: event, isLoading: eventLoading, refetch } = useEvent(eventId!);
   const { data: imgur, isLoading: imgurLoading, error: imgurError } = useImgur(event?.galleryLink || '');
 
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -581,10 +602,17 @@ function EventPage() {
               <CalendarTodayIcon sx={{ color: 'primary.main', fontSize: 24 }} />
             </IconSquircle>
             <Box>
-              <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "text.primary",
+                  fontWeight: 'bold'
+                }}>
                 {formattedDate.date}
               </Typography>
-              <Typography variant="subtitle1" color="text.secondary">
+              <Typography variant="subtitle1" sx={{
+                color: "text.secondary"
+              }}>
                 {formattedDate.dayTime}
               </Typography>
             </Box>
@@ -595,7 +623,12 @@ function EventPage() {
               <LocationOnIcon sx={{ color: 'primary.main', fontSize: 24 }} />
             </IconSquircle>
             <Box>
-              <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold' }}>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "text.primary",
+                  fontWeight: 'bold'
+                }}>
                 {event.venue}
               </Typography>
               {/* <Typography variant="subtitle1" color="text.secondary">
@@ -612,7 +645,12 @@ function EventPage() {
               About Event
             </Typography>
             {showFullDescription ? (
-              <Typography variant="body1" color="text.secondary" paragraph>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "text.secondary",
+                  marginBottom: "16px"
+                }}>
                 {event.description}
                 {isDescriptionTruncated && (
                   <Typography
@@ -661,7 +699,13 @@ function EventPage() {
           {/*  Highlights section */}
           {event.highlights && <Box>
             <Divider sx={{ my: 3 }} />
-            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 1 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: 'text.primary',
+                fontWeight: 'bold',
+                mb: 1
+              }}>
               Highlights
             </Typography>
             <HighlightsCarousel images={event.highlights.split(',').map(url => url.trim())} />
@@ -671,7 +715,13 @@ function EventPage() {
 
           {/* Activities Section */}
           <ActivitySectionContainer>
-            <Typography variant="h6" color='text.primary' sx={{ fontWeight: 'bold', mb: 2 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: 'text.primary',
+                fontWeight: 'bold',
+                mb: 2
+              }}>
               {getBaseEventType(event.type) === EventType.SPORTS ? 'Matches' : 'Activities'}
             </Typography>
             <Suspense fallback={
@@ -691,7 +741,13 @@ function EventPage() {
 
           {/* Photo Gallery Section */}
           {event.galleryLink && <Box>
-            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 'bold', mb: 2 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "text.primary",
+                fontWeight: 'bold',
+                mb: 2
+              }}>
               Event Gallery
             </Typography>
             <PhotoGallery

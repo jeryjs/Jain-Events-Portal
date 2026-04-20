@@ -5,7 +5,7 @@ import RecentArticles from '@components/Articles/RecentArticles';
 import PageTransition from '@components/shared/PageTransition';
 import { useArticles } from '@hooks/useApi';
 import { Box, Container, Skeleton, Typography } from '@mui/material';
-import Grid2 from '@mui/material/Grid2';
+import Grid2 from '@mui/material/Grid';
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useColorMode } from '@utils/ColorMode';
@@ -13,7 +13,7 @@ import { useColorMode } from '@utils/ColorMode';
 const ArticlesPage: React.FC = () => {
   const colorMode = useColorMode();
   const navigate = useNavigate();
-  const { data, isLoading } = useArticles();
+  const { data, isLoading, error } = useArticles();
   const [searchTerm, setSearchTerm] = useState('');
   const [bookmarked, setBookmarked] = useState<string[]>([]);
 
@@ -35,8 +35,21 @@ const ArticlesPage: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <Container maxWidth="xl" sx={{ textAlign: 'center', mt: 6 }}>
+        <Typography variant="h5">Failed to load articles. Please try again later.</Typography>
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="body1" color="text.secondary">
+            Error: {error.message}
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
+
   // Filter and sort articles
-  const articles = data
+  const articles = data!
     .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())
     .filter(article => {
       const searchText = searchTerm.toLowerCase();
@@ -85,7 +98,7 @@ const ArticlesPage: React.FC = () => {
               bookmarked={bookmarked.includes(featuredArticle.id)}
               onToggleBookmark={toggleBookmark}
             />
-            <Typography variant="h5" color="text.primary" sx={{ mt: 6, mb: 3, fontWeight: 700 }}>
+            <Typography variant="h5" sx={{ color: "text.primary", mt: 6, mb: 3, fontWeight: 700 }}>
               All Articles
             </Typography>
             <ArticleList

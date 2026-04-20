@@ -1,5 +1,5 @@
 import PageTransition from '@components/shared/PageTransition';
-import { Box, Container, Grid2 as Grid, Paper, Skeleton } from '@mui/material';
+import { Box, Container, Grid, Paper, Skeleton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
 

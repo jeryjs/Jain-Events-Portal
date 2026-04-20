@@ -18,7 +18,7 @@ const PollContainer = styled(Box)(({ theme }) => ({
     position: 'relative',
     margin: theme.spacing(3, 0),
     paddingBlock: theme.spacing(2),
-    borderRadius: theme.shape.borderRadius * 2,
+    borderRadius: (theme.shape.borderRadius as number) * 2,
     backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'dark' ? 0.7 : 0.6),
     backdropFilter: 'blur(10px)',
     boxShadow: `0 4px 24px ${alpha(theme.palette.common.black, theme.palette.mode === 'dark' ? 0.3 : 0.06)}`,
@@ -262,7 +262,9 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <HowToVoteIcon color="primary" sx={{ mr: 1 }} />
-                    <Typography variant="h6" fontWeight="600">Audience Poll</Typography>
+                    <Typography variant="h6" sx={{
+                        fontWeight: "600"
+                    }}>Audience Poll</Typography>
                 </Box>
                 {userVoted && (
                     <Tooltip title="You've already voted" enterTouchDelay={0}>
@@ -283,12 +285,12 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                     </Tooltip>
                 )}
             </Box>
-
             {/* Contribution note */}
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{
+                color: "text.secondary"
+            }}>
                 <span>* Audience vote contributes 10% to final result</span>
             </Typography>
-
             {/* Participant/Team Options */}
             <AnimatePresence>
                 {getVotingEntries().map((entry) => {
@@ -323,7 +325,6 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                     ease: [0, 0.71, 0.2, 1.01]
                                 }}
                             />
-
                             <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', zIndex: 1, gap: 2 }}>
                                 {isSoloPerformance ? (
                                     <Avatar
@@ -368,7 +369,13 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                 )}
 
                                 <Box sx={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                    <Typography noWrap fontWeight={600} variant="body1" sx={{ lineHeight: 1.2 }}>
+                                    <Typography
+                                        noWrap
+                                        variant="body1"
+                                        sx={{
+                                            fontWeight: 600,
+                                            lineHeight: 1.2
+                                        }}>
                                         {entry.name}
                                         {isUserVote && <VoteIcon fontSize="small" />}
                                     </Typography>
@@ -422,15 +429,14 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                         >
                                             <Typography
                                                 variant="caption"
-                                                color="text.secondary"
                                                 sx={{
+                                                    color: "text.secondary",
                                                     display: 'block',
                                                     overflow: 'hidden',
                                                     textOverflow: 'ellipsis',
                                                     whiteSpace: 'nowrap',
                                                     mt: 0.5
-                                                }}
-                                            >
+                                                }}>
                                                 <PeopleIcon sx={{ fontSize: '0.7rem', mr: 0.5, verticalAlign: 'text-top' }} />
                                                 {teamMembers.length > 3
                                                     ? `${teamMembers.slice(0, 2).map(m => m.name).join(', ')} +${teamMembers.length - 2} more`
@@ -451,13 +457,12 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                 }}>
                                     <Typography
                                         variant="body1"
-                                        fontWeight={isUserVote ? 700 : 600}
                                         color={isUserVote ? 'primary.main' : 'text.primary'}
                                         sx={{
+                                            fontWeight: isUserVote ? 700 : 600,
                                             fontSize: '1.1rem',
                                             textShadow: isUserVote ? '0 0 8px rgba(25, 118, 210, 0.4)' : 'none'
-                                        }}
-                                    >
+                                        }}>
                                         {votes}
                                     </Typography>
                                     <Box sx={{
@@ -472,8 +477,10 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                                     }}>
                                         <Typography
                                             variant="caption"
-                                            fontWeight={500}
                                             color={isUserVote ? 'primary' : 'text.secondary'}
+                                            sx={{
+                                                fontWeight: 500
+                                            }}
                                         >
                                             {percentage.toFixed(0)}%
                                         </Typography>
@@ -484,14 +491,18 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                     );
                 })}
             </AnimatePresence>
-
             {/* Summary and Authentication Info */}
             {totalVotes > 0 && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right' }}>
+                <Typography
+                    variant="caption"
+                    sx={{
+                        color: "text.secondary",
+                        display: 'block',
+                        textAlign: 'right'
+                    }}>
                     Total votes: <b>{totalVotes}</b>
                 </Typography>
             )}
-
             {/* Swipe to Vote Button */}
             <AnimatePresence>
                 {selectedTeam && isAuthenticated && !castVoteMutation.isPending && (
@@ -526,7 +537,14 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                             </SwipeThumb>
                         </SwipeButton>
 
-                        <Typography variant="caption" color="text.secondary" align="center" sx={{ display: 'block', mt: 1 }}>
+                        <Typography
+                            variant="caption"
+                            align="center"
+                            sx={{
+                                color: "text.secondary",
+                                display: 'block',
+                                mt: 1
+                            }}>
                             Swipe to confirm your vote
                         </Typography>
                     </Box>
@@ -539,13 +557,13 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                     </Box>
                 )}
             </AnimatePresence>
-
             {/* Authentication and Voting Info */}
             {((!isAuthenticated && activity.canVote) || !activity.canVote || activity.startTime > new Date()) && (
                 <Typography
                     variant="body2"
-                    color="text.secondary"
+                    onClick={(!isAuthenticated && activity.canVote) ? promptLogin : undefined}
                     sx={{
+                        color: "text.secondary",
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -557,15 +575,14 @@ export const PollingForm = ({ eventId, activityId, activity }: PollingFormProps)
                         border: `1px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
                         cursor: (!isAuthenticated && activity.canVote) ? 'pointer' : 'default',
                         transition: 'all 0.2s ease',
+
                         '&:hover': (!isAuthenticated && activity.canVote)
                             ? {
                                 bgcolor: alpha(theme.palette.primary.main, 0.08),
                                 color: theme.palette.primary.main,
                             }
-                            : {},
-                    }}
-                    onClick={(!isAuthenticated && activity.canVote) ? promptLogin : undefined}
-                >
+                            : {}
+                    }}>
                     <LockIcon sx={{ fontSize: 16 }} />
                     {(!isAuthenticated && activity.canVote)
                         ? "Sign in to cast your vote!"

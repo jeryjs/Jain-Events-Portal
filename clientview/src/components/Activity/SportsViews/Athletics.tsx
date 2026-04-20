@@ -180,15 +180,25 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
     return (
       <Card elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
         <Box sx={{ bgcolor: 'primary.light', p: 2, color: 'white', textAlign: 'center' }}>
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="h6" sx={{
+            fontWeight: "bold"
+          }}>
             Upcoming Athletics Event
           </Typography>
         </Box>
         <CardContent>
-          <Typography variant="subtitle1" color="text.secondary" align="center">
+          <Typography variant="subtitle1" align="center" sx={{
+            color: "text.secondary"
+          }}>
             The event is scheduled for:
           </Typography>
-          <Typography variant="h5" align="center" fontWeight="bold" sx={{ my: 2 }}>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{
+              fontWeight: "bold",
+              my: 2
+            }}>
             {new Date(activity.startTime).toLocaleString(undefined, {
               year: 'numeric',
               month: 'long',
@@ -200,17 +210,33 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
           <LinearProgress variant="determinate" value={0} sx={{ height: 8, borderRadius: 4 }} />
 
           <Box sx={{ mt: 4 }}>
-            <Typography variant="subtitle1" color="text.primary" align="center" gutterBottom>
+            <Typography variant="subtitle1" align="center" gutterBottom sx={{
+              color: "text.primary"
+            }}>
               <DirectionsRunIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
               {isRelay ? 'Teams' : 'Athletes'} participating:
             </Typography>
 
-            <Grid container spacing={2} justifyContent="center" sx={{ mt: 1 }}>
+            <Grid
+              container
+              spacing={2}
+              sx={{
+                justifyContent: "center",
+                mt: 1
+              }}>
               {activity.teams.map(team => (
-                <Grid item xs={12} sm={6} md={4} key={team.id}>
+                <Grid
+                  key={team.id}
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                    md: 4
+                  }}>
                   <Card variant="outlined">
                     <CardContent>
-                      <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                      <Typography variant="subtitle1" gutterBottom sx={{
+                        fontWeight: "bold"
+                      }}>
                         {team.name}
                       </Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -221,7 +247,12 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                               <Avatar key={player.usn}>{player.name.charAt(0)}</Avatar>
                             ))}
                         </AvatarGroup>
-                        <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "text.secondary",
+                            ml: 1
+                          }}>
                           {activity.participants.filter(p => p.teamId === team.id).length} Athletes
                         </Typography>
                       </Box>
@@ -239,7 +270,7 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
   return (
     <Grid container spacing={3}>
       {/* Event status card */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Card sx={{ position: 'relative', overflow: 'hidden', borderRadius: 2 }}>
           <Box
             sx={{
@@ -260,7 +291,12 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
           <CardContent sx={{ pt: 5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <DirectionsRunIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-              <Typography variant="h5" fontWeight="bold" color="primary.main">
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: "bold",
+                  color: "primary.main"
+                }}>
                 {activity.name}
               </Typography>
               {isRelay && (
@@ -274,7 +310,12 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
             </Box>
 
             {/* Event description */}
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                mb: 2
+              }}>
               {isRelay
                 ? `A relay race featuring ${activity.teams.length} teams competing for the fastest time.`
                 : `An athletics event with ${activity.participants.length} athletes competing across ${game.heats?.length || 0} heats.`
@@ -295,7 +336,12 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                     const medalIcons = [<SportsMedal />, <SportsTwoIcon />, <SportsMedal2 />];
 
                     return (
-                      <Grid item xs={12} sm={4} key={athlete.playerId}>
+                      <Grid
+                        key={athlete.playerId}
+                        size={{
+                          xs: 12,
+                          sm: 4
+                        }}>
                         <Card
                           elevation={3}
                           sx={{
@@ -336,28 +382,45 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                                 {medalIcons[idx] || <PersonIcon />}
                               </StyledMedalAvatar>
                               <Box>
-                                <Typography variant="subtitle1" fontWeight="bold">
+                                <Typography variant="subtitle1" sx={{
+                                  fontWeight: "bold"
+                                }}>
                                   {athlete.name}
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary" display="block">
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: "text.secondary",
+                                    display: "block"
+                                  }}>
                                   {athlete.playerId}
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary">
+                                <Typography variant="caption" sx={{
+                                  color: "text.secondary"
+                                }}>
                                   {athlete.teamName}
                                 </Typography>
                               </Box>
                             </Box>
 
                             <Grid container spacing={1} sx={{ mt: 'auto' }}>
-                              <Grid item xs={6}>
-                                <Typography variant="caption" color="text.secondary">Rank</Typography>
-                                <Typography variant="h6" fontWeight="bold" color={idx === 0 ? 'warning.main' : 'text.primary'}>
+                              <Grid size={6}>
+                                <Typography variant="caption" sx={{
+                                  color: "text.secondary"
+                                }}>Rank</Typography>
+                                <Typography variant="h6" color={idx === 0 ? 'warning.main' : 'text.primary'} sx={{
+                                  fontWeight: "bold"
+                                }}>
                                   {athlete.rank || (idx + 1)}
                                 </Typography>
                               </Grid>
-                              <Grid item xs={6}>
-                                <Typography variant="caption" color="text.secondary">Time</Typography>
-                                <Typography variant="h6" fontWeight="bold">
+                              <Grid size={6}>
+                                <Typography variant="caption" sx={{
+                                  color: "text.secondary"
+                                }}>Time</Typography>
+                                <Typography variant="h6" sx={{
+                                  fontWeight: "bold"
+                                }}>
                                   {formatTime(athlete.time)}
                                 </Typography>
                               </Grid>
@@ -370,7 +433,9 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                 </Grid>
               ) : (
                 <Box sx={{ textAlign: 'center', py: 4, bgcolor: 'background.paper', borderRadius: 1 }}>
-                  <Typography color="text.secondary">
+                  <Typography sx={{
+                    color: "text.secondary"
+                  }}>
                     {matchStatus.isComplete ? 'No results have been recorded yet.' : 'Event in progress - results will appear here.'}
                   </Typography>
                 </Box>
@@ -379,10 +444,9 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
           </CardContent>
         </Card>
       </Grid>
-
       {/* Heat-wise results */}
       {processedHeats.map((heat, heatIndex) => (
-        <Grid item xs={12} key={heat.heatId}>
+        <Grid key={heat.heatId} size={12}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -448,11 +512,15 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                                 {athlete.name.charAt(0)}
                               </Avatar>
                               <Box>
-                                <Typography variant="body2" fontWeight={athlete.rank === 1 ? 'bold' : 'normal'}>
+                                <Typography variant="body2" sx={{
+                                  fontWeight: athlete.rank === 1 ? 'bold' : 'normal'
+                                }}>
                                   {athlete.name}
                                   {athlete.rank === 1 && ' 🏆'}
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary">
+                                <Typography variant="caption" sx={{
+                                  color: "text.secondary"
+                                }}>
                                   {athlete.playerId}
                                 </Typography>
                               </Box>
@@ -475,7 +543,12 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                         <>
                           <TableRow>
                             <TableCell colSpan={isRelay ? 3 : 4} sx={{ py: 1 }}>
-                              <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "text.secondary",
+                                  fontStyle: 'italic'
+                                }}>
                                 Athletes without recorded times
                               </Typography>
                             </TableCell>
@@ -497,10 +570,14 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                                     {athlete.name.charAt(0)}
                                   </Avatar>
                                   <Box>
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography variant="body2" sx={{
+                                      color: "text.secondary"
+                                    }}>
                                       {athlete.name}
                                     </Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography variant="caption" sx={{
+                                      color: "text.secondary"
+                                    }}>
                                       {athlete.playerId}
                                     </Typography>
                                   </Box>
@@ -510,7 +587,9 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                                 <TableCell>{athlete.teamName}</TableCell>
                               )}
                               <TableCell align="right">
-                                <Typography variant="body2" color="text.secondary">--</Typography>
+                                <Typography variant="body2" sx={{
+                                  color: "text.secondary"
+                                }}>--</Typography>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -521,7 +600,9 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                 </TableContainer>
               ) : (
                 <Box sx={{ textAlign: 'center', py: 3, borderRadius: 1, bgcolor: 'rgba(0,0,0,0.01)' }}>
-                  <Typography color="text.secondary">
+                  <Typography sx={{
+                    color: "text.secondary"
+                  }}>
                     No results recorded for this {isRelay ? 'team' : 'heat'} yet.
                   </Typography>
                 </Box>
@@ -530,10 +611,9 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
           </Card>
         </Grid>
       ))}
-
       {/* Heat comparison */}
       {processedHeats.filter(heat => heat.athletes.length > 0).length > 1 && !isRelay && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -569,7 +649,9 @@ const AthleticsResults = ({ activity, game }: { activity: SportsActivity<Sport>,
                           <TableCell>
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                               <StyledTimeBadge sx={{ mr: 1 }}>{formatTime(fastestTime)}</StyledTimeBadge>
-                              <Typography variant="caption" color="text.secondary">
+                              <Typography variant="caption" sx={{
+                                color: "text.secondary"
+                              }}>
                                 ({fastestAthlete?.name})
                               </Typography>
                             </Box>

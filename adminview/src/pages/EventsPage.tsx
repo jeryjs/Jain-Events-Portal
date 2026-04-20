@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton, Button } from '@mui/material';
+import { Box, Typography, Container, Paper, Grid, Card, IconButton, Button } from '@mui/material';
 
 import { EventForm } from '../components/Home/EventForm';
 import { EventsList, ActivityButton } from '../components/Home';

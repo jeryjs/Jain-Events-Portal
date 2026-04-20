@@ -1,14 +1,14 @@
 import db from '@config/firebase';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { cache, TTL } from '@config/cache';
 import { Activity, CulturalActivity } from '@common/models';
 import { parseActivities } from '@common/utils';
-import { 
-  getCachedItem, 
-  getCachedCollection, 
-  createCachedItem, 
-  updateCachedItem, 
-  deleteCachedItem 
+import {
+  getCachedItem,
+  getCachedCollection,
+  createCachedItem,
+  updateCachedItem,
+  deleteCachedItem
 } from '@utils/cacheUtils';
 
 // Collection references
@@ -20,7 +20,7 @@ const activitiesCollection = (eventId: string) => eventsCollection.doc(eventId).
  */
 export const getActivities = async (eventId: string) => {
   const collectionKey = `activities-${eventId}`;
-  
+
   return getCachedCollection<Activity>({
     key: collectionKey,
     fetchFn: async () => {
@@ -51,14 +51,14 @@ export const getActivityById = async (eventId: string, activityId: string) => {
  */
 export const createActivity = async (eventId: string, activityData: any) => {
   const eventDoc = await eventsCollection.doc(eventId).get();
-  
+
   if (!eventDoc.exists) {
     throw new Error(`Event ${eventId} does not exist`);
   }
-  
-  const activityId = activityData.id || uuidv4();
+
+  const activityId = activityData.id || randomUUID();
   activityData.id = activityId;
-  
+
   return createCachedItem<Activity>({
     item: activityData,
     collectionKey: `activities-${eventId}`,
@@ -74,20 +74,18 @@ export const createActivity = async (eventId: string, activityData: any) => {
  * Update existing activity
  */
 export const updateActivity = async (eventId: string, activityId: string, activityData: any) => {
-  const activityDoc = activitiesCollection(eventId).doc(activityId);
-  const doc = await activityDoc.get();
-  
-  if (!doc.exists) return null;
-  
-  // Ensure the ID is set correctly
-  activityData.id = activityId;
-  
+  const existingActivity = await getActivityById(eventId, activityId);
+
+  if (!existingActivity) return null;
+
   return updateCachedItem<Activity>({
-    item: activityData,
+    oldItem: existingActivity,
     collectionKey: `activities-${eventId}`,
     itemKeyPrefix: `activities-${eventId}`,
-    updateFn: async (item) => {
-      await activityDoc.update(activityData);
+    updateFn: async (existingItem) => {
+      const updatedItem = { ...existingItem, ...activityData };
+      await activitiesCollection(eventId).doc(activityId).update(updatedItem);
+      return Activity.parse(updatedItem);
     },
     ttl: TTL.ACTIVITIES
   });
@@ -98,7 +96,7 @@ export const updateActivity = async (eventId: string, activityId: string, activi
  */
 export const deleteActivity = async (eventId: string, activityId: string) => {
   const activityDoc = activitiesCollection(eventId).doc(activityId);
-  
+
   return deleteCachedItem<Activity>({
     id: activityId,
     collectionKey: `activities-${eventId}`,
@@ -128,7 +126,7 @@ export const invalidateActivitiesCache = async () => {
  */
 export const getPollResults = async (eventId: string, activityId: string) => {
   const activityKey = `activities-${eventId}-${activityId}`;
-  
+
   // Get activity with poll data
   const activity = await getCachedItem<Activity>({
     key: activityKey,
@@ -139,11 +137,11 @@ export const getPollResults = async (eventId: string, activityId: string) => {
     },
     ttl: TTL.ACTIVITIES
   });
-  
+
   if (!(activity instanceof CulturalActivity)) {
     throw new Error(`Invalid activity type for poll results: ${typeof activity}`);
   }
-  
+
   return activity.pollData;
 };
 
@@ -164,7 +162,7 @@ export const castVote = async (eventId: string, activityId: string, teamId: stri
   if (!activity.showPoll) throw new Error('Poll is not enabled for this activity');
 
   const pollData = activity.pollData;
-  
+
   // First, remove the user's vote from any team they previously voted for
   for (const poll of pollData) {
     const voteIndex = poll.votes.indexOf(username);
@@ -172,27 +170,30 @@ export const castVote = async (eventId: string, activityId: string, teamId: stri
       poll.votes.splice(voteIndex, 1);
     }
   }
-  
+
   // Then add the vote to the selected team
   let teamPoll = pollData.find(poll => poll.teamId === teamId);
   if (!teamPoll) {
     teamPoll = { teamId, votes: [] };
     pollData.push(teamPoll);
   }
-  
+
   teamPoll.votes.push(username);
   activity.pollData = pollData;
 
   await updateCachedItem<CulturalActivity>({
-    item: activity,
+    oldItem: activity,
     collectionKey: `activities-${eventId}`,
     itemKeyPrefix: `activities-${eventId}`,
-    updateFn: async (item) => await activityDoc.update(JSON.parse(JSON.stringify(item))),
+    updateFn: async (item) => {
+      await activityDoc.update({ pollData: item.pollData });
+      return CulturalActivity.parse(activity);
+    },
     ttl: TTL.ACTIVITIES
   });
-  
-  return { 
-    success: true, 
+
+  return {
+    success: true,
     message: 'Vote recorded successfully'
   };
 };

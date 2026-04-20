@@ -22,12 +22,12 @@ import Event from '@common/models/Event';
 import { parseEvents } from '@common/utils';
 import { cache, TTL } from '@config/cache';
 import { db, sendPushNotificationToAllUsers } from '@config/firebase';
-import { 
-  getCachedItem, 
-  getCachedCollection, 
-  createCachedItem, 
-  updateCachedItem, 
-  deleteCachedItem 
+import {
+  getCachedItem,
+  getCachedCollection,
+  createCachedItem,
+  updateCachedItem,
+  deleteCachedItem
 } from '@utils/cacheUtils';
 
 // Collection references
@@ -81,7 +81,7 @@ export const createEvent = async (eventData: any) => {
   const event = Event.parse(eventData);
 
   sendPushNotificationToAllUsers(`New Event: ${event.name}`, `Check out the new event: ${event.name}`);
-  
+
   return createCachedItem<Event>({
     item: event,
     collectionKey: COLLECTION_KEY,
@@ -97,11 +97,20 @@ export const createEvent = async (eventData: any) => {
  * Update existing event
  */
 export const updateEvent = async (eventId: string, eventData: Partial<Event>) => {
-  // Only update provided fields (patch)
-  await eventsCollection.doc(eventId).update(eventData);
-  // Invalidate cache for this event
-  cache.del(`${ITEM_KEY_PREFIX}-${eventId}`);
-  return (await eventsCollection.doc(eventId).get()).data();
+  const existingEvent = await getEventById(eventId);
+  if (!existingEvent) return null;
+
+  return updateCachedItem<Event>({
+    oldItem: existingEvent,
+    collectionKey: COLLECTION_KEY,
+    itemKeyPrefix: ITEM_KEY_PREFIX,
+    updateFn: async (existingItem) => {
+      const updatedItem = { ...existingItem, ...eventData };
+      await eventsCollection.doc(eventId).update(updatedItem);
+      return Event.parse(updatedItem);
+    },
+    ttl: TTL.EVENTS
+  });
 };
 
 /**
@@ -110,9 +119,9 @@ export const updateEvent = async (eventId: string, eventData: Partial<Event>) =>
 export const deleteEvent = async (eventId: string) => {
   const eventDoc = eventsCollection.doc(eventId);
   const doc = await eventDoc.get();
-  
+
   if (!doc.exists) return false;
-  
+
   return deleteCachedItem<Event>({
     id: eventId,
     collectionKey: COLLECTION_KEY,
@@ -128,7 +137,7 @@ export const deleteEvent = async (eventId: string) => {
           batch.delete(doc.ref);
         });
       }));
-      
+
       // Then delete the event itself
       batch.delete(eventDoc);
       await batch.commit();

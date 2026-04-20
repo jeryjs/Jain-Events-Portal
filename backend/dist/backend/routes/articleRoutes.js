@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,14 +41,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const articles_1 = require("@services/articles");
 const auth_1 = require("@middlewares/auth");
-const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
+const express_rate_limit_1 = __importStar(require("express-rate-limit"));
 const router = (0, express_1.Router)();
 // Rate limiter to prevent abuse (1 request per minute per article)
 const viewCountLimiter = (0, express_rate_limit_1.default)({
@@ -23,7 +53,9 @@ const viewCountLimiter = (0, express_rate_limit_1.default)({
     max: 1,
     message: 'Article already marked as read!',
     keyGenerator: function (req, res) {
-        return req.ip + '-' + req.params.articleId; // Unique key per IP and article ID
+        var _a;
+        // Use ipKeyGenerator to handle IPv6 properly, then append articleId
+        return (0, express_rate_limit_1.ipKeyGenerator)((_a = req.ip) !== null && _a !== void 0 ? _a : '') + '-' + req.params.articleId; // Unique key per IP and article ID
     },
 });
 /**
@@ -71,7 +103,12 @@ router.post('', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, 
 router.patch('/:articleId', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updatedArticle = yield (0, articles_1.updateArticle)(req.params.articleId, req.body);
-        res.json(updatedArticle);
+        if (!updatedArticle) {
+            res.status(404).json({ message: 'Article not found' });
+        }
+        else {
+            res.json(updatedArticle);
+        }
     }
     catch (error) {
         console.error('Error updating article:', error);
@@ -97,8 +134,7 @@ router.delete('/:articleId', auth_1.adminMiddleware, (req, res) => __awaiter(voi
 // Update article view count
 router.post('/:articleId/view', viewCountLimiter, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const articleId = req.params.articleId;
-        const article = yield (0, articles_1.updateArticleViewCount)(articleId);
+        const article = yield (0, articles_1.updateArticleViewCount)(req.params.articleId);
         if (article) {
             res.json({ message: 'View count updated successfully' });
         }

@@ -63,9 +63,6 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ variant, size, sx }) => {
                     edge="end"
                     checked={colorMode.mode === 'dark'}
                     onChange={colorMode.toggleColorMode}
-                    inputProps={{
-                        'aria-label': `Switch to ${colorMode.mode === 'dark' ? 'light' : 'dark'} mode`
-                    }}
                     sx={{
                         ml: 2,
                         '& .MuiSwitch-switchBase.Mui-checked': {
@@ -76,6 +73,11 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ variant, size, sx }) => {
                         },
                         '& .MuiSwitch-track': {
                             opacity: 0.7,
+                        }
+                    }}
+                    slotProps={{
+                        input: {
+                            'aria-label': `Switch to ${colorMode.mode === 'dark' ? 'light' : 'dark'} mode`
                         }
                     }}
                 />

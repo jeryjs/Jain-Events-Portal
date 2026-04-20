@@ -181,7 +181,9 @@ const ArticleCard = memo<ArticleCardProps>(({
                   )}
                   <Box>
                     <Typography variant="subtitle2">{article.author.name}</Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" sx={{
+                      color: "text.secondary"
+                    }}>
                       {article.lastUpdatedAt?.toLocaleDateString() || ''}
                     </Typography>
                   </Box>
@@ -208,7 +210,9 @@ const ArticleCard = memo<ArticleCardProps>(({
                       <AccessTimeIcon sx={{ mr: 0.5 }} fontSize="small" />
                       <Typography variant="body2">{article.readingTimeMinutes} min</Typography>
                     </Box>
-                    <Typography variant="body2" color="text.secondary">{article.publishedAt?.toLocaleDateString() || ''}</Typography>
+                    <Typography variant="body2" sx={{
+                      color: "text.secondary"
+                    }}>{article.publishedAt?.toLocaleDateString() || ''}</Typography>
                   </Box>
 
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>

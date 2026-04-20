@@ -41,7 +41,13 @@ export const TeamsForm = ({ teams: initialTeams = [], setTeams }: TeamsFormProps
 
   return (
     <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2
+        }}>
         <Typography variant="h6">Teams</Typography>
         <Button
           variant="contained"
@@ -52,7 +58,6 @@ export const TeamsForm = ({ teams: initialTeams = [], setTeams }: TeamsFormProps
           Add Team
         </Button>
       </Box>
-
       <List>
         {teams.map((team, index) => (
           <ListItem key={index} divider>
@@ -73,8 +78,14 @@ export const TeamsForm = ({ teams: initialTeams = [], setTeams }: TeamsFormProps
         ))}
       </List>
       {teams.length === 0 && (
-        <Box py={2} textAlign="center">
-          <Typography color="text.secondary">No teams added yet</Typography>
+        <Box
+          sx={{
+            py: 2,
+            textAlign: "center"
+          }}>
+          <Typography sx={{
+            color: "text.secondary"
+          }}>No teams added yet</Typography>
         </Box>
       )}
     </Paper>

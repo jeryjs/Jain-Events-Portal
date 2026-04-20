@@ -72,13 +72,15 @@ const LoginDialog = () => {
       onClose={!loginInProgress ? closeLoginPrompt : undefined}
       maxWidth="xs"
       fullWidth
-      PaperProps={{
-        sx: {
-          backgroundColor: alpha(theme.palette.background.paper, 0.8),
-          backdropFilter: 'blur(10px)',
-          borderRadius: 2,
-          boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
-          border: `1px solid ${alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.1 : 0.2)}`
+      slotProps={{
+        paper: {
+          sx: {
+            backgroundColor: alpha(theme.palette.background.paper, 0.8),
+            backdropFilter: 'blur(10px)',
+            borderRadius: 2,
+            boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
+            border: `1px solid ${alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.1 : 0.2)}`
+          }
         }
       }}
     >
@@ -89,18 +91,29 @@ const LoginDialog = () => {
           </IconButton>
         )}
       </Box>
-
       <DialogContent sx={{ pt: 0, pb: 4 }}>
-        <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 3
+          }}>
           <Avatar sx={{ width: 56, height: 56, bgcolor: theme.palette.primary.main, mb: 1 }}>
             <GoogleIcon sx={{ fontSize: 28 }} />
           </Avatar>
 
-          <Box textAlign="center">
-            <Typography variant="h5" fontWeight="500" gutterBottom>
+          <Box sx={{
+            textAlign: "center"
+          }}>
+            <Typography variant="h5" gutterBottom sx={{
+              fontWeight: "500"
+            }}>
               Sign In
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{
+              color: "text.secondary"
+            }}>
               Sign in to cast your vote and participate in events
             </Typography>
           </Box>
@@ -124,7 +137,9 @@ const LoginDialog = () => {
             {loginInProgress ? 'Signing in...' : 'Continue with Google'}
           </Button>
 
-          <Typography variant="caption" color="text.secondary" align="center">
+          <Typography variant="caption" align="center" sx={{
+            color: "text.secondary"
+          }}>
             By signing in, you agree to our Terms of Service and Privacy Policy
           </Typography>
         </Box>
@@ -287,7 +302,7 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     <LoginContext.Provider
       value={{
         userData,
-        username: userData?.username,
+        username: userData?.username || null,
         token,
         isAuthenticated: !!userData,
         isLoading,

@@ -33,12 +33,18 @@ class CulturalActivity extends Activity {
     };
   }
 
-  // Getter for backward compatibility
+  /**
+   * Getter for backward compatibility
+   * @deprecated Use config.isSoloPerformance instead
+  */
   get isSoloPerformance(): boolean {
     return this.config.isSoloPerformance;
   }
 
-  // Setter for backward compatibility
+  /**
+   * Setter for backward compatibility
+   * @deprecated Use config.isSoloPerformance instead
+   */
   set isSoloPerformance(value: boolean) {
     this.config.isSoloPerformance = value;
   }

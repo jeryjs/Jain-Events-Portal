@@ -1,6 +1,7 @@
-import { Box } from "@mui/material";
+import { Box, Skeleton, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import ProgressiveImage from '@components/shared/ProgressiveImage';
 
 
 export interface HighlightsCarouselProps {
@@ -24,6 +25,10 @@ export default function HighlightsCarousel({
     const [dragging, setDragging] = useState(false);
     const carouselRef = useRef<HTMLDivElement>(null);
     const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+
+    if (!images.length) {
+        return // Don't render anything if there are no images
+    }
 
     // Reset timer when manually navigating
     const resetTimer = () => {
@@ -86,7 +91,7 @@ export default function HighlightsCarousel({
             position: 'relative',
             height,
             my: 2,
-            overflow: 'hidden'
+            overflowX: 'clip'
         }}>
             {/* Main carousel container */}
             <Box
@@ -135,9 +140,12 @@ export default function HighlightsCarousel({
                             onClick={() => navigate('prev')}
                             whileHover={{ opacity: 0.7, scale: 0.87 }}
                         >
-                            <Box component="img"
+                            <ProgressiveImage
                                 src={images[prevIndex]}
                                 alt={`Previous image ${prevIndex + 1}`}
+                                placeholderSrc={images[prevIndex]}
+                                objectFit="cover"
+                                loading="lazy"
                                 sx={{
                                     width: '100%',
                                     height: '100%',
@@ -170,6 +178,7 @@ export default function HighlightsCarousel({
                         style={{
                             position: 'relative',
                             width: 'auto',
+                            maxWidth: '95%',
                             height: '100%',
                             zIndex: 2,
                             boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
@@ -182,18 +191,14 @@ export default function HighlightsCarousel({
                             backgroundColor: 'rgba(0,0,0,0.03)'
                         }}
                     >
-                        <Box
-                            component="img"
+                        <ProgressiveImage
                             src={images[current]}
                             alt={`Current image ${current + 1}`}
-                            sx={{
-                                maxWidth: '100%',
-                                maxHeight: '100%',
-                                objectFit: 'contain',
-                                width: 'auto',
-                                height: '100%',
-                                margin: '0 auto', // Ensure the image is centered within its container
-                            }}
+                            placeholderSrc={images[current]}
+                            objectFit="contain"
+                            loading="eager"
+                            style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
+                            sx={{ backgroundColor: 'rgba(0,0,0,0.03)' }}
                         />
                     </motion.div>
 
@@ -222,9 +227,12 @@ export default function HighlightsCarousel({
                             onClick={() => navigate('next')}
                             whileHover={{ opacity: 0.7, scale: 0.87 }}
                         >
-                            <Box component="img"
+                            <ProgressiveImage
                                 src={images[nextIndex]}
                                 alt={`Next image ${nextIndex + 1}`}
+                                placeholderSrc={images[nextIndex]}
+                                objectFit="cover"
+                                loading="lazy"
                                 sx={{
                                     width: '100%',
                                     height: '100%',

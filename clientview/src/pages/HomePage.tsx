@@ -49,7 +49,7 @@ const ArticleCard = styled(Link)(({ theme }) => ({
   flexShrink: 0,
   scrollSnapAlign: 'start',
   cursor: 'pointer',
-  borderRadius: theme.shape.borderRadius * 2,
+  borderRadius: (theme.shape.borderRadius as number) * 2,
   boxShadow: theme.shadows[2],
   overflow: 'hidden',
   transition: 'transform 0.3s, box-shadow 0.3s',
@@ -167,7 +167,7 @@ function HomePage() {
         )}
         {error && (
           <Box sx={{ p: 4, textAlign: 'center' }}>
-            <Typography color="error">Failed to load events</Typography>
+            <Typography color="error">Error loading events: {error.message}</Typography>
           </Box>
         )}
       </Section>
@@ -215,6 +215,11 @@ function HomePage() {
 
 
   const handleEventSave = async (formData: Partial<Event>) => {
+    formData = Event.parse(formData);
+    if (!formData.name || !formData.time || !formData.time.start || !formData.time.end) {
+      setError('Please fill in all required fields');
+      return;
+    }
     const eventData = Event.parse({ ...formData, id: slugify(formData.name) });
       try {
         await createEvent(eventData);
@@ -245,7 +250,7 @@ function HomePage() {
         </Box> */}
 
         {/* Admin Actions Section (Admin only) */}
-        {userData?.role >= Role.ADMIN && (
+        {(userData?.role ?? NaN) >= Role.ADMIN && (
           <Section title='Admin Actions'>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', p: 2 }}>
               <Button variant="outlined" color="secondary" onClick={() => setSearchParams(prev => ({ ...prev, create: 'event' }))}>
@@ -312,7 +317,7 @@ function HomePage() {
                         }} />
                         <Chip
                           size="small"
-                          label={pascalCase(EventType[article.relatedEventType]) || 'Article'}
+                          label={pascalCase(EventType[article.relatedEventType ?? EventType.GENERAL]) || 'Article'}
                           sx={{
                             position: 'absolute',
                             top: 12,
@@ -331,23 +336,24 @@ function HomePage() {
                           </Typography>
                           <Typography
                             variant="body2"
-                            color="text.secondary"
                             sx={{
+                              color: "text.secondary",
                               display: '-webkit-box',
                               WebkitLineClamp: 2,
                               WebkitBoxOrient: 'vertical',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               mb: 2
-                            }}
-                          >
+                            }}>
                             {article.summary}
                           </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <AccessTimeIcon sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant="caption" sx={{
+                              color: "text.secondary"
+                            }}>
                               {article.readingTimeMinutes || 1} min read
                             </Typography>
                           </Box>

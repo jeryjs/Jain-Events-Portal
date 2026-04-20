@@ -13,7 +13,12 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, bookmarked, onToggl
   return (
     <Grid container spacing={3}>
       {articles.map((article, index) => (
-        <Grid item xs={12} md={6} key={article.id}>
+        <Grid
+          key={article.id}
+          size={{
+            xs: 12,
+            md: 6
+          }}>
           <ArticleCard
             variant="list"
             article={article}

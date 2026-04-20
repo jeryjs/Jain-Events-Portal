@@ -115,11 +115,20 @@ exports.createEvent = createEvent;
  * Update existing event
  */
 const updateEvent = (eventId, eventData) => __awaiter(void 0, void 0, void 0, function* () {
-    // Only update provided fields (patch)
-    yield eventsCollection.doc(eventId).update(eventData);
-    // Invalidate cache for this event
-    cache_1.cache.del(`${ITEM_KEY_PREFIX}-${eventId}`);
-    return (yield eventsCollection.doc(eventId).get()).data();
+    const existingEvent = yield (0, exports.getEventById)(eventId);
+    if (!existingEvent)
+        return null;
+    return (0, cacheUtils_1.updateCachedItem)({
+        oldItem: existingEvent,
+        collectionKey: COLLECTION_KEY,
+        itemKeyPrefix: ITEM_KEY_PREFIX,
+        updateFn: (existingItem) => __awaiter(void 0, void 0, void 0, function* () {
+            const updatedItem = Object.assign(Object.assign({}, existingItem), eventData);
+            yield eventsCollection.doc(eventId).update(updatedItem);
+            return Event_1.default.parse(updatedItem);
+        }),
+        ttl: cache_1.TTL.EVENTS
+    });
 });
 exports.updateEvent = updateEvent;
 /**

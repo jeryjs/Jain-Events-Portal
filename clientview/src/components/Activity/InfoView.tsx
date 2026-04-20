@@ -12,7 +12,7 @@ const Section = styled(Box)(({ theme }) => ({
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(3),
-    borderRadius: theme.shape.borderRadius * 1.5,
+    borderRadius: (theme.shape.borderRadius as number) * 1.5,
     boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.07)}`,
     overflow: 'hidden',
     [theme.breakpoints.down('sm')]: {
@@ -40,10 +40,14 @@ export const InfoView = ({ activity }) => {
     if (!activity) {
         return (
             <StyledPaper sx={{ p: 4, textAlign: 'center' }}>
-                <Typography variant="h6" color="text.secondary" gutterBottom>
+                <Typography variant="h6" gutterBottom sx={{
+                    color: "text.secondary"
+                }}>
                     Information Not Available
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                }}>
                     The requested information could not be found.
                 </Typography>
             </StyledPaper>
@@ -67,9 +71,11 @@ export const InfoView = ({ activity }) => {
                     }}>
                         <Typography
                             variant="caption"
-                            color="text.secondary"
-                            sx={{ px: 2, fontWeight: 500 }}
-                        >
+                            sx={{
+                                color: "text.secondary",
+                                px: 2,
+                                fontWeight: 500
+                            }}>
                             ...
                         </Typography>
                     </Divider>

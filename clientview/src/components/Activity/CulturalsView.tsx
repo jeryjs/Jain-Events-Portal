@@ -25,6 +25,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { PollingForm } from "./CulturalsView/PollingForm";
+import { EventType } from "@common/constants";
 
 const Section = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -378,7 +379,7 @@ export const CulturalsView = ({
   eventId: string;
   activity: CulturalActivity;
 }) => {
-  const [selectedJudge, setSelectedJudge] = useState<Judge>(null);
+  const [selectedJudge, setSelectedJudge] = useState<Judge | null>(null);
   const [selectedTeam, setSelectedTeam] = useState<{ id: string, name: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const theme = useTheme();
@@ -387,6 +388,9 @@ export const CulturalsView = ({
 
   // Determine if the winner and audience choice are the same
   const audienceChoice = activity.audienceChoice?.teamId;
+
+  // Select terminology
+  const participantsTerm = activity.type > EventType.CULTURAL && activity.type <= EventType.THEATERS ? "Performers" : "Participants";
 
   const handleOpenDialog = (judge: Judge) => {
     setLoading(true);
@@ -418,11 +422,12 @@ export const CulturalsView = ({
           <Typography
             variant="h5"
             component="h2"
-            fontWeight="bold"
             sx={{
+              fontWeight: "bold",
               mb: 3,
               position: "relative",
               display: "inline-block",
+
               "&:after": {
                 content: '""',
                 position: "absolute",
@@ -433,8 +438,7 @@ export const CulturalsView = ({
                 backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
                 borderRadius: "2px"
               }
-            }}
-          >
+            }}>
             Judges
           </Typography>
 
@@ -449,7 +453,12 @@ export const CulturalsView = ({
                 border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.1 : 0.05)}`,
               }}
             >
-              <Typography variant="subtitle1" color="text.secondary" fontStyle="italic">
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  color: "text.secondary",
+                  fontStyle: "italic"
+                }}>
                 Judges will be announced soon
               </Typography>
             </Box>
@@ -532,23 +541,27 @@ export const CulturalsView = ({
           <Dialog
             open={selectedJudge !== null}
             onClose={handleCloseDialog}
-            TransitionComponent={Fade}
-            TransitionProps={{ timeout: 500 }}
             maxWidth="sm"
             fullWidth
-            PaperProps={{
-              elevation: 24,
-              sx: {
-                borderRadius: 3,
-                overflow: "hidden",
-                bgcolor: theme.palette.background.paper,
-                border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
-                margin: isMobile ? 2 : 'auto',
-                maxHeight: isMobile ? 'calc(100% - 32px)' : '90vh',
-                width: isMobile ? 'calc(100% - 32px)' : '100%',
-              }
+            slots={{
+              transition: Fade
             }}
-          >
+            slotProps={{
+              transition: { timeout: 500 },
+
+              paper: {
+                elevation: 24,
+                sx: {
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  bgcolor: theme.palette.background.paper,
+                  border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
+                  margin: isMobile ? 2 : 'auto',
+                  maxHeight: isMobile ? 'calc(100% - 32px)' : '90vh',
+                  width: isMobile ? 'calc(100% - 32px)' : '100%',
+                }
+              }
+            }}>
             {selectedJudge && (
               <>
                 <Box
@@ -626,9 +639,10 @@ export const CulturalsView = ({
                         <Typography
                           variant={isMobile ? "h5" : "h4"}
                           component="h3"
-                          fontWeight="bold"
-                          sx={{ mb: 1 }}
-                        >
+                          sx={{
+                            fontWeight: "bold",
+                            mb: 1
+                          }}>
                           {selectedJudge.name || "Guest Judge"}
                         </Typography>
                       </Fade>
@@ -640,8 +654,8 @@ export const CulturalsView = ({
                       <Fade in={!loading} timeout={700}>
                         <Typography
                           variant="subtitle1"
-                          color="text.secondary"
                           sx={{
+                            color: "text.secondary",
                             fontStyle: "italic",
                             maxWidth: "600px",
                             mx: "auto",
@@ -652,8 +666,7 @@ export const CulturalsView = ({
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             lineHeight: 1.5
-                          }}
-                        >
+                          }}>
                           "{selectedJudge.description}"
                         </Typography>
                       </Fade>
@@ -711,18 +724,18 @@ export const CulturalsView = ({
           </Dialog>
         </Section>
       )}
-
       {/* Winners Section */}
       {activity.winners && activity.winners.length > 0 && (
         <Section>
           <Typography
             variant="h5"
             component="h2"
-            fontWeight="bold"
             sx={{
+              fontWeight: "bold",
               mb: 3,
               position: "relative",
               display: "inline-block",
+
               "&:after": {
                 content: '""',
                 position: "absolute",
@@ -733,8 +746,7 @@ export const CulturalsView = ({
                 backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
                 borderRadius: "2px"
               }
-            }}
-          >
+            }}>
             Winners
           </Typography>
 
@@ -818,7 +830,6 @@ export const CulturalsView = ({
                       <WinnerPosition placed={position}>
                         {getPositionLabel(winner.rank)}
                       </WinnerPosition>
-
                       <WinnerAvatarContainer
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.2 }}
@@ -854,7 +865,6 @@ export const CulturalsView = ({
                           />
                         )}
                       </WinnerAvatarContainer>
-
                       <Box sx={{
                         flex: 1,
                         minWidth: 0, // Important to contain flex items properly
@@ -923,9 +933,10 @@ export const CulturalsView = ({
                                 </>}
                             </Box>
                           }
-                          secondaryTypographyProps={{ component: 'div' }} />
+                          slotProps={{
+                            secondary: { component: 'div' }
+                          }} />
                       </Box>
-
                       <Box sx={{ flexShrink: 0 }}>
                         <CompactChip
                           label={winner.rank === 1 ? "Winner" : winner.rank === 2 ? "Runner Up" : `${getPositionLabel(winner.rank)} Place`}
@@ -1011,7 +1022,6 @@ export const CulturalsView = ({
                             />
                           )}
                         </WinnerAvatarContainer>
-
                         <Box sx={{
                           flex: 1,
                           minWidth: 0, // Important to contain flex items properly
@@ -1080,9 +1090,10 @@ export const CulturalsView = ({
                                   </>}
                               </Box>
                             }
-                            secondaryTypographyProps={{ component: 'div' }} />
+                            slotProps={{
+                              secondary: { component: 'div' }
+                            }} />
                         </Box>
-
                         <Box sx={{ flexShrink: 0 }}>
                           <CompactChip
                             label="Audience Choice"
@@ -1104,14 +1115,12 @@ export const CulturalsView = ({
           </WinnerSection>
         </Section>
       )}
-
       {/* Poll Section */}
       {activity.showPoll && (
         <Section>
           <PollingForm eventId={eventId} activityId={activity.id} activity={activity} />
         </Section>
       )}
-
       {/* Performers Section with Column Layout */}
       <PerformerSection
         initial={{ opacity: 0, y: 20 }}
@@ -1122,11 +1131,12 @@ export const CulturalsView = ({
           <Typography
             variant="h5"
             component="h2"
-            fontWeight="bold"
             sx={{
+              fontWeight: "bold",
               mb: 4,
               position: "relative",
               display: "inline-block",
+
               "&::after": {
                 content: '""',
                 position: "absolute",
@@ -1137,9 +1147,8 @@ export const CulturalsView = ({
                 backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main}, transparent)`,
                 borderRadius: "2px"
               }
-            }}
-          >
-            Performers
+            }}>
+            {participantsTerm}
           </Typography>)}
 
         {(!activity.participants || activity.participants.length === 0) ? (
@@ -1153,8 +1162,13 @@ export const CulturalsView = ({
               border: `1px solid ${alpha(theme.palette.divider, isDarkMode ? 0.1 : 0.05)}`,
             }}
           >
-            <Typography variant="subtitle1" color="text.secondary" fontStyle="italic">
-              Performers will be announced soon
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: "text.secondary",
+                fontStyle: "italic"
+              }}>
+              {participantsTerm} will be announced soon
             </Typography>
           </Box>
         ) : (
@@ -1226,13 +1240,12 @@ export const CulturalsView = ({
 
                       <Typography
                         variant="body2"
-                        color="text.secondary"
                         sx={{
+                          color: "text.secondary",
                           display: "flex",
                           alignItems: "center",
-                          gap: 0.5,
-                        }}
-                      >
+                          gap: 0.5
+                        }}>
                         Click to view team members and details
                       </Typography>
                     </PerformerInfo>
@@ -1241,7 +1254,7 @@ export const CulturalsView = ({
               </Box>
             ) : !activity.showPoll && (
               /* Individual performers - only show if there are no teams */
-              <Box>
+              (<Box>
                 {activity.participants.map((participant, idx) => (
                   <PerformerCard
                     key={participant.usn || idx}
@@ -1285,13 +1298,15 @@ export const CulturalsView = ({
                           )}
                         </Box>
                       }
-                      secondaryTypographyProps={{
-                        component: 'div',
+                      slotProps={{
+                        secondary: {
+                          component: 'div',
+                        }
                       }}
                     />
                   </PerformerCard>
                 ))}
-              </Box>
+              </Box>)
             )}
           </Box>
         )}
@@ -1302,23 +1317,27 @@ export const CulturalsView = ({
             <Dialog
               open={selectedTeam !== null}
               onClose={handleCloseTeam}
-              TransitionComponent={Fade}
-              TransitionProps={{ timeout: 500 }}
               maxWidth="sm"
               fullWidth
-              PaperProps={{
-                elevation: 24,
-                sx: {
-                  borderRadius: 3,
-                  overflow: "hidden",
-                  bgcolor: theme.palette.background.paper,
-                  border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
-                  margin: isMobile ? 2 : 'auto',
-                  maxHeight: isMobile ? 'calc(100% - 32px)' : '90vh',
-                  width: isMobile ? 'calc(100% - 32px)' : '100%',
-                }
+              slots={{
+                transition: Fade
               }}
-            >
+              slotProps={{
+                transition: { timeout: 500 },
+
+                paper: {
+                  elevation: 24,
+                  sx: {
+                    borderRadius: 3,
+                    overflow: "hidden",
+                    bgcolor: theme.palette.background.paper,
+                    border: isDarkMode ? `1px solid ${alpha(theme.palette.divider, 0.1)}` : 'none',
+                    margin: isMobile ? 2 : 'auto',
+                    maxHeight: isMobile ? 'calc(100% - 32px)' : '90vh',
+                    width: isMobile ? 'calc(100% - 32px)' : '100%',
+                  }
+                }
+              }}>
               <Box
                 sx={{
                   display: "flex",
@@ -1425,9 +1444,10 @@ export const CulturalsView = ({
                     <Typography
                       variant={isMobile ? "h5" : "h4"}
                       component="h3"
-                      fontWeight="bold"
-                      sx={{ mb: 1 }}
-                    >
+                      sx={{
+                        fontWeight: "bold",
+                        mb: 1
+                      }}>
                       {selectedTeam.name}
                     </Typography>
                   </Fade>
@@ -1514,10 +1534,14 @@ export const CulturalsView = ({
                               }}
                             />
                             <Box>
-                              <Typography variant="subtitle1" fontWeight={600}>
+                              <Typography variant="subtitle1" sx={{
+                                fontWeight: 600
+                              }}>
                                 {member.name}
                               </Typography>
-                              <Typography variant="caption" color="text.secondary">
+                              <Typography variant="caption" sx={{
+                                color: "text.secondary"
+                              }}>
                                 {member.usn} • {member.branch}
                               </Typography>
                               <Typography
@@ -1543,14 +1567,13 @@ export const CulturalsView = ({
 
                 <Typography
                   variant="caption"
-                  color="text.secondary"
                   sx={{
+                    color: "text.secondary",
                     textAlign: "center",
                     mt: 3,
                     display: "block",
                     opacity: 0.7
-                  }}
-                >
+                  }}>
                   Team details are visible only to event organizers and administrators.
                 </Typography>
               </PerformerDialogContent>

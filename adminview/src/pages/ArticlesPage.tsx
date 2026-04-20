@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Box, Typography, Container, Paper, Grid2 as Grid, Card, IconButton } from '@mui/material';
+import { Box, Typography, Container, Paper, Grid, Card, IconButton } from '@mui/material';
 
 import { ArticlesList, ArticleForm } from '../components/Articles';
 import { useArticle, useCreateArticle, useUpdateArticle, useDeleteArticle } from '@hooks/App';

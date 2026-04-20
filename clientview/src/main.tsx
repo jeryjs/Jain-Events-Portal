@@ -6,9 +6,22 @@ import './index.css'
 import './firebaseConfig.ts'
 
 const updateSW = registerSW({
+  onRegisterError(error) {
+    console.error('SW registration failed: ', error);
+  },
+  onRegisteredSW(swUrl, r) {
+    console.log(`Service worker registered at ${swUrl}`);
+
+    // Update the service worker when the app gains focus or becomes visible
+    void r?.update(); // Initial update check
+    window.addEventListener('focus', () => void r?.update());
+    document.addEventListener('visibilitychange', () => (document.visibilityState === 'visible') && void r?.update());
+  },
   onNeedRefresh() {
-    // Optional: prompt user to update app
-    console.log('New content is available; please refresh.');
+    const shouldReload = window.confirm('A new version is available. Reload now?');
+    if (shouldReload) {
+      void updateSW(true);
+    }
   },
   onOfflineReady() {
     console.log('App is ready to work offline');
