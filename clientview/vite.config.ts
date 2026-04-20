@@ -94,18 +94,4 @@ export default defineConfig({
     host: "0.0.0.0",
     allowedHosts: ['jeryjs.me', 'admin.jeryjs.me', '10.0.0.4', 'localhost']
   },
-  build: {
-    rolldownOptions: {
-      output: {
-        codeSplitting: {
-          // combine all packages into single vendor chunk to reduce number of vercel requests
-          groups: [
-            { name: 'styles', test: /\.css$/, priority: 2 }, // all CSS in one chunk
-            { name: 'app', test: /./, priority: 1, maxSize: 5000000, minSize: 2000000 },  // 2-5 MiB, compression should reduce it to around 500 KiB
-          ],
-        },
-      },
-    },
-    chunkSizeWarningLimit: 3000, // 3 MiB
-  },
 })

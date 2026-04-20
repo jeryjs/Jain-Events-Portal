@@ -21,7 +21,7 @@
 		"clean:backend": "cd backend && pnpm cache delete && rm -rf node_modules",
 		"clean:clientview": "cd clientview && pnpm cache delete && rm -rf node_modules",
 		"clean": "pnpx concurrently -c \"bgBlue.bold,bgMagenta.bold\" -n \"B,C\" \"pnpm run clean:backend\" \"pnpm run clean:clientview\" && pnpm cache delete && rm -rf node_modules",
-    	"ssh:deploy": "ssh fet@ssh.sa-fet.com \"cd ~/all-projects/Jain-Events-Portal && git pull && pnpm run init && pnpm build && pm2 reload fet-hub\""
+		"ssh:deploy": "ssh fet@ssh.sa-fet.com \"cd ~/all-projects/Jain-Events-Portal && branch=$(git rev-parse --abbrev-ref HEAD) && git fetch origin $branch && git reset --hard origin/$branch && pnpm run init && pnpm build && pm2 reload fet-hub\""
 	},
 	"keywords": [],
 	"author": "Jery",
