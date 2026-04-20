@@ -107,7 +107,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
 
   // Get display name for a team or participant
   const getDisplayName = (id: string) => {
-    if (formData.config.isSoloPerformance) {
+    if (formData.config?.isSoloPerformance) {
       const participant = participants.find(p => p.usn === id);
       return participant ? `${participant.name} (${participant.usn})` : id;
     } else {
@@ -143,7 +143,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
           <FormControlLabel
             control={
               <Switch
-                checked={formData.config.isSoloPerformance}
+                checked={formData.config?.isSoloPerformance}
                 onChange={(e) => updateConfig({ isSoloPerformance: e.target.checked })}
                 color="primary"
               />
@@ -156,7 +156,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
                 <Typography variant="caption" sx={{
                   color: "text.secondary"
                 }}>
-                  {formData.config.isSoloPerformance
+                  {formData.config?.isSoloPerformance
                     ? "Each participant is treated as an individual entry (team of 1)"
                     : "Participants compete as teams"}
                 </Typography>
@@ -167,7 +167,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
           <FormControlLabel
             control={
               <Switch
-                checked={formData.config.useSelectedTerminology}
+                checked={formData.config?.useSelectedTerminology}
                 onChange={(e) => updateConfig({ useSelectedTerminology: e.target.checked })}
                 color="primary"
               />
@@ -180,7 +180,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
                 <Typography variant="caption" sx={{
                   color: "text.secondary"
                 }}>
-                  {formData.config.useSelectedTerminology
+                  {formData.config?.useSelectedTerminology
                     ? "Use 'Selected' instead of 'Winners' terminology"
                     : "Use traditional 'Winners' terminology"}
                 </Typography>
@@ -188,7 +188,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
             }
           />
 
-          {formData.config.isSoloPerformance && (
+          {formData.config?.isSoloPerformance && (
             <Alert severity="info" sx={{ mt: 2 }}>
               In solo mode, each participant competes as an individual entry.
               Teams will be automatically created for each participant.
@@ -204,13 +204,13 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
         setTeams={handleTeamsChange}
         participants={participants}
         setParticipants={handleParticipantsChange}
-        isSoloPerformance={formData.config.isSoloPerformance}
+        isSoloPerformance={formData.config?.isSoloPerformance}
       />
       {/* Winners Section */}
       <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
           <EmojiEventsIcon sx={{ mr: 1, color: 'gold' }} />
-          {formData.config.useSelectedTerminology ? 'Selected' : 'Winners'}
+          {formData.config?.useSelectedTerminology ? 'Selected' : 'Winners'}
         </Typography>
         
         <Box sx={{ mb: 3 }}>
@@ -220,7 +220,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
               color: "text.secondary",
               mb: 2
             }}>
-            Declare {formData.config.useSelectedTerminology ? 'selected participants' : 'winners'} for this activity. Select {formData.config.isSoloPerformance ? "participants" : "teams"} and assign ranks.
+            Declare {formData.config?.useSelectedTerminology ? 'selected participants' : 'winners'} for this activity. Select {formData.config?.isSoloPerformance ? "participants" : "teams"} and assign ranks.
             Ranks will be automatically managed for consistency.
           </Typography>
           
@@ -228,7 +228,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
           {winners.length > 0 && (
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle2" gutterBottom>
-                Current {formData.config.useSelectedTerminology ? 'Selected:' : 'Winners:'}
+                Current {formData.config?.useSelectedTerminology ? 'Selected:' : 'Winners:'}
               </Typography>
               <Stack spacing={1}>
                 {[...winners]
@@ -286,14 +286,14 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
           {/* Add Winner */}
           <Box>
             <Typography variant="subtitle2" gutterBottom>
-              Add {formData.config.useSelectedTerminology ? 'Selected:' : 'Winners:'}
+              Add {formData.config?.useSelectedTerminology ? 'Selected:' : 'Winners:'}
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {(formData.config.isSoloPerformance ? participants : teams)
+              {(formData.config?.isSoloPerformance ? participants : teams)
                 .filter(item => !winners.some(w => w.teamId === item.id))
                 .map(item => {
                   return (
-                    <Tooltip key={item.id} title={`Add as ${formData.config.useSelectedTerminology ? 'selected' : 'winner'}`}>
+                    <Tooltip key={item.id} title={`Add as ${formData.config?.useSelectedTerminology ? 'selected' : 'winner'}`}>
                       <Chip
                         label={item.name}
                         onClick={() => addWinner(item.id)}
@@ -335,7 +335,7 @@ export const CulturalsView = ({ formData, setFormData }: CulturalsViewProps) => 
             mt: 1,
             mb: 2
           }}>
-          When enabled, users will be able to vote for their favorite {formData.config.isSoloPerformance ? "participants" : "teams"} in this activity.
+          When enabled, users will be able to vote for their favorite {formData.config?.isSoloPerformance ? "participants" : "teams"} in this activity.
           Voting results will be visible in real-time to the audience.
         </Typography>
 
