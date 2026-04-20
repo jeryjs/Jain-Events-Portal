@@ -25,6 +25,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { PollingForm } from "./CulturalsView/PollingForm";
+import { EventType } from "@common/constants";
 
 const Section = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -387,6 +388,9 @@ export const CulturalsView = ({
 
   // Determine if the winner and audience choice are the same
   const audienceChoice = activity.audienceChoice?.teamId;
+
+  // Select terminology
+  const participantsTerm = activity.type > EventType.CULTURAL && activity.type <= EventType.THEATERS ? "Performers" : "Participants";
 
   const handleOpenDialog = (judge: Judge) => {
     setLoading(true);
@@ -1144,7 +1148,7 @@ export const CulturalsView = ({
                 borderRadius: "2px"
               }
             }}>
-            Performers
+            {participantsTerm}
           </Typography>)}
 
         {(!activity.participants || activity.participants.length === 0) ? (
@@ -1164,7 +1168,7 @@ export const CulturalsView = ({
                 color: "text.secondary",
                 fontStyle: "italic"
               }}>
-              Performers will be announced soon
+              {participantsTerm} will be announced soon
             </Typography>
           </Box>
         ) : (
