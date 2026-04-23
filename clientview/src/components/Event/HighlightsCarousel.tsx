@@ -1,5 +1,6 @@
-import { Box, Skeleton, Typography } from "@mui/material";
-import { motion } from "framer-motion";
+import { Backdrop, Box, Dialog, IconButton } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import ProgressiveImage from '@components/shared/ProgressiveImage';
 
@@ -22,7 +23,7 @@ export default function HighlightsCarousel({
     slideRadius = 16
 }: HighlightsCarouselProps) {
     const [current, setCurrent] = useState(0);
-    const [dragging, setDragging] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(-1);   // -1 means no dialog open, otherwise holds index of open image
     const carouselRef = useRef<HTMLDivElement>(null);
     const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -87,197 +88,262 @@ export default function HighlightsCarousel({
     const nextIndex = (current + 1) % images.length;
 
     return (
-        <Box sx={{
-            position: 'relative',
-            height,
-            my: 2,
-            overflowX: 'clip'
-        }}>
-            {/* Main carousel container */}
-            <Box
-                ref={carouselRef}
-                sx={{
-                    position: 'relative',
-                    height: '100%',
-                    overflow: 'visible',
-                    borderRadius: 3,
-                    '&:hover .carousel-controls': {
-                        opacity: 1
-                    }
-                }}
-            >
-                {/* Carousel items container */}
-                <Box sx={{
-                    position: 'relative',
-                    height: '100%',
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    {/* Previous image - positioned behind on mobile */}
-                    {showControls && (
+        <>
+            <Box sx={{
+                position: 'relative',
+                height,
+                my: 2,
+                overflowX: 'clip'
+            }}>
+                {/* Main carousel container */}
+                <Box
+                    ref={carouselRef}
+                    sx={{
+                        position: 'relative',
+                        height: '100%',
+                        overflow: 'visible',
+                        borderRadius: 3,
+                        '&:hover .carousel-controls': {
+                            opacity: 1
+                        }
+                    }}
+                >
+                    {/* Carousel items container */}
+                    <Box sx={{
+                        position: 'relative',
+                        height: '100%',
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                    }}>
+                        {/* Previous image - positioned behind on mobile */}
+                        {showControls && (
+                            <motion.div
+                                key={`prev-${prevIndex}`}
+                                initial={{ opacity: 0, x: '-100%', scale: 0.8 }}
+                                animate={{
+                                    opacity: 0.4,
+                                    x: window.innerWidth < 600 ? '-50%' : '0%',
+                                    scale: 0.85,
+                                    zIndex: 1
+                                }}
+                                transition={{ duration: 0.5 }}
+                                style={{
+                                    position: 'absolute',
+                                    left: 0,
+                                    height: '80%',
+                                    width: '30%',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                                    borderRadius: slideRadius,
+                                    overflow: 'hidden',
+                                }}
+                                onClick={() => navigate('prev')}
+                                whileHover={{ opacity: 0.7, scale: 0.87 }}
+                            >
+                                <ProgressiveImage
+                                    src={images[prevIndex]}
+                                    alt={`Previous image ${prevIndex + 1}`}
+                                    placeholderSrc={images[prevIndex]}
+                                    objectFit="cover"
+                                    loading="lazy"
+                                    sx={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover',
+                                        backgroundColor: 'rgba(0,0,0,0.03)'
+                                    }}
+                                />
+                            </motion.div>
+                        )}
+
+                        {/* Current image - maintains aspect ratio */}
                         <motion.div
-                            key={`prev-${prevIndex}`}
-                            initial={{ opacity: 0, x: '-100%', scale: 0.8 }}
+                            key={`current-${current}`}
+                            initial={{ opacity: 0, scale: 0.9, zIndex: 5 }}
                             animate={{
-                                opacity: 0.4,
-                                x: window.innerWidth < 600 ? '-50%' : '0%',
-                                scale: 0.85,
-                                zIndex: 1
+                                opacity: 1,
+                                scale: 1,
+                                zIndex: 10
                             }}
                             transition={{ duration: 0.5 }}
+                            drag="x"
+                            dragConstraints={{ left: 0, right: 0 }}
+                            dragElastic={0.3}
+                            onDragEnd={(_, info) => {
+                                if (info.offset.x < -100) navigate('next');
+                                if (info.offset.x > 100) navigate('prev');
+                            }}
                             style={{
-                                position: 'absolute',
-                                left: 0,
-                                height: '80%',
-                                width: '30%',
-                                cursor: 'pointer',
-                                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                                position: 'relative',
+                                width: 'auto',
+                                maxWidth: '640px',
+                                maxHeight: '360px',
+                                height: '100%',
+                                zIndex: 2,
+                                boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
                                 borderRadius: slideRadius,
                                 overflow: 'hidden',
+                                margin: '0 auto', // Center the container
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: 'rgba(0,0,0,0.03)'
                             }}
-                            onClick={() => navigate('prev')}
-                            whileHover={{ opacity: 0.7, scale: 0.87 }}
                         >
                             <ProgressiveImage
-                                src={images[prevIndex]}
-                                alt={`Previous image ${prevIndex + 1}`}
-                                placeholderSrc={images[prevIndex]}
-                                objectFit="cover"
-                                loading="lazy"
-                                sx={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
-                                    backgroundColor: 'rgba(0,0,0,0.03)'
-                                }}
+                                src={images[current]}
+                                alt={`Current image ${current + 1}`}
+                                placeholderSrc={images[current]}
+                                objectFit="contain"
+                                loading="eager"
+                                style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
+                                sx={{ backgroundColor: 'rgba(0,0,0,0.03)' }}
+                                onClick={setDialogOpen.bind(null, current)}
                             />
                         </motion.div>
-                    )}
 
-                    {/* Current image - maintains aspect ratio */}
-                    <motion.div
-                        key={`current-${current}`}
-                        initial={{ opacity: 0, scale: 0.9, zIndex: 5 }}
-                        animate={{
-                            opacity: 1,
-                            scale: 1,
-                            zIndex: 10
-                        }}
-                        transition={{ duration: 0.5 }}
-                        drag="x"
-                        dragConstraints={{ left: 0, right: 0 }}
-                        dragElastic={0.3}
-                        onDragStart={() => setDragging(true)}
-                        onDragEnd={(_, info) => {
-                            setDragging(false);
-                            if (info.offset.x < -100) navigate('next');
-                            if (info.offset.x > 100) navigate('prev');
-                        }}
-                        style={{
-                            position: 'relative',
-                            width: 'auto',
-                            maxWidth: '95%',
-                            height: '100%',
-                            zIndex: 2,
-                            boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
-                            borderRadius: slideRadius,
-                            overflow: 'hidden',
-                            margin: '0 auto', // Center the container
+                        {/* Next image - positioned behind on mobile */}
+                        {showControls && (
+                            <motion.div
+                                key={`next-${nextIndex}`}
+                                initial={{ opacity: 0, x: '100%', scale: 0.8 }}
+                                animate={{
+                                    opacity: 0.4,
+                                    x: window.innerWidth < 600 ? '50%' : '0%',
+                                    scale: 0.85,
+                                    zIndex: 1
+                                }}
+                                transition={{ duration: 0.5 }}
+                                style={{
+                                    position: 'absolute',
+                                    right: 0,
+                                    height: '80%',
+                                    width: '30%',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                                    borderRadius: slideRadius,
+                                    overflow: 'hidden',
+                                }}
+                                onClick={() => navigate('next')}
+                                whileHover={{ opacity: 0.7, scale: 0.87 }}
+                            >
+                                <ProgressiveImage
+                                    src={images[nextIndex]}
+                                    alt={`Next image ${nextIndex + 1}`}
+                                    placeholderSrc={images[nextIndex]}
+                                    objectFit="cover"
+                                    loading="lazy"
+                                    sx={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover',
+                                        backgroundColor: 'rgba(0,0,0,0.03)'
+                                    }}
+                                />
+                            </motion.div>
+                        )}
+                    </Box>
+
+                    {/* Navigation controls */}
+                    {showIndicators && images.length > 1 && (
+                        <Box className="carousel-controls" sx={{
+                            position: 'absolute',
+                            bottom: '-16px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
                             display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: 'rgba(0,0,0,0.03)'
-                        }}
-                    >
-                        <ProgressiveImage
-                            src={images[current]}
-                            alt={`Current image ${current + 1}`}
-                            placeholderSrc={images[current]}
-                            objectFit="contain"
-                            loading="eager"
-                            style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
-                            sx={{ backgroundColor: 'rgba(0,0,0,0.03)' }}
-                        />
-                    </motion.div>
-
-                    {/* Next image - positioned behind on mobile */}
-                    {showControls && (
-                        <motion.div
-                            key={`next-${nextIndex}`}
-                            initial={{ opacity: 0, x: '100%', scale: 0.8 }}
-                            animate={{
-                                opacity: 0.4,
-                                x: window.innerWidth < 600 ? '50%' : '0%',
-                                scale: 0.85,
-                                zIndex: 1
-                            }}
-                            transition={{ duration: 0.5 }}
-                            style={{
-                                position: 'absolute',
-                                right: 0,
-                                height: '80%',
-                                width: '30%',
-                                cursor: 'pointer',
-                                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                                borderRadius: slideRadius,
-                                overflow: 'hidden',
-                            }}
-                            onClick={() => navigate('next')}
-                            whileHover={{ opacity: 0.7, scale: 0.87 }}
-                        >
-                            <ProgressiveImage
-                                src={images[nextIndex]}
-                                alt={`Next image ${nextIndex + 1}`}
-                                placeholderSrc={images[nextIndex]}
-                                objectFit="cover"
-                                loading="lazy"
-                                sx={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
-                                    backgroundColor: 'rgba(0,0,0,0.03)'
-                                }}
-                            />
-                        </motion.div>
+                            gap: 1,
+                            opacity: { xs: 1, sm: 0.3 },
+                            transition: 'opacity 0.3s ease',
+                            zIndex: 20
+                        }}>
+                            {images.map((_, index) => (
+                                <Box
+                                    key={index}
+                                    onClick={() => goToSlide(index)}
+                                    sx={{
+                                        width: current === index ? 24 : 12,
+                                        height: 12,
+                                        borderRadius: 6,
+                                        bgcolor: current === index ? 'secondary.main' : 'primary.main',
+                                        transition: 'all 0.3s ease',
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            bgcolor: current === index ? 'secondary.main' : 'primary.main'
+                                        }
+                                    }}
+                                />
+                            ))}
+                        </Box>
                     )}
                 </Box>
-
-                {/* Navigation controls */}
-                {showIndicators && images.length > 1 && (
-                    <Box className="carousel-controls" sx={{
-                        position: 'absolute',
-                        bottom: '-16px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        display: 'flex',
-                        gap: 1,
-                        opacity: { xs: 1, sm: 0.3 },
-                        transition: 'opacity 0.3s ease',
-                        zIndex: 20
-                    }}>
-                        {images.map((_, index) => (
-                            <Box
-                                key={index}
-                                onClick={() => goToSlide(index)}
-                                sx={{
-                                    width: current === index ? 24 : 12,
-                                    height: 12,
-                                    borderRadius: 6,
-                                    bgcolor: current === index ? 'secondary.main' : 'primary.main',
-                                    transition: 'all 0.3s ease',
-                                    cursor: 'pointer',
-                                    '&:hover': {
-                                        bgcolor: current === index ? 'secondary.main' : 'primary.main'
-                                    }
-                                }}
-                            />
-                        ))}
-                    </Box>
-                )}
             </Box>
-        </Box>
+
+            {/* Image dialog for expanding Highlights */}
+            <Dialog
+                open={dialogOpen >= 0}
+                onClose={setDialogOpen.bind(null, -1)}
+                maxWidth={false}
+                slots={{
+                    backdrop: Backdrop
+                }}
+                slotProps={{
+                    backdrop: {
+                        style: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            backdropFilter: 'blur(5px)'
+                        }
+                    },
+                    paper: {
+                        style: {
+                            backgroundColor: 'transparent',
+                            boxShadow: 'none',
+                            overflow: 'hidden'
+                        },
+                        // Disable the Paper overlay by removing elevation
+                        elevation: 0,
+                    }
+                }}>
+                <AnimatePresence mode="wait">
+                    {dialogOpen >= 0 && (
+                        <Box
+                            sx={{
+                                position: 'relative',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: '100%', width: '100%',
+                            }}
+                        >
+                            <motion.div
+                                key={dialogOpen}
+                                style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center' }}
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.5 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            >
+                                <Box sx={{ position: 'relative', display: 'inline-block', width: 'fit-content', height: 'fit-content', maxWidth: '90vw', maxHeight: '90vh' }}>
+                                    <ProgressiveImage
+                                        src={images[dialogOpen]}
+                                        alt={`Expanded view ${dialogOpen + 1}`}
+                                        placeholderSrc={images[dialogOpen]}
+                                        loading="eager"
+                                        style={{ width: 'auto', height: 'auto', maxWidth: '90vw', maxHeight: '90vh' }}
+                                    />
+                                </Box>
+                            </motion.div>
+
+                            <IconButton onClick={setDialogOpen.bind(null, -1)} sx={{ position: 'absolute', top: 16, right: 16, backgroundColor: 'rgba(0, 0, 0, 0.5)', color: '#fff', '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.7)', } }}>
+                                <CloseIcon />
+                            </IconButton>
+                        </Box>
+                    )}
+                </AnimatePresence>
+            </Dialog>
+        </>
     );
 }
 
