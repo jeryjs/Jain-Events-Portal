@@ -148,7 +148,8 @@ exports.getPollResults = getPollResults;
 /**
  * Cast a vote for a team (or participant)
  */
-const castVote = (eventId, activityId, teamId, username) => __awaiter(void 0, void 0, void 0, function* () {
+const castVote = (eventId, activityId, teamId, userUid, legacyIdentifier) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const activityKey = `activities-${eventId}-${activityId}`;
     const activityDoc = activitiesCollection(eventId).doc(activityId);
     const activity = yield (0, cacheUtils_1.getCachedItem)({
@@ -160,13 +161,15 @@ const castVote = (eventId, activityId, teamId, username) => __awaiter(void 0, vo
         throw new Error(`Invalid activity type for voting: ${typeof activity}`);
     if (!activity.showPoll)
         throw new Error('Poll is not enabled for this activity');
+    if (!userUid)
+        throw new Error('User uid missing');
     const pollData = activity.pollData;
+    const identifiersToRemove = new Set([userUid, legacyIdentifier].filter((value) => !!value));
     // First, remove the user's vote from any team they previously voted for
     for (const poll of pollData) {
-        const voteIndex = poll.votes.indexOf(username);
-        if (voteIndex !== -1) {
-            poll.votes.splice(voteIndex, 1);
-        }
+        if (!((_a = poll.votes) === null || _a === void 0 ? void 0 : _a.length))
+            continue;
+        poll.votes = poll.votes.filter(vote => !identifiersToRemove.has(vote));
     }
     // Then add the vote to the selected team
     let teamPoll = pollData.find(poll => poll.teamId === teamId);
@@ -174,7 +177,9 @@ const castVote = (eventId, activityId, teamId, username) => __awaiter(void 0, vo
         teamPoll = { teamId, votes: [] };
         pollData.push(teamPoll);
     }
-    teamPoll.votes.push(username);
+    if (!teamPoll.votes.includes(userUid)) {
+        teamPoll.votes.push(userUid);
+    }
     activity.pollData = pollData;
     yield (0, cacheUtils_1.updateCachedItem)({
         oldItem: activity,

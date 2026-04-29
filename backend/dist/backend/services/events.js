@@ -46,6 +46,7 @@ const isUserEventManager = (eventId, username) => __awaiter(void 0, void 0, void
     return managers.includes(username);
 });
 exports.isUserEventManager = isUserEventManager;
+const constants_1 = require("@common/constants");
 const Event_1 = __importDefault(require("@common/models/Event"));
 const utils_1 = require("@common/utils");
 const cache_1 = require("@config/cache");
@@ -61,7 +62,7 @@ const ITEM_KEY_PREFIX = "events";
 // Helper to filter sensitive fields
 function filterEventForUser(event, user) {
     // Only admins or managers for this event can see managers field
-    if (!user || (user.role < Role.MANAGER && !(event.managers && event.managers.includes(user.username)))) {
+    if (!user || (user.role < constants_1.Role.MANAGER && !(event.managers && event.managers.includes(user.username)))) {
         const { managers } = event, rest = __rest(event, ["managers"]);
         return rest;
     }

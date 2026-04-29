@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("../constants");
 class UserData {
-    constructor(name, username, role, profilePic) {
+    constructor(uid, name, username, role, profilePic) {
+        this.uid = uid;
         this.name = name;
         this.username = username;
         this.role = role;
@@ -16,10 +17,12 @@ class UserData {
         if (data.username && adminEmails.includes(data.username.toLowerCase()) && data.role < constants_1.Role.ADMIN) {
             data.role = constants_1.Role.ADMIN;
         }
-        return new UserData(data.name || '', data.username || data.email || '', data.role || constants_1.Role.USER, data.profilePic || data.profile || `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(data.name)}`);
+        const uid = data.uid || data.userId || data.id || '';
+        return new UserData(uid, data.name || '', data.username || data.email || '', data.role || constants_1.Role.USER, data.profilePic || data.profile || `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(data.name)}`);
     }
     toJSON() {
         return {
+            uid: this.uid,
             name: this.name,
             username: this.username,
             role: this.role,
