@@ -4,3 +4,5 @@ dist-ssr
 *.local
 .env
 .vercel
+logs
+log_file.txt
