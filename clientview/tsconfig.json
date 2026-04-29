@@ -17,7 +17,6 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     
-    "baseUrl": "./",
     "paths": {
       "@common/*": ["../common/*"],
       "@components/*": ["./src/components/*"],
@@ -30,6 +29,7 @@
     // "strict": true,
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
+    "noImplicitAny": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   }

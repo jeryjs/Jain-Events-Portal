@@ -47,6 +47,8 @@ const getAllBaseEventTypes = () => {
 };
 exports.getAllBaseEventTypes = getAllBaseEventTypes;
 const getActivityTypes = (type) => {
+    if (type === undefined)
+        return [];
     const nextBaseType = type + 1000;
     const types = [];
     for (let i = type + 1; i < nextBaseType; i++) {

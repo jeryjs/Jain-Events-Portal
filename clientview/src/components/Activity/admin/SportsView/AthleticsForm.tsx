@@ -69,20 +69,27 @@ export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => 
     return (
         <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
             <Box sx={{ mb: 3 }}>
-                <Typography variant="h5" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', color: theme.palette.primary.main }}>
+                <Typography
+                    variant="h5"
+                    sx={{
+                        fontWeight: "bold",
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: theme.palette.primary.main
+                    }}>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" style={{ marginRight: '8px' }}><path fill="currentColor" d="M14.83 12c-2.69 0-4.83 2.14-4.83 4.83s2.14 4.83 4.83 4.83 4.83-2.14 4.83-4.83-2.14-4.83-4.83-4.83zm-8.66 0c-2.69 0-4.83 2.14-4.83 4.83S3.48 21.66 6.17 21.66 11 19.52 11 16.83 8.86 12 6.17 12zM19 9.83c0-1.77-1.43-3.2-3.2-3.2s-3.2 1.43-3.2 3.2 1.43 3.2 3.2 3.2 3.2-1.43 3.2-3.2zM6.17 8.34C4.4 8.34 3 6.94 3 5.17S4.4 2 6.17 2 9.34 3.4 9.34 5.17 7.94 8.34 6.17 8.34zM12 1.5q3.04 0 5.2 2.16L12 8.83 6.8 3.67Q8.96 1.5 12 1.5Zm0 20.5q-3.04 0-5.2-2.16l5.2-5.16 5.2 5.16Q15.04 22 12 22Zm10-6.67q-1.77 0-3.2-1.43-1.43-1.43-1.43-3.2 0-1.77 1.43-3.2 3.2-3.2 1.77 1.43 3.2 3.2 1.43 1.43 1.43 3.2 0 1.77-1.43 3.2-3.2 3.2Zm-1.17-1.49q.69-.84.69-1.87 0-1.03-.69-1.87-1.41-1.15-3.28-1.15-1.87 0-3.28 1.15-.69.84-.69 1.87 0 1.03.69 1.87 1.41 1.15 3.28 1.15 1.87 0 3.28-1.15Z"></path></svg>
                     Athletics Event
                 </Typography>
                 <Divider sx={{ mt: 1 }} />
             </Box>
-
             <Tabs value={activeTab} onChange={handleTabChange} aria-label="athletics-tabs">
                 <Tab label="Manage Heats" />
                 <Tab label="Export" />
             </Tabs>
-
             {activeTab === 0 && (
-                <Box mt={3}>
+                <Box sx={{
+                    mt: 3
+                }}>
                     {formData.teams?.map((team) => (
                         <HeatManager
                             key={team.id}
@@ -94,7 +101,6 @@ export const AthleticsForm = ({ formData, setFormData }: AthleticsFormProps) => 
                     ))}
                 </Box>
             )}
-
             {activeTab === 1 && (
                 <ExportTab
                     game={formData.game as Athletics}
@@ -157,7 +163,9 @@ const HeatManager = React.memo<HeatManagerProps>(({ team, game, players, updateG
     return (
         <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)}>
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography variant="subtitle1" sx={{
+                    fontWeight: "bold"
+                }}>
                     {team.name}
                 </Typography>
             </AccordionSummary>
@@ -231,7 +239,9 @@ const AthleteListItem = React.memo<AthleteListItemProps>(({ player, athlete, upd
                 value={athlete.time || 0}
                 onChange={handleTimeChange}
                 sx={{ width: 100, mr: 2 }}
-                inputProps={{ min: 0, step: 0.1 }}
+                slotProps={{
+                    htmlInput: { min: 0, step: 0.1 }
+                }}
             />
             <TextField
                 label="Rank"
@@ -240,7 +250,9 @@ const AthleteListItem = React.memo<AthleteListItemProps>(({ player, athlete, upd
                 value={athlete.rank || 0}
                 onChange={handleRankChange}
                 sx={{ width: 80 }}
-                inputProps={{ min: 0, step: 1 }}
+                slotProps={{
+                    htmlInput: { min: 0, step: 1 }
+                }}
             />
         </ListItem>
     );
@@ -301,9 +313,20 @@ const ExportTab = React.memo<ExportTabProps>(({ game, players, topPlayersCount, 
     }, [topPlayersJson]);
 
     return (
-        <Box mt={3} display="flex" flexDirection="column" alignItems="center">
+        <Box
+            sx={{
+                mt: 3,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center"
+            }}>
             <Typography>Select top performers to export:</Typography>
-            <Box display="flex" alignItems="center" mt={2}>
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    mt: 2
+                }}>
                 <Slider
                     value={topPlayersCount}
                     onChange={(e, newValue) => setTopPlayersCount(newValue as number)}
@@ -321,7 +344,6 @@ const ExportTab = React.memo<ExportTabProps>(({ game, players, topPlayersCount, 
                     Generate JSON
                 </Button>
             </Box>
-
             <Dialog open={exportDialogOpen} onClose={() => setExportDialogOpen(false)}>
                 <DialogTitle>Top Athletes JSON</DialogTitle>
                 <DialogContent>

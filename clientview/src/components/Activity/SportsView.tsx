@@ -77,9 +77,11 @@ const TeamComparisonCard = ({ activity }: { activity: SportsActivity<Sport> }) =
     return (
         <Card sx={{ borderRadius: 2, overflow: 'hidden' }}>
             <Box sx={{ p: 3 }}>
-                <Grid container alignItems="center">
+                <Grid container sx={{
+                    alignItems: "center"
+                }}>
                     {/* Left Team */}
-                    <Grid item xs={5} sx={{ textAlign: isMobile ? 'center' : 'left' }}>
+                    <Grid sx={{ textAlign: isMobile ? 'center' : 'left' }} size={5}>
                         <TeamDisplay
                             team={team1}
                             activity={activity}
@@ -92,7 +94,7 @@ const TeamComparisonCard = ({ activity }: { activity: SportsActivity<Sport> }) =
                     </Grid>
 
                     {/* VS Section */}
-                    <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Grid sx={{ display: 'flex', justifyContent: 'center' }} size={2}>
                         <Box
                             sx={{
                                 height: 80,
@@ -105,12 +107,11 @@ const TeamComparisonCard = ({ activity }: { activity: SportsActivity<Sport> }) =
                         >
                             <Typography
                                 variant="h4"
-                                fontWeight="bold"
                                 sx={{
+                                    fontWeight: "bold",
                                     color: theme.palette.text.secondary,
                                     opacity: 0.8
-                                }}
-                            >
+                                }}>
                                 VS
                             </Typography>
                             <Divider orientation="vertical" sx={{
@@ -124,7 +125,7 @@ const TeamComparisonCard = ({ activity }: { activity: SportsActivity<Sport> }) =
                     </Grid>
 
                     {/* Right Team */}
-                    <Grid item xs={5} sx={{ textAlign: isMobile ? 'center' : 'right' }}>
+                    <Grid sx={{ textAlign: isMobile ? 'center' : 'right' }} size={5}>
                         <TeamDisplay
                             team={team2}
                             activity={activity}
@@ -149,20 +150,18 @@ const TeamDisplay = ({ team, activity, score, secondaryStat, isWinner, align, co
         <Box>
             <Typography
                 variant="h5"
-                fontWeight="bold"
                 sx={{
+                    fontWeight: "bold",
                     color: isWinner ? theme.palette[color].main : 'inherit',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center',
                     gap: 1
-                }}
-            >
+                }}>
                 {isWinner && align === 'left' && <EmojiEventsIcon color={color} />}
                 {team.name}
                 {isWinner && align === 'right' && <EmojiEventsIcon color={color} />}
             </Typography>
-
             <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center' }}>
                 <Typography variant="h3" sx={{ fontWeight: 'bold', color: theme.palette[color].main, opacity: isWinner ? 1 : 0.7 }}>
                     {score}
@@ -172,11 +171,12 @@ const TeamDisplay = ({ team, activity, score, secondaryStat, isWinner, align, co
                 </Typography>}
             </Box>
             {(activity.game instanceof Cricket) && (
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                }}>
                     {activity.game.getTeamOvers(team.id)} overs
                 </Typography>
             )}
-
             <Box sx={{
                 display: 'flex',
                 mt: 1,

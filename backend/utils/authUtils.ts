@@ -24,11 +24,7 @@ const generateToken = (userData: UserData): string => {
  * @param {string} token - The Firebase ID token to verify
  * @returns {admin.auth.DecodedIdToken | null} Decoded token payload if verification succeeds, null if verification fails
  */
-const verifyToken = async (token: string): Promise<admin.auth.DecodedIdToken | JwtPayload | null> => {
-	try {
-		// First try to verify as a standard JWT
-		return jwt.verify(token, JWT_SECRET) as JwtPayload;
-	} catch { }
+const verifyToken = async (token: string): Promise<admin.auth.DecodedIdToken | null> => {
 	try {
 		return await admin.auth().verifyIdToken(token);
 	} catch (error) {
@@ -56,6 +52,7 @@ const getUserFromToken = async (token: string, fetchFromDb: boolean = false): Pr
 		}
 
 		return UserData.parse({
+			uid: decoded.uid,
 			name: decoded.name || decoded.email?.split('@')[0] || '',
 			username: decoded.email || '',
 			role: decoded.role || Role.USER,

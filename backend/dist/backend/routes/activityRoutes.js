@@ -13,9 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const activities_1 = require("@services/activities");
 const auth_1 = require("@middlewares/auth");
 const router = express_1.default.Router();
+const voteRateLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    limit: 10, // 10 requests per IP
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Too many vote attempts. Please try again later.' },
+});
 /**
  * Activity Routes
  */
@@ -112,14 +120,19 @@ router.get('/:eventId/:activityId/poll', (req, res) => __awaiter(void 0, void 0,
     }
 }));
 // Cast a vote for a participant
-router.post('/:eventId/:activityId/vote/:teamId', auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/:eventId/:activityId/vote/:teamId', voteRateLimiter, auth_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userdata = 'user' in req ? req.user : null;
         if (!userdata) {
             res.status(400).json({ message: 'User data missing from token' });
             return;
         }
-        const result = yield (0, activities_1.castVote)(req.params.eventId, req.params.activityId, req.params.teamId, userdata.username);
+        if (!userdata.uid) {
+            res.status(400).json({ message: 'User uid missing from token' });
+            return;
+        }
+        const result = yield (0, activities_1.castVote)(req.params.eventId, req.params.activityId, req.params.teamId, userdata.uid, userdata.username);
+        console.log(`Vote cast successfully for team ${req.params.teamId} by user ${userdata.uid}`);
         res.status(200).json(result);
     }
     catch (error) {

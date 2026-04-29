@@ -39,7 +39,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
     <Box>
       <Grid container spacing={3}>
         {/* Teams Card */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -48,7 +48,12 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
 
               <Grid container spacing={2}>
                 {activity.teams?.map(team => (
-                  <Grid item xs={12} md={6} key={team.id}>
+                  <Grid
+                    key={team.id}
+                    size={{
+                      xs: 12,
+                      md: 6
+                    }}>
                     <Box
                       sx={{
                         p: 2,
@@ -59,17 +64,29 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                       }}
                     >
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                        <Typography variant="body1" fontWeight="medium">
+                        <Typography variant="body1" sx={{
+                          fontWeight: "medium"
+                        }}>
                           {team.name}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{
+                          color: "text.secondary"
+                        }}>
                           {activity.getTeamPlayers(team.id).length} Players
                         </Typography>
                       </Box>
 
                       {/* Playing Players */}
                       <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="success.main" sx={{ mb: 1, fontWeight: 'medium', display: 'flex', alignItems: 'center' }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "success.main",
+                            mb: 1,
+                            fontWeight: 'medium',
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}>
                           <Box
                             component="span"
                             sx={{
@@ -109,7 +126,15 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                       {/* Substitutes */}
                       {activity.getTeamPlayers(team.id).filter(p => !p.isPlaying).length > 0 && (
                         <Box>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 'medium', display: 'flex', alignItems: 'center' }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "text.secondary",
+                              mb: 1,
+                              fontWeight: 'medium',
+                              display: 'flex',
+                              alignItems: 'center'
+                            }}>
                             <Box
                               component="span"
                               sx={{
@@ -156,7 +181,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
         </Grid>
 
         {/* Activity Details */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -179,7 +204,9 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
                 {game.winner && (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <EmojiEventsIcon color="primary" />
-                    <Typography variant="body1" fontWeight="medium">
+                    <Typography variant="body1" sx={{
+                      fontWeight: "medium"
+                    }}>
                       Winner: {activity.teams?.find(t => t.id === game.winner)?.name || 'Unknown Team'}
                     </Typography>
                   </Box>
@@ -196,7 +223,7 @@ const OverviewTab = ({ activity, game }: { activity: SportsActivity<Sport>, game
 const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, game: OtherSport }) => {
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
@@ -215,8 +242,7 @@ const ScoreboardTab = ({ activity, game }: { activity: SportsActivity<Sport>, ga
           </CardContent>
         </Card>
       </Grid>
-
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>

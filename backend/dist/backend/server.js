@@ -53,8 +53,10 @@ const eventRoutes_1 = __importDefault(require("@routes/eventRoutes"));
 const activityRoutes_1 = __importDefault(require("@routes/activityRoutes"));
 const articleRoutes_1 = __importDefault(require("@routes/articleRoutes"));
 const authRoutes_1 = __importDefault(require("@routes/authRoutes"));
+const logger_1 = require("@utils/logger");
 const os = require("os");
 const app = (0, express_1.default)();
+app.set("trust proxy", true); // Trust the first proxy (request logger) to get correct client IPs
 // Configure CORS to handle credentials
 app.use((0, cors_1.default)({
     origin: function (origin, callback) {
@@ -85,6 +87,7 @@ app.use((0, cors_1.default)({
 if (process.env.NODE_ENV !== "development") {
     app.use((0, helmet_1.default)());
 }
+app.use(logger_1.requestLogger);
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
 app.get("/api", (req, res) => {

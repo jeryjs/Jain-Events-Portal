@@ -278,7 +278,9 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
     return (
       <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
         <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography variant="h6" color="text.secondary">
+          <Typography variant="h6" sx={{
+            color: "text.secondary"
+          }}>
             At least two teams are required to set up the volleyball match.
           </Typography>
         </Box>
@@ -291,7 +293,9 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
     return (
       <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
         <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography variant="h6" color="text.secondary">
+          <Typography variant="h6" sx={{
+            color: "text.secondary"
+          }}>
             Initializing volleyball match data...
           </Typography>
         </Box>
@@ -302,12 +306,18 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
   return (
     <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', color: 'primary.main' }}>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: "bold",
+            display: 'flex',
+            alignItems: 'center',
+            color: 'primary.main'
+          }}>
           <SportsVolleyballIcon sx={{ mr: 1 }} /> Volleyball Match
         </Typography>
         <Divider sx={{ mt: 1 }} />
       </Box>
-
       {/* Match Summary */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         {teams.map((team) => {
@@ -315,7 +325,12 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
           const totalPoints = getTeamTotalPoints(team.id);
 
           return (
-            <Grid item xs={12} sm={6} key={team.id}>
+            <Grid
+              key={team.id}
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <Card variant="outlined" sx={{
                 height: '100%',
                 borderWidth: 2,
@@ -332,12 +347,18 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
                   }
                   action={
                     <Box sx={{ display: 'flex', alignItems: 'center', pr: 2 }}>
-                      <Typography variant="h4" fontWeight="bold">
+                      <Typography variant="h4" sx={{
+                        fontWeight: "bold"
+                      }}>
                         {setsWon}
                       </Typography>
                       <Box sx={{ ml: 2, textAlign: 'right' }}>
-                        <Typography variant="body2" color="text.secondary">Total Points</Typography>
-                        <Typography variant="body1" fontWeight="bold">{totalPoints}</Typography>
+                        <Typography variant="body2" sx={{
+                          color: "text.secondary"
+                        }}>Total Points</Typography>
+                        <Typography variant="body1" sx={{
+                          fontWeight: "bold"
+                        }}>{totalPoints}</Typography>
                       </Box>
                     </Box>
                   }
@@ -347,7 +368,6 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
           );
         })}
       </Grid>
-
       {/* Sets as Accordions */}
       {isVolleyballFormat(game) && game.sets && game.sets.map((set, index) => (
         <Accordion 
@@ -366,8 +386,12 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
                 const points = set.points.find(p => p.teamId === team.id)?.points || 0;
                 return (
                   <Box key={team.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" color="text.secondary">{team.name?.split(' ')[0] || 'Team'}:</Typography>
-                    <Typography variant="body1" fontWeight="bold">{points}</Typography>
+                    <Typography variant="body2" sx={{
+                      color: "text.secondary"
+                    }}>{team.name?.split(' ')[0] || 'Team'}:</Typography>
+                    <Typography variant="body1" sx={{
+                      fontWeight: "bold"
+                    }}>{points}</Typography>
                   </Box>
                 );
               })}
@@ -399,7 +423,12 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
               {teams.map((team) => {
                 const teamPoints = set.points.find(p => p.teamId === team.id)?.points || 0;
                 return (
-                  <Grid item xs={12} sm={6} key={team.id}>
+                  <Grid
+                    key={team.id}
+                    size={{
+                      xs: 12,
+                      sm: 6
+                    }}>
                     <Card variant="outlined" sx={{ mb: 1 }}>
                       <CardContent sx={{ 
                         display: 'flex', 
@@ -436,7 +465,6 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
           </AccordionDetails>
         </Accordion>
       ))}
-
       {/* Add New Set Button */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
         <Button 
@@ -447,7 +475,6 @@ export const Volleyball = ({ formData, setFormData }: VolleyballProps) => {
           Add Set
         </Button>
       </Box>
-
       {/* Notification */}
       <Snackbar
         open={!!notification}

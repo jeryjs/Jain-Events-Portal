@@ -2,13 +2,14 @@ import Article from '@common/models/Article';
 import { parseArticles } from '@common/utils';
 import { cache, TTL } from '@config/cache';
 import db from '@config/firebase';
-import { 
-  getCachedItem, 
-  getCachedCollection, 
-  createCachedItem, 
-  updateCachedItem, 
-  deleteCachedItem 
+import {
+  getCachedItem,
+  getCachedCollection,
+  createCachedItem,
+  updateCachedItem,
+  deleteCachedItem
 } from '@utils/cacheUtils';
+import { get } from 'http';
 
 // Collection references
 const articlesCollection = db.collection('articles');
@@ -50,22 +51,23 @@ export const getArticleById = async (articleId: string) => {
 export const updateArticleViewCount = async (articleId: string) => {
   const articleKey = `${ITEM_KEY_PREFIX}-${articleId}`;
   let articleData: Article | null = cache.get(articleKey) as Article;
-  
+
   if (!articleData) {
     console.log(`🔥 Database: Fetching article by ID for view count update: ${articleId}`);
     const doc = await articlesCollection.doc(articleId).get();
     if (!doc.exists) return null;
     articleData = Article.parse(doc.data());
   }
-  
+
   articleData.viewCount = (articleData.viewCount || 0) + 1;
-  
+
   return updateCachedItem<Article>({
-    item: articleData,
+    oldItem: articleData,
     collectionKey: COLLECTION_KEY,
     itemKeyPrefix: ITEM_KEY_PREFIX,
     updateFn: async (item) => {
       await articlesCollection.doc(item.id).update({ viewCount: item.viewCount });
+      return Article.parse(item);
     },
     ttl: TTL.ARTICLES
   });
@@ -76,7 +78,7 @@ export const updateArticleViewCount = async (articleId: string) => {
  */
 export const createArticle = async (articleData: any) => {
   const article = Article.parse(articleData);
-  
+
   return createCachedItem<Article>({
     item: article,
     collectionKey: COLLECTION_KEY,
@@ -92,14 +94,16 @@ export const createArticle = async (articleData: any) => {
  * Update existing article
  */
 export const updateArticle = async (articleId: string, articleData: any) => {
-  const article = Article.parse(articleData);
-  
+  const existingArticle = await getArticleById(articleId);
+  if (!existingArticle) return null;
+
   return updateCachedItem<Article>({
-    item: article,
+    oldItem: existingArticle,
     collectionKey: COLLECTION_KEY,
     itemKeyPrefix: ITEM_KEY_PREFIX,
     updateFn: async (item) => {
       await articlesCollection.doc(item.id).update(item.toJSON());
+      return Article.parse(item);
     },
     ttl: TTL.ARTICLES
   });
@@ -111,9 +115,9 @@ export const updateArticle = async (articleId: string, articleData: any) => {
 export const deleteArticle = async (articleId: string) => {
   const articleDoc = articlesCollection.doc(articleId);
   const doc = await articleDoc.get();
-  
+
   if (!doc.exists) return false;
-  
+
   return deleteCachedItem<Article>({
     id: articleId,
     collectionKey: COLLECTION_KEY,

@@ -154,6 +154,7 @@ export const useCastVote = (eventId: string, activityId: string) => {
 					"Content-Type": "application/json",
 					"Cache-Control": "no-cache",
 				},
+				credentials: "include", // Important: This allows the session cookie to be sent
 			});
 
 			if (!response.ok) {

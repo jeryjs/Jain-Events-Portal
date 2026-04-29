@@ -1,6 +1,6 @@
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
+import { getMessaging, getToken, isSupported, Messaging, onMessage } from "firebase/messaging";
 import config from "./config";
 import { addNotification } from "./utils/notificationUtils";
 
@@ -9,7 +9,7 @@ const firebaseConfig = JSON.parse(import.meta.env.VITE_FIREBASE_CLIENT_CONFIG_JS
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-let messaging = null;
+let messaging: Messaging | null;
 
 // Initialize FCM only if supported and already granted
 export const initializeMessaging = async () => {
@@ -73,7 +73,7 @@ export const initializeMessaging = async () => {
 
 // Initialize messaging and export
 initializeMessaging().then((result) => {
-	messaging = result;
+	messaging = result || null;
 });
 
 // Process and save incoming notification

@@ -42,7 +42,8 @@ export const getAllBaseEventTypes = (): EventType[] => {
         .filter((value) => typeof value === "number" && value % 1000 === 0) as EventType[];
 }
 
-export const getActivityTypes = (type: EventType): EventType[] => {
+export const getActivityTypes = (type: EventType | undefined): EventType[] => {
+    if (type === undefined) return [];
     const nextBaseType = type + 1000;
     const types: EventType[] = [];
     for (let i = type + 1; i < nextBaseType; i++) {

@@ -53,7 +53,7 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
   // Initialize game stats if needed
   const initializeGameStats = useCallback(() => {
     if (!game.stats || game.stats.length === 0) {
-      const initialStats = teams.map(team => ({
+      const initialStats: Football['stats'] = teams.map(team => ({
         teamId: team.id,
         goals: [],
         assists: [],
@@ -118,7 +118,7 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
       });
     }
 
-    const teamStat = updatedStats.find(stat => stat.teamId === teamId);
+    const teamStat = updatedStats.find(stat => stat.teamId === teamId) as Football['stats'][0];
 
     switch (actionType) {
       case 'goal':
@@ -194,12 +194,18 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
   return (
     <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', color: theme.palette.primary.main }}>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: "bold",
+            display: 'flex',
+            alignItems: 'center',
+            color: theme.palette.primary.main
+          }}>
           <SportsSoccerIcon sx={{ mr: 1 }} /> Football Match
         </Typography>
         <Divider sx={{ mt: 1 }} />
       </Box>
-
       {/* Scoreboard - Side by Side */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         {teams.map((team) => {
@@ -211,7 +217,12 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
           };
 
           return (
-            <Grid item xs={12} md={6} key={team.id}>
+            <Grid
+              key={team.id}
+              size={{
+                xs: 12,
+                md: 6
+              }}>
               <Card variant="outlined" sx={{
                 height: '100%',
                 borderWidth: 2,
@@ -228,7 +239,9 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
                   }
                   action={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, pr: 2 }}>
-                      <Typography variant="h4" fontWeight="bold">
+                      <Typography variant="h4" sx={{
+                        fontWeight: "bold"
+                      }}>
                         {goals}
                       </Typography>
                       <Box>
@@ -255,13 +268,17 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
           );
         })}
       </Grid>
-
       {/* Teams and Players - Side by Side */}
       <Grid container spacing={3}>
         {teams.map((team) => {
           const teamPlayers = getTeamPlayers(team.id);
           return (
-            <Grid item xs={12} md={6} key={team.id}>
+            <Grid
+              key={team.id}
+              size={{
+                xs: 12,
+                md: 6
+              }}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -287,7 +304,9 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
                             bgcolor: isHovered ? `${theme.palette.primary.main}15` : 'transparent'
                           }}
                         >
-                          <Box display="flex">
+                          <Box sx={{
+                            display: "flex"
+                          }}>
                             <ListItemAvatar>
                               <Avatar sx={{
                                 bgcolor: isHovered ? theme.palette.primary.main : theme.palette.grey[400],
@@ -304,7 +323,6 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
                               }}
                             />
                           </Box>
-
                           {/* Action chips with smooth transition */}
                           <Box sx={{
                             height: isHovered ? '40px' : '0px',
@@ -419,7 +437,12 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
                       );
                     })}
                     {teamPlayers.length === 0 && (
-                      <Typography color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
+                      <Typography
+                        sx={{
+                          color: "text.secondary",
+                          p: 2,
+                          textAlign: 'center'
+                        }}>
                         No players in this team
                       </Typography>
                     )}
@@ -430,7 +453,6 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
           );
         })}
       </Grid>
-
       {/* Edit Actions Section */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6" gutterBottom>Edit Actions</Typography>
@@ -449,7 +471,14 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
                   {goals.map((goal, index) => {
                     const player = players.find(p => p.usn === goal.playerId);
                     return (
-                      <Grid item key={`goal-${index}`} xs={6} sm={4} md={3} lg={2}>
+                      <Grid
+                        key={`goal-${index}`}
+                        size={{
+                          xs: 6,
+                          sm: 4,
+                          md: 3,
+                          lg: 2
+                        }}>
                         <Tooltip title={`Remove Goal from ${player?.name || 'Unknown'}`}>
                           <IconButton
                             size="small"
@@ -465,7 +494,14 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
                   {assists.map((assist, index) => {
                     const player = players.find(p => p.usn === assist.playerId);
                     return (
-                      <Grid item key={`assist-${index}`} xs={6} sm={4} md={3} lg={2}>
+                      <Grid
+                        key={`assist-${index}`}
+                        size={{
+                          xs: 6,
+                          sm: 4,
+                          md: 3,
+                          lg: 2
+                        }}>
                         <Tooltip title={`Remove Assist from ${player?.name || 'Unknown'}`}>
                           <IconButton
                             size="small"
@@ -481,7 +517,14 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
                   {yellowCards.map((card, index) => {
                     const player = players.find(p => p.usn === card.playerId);
                     return (
-                      <Grid item key={`yellow-${index}`} xs={6} sm={4} md={3} lg={2}>
+                      <Grid
+                        key={`yellow-${index}`}
+                        size={{
+                          xs: 6,
+                          sm: 4,
+                          md: 3,
+                          lg: 2
+                        }}>
                         <Tooltip title={`Remove Yellow Card from ${player?.name || 'Unknown'}`}>
                           <IconButton
                             size="small"
@@ -497,7 +540,14 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
                   {redCards.map((card, index) => {
                     const player = players.find(p => p.usn === card.playerId);
                     return (
-                      <Grid item key={`red-${index}`} xs={6} sm={4} md={3} lg={2}>
+                      <Grid
+                        key={`red-${index}`}
+                        size={{
+                          xs: 6,
+                          sm: 4,
+                          md: 3,
+                          lg: 2
+                        }}>
                         <Tooltip title={`Remove Red Card from ${player?.name || 'Unknown'}`}>
                           <IconButton
                             size="small"
@@ -511,8 +561,12 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
                     );
                   })}
                   {(goals.length === 0 && assists.length === 0 && yellowCards.length === 0 && redCards.length === 0) && (
-                    <Grid item xs={12}>
-                      <Typography color="text.secondary" sx={{ p: 2 }}>No actions recorded for this team</Typography>
+                    <Grid size={12}>
+                      <Typography
+                        sx={{
+                          color: "text.secondary",
+                          p: 2
+                        }}>No actions recorded for this team</Typography>
                     </Grid>
                   )}
                 </Grid>
@@ -521,7 +575,6 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
           );
         })}
       </Box>
-
       {/* Confirm Delete Dialog */}
       <Dialog
         open={!!confirmDelete}
@@ -536,7 +589,6 @@ export const FootballForm = ({ formData, setFormData }: FootballFormProps) => {
           <Button onClick={handleConfirmDelete} color="error">Delete</Button>
         </DialogActions>
       </Dialog>
-
       {/* Notification */}
       <Snackbar
         open={!!notification}

@@ -13,9 +13,11 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
       workbox: {
+        // Keep backend routes out of the SPA shell so /api/* always reaches Express.
+        navigateFallbackDenylist: [/^\/api(?:\/|$)/],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
         runtimeCaching: [
@@ -84,37 +86,12 @@ export default defineConfig({
       '@pages': path.resolve(__dirname, './src/pages'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
       '@utils': path.resolve(__dirname, './src/utils'),
-    }
+    },
+    conditions: ['mui-modern', 'module', 'browser', 'development|production']
   },
   server: {
     port: 5780,
     host: "0.0.0.0",
     allowedHosts: ['jeryjs.me', 'admin.jeryjs.me', '10.0.0.4', 'localhost']
-  },
-
-  build: {
-    rollupOptions: {
-      output: {
-        // Bundle everything into fewer chunks to reduce Vercel requests
-        manualChunks: {
-          // Single vendor chunk for all dependencies
-          vendor: ['react', 'react-dom', '@mui/material', '@mui/icons-material', '@mui/lab', '@tanstack/react-query', 'framer-motion'],
-        },
-        // Reduce the number of separate CSS files
-        assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split('.');
-          const ext = info[info.length - 1];
-          if (/\.(css)$/.test(assetInfo.name)) {
-            return `assets/[name]-[hash].${ext}`;
-          }
-          return `assets/[name]-[hash].${ext}`;
-        },
-        // Bundle JS files more aggressively
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-      },
-    },
-    // Increase chunk size limit to allow larger bundles
-    chunkSizeWarningLimit: 5000,
   },
 })

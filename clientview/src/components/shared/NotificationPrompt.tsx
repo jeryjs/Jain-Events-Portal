@@ -1,6 +1,6 @@
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlined';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
@@ -218,7 +218,12 @@ const NotificationPrompt = (props) => {
 
   if (!isSubscribed && !showSettings) {
     return (
-      <Box display='grid' alignContent='center' {...props}>
+      <Box
+        {...props}
+        sx={[{
+          display: 'grid',
+          alignContent: 'center'
+        }, ...(Array.isArray(props.sx) ? props.sx : [props.sx])]}>
         <NotificationIconContainer>
           <NotificationsActiveIcon
             sx={{
@@ -228,23 +233,28 @@ const NotificationPrompt = (props) => {
             }}
           />
         </NotificationIconContainer>
-
-        <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: "700",
+            textAlign: "center",
+            mb: 1.5
+          }}>
           {isSubscribing ? "Setting Up Notifications..." : "Never Miss an Event!"}
         </Typography>
-
         <Typography
           variant="body2"
-          color="text.secondary"
-          textAlign="center"
-          sx={{ mb: 3, px: 1 }}
-        >
+          sx={{
+            color: "text.secondary",
+            textAlign: "center",
+            mb: 3,
+            px: 1
+          }}>
           {isSubscribing
             ? "Preparing your personalized event notifications..."
             : "Get instant updates about upcoming events, shrine timings and important announcements directly to your device."
           }
         </Typography>
-
         {permissionStatus !== 'granted' && !isSubscribing && !isSubscribed && (
           <EnableButton
             variant="contained"
@@ -256,7 +266,6 @@ const NotificationPrompt = (props) => {
             Enable Notifications
           </EnableButton>
         )}
-
         {permissionStatus === 'denied' && !showSettings && (
           <SecondaryButton
             variant="outlined"
@@ -267,16 +276,15 @@ const NotificationPrompt = (props) => {
             Having trouble?
           </SecondaryButton>
         )}
-
         <Divider />
-
         {permissionStatus === 'granted' && isSubscribing && (
           <Box sx={{ py: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
             <CircularProgress size={20} />
-            <Typography variant="body2" color="primary" fontWeight="medium">Almost there...</Typography>
+            <Typography variant="body2" color="primary" sx={{
+              fontWeight: "medium"
+            }}>Almost there...</Typography>
           </Box>
         )}
-
         {permissionStatus === 'granted' && !isSubscribing && isSubscribed && (
           <Box sx={{ textAlign: 'center', py: 1 }}>
             <Avatar
@@ -288,80 +296,91 @@ const NotificationPrompt = (props) => {
             >
               <CheckCircleOutlineIcon />
             </Avatar>
-            <Typography variant="body2" color="success.main" fontWeight="medium">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "success.main",
+                fontWeight: "medium"
+              }}>
               Push notifications enabled successfully!
             </Typography>
           </Box>
         )}
-
         <Typography
           variant="caption"
-          color="text.secondary"
-          textAlign="center"
-          sx={{ mt: 2, opacity: 0.7 }}
-        >
+          sx={{
+            color: "text.secondary",
+            textAlign: "center",
+            mt: 2,
+            opacity: 0.7
+          }}>
           You can change notification settings anytime
         </Typography>
       </Box>
-    )
+    );
   }
 
   // Settings view - instructions for rejected permissions
   if (!isSubscribed && showSettings) {
-    return (<>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-        <Avatar sx={{ bgcolor: theme.palette.warning.light, width: 56, height: 56 }}>
-          <ErrorOutlineIcon sx={{ fontSize: 32, color: theme.palette.warning.dark }} />
-        </Avatar>
-      </Box>
-
-      <Typography variant="h6" fontWeight="700" textAlign="center" sx={{ mb: 1.5 }}>
-        Permission Required
-      </Typography>
-
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        textAlign="center"
-        sx={{ mb: 3, px: 1 }}
-      >
-        Notifications have been blocked in {getBrowserName()}. To enable them:
-      </Typography>
-
-      <Box sx={{
-        backgroundColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
-        borderRadius: 2,
-        p: 2,
-        width: '100%',
-        mb: 2
-      }}>
-        <Typography variant="body2" component="ol" sx={{ pl: 2 }}>
-          <li>Click the button below to open {getBrowserName()} settings</li>
-          <li>Find "FET Hub" in the list of sites</li>
-          <li>Change notifications to "Allow"</li>
-          <li>Return to this page and try again</li>
+    return (
+      <>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+          <Avatar sx={{ bgcolor: theme.palette.warning.light, width: 56, height: 56 }}>
+            <ErrorOutlineIcon sx={{ fontSize: 32, color: theme.palette.warning.dark }} />
+          </Avatar>
+        </Box>
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: "700",
+            textAlign: "center",
+            mb: 1.5
+          }}>
+          Permission Required
         </Typography>
-      </Box>
-
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        onClick={openBrowserSettings}
-        startIcon={<OpenInNewIcon />}
-        sx={{ mb: 1.5 }}
-      >
-        Open Browser Settings
-      </Button>
-
-      <Button
-        variant="text"
-        size="small"
-        onClick={() => setShowSettings(false)}
-      >
-        Go back
-      </Button>
-    </>)
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            textAlign: "center",
+            mb: 3,
+            px: 1
+          }}>
+          Notifications have been blocked in {getBrowserName()}. To enable them:
+        </Typography>
+        <Box sx={{
+          backgroundColor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.05)',
+          borderRadius: 2,
+          p: 2,
+          width: '100%',
+          mb: 2
+        }}>
+          <Typography variant="body2" component="ol" sx={{ pl: 2 }}>
+            <li>Click the button below to open {getBrowserName()} settings</li>
+            <li>Find "FET Hub" in the list of sites</li>
+            <li>Change notifications to "Allow"</li>
+            <li>Return to this page and try again</li>
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={openBrowserSettings}
+          startIcon={<OpenInNewIcon />}
+          sx={{ mb: 1.5 }}
+        >
+          Open Browser Settings
+        </Button>
+        <Button
+          variant="text"
+          size="small"
+          onClick={() => setShowSettings(false)}
+        >
+          Go back
+        </Button>
+      </>
+    );
   }
 
   // Notifications list view
@@ -382,7 +401,9 @@ const NotificationPrompt = (props) => {
               px: 1
             }}
           >
-            <Typography variant="subtitle2" fontWeight={600}>
+            <Typography variant="subtitle2" sx={{
+              fontWeight: 600
+            }}>
               Notification History
             </Typography>
             <Tooltip title="Mark all as read">
@@ -416,22 +437,25 @@ const NotificationPrompt = (props) => {
               >
                 <ListItemAvatar>
                   <Avatar
+                    src={notification.imageUrl}
+                    alt={notification.title}
                     sx={{
                       bgcolor: notification.read ?
                         (theme.palette.mode === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.08)') :
                         'primary.light'
                     }}
                   >
-                    {!notification.read ?
+                    {notification.imageUrl ? null : (!notification.read ?
                       <NotificationsActiveIcon color="primary" /> :
-                      <NotificationsIcon color="action" />
-                    }
+                      <NotificationsIcon color="action" />)}
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
                   primary={
                     <Box sx={{ display: 'flex', pr: 4, alignItems: 'flex-start' }}>
-                      <Typography variant="subtitle2" component="span" fontWeight={notification.read ? 400 : 600}>
+                      <Typography variant="subtitle2" component="span" sx={{
+                        fontWeight: notification.read ? 400 : 600
+                      }}>
                         {notification.title}
                       </Typography>
                       {!notification.read && (
@@ -448,13 +472,12 @@ const NotificationPrompt = (props) => {
                     <>
                       <Typography
                         variant="body2"
-                        color="text.primary"
                         sx={{
+                          color: "text.primary",
                           display: 'block',
                           fontWeight: notification.read ? 'normal' : 500,
                           opacity: notification.read ? 0.9 : 1
-                        }}
-                      >
+                        }}>
                         {notification.body}
                       </Typography>
                       <NotificationTimestamp>

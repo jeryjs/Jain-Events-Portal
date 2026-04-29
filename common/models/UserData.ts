@@ -2,6 +2,7 @@ import { Role } from '../constants';
 
 export default class UserData {
     constructor(
+        public uid: string,
         public name: string,
         public username: string,
         public role: Role,
@@ -16,8 +17,11 @@ export default class UserData {
 		if (data.username && adminEmails.includes(data.username.toLowerCase()) && data.role < Role.ADMIN) {
 			data.role = Role.ADMIN;
 		}
+
+		const uid = data.uid || data.userId || data.id || '';
         
         return new UserData(
+            uid,
             data.name || '',
             data.username || data.email || '',
             data.role || Role.USER,
@@ -27,6 +31,7 @@ export default class UserData {
 
     toJSON(): object {
         return {
+            uid: this.uid,
             name: this.name,
             username: this.username,
             role: this.role,

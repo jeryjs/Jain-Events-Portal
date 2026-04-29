@@ -111,7 +111,7 @@ function TimelinePage() {
   const { events, isLoading } = useEvents();
   const timelineRef = useRef<HTMLDivElement>(null);
   const [activeMarker, setActiveMarker] = useState<MarkerType | null>(null);
-  const [itemRefs, setItemRefs] = useState<Record<string, React.RefObject<HTMLElement>>>({});
+  const [itemRefs, setItemRefs] = useState<Record<string, React.RefObject<HTMLElement | null>>>({});
   const isWideScreen = useMediaQuery('(min-width: 900px)');
   const [selectedEventType, setSelectedEventType] = useState(-1);
   const location = useLocation();
@@ -170,10 +170,10 @@ function TimelinePage() {
   // Initialize refs for sections
   useEffect(() => {
     if (events && events.length > 0) {
-      const refs: Record<string, React.RefObject<HTMLElement>> = {};
+      const refs: Record<string, React.RefObject<HTMLElement | null>> = {};
       Object.keys(groupedEvents).forEach(year => {
         Object.keys(groupedEvents[year]).forEach(month => {
-          refs[`${year}-${month}`] = React.createRef<HTMLElement>();
+          refs[`${year}-${month}`] = React.createRef<HTMLElement | null>();
         });
       });
       setItemRefs(refs);
@@ -211,7 +211,7 @@ function TimelinePage() {
       const viewportHeight = timelineRef.current?.clientHeight || 0;
       const viewportMid = scrollPosition + viewportHeight / 3; // 1/3 from the top
 
-      let closestElement = null;
+      let closestElement = '';
       let minDistance = Infinity;
 
       // Find the closest section to the viewport mid
@@ -266,7 +266,7 @@ function TimelinePage() {
       if (itemRefs[elementId]?.current) {
         setTimeout(() => {
           const element = itemRefs[elementId].current;
-          timelineRef.current?.scrollTo({ top: element.offsetTop });
+          timelineRef.current?.scrollTo({ top: element?.offsetTop });
           // Mark as scrolled so we don't do it again
           scrolledToHashRef.current = true;
         }, 100);

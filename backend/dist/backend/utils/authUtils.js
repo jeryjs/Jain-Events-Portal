@@ -70,11 +70,6 @@ exports.generateToken = generateToken;
  */
 const verifyToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // First try to verify as a standard JWT
-        return jsonwebtoken_1.default.verify(token, JWT_SECRET);
-    }
-    catch (_a) { }
-    try {
         return yield firebase_admin_1.default.auth().verifyIdToken(token);
     }
     catch (error) {
@@ -103,6 +98,7 @@ const getUserFromToken = (token_1, ...args_1) => __awaiter(void 0, [token_1, ...
                 return dbUser;
         }
         return models_1.UserData.parse({
+            uid: decoded.uid,
             name: decoded.name || ((_a = decoded.email) === null || _a === void 0 ? void 0 : _a.split('@')[0]) || '',
             username: decoded.email || '',
             role: decoded.role || constants_1.Role.USER,

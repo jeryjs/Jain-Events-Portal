@@ -46,6 +46,7 @@ const isUserEventManager = (eventId, username) => __awaiter(void 0, void 0, void
     return managers.includes(username);
 });
 exports.isUserEventManager = isUserEventManager;
+const constants_1 = require("@common/constants");
 const Event_1 = __importDefault(require("@common/models/Event"));
 const utils_1 = require("@common/utils");
 const cache_1 = require("@config/cache");
@@ -61,7 +62,7 @@ const ITEM_KEY_PREFIX = "events";
 // Helper to filter sensitive fields
 function filterEventForUser(event, user) {
     // Only admins or managers for this event can see managers field
-    if (!user || (user.role < 100 && !(event.managers && event.managers.includes(user.username)))) {
+    if (!user || (user.role < constants_1.Role.MANAGER && !(event.managers && event.managers.includes(user.username)))) {
         const { managers } = event, rest = __rest(event, ["managers"]);
         return rest;
     }
@@ -115,11 +116,20 @@ exports.createEvent = createEvent;
  * Update existing event
  */
 const updateEvent = (eventId, eventData) => __awaiter(void 0, void 0, void 0, function* () {
-    // Only update provided fields (patch)
-    yield eventsCollection.doc(eventId).update(eventData);
-    // Invalidate cache for this event
-    cache_1.cache.del(`${ITEM_KEY_PREFIX}-${eventId}`);
-    return (yield eventsCollection.doc(eventId).get()).data();
+    const existingEvent = yield (0, exports.getEventById)(eventId);
+    if (!existingEvent)
+        return null;
+    return (0, cacheUtils_1.updateCachedItem)({
+        oldItem: existingEvent,
+        collectionKey: COLLECTION_KEY,
+        itemKeyPrefix: ITEM_KEY_PREFIX,
+        updateFn: (existingItem) => __awaiter(void 0, void 0, void 0, function* () {
+            const updatedItem = Object.assign(Object.assign({}, existingItem), eventData);
+            yield eventsCollection.doc(eventId).update(updatedItem);
+            return Event_1.default.parse(updatedItem);
+        }),
+        ttl: cache_1.TTL.EVENTS
+    });
 });
 exports.updateEvent = updateEvent;
 /**

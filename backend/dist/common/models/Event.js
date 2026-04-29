@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("@common/constants");
 class Event {
-    constructor(id, name, type, timings, description, venue, galleryLink, highlights, banner = [], managers = [], config = {}) {
+    constructor(id, name, type, timings, description, venue, galleryLink = "", highlights = "", banner = [], managers = [], config = {}) {
         this.id = id;
         this.name = name;
         this.type = type;

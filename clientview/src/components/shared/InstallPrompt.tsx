@@ -1,5 +1,5 @@
 import AppShortcutIcon from '@mui/icons-material/AppShortcut';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import {
     Avatar,
@@ -208,22 +208,33 @@ const InstallPrompt = ({ showAsComponent = false }: InstallPromptProps) => {
                     <IconContainer sx={{ width: 40, height: 40, boxShadow: 'none' }}>
                         <AppShortcutIcon color="primary" sx={{ fontSize: 24 }} />
                     </IconContainer>
-                    <Typography variant="h6" fontWeight="600">
+                    <Typography variant="h6" sx={{
+                        fontWeight: "600"
+                    }}>
                         Install FET Hub App
                     </Typography>
                 </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography
+                    variant="body2"
+                    sx={{
+                        color: "text.secondary",
+                        mb: 2
+                    }}>
                     {installAvailable
                         ? "Add to your home screen for quick access and a better experience."
                         : isStandalone
                             ? "You're already using the installed app!"
                             : "For the best experience, install our web app on your device."}
                 </Typography>
-
                 {isStandalone ? (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <CheckCircleOutlineIcon color="success" />
-                        <Typography variant="body2" color="success.main" fontWeight="medium">
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: "success.main",
+                                fontWeight: "medium"
+                            }}>
                             App installed successfully
                         </Typography>
                     </Box>
@@ -280,10 +291,20 @@ const InstallPrompt = ({ showAsComponent = false }: InstallPromptProps) => {
                             animation: `${slideIn} 0.5s ease-out`,
                             flexGrow: 1
                         }}>
-                            <Typography variant="h6" fontWeight="700" sx={{ mb: 0.5 }}>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    fontWeight: "700",
+                                    mb: 0.5
+                                }}>
                                 {installing ? "Installing..." : "Upgrade Your Experience"}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "text.secondary",
+                                    mb: 2
+                                }}>
                                 {installing ?
                                     "Setting up your app for offline access and faster loading" :
                                     "Add FET Hub to your home screen to stay updated with upcoming events, get notifications, and more."
@@ -331,7 +352,9 @@ const InstallPrompt = ({ showAsComponent = false }: InstallPromptProps) => {
                                         justifyContent: 'center',
                                         animation: `${pulse} 1.5s infinite ease-in-out`
                                     }}>
-                                        <Typography variant="body2" color="primary" fontWeight="medium">
+                                        <Typography variant="body2" color="primary" sx={{
+                                            fontWeight: "medium"
+                                        }}>
                                             Please follow the installation instructions
                                         </Typography>
                                     </Box>

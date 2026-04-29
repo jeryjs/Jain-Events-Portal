@@ -81,19 +81,36 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
           p: 2,
           textAlign: 'center'
         }}>
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="h6" sx={{
+            fontWeight: "bold"
+          }}>
             Upcoming Match
           </Typography>
         </Box>
         <CardContent>
-          <Typography variant="subtitle1" color="text.secondary" align="center">
+          <Typography variant="subtitle1" align="center" sx={{
+            color: "text.secondary"
+          }}>
             Get ready! The match is scheduled for:
           </Typography>
-          <Typography variant="h5" align="center" fontWeight="bold" sx={{ my: 2 }}>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{
+              fontWeight: "bold",
+              my: 2
+            }}>
             {new Date(activity.startTime).toLocaleString()}
           </Typography>
           <LinearProgress variant="determinate" value={0} sx={{ height: 8, borderRadius: 4 }} />
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ display: 'block', mt: 1 }}>
+          <Typography
+            variant="caption"
+            align="center"
+            sx={{
+              color: "text.secondary",
+              display: 'block',
+              mt: 1
+            }}>
             Stay tuned for live updates!
           </Typography>
         </CardContent>
@@ -104,7 +121,7 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
   return (
     <Grid container spacing={3}>
       {/* Score Card */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
           <Box
             sx={{
@@ -124,7 +141,12 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
           <Box sx={{ p: 3, pt: 5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <SportsBasketballIcon sx={{ mr: 1, color: theme.palette.primary.main }} />
-              <Typography variant="h5" fontWeight="bold" color="primary.main">
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: "bold",
+                  color: "primary.main"
+                }}>
                 Basketball Match
               </Typography>
             </Box>
@@ -137,9 +159,16 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                 bgcolor: 'rgba(0,0,0,0.03)',
                 borderRadius: 1
               }}>
-                <Box display="flex" alignItems="center" justifyContent="center">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
                   <EmojiEventsIcon color="secondary" sx={{ mr: 1 }} />
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography variant="h6" sx={{
+                    fontWeight: "bold"
+                  }}>
                   {matchStatus.winner
                     ? `${matchStatus.winner.name} won by ${Math.abs(
                     game.getTotalPoints(matchStatus.winner.id) -
@@ -158,7 +187,9 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                 bgcolor: 'rgba(76, 175, 80, 0.08)',
                 borderRadius: 1
               }}>
-                <Typography variant="body1" color="success.main">
+                <Typography variant="body1" sx={{
+                  color: "success.main"
+                }}>
                   Match in progress
                 </Typography>
               </Box>
@@ -219,7 +250,9 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                   .length > 0 && (
                     <TableRow>
                       <TableCell colSpan={5} sx={{ py: 1 }}>
-                        <Typography variant="subtitle2" fontWeight="medium">
+                        <Typography variant="subtitle2" sx={{
+                          fontWeight: "medium"
+                        }}>
                           Substitutes
                         </Typography>
                       </TableCell>
@@ -251,7 +284,9 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                   .map((playerWithPoints: any) => (
                     <TableRow key={playerWithPoints.usn}>
                     <TableCell>
-                      <Typography color="text.secondary">{playerWithPoints.name}</Typography>
+                      <Typography sx={{
+                        color: "text.secondary"
+                      }}>{playerWithPoints.name}</Typography>
                     </TableCell>
                     <TableCell align="center">{playerWithPoints.onePoints || '-'}</TableCell>
                     <TableCell align="center">{playerWithPoints.twoPoints || '-'}</TableCell>
@@ -268,9 +303,12 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
           </Box>
         </Paper>
       </Grid>
-
       {/* Top Scorers */}
-      <Grid item xs={12} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6
+        }}>
         <Card>
           <CardContent>
             <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
@@ -304,7 +342,9 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                             <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
                               {player.name.charAt(0)}
                             </Avatar>
-                            <Typography variant="body2" fontWeight={idx === 0 ? 'bold' : 'normal'}>
+                            <Typography variant="body2" sx={{
+                              fontWeight: idx === 0 ? 'bold' : 'normal'
+                            }}>
                               {player.name}
                               {idx === 0 && ' 👑'}
                             </Typography>
@@ -323,9 +363,12 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
           </CardContent>
         </Card>
       </Grid>
-
       {/* Point Distribution */}
-      <Grid item xs={12} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6
+        }}>
         <Card>
           <CardContent>
             <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
@@ -353,34 +396,47 @@ const BasketballOverview = ({ activity, game }: { activity: SportsActivity<Sport
                     <Avatar sx={{ width: 28, height: 28, mr: 1 }}>{team.name.charAt(0)}</Avatar>
                     <Typography variant="subtitle1">{team.name}</Typography>
                   </Box>
-
                   <Grid container spacing={1} sx={{ mb: 2 }}>
-                    <Grid item xs={4}>
+                    <Grid size={4}>
                       <Card variant="outlined" sx={{ p: 1, textAlign: 'center' }}>
-                        <Typography variant="h5" fontWeight="bold" color="secondary.main">
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: "bold",
+                            color: "secondary.main"
+                          }}>
                           {threePoints}
                         </Typography>
                         <Typography variant="caption">3-pointers ({threePointValue} pts)</Typography>
                       </Card>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid size={4}>
                       <Card variant="outlined" sx={{ p: 1, textAlign: 'center' }}>
-                        <Typography variant="h5" fontWeight="bold" color="primary.main">
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: "bold",
+                            color: "primary.main"
+                          }}>
                           {twoPoints}
                         </Typography>
                         <Typography variant="caption">2-pointers ({twoPointValue} pts)</Typography>
                       </Card>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid size={4}>
                       <Card variant="outlined" sx={{ p: 1, textAlign: 'center' }}>
-                        <Typography variant="h5" fontWeight="bold" color="success.main">
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: "bold",
+                            color: "success.main"
+                          }}>
                           {onePoints}
                         </Typography>
                         <Typography variant="caption">Free throws ({onePointValue} pts)</Typography>
                       </Card>
                     </Grid>
                   </Grid>
-
                   <Divider />
                 </Box>
               );

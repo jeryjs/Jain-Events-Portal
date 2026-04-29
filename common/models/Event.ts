@@ -21,14 +21,14 @@ export default class Event {
 		timings: any[] | Date[],
 		public description: string,
 		public venue: string,
-		public galleryLink: string,
-		public highlights: string,
+		public galleryLink: string = "",
+		public highlights: string = "",
 		public banner: BannerItem[] = [],
 		public managers: string[] = [],
 		public config: EventConfig = {}
 	) {
-	// Convert Timestamp-like objects (from firestore) to Date
-	this.timings = timings.map((t) => {
+		// Convert Timestamp-like objects (from firestore) to Date
+		this.timings = timings.map((t) => {
 			// If already a Date object
 			if (t instanceof Date) return t;
 
@@ -40,18 +40,18 @@ export default class Event {
 		});
 	}
 
-	static parse(data: any={}): Event {
+	static parse(data: any = {}): Event {
 		// Make sure banner is always an array with the correct shape
 		let banner = data.banner || [{ type: 'image' }];
 		if (!Array.isArray(banner)) {
 			// Convert legacy banner format to new format
-			banner = [{ 
-				url: data.banner?.url || undefined, 
+			banner = [{
+				url: data.banner?.url || undefined,
 				customCss: data.banner?.customCss || undefined,
-				type: 'image' 
+				type: 'image'
 			}];
 		}
-		
+
 		return new Event(
 			data.id || "",
 			data.name || "",

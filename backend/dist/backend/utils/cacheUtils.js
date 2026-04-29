@@ -71,19 +71,19 @@ function createCachedItem(_a) {
  * Update item with cache update
  */
 function updateCachedItem(_a) {
-    return __awaiter(this, arguments, void 0, function* ({ item, collectionKey, itemKeyPrefix, updateFn, ttl, }) {
-        console.log(`🔥 Database: Updating ${typeof item} item with ID ${item.id}`);
-        yield updateFn(item);
-        const itemKey = `${itemKeyPrefix}-${item.id}`;
+    return __awaiter(this, arguments, void 0, function* ({ oldItem, collectionKey, itemKeyPrefix, updateFn, ttl, }) {
+        console.log(`🔥 Database: Updating ${typeof oldItem} item with ID ${oldItem.id}`);
+        const updatedItem = yield updateFn(oldItem);
+        const itemKey = `${itemKeyPrefix}-${oldItem.id}`;
         // Update individual item cache
-        cache_1.cache.set(itemKey, item, ttl);
+        cache_1.cache.set(itemKey, updatedItem, ttl);
         // Update collection cache if it exists
         const cachedCollection = cache_1.cache.get(collectionKey);
         if (cachedCollection) {
-            const updatedCollection = cachedCollection.map((cachedItem) => (cachedItem.id === item.id ? Object.assign(Object.assign({}, cachedItem), item) : cachedItem));
+            const updatedCollection = cachedCollection.map((cachedItem) => (cachedItem.id === oldItem.id ? Object.assign(Object.assign({}, cachedItem), updatedItem) : cachedItem));
             cache_1.cache.set(collectionKey, updatedCollection, ttl);
         }
-        return item;
+        return updatedItem;
     });
 }
 /**

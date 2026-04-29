@@ -1,26 +1,27 @@
 import { Router, Request, Response } from 'express';
-import { 
-    getArticles, 
-    getArticleById, 
-    createArticle, 
-    updateArticle, 
+import {
+    getArticles,
+    getArticleById,
+    createArticle,
+    updateArticle,
     deleteArticle,
     updateArticleViewCount,
     invalidateArticlesCache,
 } from "@services/articles";
 import { adminMiddleware } from '@middlewares/auth';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 
 const router = Router();
 
 // Rate limiter to prevent abuse (1 request per minute per article)
 const viewCountLimiter = rateLimit({
-  windowMs: 30 * 60 * 1000, // 30 minutes
-  max: 1,
-  message: 'Article already marked as read!',
-  keyGenerator: function (req: Request, res: Response) {
-    return req.ip + '-' + req.params.articleId; // Unique key per IP and article ID
-  },
+    windowMs: 30 * 60 * 1000, // 30 minutes
+    max: 1,
+    message: 'Article already marked as read!',
+    keyGenerator: function (req: Request, res: Response) {
+        // Use ipKeyGenerator to handle IPv6 properly, then append articleId
+        return ipKeyGenerator(req.ip ?? '') + '-' + req.params.articleId; // Unique key per IP and article ID
+    },
 });
 
 /**
@@ -41,7 +42,7 @@ router.get('/', async (_: Request, res: Response) => {
 // Get article by ID
 router.get('/:articleId', async (req: Request, res: Response) => {
     try {
-        const article = await getArticleById(req.params.articleId);
+        const article = await getArticleById(req.params.articleId as string);
         if (article) {
             res.json(article);
         } else {
@@ -67,8 +68,12 @@ router.post('', adminMiddleware, async (req: Request, res: Response) => {
 // Update article
 router.patch('/:articleId', adminMiddleware, async (req: Request, res: Response) => {
     try {
-        const updatedArticle = await updateArticle(req.params.articleId, req.body);
-        res.json(updatedArticle);
+        const updatedArticle = await updateArticle(req.params.articleId as string, req.body);
+        if (!updatedArticle) {
+            res.status(404).json({ message: 'Article not found' });
+        } else {
+            res.json(updatedArticle);
+        }
     } catch (error) {
         console.error('Error updating article:', error);
         res.status(500).json({ message: 'Error updating article', details: JSON.stringify(error) });
@@ -78,7 +83,7 @@ router.patch('/:articleId', adminMiddleware, async (req: Request, res: Response)
 // Delete article
 router.delete('/:articleId', adminMiddleware, async (req: Request, res: Response) => {
     try {
-        const result = await deleteArticle(req.params.articleId);
+        const result = await deleteArticle(req.params.articleId as string);
         if (result) {
             res.json({ message: 'Article successfully deleted' });
         } else {
@@ -92,18 +97,17 @@ router.delete('/:articleId', adminMiddleware, async (req: Request, res: Response
 
 // Update article view count
 router.post('/:articleId/view', viewCountLimiter, async (req: Request, res: Response) => {
-  try {
-    const articleId = req.params.articleId;
-    const article = await updateArticleViewCount(articleId);
-    if (article) {
-      res.json({ message: 'View count updated successfully' });
-    } else {
-      res.status(404).json({ message: 'Article not found' });
+    try {
+        const article = await updateArticleViewCount(req.params.articleId as string);
+        if (article) {
+            res.json({ message: 'View count updated successfully' });
+        } else {
+            res.status(404).json({ message: 'Article not found' });
+        }
+    } catch (error) {
+        console.error('Error updating article view count:', error);
+        res.status(500).json({ message: 'Error updating article view count', details: error });
     }
-  } catch (error) {
-    console.error('Error updating article view count:', error);
-    res.status(500).json({ message: 'Error updating article view count', details: error });
-  }
 });
 
 // Invalidate cache for articles

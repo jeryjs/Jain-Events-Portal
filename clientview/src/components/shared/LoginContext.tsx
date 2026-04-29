@@ -37,6 +37,7 @@ const googleProvider = new GoogleAuthProvider();
 interface LoginContextType {
   userData: UserData | null;
   username: string | null;
+  uid: string | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -72,13 +73,15 @@ const LoginDialog = () => {
       onClose={!loginInProgress ? closeLoginPrompt : undefined}
       maxWidth="xs"
       fullWidth
-      PaperProps={{
-        sx: {
-          backgroundColor: alpha(theme.palette.background.paper, 0.8),
-          backdropFilter: 'blur(10px)',
-          borderRadius: 2,
-          boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
-          border: `1px solid ${alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.1 : 0.2)}`
+      slotProps={{
+        paper: {
+          sx: {
+            backgroundColor: alpha(theme.palette.background.paper, 0.8),
+            backdropFilter: 'blur(10px)',
+            borderRadius: 2,
+            boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
+            border: `1px solid ${alpha(theme.palette.common.white, theme.palette.mode === 'dark' ? 0.1 : 0.2)}`
+          }
         }
       }}
     >
@@ -89,18 +92,29 @@ const LoginDialog = () => {
           </IconButton>
         )}
       </Box>
-
       <DialogContent sx={{ pt: 0, pb: 4 }}>
-        <Box display="flex" flexDirection="column" alignItems="center" gap={3}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 3
+          }}>
           <Avatar sx={{ width: 56, height: 56, bgcolor: theme.palette.primary.main, mb: 1 }}>
             <GoogleIcon sx={{ fontSize: 28 }} />
           </Avatar>
 
-          <Box textAlign="center">
-            <Typography variant="h5" fontWeight="500" gutterBottom>
+          <Box sx={{
+            textAlign: "center"
+          }}>
+            <Typography variant="h5" gutterBottom sx={{
+              fontWeight: "500"
+            }}>
               Sign In
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{
+              color: "text.secondary"
+            }}>
               Sign in to cast your vote and participate in events
             </Typography>
           </Box>
@@ -124,7 +138,9 @@ const LoginDialog = () => {
             {loginInProgress ? 'Signing in...' : 'Continue with Google'}
           </Button>
 
-          <Typography variant="caption" color="text.secondary" align="center">
+          <Typography variant="caption" align="center" sx={{
+            color: "text.secondary"
+          }}>
             By signing in, you agree to our Terms of Service and Privacy Policy
           </Typography>
         </Box>
@@ -144,6 +160,7 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
   // Convert Firebase User to UserData
   const createUserDataFromFirebase = (user: User): UserData => {
     return UserData.parse({
+      uid: user.uid,
       name: user.displayName || user.email?.split('@')[0] || 'User',
       username: user.email || '',  // Using email as username
       role: Role.USER,
@@ -235,11 +252,17 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
         // Use TokenManager for consistent token management
         if (TokenManager.needsRefresh()) {
           await TokenManager.forceRefresh();
-          // Update local token state ONLY - no backend calls
+          // Update local token state and renew backend session cookie
           const freshToken = await auth.currentUser!.getIdToken(false);
           setToken(freshToken);
           localStorage.setItem('auth_token', freshToken);
-          console.log('🔄 Firebase token refreshed locally');
+          const backendUser = await getSession(freshToken);
+          if (backendUser) {
+            setUserData(backendUser);
+            localStorage.setItem('auth_user', JSON.stringify(backendUser));
+            localStorage.setItem('auth_username', backendUser.username);
+          }
+          console.log('🔄 Firebase token refreshed and session renewed');
         }
       } catch (error) {
         console.error('❌ Token refresh failed:', error);
@@ -257,6 +280,7 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     };
 
     // Refresh token every 30 minutes (Firebase tokens expire after 1 hour)
+    refreshToken();
     const intervalId = setInterval(refreshToken, 30 * 60 * 1000);
 
     return () => clearInterval(intervalId);
@@ -287,7 +311,8 @@ export const LoginProvider = ({ children }: { children: ReactNode }) => {
     <LoginContext.Provider
       value={{
         userData,
-        username: userData?.username,
+        username: userData?.username || null,
+        uid: userData?.uid || null,
         token,
         isAuthenticated: !!userData,
         isLoading,

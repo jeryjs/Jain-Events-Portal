@@ -16,11 +16,17 @@ class CulturalActivity extends models_1.Activity {
             useSelectedTerminology: false
         };
     }
-    // Getter for backward compatibility
+    /**
+     * Getter for backward compatibility
+     * @deprecated Use config.isSoloPerformance instead
+    */
     get isSoloPerformance() {
         return this.config.isSoloPerformance;
     }
-    // Setter for backward compatibility
+    /**
+     * Setter for backward compatibility
+     * @deprecated Use config.isSoloPerformance instead
+     */
     set isSoloPerformance(value) {
         this.config.isSoloPerformance = value;
     }

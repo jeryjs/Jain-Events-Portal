@@ -74,6 +74,7 @@ router.post("/session", (req, res) => __awaiter(void 0, void 0, void 0, function
             const adminEmails = (process.env.ADMIN_EMAILS || "jery99961@gmail.com").split(",").map(e => e.trim().toLowerCase());
             const isAdmin = decoded.email && adminEmails.includes(decoded.email.toLowerCase());
             user = {
+                uid: decoded.uid,
                 name: decoded.name || ((_a = decoded.email) === null || _a === void 0 ? void 0 : _a.split("@")[0]) || "User",
                 username: decoded.email || decoded.uid,
                 role: isAdmin ? constants_1.Role.ADMIN : constants_1.Role.USER,

@@ -50,9 +50,12 @@ import eventRoutes from "@routes/eventRoutes";
 import activityRoutes from "@routes/activityRoutes";
 import articleRoutes from "@routes/articleRoutes";
 import authRoutes from "@routes/authRoutes";
+import { requestLogger } from "@utils/logger";
 
 const os = require("os");
 const app = express();
+
+app.set("trust proxy", true);	// Trust the first proxy (request logger) to get correct client IPs
 
 // Configure CORS to handle credentials
 app.use(cors<Request>({
@@ -89,6 +92,7 @@ if (process.env.NODE_ENV !== "development") {
 	app.use(helmet());
 }
 
+app.use(requestLogger);
 app.use(express.json());
 app.use(cookieParser());
 

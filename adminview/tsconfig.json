@@ -20,7 +20,7 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     
-    "baseUrl": "./",
+    "rootDir": "..",
     "paths": {
       "@common/*": ["../common/*"],
       "@components/*": ["./src/components/*"],

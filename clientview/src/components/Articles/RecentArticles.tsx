@@ -68,7 +68,9 @@ const RecentArticles: React.FC<RecentArticlesProps> = ({ articles }) => {
                                     {article.title}
                                 </Typography>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant="caption" color="text.secondary">{article.dateString}</Typography>
+                                    <Typography variant="caption" sx={{
+                                        color: "text.secondary"
+                                    }}>{article.dateString}</Typography>
                                     {article.eventTypeString && <Chip label={article.eventTypeString} size="small" sx={{ height: 20, fontSize: '0.625rem' }} variant="outlined" />}
                                 </Box>
                             </RecentArticleContent>

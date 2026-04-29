@@ -14,7 +14,10 @@ export async function getUserByUID(uid: string): Promise<UserData | null> {
 		const userDoc = await usersCollection.doc(uid).get();
 		if (!userDoc.exists) return null;
 		
-		const userData = UserData.parse(userDoc.data());
+		const userData = UserData.parse({
+			...userDoc.data(),
+			uid
+		});
 		
 		return userData;
 	} catch (error) {

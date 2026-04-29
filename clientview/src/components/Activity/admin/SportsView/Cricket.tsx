@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, useRef } from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SportsBaseballIcon from '@mui/icons-material/SportsBaseball';
 import SportsBatIcon from '@mui/icons-material/SportsCricket';
@@ -154,9 +154,14 @@ const TossSection = ({ teams, game, updateGameData }) => {
       <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
         <SportsScoreIcon sx={{ mr: 1 }} /> Toss Information
       </Typography>
-
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} sm={6}>
+      <Grid container spacing={2} sx={{
+        alignItems: "center"
+      }}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <FormControl fullWidth size="small">
             <InputLabel>Toss Winner</InputLabel>
             <Select
@@ -172,7 +177,11 @@ const TossSection = ({ teams, game, updateGameData }) => {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <Card
             variant="outlined"
             sx={{
@@ -370,9 +379,18 @@ const InningsSummary = ({ innings, inningsIndex, teams, score, handleDeleteInnin
 
   return (
     <>
-      <Typography fontWeight="bold" sx={{ flexGrow: 1 }}>
+      <Typography
+        sx={{
+          fontWeight: "bold",
+          flexGrow: 1
+        }}>
         Innings {inningsIndex + 1}: {battingTeam?.name || 'Unknown'}
-        <Typography component="span" color="text.secondary" sx={{ ml: 1 }}>
+        <Typography
+          component="span"
+          sx={{
+            color: "text.secondary",
+            ml: 1
+          }}>
           {score.runs}/{score.wickets}
         </Typography>
       </Typography>
@@ -416,7 +434,11 @@ const InningsDetails = ({ innings, inningsIndex, teams, players, game, updateGam
   return (
     <Grid container spacing={2}>
       {/* Batting team panel */}
-      <Grid item xs={12} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6
+        }}>
         <BatsmenPanel
           teamName={battingTeam?.name || 'Batting Team'}
           teamId={innings.battingTeam}
@@ -427,9 +449,12 @@ const InningsDetails = ({ innings, inningsIndex, teams, players, game, updateGam
           setSelectedBatsman={setSelectedBatsman}
         />
       </Grid>
-
       {/* Bowling team panel */}
-      <Grid item xs={12} md={6}>
+      <Grid
+        size={{
+          xs: 12,
+          md: 6
+        }}>
         <BowlersPanel
           teamName={bowlingTeam?.name || 'Bowling Team'}
           teamId={innings.bowlingTeam}
@@ -503,9 +528,11 @@ const BatsmenPanel = ({ teamName, teamId, teamPlayers, inningsIndex, game, selec
                   <ListItemText
                     primary={player.name}
                     secondary={`${batsmanRuns} runs`}
-                    primaryTypographyProps={{
-                      color: isSelected ? 'primary.dark' : 'inherit',
-                      fontWeight: isSelected ? 'bold' : 'normal'
+                    slotProps={{
+                      primary: {
+                        color: isSelected ? 'primary.dark' : 'inherit',
+                        sx: { fontWeight: isSelected ? 'bold' : 'normal' }
+                      }
                     }}
                   />
                   {isSelected && (
@@ -521,7 +548,9 @@ const BatsmenPanel = ({ teamName, teamId, teamPlayers, inningsIndex, game, selec
               );
             })
           ) : (
-            <Typography color="text.secondary">No players found for this team</Typography>
+            <Typography sx={{
+              color: "text.secondary"
+            }}>No players found for this team</Typography>
           )}
         </List>
       </CardContent>
@@ -706,9 +735,10 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
                           key={idx}
                           direction="row"
                           spacing={0.5}
-                          alignItems="center"
-                          sx={{ width: '100%' }}
-                        >
+                          sx={{
+                            alignItems: "center",
+                            width: '100%'
+                          }}>
                           {over.balls.map((ball, ballIndex) => {
                             const ballType = BALL_TYPES.find(b => b.value === ball.type);
                             const totalRuns = (ball.runs || 0) + (ball.extraRuns || 0);
@@ -765,7 +795,9 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
                         </Stack>
                       ))
                     ) : (
-                      <Stack direction="row" justifyContent="flex-end">
+                      <Stack direction="row" sx={{
+                        justifyContent: "flex-end"
+                      }}>
                         <IconButton
                           size="small"
                           color="primary"
@@ -787,7 +819,9 @@ const BowlersPanel = ({ teamName, teamId, teamPlayers, inningsIndex, innings, ga
               );
             })
           ) : (
-            <Typography color="text.secondary">No players found for this team</Typography>
+            <Typography sx={{
+              color: "text.secondary"
+            }}>No players found for this team</Typography>
           )}
         </List>
       </CardContent>
@@ -864,8 +898,10 @@ const BallEditorPopover = ({
               runs: parseInt(e.target.value) || 0
             })}
             disabled={ballDetails.type === "4" || ballDetails.type === "6"}
-            InputProps={{ inputProps: { min: 0, max: 6 } }}
             sx={{ mb: 2 }}
+            slotProps={{
+              input: { inputProps: { min: 0, max: 6 } }
+            }}
           />
         )}
 

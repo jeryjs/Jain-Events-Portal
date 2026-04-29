@@ -29,15 +29,13 @@ import PageTransition from '@components/shared/PageTransition';
 import { useUpdateActivity, useDeleteActivity } from '@hooks/admin';
 import { useActivity, useEvent } from '@hooks/useApi';
 import { pascalCase } from '@utils/utils';
-import { borderRadius } from '@mui/system';
-import { error } from 'console';
 import { useState } from 'react';
 
 // Styled Components
 const HeroContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
   backgroundColor: theme.palette.background.default,
-  borderRadius: theme.shape.borderRadius * 2,
+  borderRadius: (theme.shape.borderRadius as number) * 2,
   overflow: 'hidden',
   marginBottom: theme.spacing(4),
   padding: theme.spacing(3),
@@ -107,7 +105,7 @@ function ActivityPage() {
     return <ActivitySkeleton />;
   }
 
-  if (!isLoading && !activity) {
+  if (!activity) {
     return <ActivityNotFound eventId={eventId || ''} />;
   }
 
@@ -122,7 +120,7 @@ function ActivityPage() {
     <PageTransition>
       <Container maxWidth="lg" sx={{ py: 4, color: 'text.primary' }}>
         {/* Activity Hero Section */}
-        <ActivityHero activity={activity} baseType={baseType} handleBack={handleBack} />
+        <ActivityHero activity={activity!} baseType={baseType} handleBack={handleBack} />
 
         {/* Activity Content Based on Type */}
         {(() => {
@@ -130,7 +128,7 @@ function ActivityPage() {
             case EventType.GENERAL: return <GeneralView activity={activity} />;
             case EventType.INFO: return <InfoView activity={activity as InfoActivity} />;
             case EventType.SPORTS: return <SportsView activity={activity as SportsActivity<Sport>} />;
-            case EventType.CULTURAL: return <CulturalsView eventId={eventId} activity={activity as CulturalActivity} />;
+            case EventType.CULTURAL: return <CulturalsView eventId={eventId!} activity={activity as CulturalActivity} />;
             case EventType.TECH: return <TechView activity={activity as TechnicalActivity} />;
             default: return null;
           }
@@ -155,7 +153,7 @@ function ActivityPage() {
       >
         <ActivityForm
           eventId={eventId}
-          activity={activity}
+          activity={activity!}
           isCreating={false}
           managers={event?.managers || []}
           onSave={handleActivitySave}
@@ -217,11 +215,16 @@ const ActivityHero = ({ activity, baseType, handleBack }: { activity: Activity; 
         >
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5" component="h1" fontWeight="bold" color="inherit">
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{
+            fontWeight: "bold",
+            color: "inherit"
+          }}>
           {activity.name}
         </Typography>
       </Box>
-
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
           <HeaderChip
@@ -235,7 +238,9 @@ const ActivityHero = ({ activity, baseType, handleBack }: { activity: Activity; 
           <Box sx={{ mt: 2, color: 'inherit' }}>
             <InfoIconWrapper sx={{ color: 'inherit' }}>
               <CalendarTodayIcon sx={{ color: 'inherit' }} />
-              <Typography variant="body2" color="inherit">
+              <Typography variant="body2" sx={{
+                color: "inherit"
+              }}>
                 {activity.startTime.toLocaleDateString('en-US', {
                   weekday: 'short',
                   month: 'long',
@@ -250,7 +255,12 @@ const ActivityHero = ({ activity, baseType, handleBack }: { activity: Activity; 
               <PeopleIcon sx={{ color: 'inherit' }} />
 
               <Box>
-                <Typography variant="subtitle2" sx={{ mb: 0.5 }} color="inherit">
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: "inherit",
+                    mb: 0.5
+                  }}>
                   {activity.participants?.length || 0} Participants
                 </Typography>
                 <AvatarGroup max={5}>
@@ -279,7 +289,13 @@ const ActivityHero = ({ activity, baseType, handleBack }: { activity: Activity; 
 const ActivityNotFound = ({ eventId }) => {
   return (
     <Container maxWidth="lg" sx={{ py: 4, color: 'text.primary' }}>
-      <Typography variant="h4" component="h1" fontWeight="bold" sx={{ mb: 2 }}>
+      <Typography
+        variant="h4"
+        component="h1"
+        sx={{
+          fontWeight: "bold",
+          mb: 2
+        }}>
         Activity Not Found
       </Typography>
       <Typography variant="body1" sx={{ mb: 2 }}>

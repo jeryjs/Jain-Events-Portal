@@ -6,18 +6,15 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
-        "baseUrl": ".",
-        "outDir": "dist",
+        "rootDir": "..",
+        "outDir": "./dist",
         "paths": {
             "@common/*": ["../common/*"],
             "@config/*": ["./config/*"],
             "@middlewares/*": ["./middlewares/*"],
             "@routes/*": ["./routes/*"],
             "@services/*": ["./services/*"],
-            "@utils/*": ["./utils/*"],
-            "*": ["node_modules/*", "types/*"]
+            "@utils/*": ["./utils/*"]
         }
-    },
-    "include": ["**/*"],
-    "exclude": ["node_modules"]
+    }
 }

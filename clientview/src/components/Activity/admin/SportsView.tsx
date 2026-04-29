@@ -71,7 +71,13 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
     <Box>
       {/* Teams Section */}
       <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2
+          }}>
           <Typography variant="h6">Teams</Typography>
           <Button
             variant="contained"
@@ -98,10 +104,15 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
           </DialogContent>
         </Dialog>
       </Paper>
-
       {/* Participants Section */}
       <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2
+          }}>
           <Typography variant="h6">Participants</Typography>
           <Button
             variant="contained"
@@ -130,7 +141,6 @@ export const SportsView = ({ formData, setFormData }: SportsViewProps) => {
           </DialogContent>
         </Dialog>
       </Paper>
-
       {/* Sport-specific form */}
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6" gutterBottom>Manage Match</Typography>

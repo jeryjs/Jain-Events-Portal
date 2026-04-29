@@ -30,6 +30,8 @@ var EventType;
     EventType[EventType["THEATERS"] = 2004] = "THEATERS";
     EventType[EventType["ORATORY"] = 2005] = "ORATORY";
     EventType[EventType["LITERATURE"] = 2006] = "LITERATURE";
+    EventType[EventType["ARTS"] = 2007] = "ARTS";
+    EventType[EventType["PHOTOGRAPHY"] = 2008] = "PHOTOGRAPHY";
     EventType[EventType["TECH"] = 3000] = "TECH";
     EventType[EventType["CODING"] = 3001] = "CODING";
     EventType[EventType["HACKATHON"] = 3002] = "HACKATHON";

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Box, Grid, Skeleton, Dialog, IconButton, Backdrop, Button, Typography, Alert } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
@@ -6,6 +6,7 @@ import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ProgressiveImage from '@components/shared/ProgressiveImage';
 
 // Styled components
 const GalleryContainer = styled(Box)(({ theme }) => ({
@@ -20,13 +21,6 @@ const PhotoItem = styled(motion.div)(({ theme }) => ({
   overflow: 'hidden',
   cursor: 'pointer',
 }));
-
-const Image = styled('img')({
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-  display: 'block',
-});
 
 const ExpandedImage = styled(motion.img)(() => ({
   minWidth: '60vw',
@@ -139,6 +133,7 @@ interface NormalizedImage {
   thumbnail: string;
 }
 
+
 interface PhotoGalleryProps {
   title?: string;
   images?: (string | ImageItem)[];
@@ -148,12 +143,12 @@ interface PhotoGalleryProps {
   onSeeAllClick?: () => void;
   imageHeight?: number;
   imageMargin?: number;
-  loadFailed?: Error;
+  loadFailed?: Error | null;
 }
 
 const PhotoGallery: React.FC<PhotoGalleryProps> = ({ 
   images = placeholderImages,
-  isLoading = false,
+  isLoading = true,
   rows = 2,
   columns = 3,
   onSeeAllClick,
@@ -165,6 +160,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dragDirection, setDragDirection] = useState<number>(0);
   const [fullGalleryOpen, setFullGalleryOpen] = useState(false);
+  const preloadedImages = useRef(new Set<string>());
 
   // Normalize the images to have consistent format
   const normalizeImages = (imgs: (string | ImageItem)[]): NormalizedImage[] => {
@@ -189,9 +185,29 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
 
   // Calculate the maximum number of images to display
   const calcMaxImagesCount = rows * columns;
-  const normalizedImages = normalizeImages(images);
+  const normalizedImages = useMemo(() => normalizeImages(images), [images]);
   const hasMoreImages = normalizedImages.length > calcMaxImagesCount;
   const displayedImages = normalizedImages.slice(0, calcMaxImagesCount);
+
+  // Preload adjacent images when an image is selected
+  useEffect(() => {
+    if (!dialogOpen || selectedImageIndex === null || !normalizedImages.length) return;
+
+    const indices = [
+      selectedImageIndex,
+      (selectedImageIndex - 1 + normalizedImages.length) % normalizedImages.length,
+      (selectedImageIndex + 1) % normalizedImages.length,
+    ];
+
+    indices.forEach((index) => {
+      const url = normalizedImages[index]?.link;
+      if (!url || preloadedImages.current.has(url)) return;
+
+      preloadedImages.current.add(url);
+      const image = new Image();
+      image.src = url;
+    });
+  }, [dialogOpen, selectedImageIndex, normalizedImages]);
 
   const handleImageClick = (index: number) => {
     setSelectedImageIndex(index);
@@ -206,13 +222,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const goToNextImage = () => {
     setDragDirection(0);
     if (selectedImageIndex === null || !normalizedImages.length) return;
-    setSelectedImageIndex((prevIndex) => (prevIndex + 1) % normalizedImages.length);
+    setSelectedImageIndex((prevIndex) => ((prevIndex ?? NaN) + 1) % normalizedImages.length);
   };
 
   const goToPreviousImage = () => {
     setDragDirection(0);
     if (selectedImageIndex === null || !normalizedImages.length) return;
-    setSelectedImageIndex((prevIndex) => (prevIndex - 1 + normalizedImages.length) % normalizedImages.length);
+    setSelectedImageIndex((prevIndex) => ((prevIndex ?? NaN) - 1 + normalizedImages.length) % normalizedImages.length);
   };
 
   // Handle keyboard navigation - modified to also close the fullscreen gallery
@@ -329,7 +345,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Image src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
+                  <ProgressiveImage src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
                 </StaggeredItem>
               );
             })}
@@ -339,7 +355,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
     </AnimatePresence>
   );
 
-  if (!!loadFailed) {
+  if (loadFailed) {
     return (
       <GalleryContainer>
         <Alert severity="error" variant="outlined">
@@ -357,28 +373,28 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         <Grid container spacing={imageMargin}>
           {isLoading ? (
             // Skeleton loaders
-            [...Array(calcMaxImagesCount)].map((_, index) => (
-              <Grid item xs={gridSize.xs} key={`skeleton-${index}`}>
+            ([...Array(calcMaxImagesCount)].map((_, index) => (
+              <Grid key={`skeleton-${index}`} size={gridSize.xs}>
                 <Box sx={{ height: imageHeight }}>
                   <Skeleton variant="rectangular" width="100%" height="100%" />
                 </Box>
               </Grid>
-            ))
+            )))
           ) : (
             // Image grid
-            displayedImages.map((image, index) => (
-              <Grid item xs={gridSize.xs} key={`image-${index}`}>
+            (displayedImages.map((image, index) => (
+              <Grid key={`image-${index}`} size={gridSize.xs}>
                 <PhotoItem
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleImageClick(index)}
                 >
                   <Box sx={{ height: imageHeight }}>
-                    <Image src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
+                    <ProgressiveImage src={image.thumbnail} alt={`Gallery image ${index + 1}`} />
                   </Box>
                 </PhotoItem>
               </Grid>
-            ))
+            )))
           )}
         </Grid>
 
@@ -393,30 +409,32 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
           </Box>
         )}
       </GalleryContainer>
-
       {/* Fullscreen gallery that responds to URL hash */}
       {renderFullscreenGallery()}
-
       {/* Image dialog for expanded view */}
       <Dialog
         open={dialogOpen}
         onClose={handleDialogClose}
         maxWidth={false}
-        PaperProps={{
-          style: {
-            backgroundColor: 'transparent',
-            boxShadow: 'none',
-            overflow: 'hidden'
-          }
+        slots={{
+          backdrop: Backdrop
         }}
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          style: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            backdropFilter: 'blur(5px)'
+        slotProps={{
+          backdrop: {
+            style: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              backdropFilter: 'blur(5px)'
+            }
+          },
+
+          paper: {
+            style: {
+              backgroundColor: 'transparent',
+              boxShadow: 'none',
+              overflow: 'hidden'
+            }
           }
-        }}
-      >
+        }}>
         <AnimatePresence mode="wait">
           {dialogOpen && selectedImageIndex !== null && (
             <Box 
@@ -439,10 +457,15 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 exit={{ opacity: 0, x: dragDirection * -200 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
-                <ExpandedImage 
-                  src={normalizedImages[selectedImageIndex].link} 
-                  alt={`Expanded view ${selectedImageIndex + 1}`}
-                />
+                <Box sx={{ position: 'relative', display: 'inline-block', width: 'fit-content', height: 'fit-content', maxWidth: '90vw', maxHeight: '90vh' }}>
+                  <ProgressiveImage
+                    src={normalizedImages[selectedImageIndex].link}
+                    alt={`Expanded view ${selectedImageIndex + 1}`}
+                    placeholderSrc={normalizedImages[selectedImageIndex].thumbnail}
+                    loading="eager"
+                    style={{ width: 'auto', height: 'auto', maxWidth: '90vw', maxHeight: '90vh' }}
+                  />
+                </Box>
               </motion.div>
               
               <CloseButton onClick={handleDialogClose}>

@@ -57,6 +57,7 @@ router.post('/', auth_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0,
         res.status(500).json({ message: 'Error creating event', details: error });
     }
 }));
+// Update event by id - only admin or manager of this event can update
 router.patch('/:eventId', auth_1.managerMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Only allow if user is admin or manager for this event
@@ -71,6 +72,10 @@ router.patch('/:eventId', auth_1.managerMiddleware, (req, res) => __awaiter(void
             return;
         }
         const updatedEvent = yield (0, events_1.updateEvent)(req.params.eventId, req.body);
+        if (updatedEvent == null) {
+            res.status(404).json({ message: 'Event not found' });
+            return;
+        }
         res.json(updatedEvent);
     }
     catch (error) {

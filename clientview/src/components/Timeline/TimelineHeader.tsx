@@ -15,7 +15,7 @@ interface TimelineHeaderProps {
 const HeaderCard = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   // padding: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius * 2,
+  borderRadius: (theme.shape.borderRadius as number) * 2,
   position: 'sticky',
   top: 0,
   zIndex: 10,
@@ -76,7 +76,13 @@ const TimelineHeader: React.FC<TimelineHeaderProps> = ({
         <ArrowBackIcon onClick={() => navigate(-1)} sx={{ mr: 2, cursor: 'pointer' }} />
         <Typography variant="h4" sx={{ fontWeight: 'bold', color: theme => theme.palette.primary.main }}>
           Timeline
-          <Typography component="span" variant="body1" color="text.secondary" sx={{ ml: 1 }}>
+          <Typography
+            component="span"
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              ml: 1
+            }}>
             ({totalEvents} events)
           </Typography>
         </Typography>

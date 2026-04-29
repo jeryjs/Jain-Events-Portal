@@ -28,7 +28,7 @@ function getUserByUID(uid) {
             const userDoc = yield usersCollection.doc(uid).get();
             if (!userDoc.exists)
                 return null;
-            const userData = models_1.UserData.parse(userDoc.data());
+            const userData = models_1.UserData.parse(Object.assign(Object.assign({}, userDoc.data()), { uid }));
             return userData;
         }
         catch (error) {

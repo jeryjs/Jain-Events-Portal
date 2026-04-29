@@ -102,8 +102,12 @@ export const TechnicalView = ({ formData, setFormData }: TechnicalViewProps) => 
             }
             label={
               <Box>
-                <Typography fontWeight="medium">Solo Activity</Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography sx={{
+                  fontWeight: "medium"
+                }}>Solo Activity</Typography>
+                <Typography variant="caption" sx={{
+                  color: "text.secondary"
+                }}>
                   {formData.isSoloPerformance
                     ? "Each participant is treated as an individual entry (team of 1)"
                     : "Participants compete as teams"}
@@ -119,7 +123,6 @@ export const TechnicalView = ({ formData, setFormData }: TechnicalViewProps) => 
           )}
         </CardContent>
       </Card>
-
       {/* Participants and Teams Section */}
       <ManageTeamsForm
         teams={teams}
@@ -127,7 +130,6 @@ export const TechnicalView = ({ formData, setFormData }: TechnicalViewProps) => 
         participants={participants}
         setParticipants={handleParticipantsChange}
         isSoloPerformance={formData.isSoloPerformance || false} />
-
       {/* Winners Section */}
       <Paper elevation={1} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -136,7 +138,12 @@ export const TechnicalView = ({ formData, setFormData }: TechnicalViewProps) => 
         </Typography>
 
         <Box sx={{ mb: 3 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              mb: 2
+            }}>
             Declare winners for this activity. Select {formData.isSoloPerformance ? "participants" : "teams"} and assign ranks.
             Ranks will be automatically managed for consistency.
           </Typography>

@@ -275,7 +275,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
 
               {status === 'upcoming' ? (
                 <Box sx={{ mt: 1.5 }}>
-                  <Typography variant="body2" color="text.secondary" align="center">
+                  <Typography variant="body2" align="center" sx={{
+                    color: "text.secondary"
+                  }}>
                     {new Date(sportActivity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} • {new Date(sportActivity.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </Typography>
                 </Box>
@@ -406,9 +408,10 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                                       <Typography
                                         component="span"
                                         variant="caption"
-                                        color="text.secondary"
-                                        sx={{ ml: 0.5 }}
-                                      >
+                                        sx={{
+                                          color: "text.secondary",
+                                          ml: 0.5
+                                        }}>
                                         ({sportActivity.getTeamPlayers(item.id).map(p => p.name).join(', ')})
                                       </Typography>
                                     )}
@@ -419,9 +422,10 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                                     <Typography
                                       component="span"
                                       variant="caption"
-                                      color="text.secondary"
-                                      sx={{ ml: 0.5 }}
-                                    >
+                                      sx={{
+                                        color: "text.secondary",
+                                        ml: 0.5
+                                      }}>
                                       ({item.teamName})
                                     </Typography>
                                   </>
@@ -431,8 +435,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                             {!isRelay && (
                               <Typography
                                 variant="body2"
-                                fontWeight={idx === 0 ? 600 : 400}
                                 sx={{
+                                  fontWeight: idx === 0 ? 600 : 400,
+
                                   color:
                                     idx < 3
                                       ? idx === 0
@@ -441,9 +446,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                                           ? 'secondary.main'
                                           : 'warning.main'
                                       : 'text.primary',
+
                                   whiteSpace: 'nowrap'
-                                }}
-                              >
+                                }}>
                                 {item.time && item.time > 0
                                   ? `${item.time.toFixed(2)}s`
                                   : `Rank ${item.rank || '-'}`}
@@ -464,7 +469,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                         borderRadius: 1
                       }}
                     >
-                      <Typography color="text.secondary" variant="body2">
+                      <Typography variant="body2" sx={{
+                        color: "text.secondary"
+                      }}>
                         {status === 'ongoing'
                           ? 'Event in progress - No results yet'
                           : 'No results recorded'}
@@ -592,7 +599,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
 
               {status === 'upcoming' && (
                 <Box sx={{ mt: 1.5 }}>
-                  <Typography variant="body2" color="text.secondary" align="center">
+                  <Typography variant="body2" align="center" sx={{
+                    color: "text.secondary"
+                  }}>
                     {new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} • {new Date(activity.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </Typography>
                 </Box>
@@ -600,7 +609,14 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
 
               {status === 'ongoing' && (
                 <Box sx={{ mt: 1.5 }}>
-                  <Typography variant="body2" color="error.main" align="center" sx={{ mt: 0.5, fontWeight: 600 }}>
+                  <Typography
+                    variant="body2"
+                    align="center"
+                    sx={{
+                      color: "error.main",
+                      mt: 0.5,
+                      fontWeight: 600
+                    }}>
                     MATCH IN PROGRESS
                   </Typography>
                 </Box>
@@ -622,7 +638,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
 
               {status === 'completed' && !isTeamsConfirmed && (
                 <Box sx={{ mt: 1.5 }}>
-                  <Typography variant="body2" color="text.secondary" align="center">
+                  <Typography variant="body2" align="center" sx={{
+                    color: "text.secondary"
+                  }}>
                     Match completed
                   </Typography>
                 </Box>
@@ -656,10 +674,21 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
               </Box>
               <Divider sx={{ mt: 0.5 }} />
               <Card sx={{ p: 1.5, borderRadius: 1, position: 'relative', overflow: 'hidden', '&::after': { content: '""', position: 'absolute', bottom: 0, left: 0, right: 0, height: '20px' } }}>
-                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.4, display: '-webkit-box', overflow: 'hidden', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2 }}>{contentPreview}</Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                    lineHeight: 1.4,
+                    display: '-webkit-box',
+                    overflow: 'hidden',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2
+                  }}>{contentPreview}</Typography>
               </Card>
               <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" sx={{
+                  color: "text.secondary"
+                }}>
                   {new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 500, display: 'flex', alignItems: 'center' }}>
@@ -701,7 +730,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
               </Box>
               <Divider sx={{ my: 1.5 }} />
               {status === 'upcoming' ? (
-                <Box sx={{ mt: 1.5 }}><Typography variant="body2" color="text.secondary" align="center">{new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} • {new Date(activity.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Typography></Box>
+                <Box sx={{ mt: 1.5 }}><Typography variant="body2" align="center" sx={{
+                  color: "text.secondary"
+                }}>{new Date(activity.startTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} • {new Date(activity.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Typography></Box>
               ) : (
                 <>
                 { status === 'ongoing' && (
@@ -709,7 +740,12 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                     <Chip icon={activity.isSoloPerformance ? <PersonIcon sx={{ fontSize: '0.85rem !important' }} /> : <Badge sx={{ '& .MuiBadge-badge': { position: 'static', transform: 'none', fontSize: '0.7rem', height: '16px', minWidth: '16px', padding: 0 } }} badgeContent={activity.teams?.length || 0} color="primary" />} label={activity.isSoloPerformance ? "Solo" : "Teams"} size="small" sx={{ bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', '& .MuiChip-label': { px: 1, py: 0.5 }, '& .MuiChip-icon': { ml: 0.5 } }} />
                     {hasJudges && (
                       <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>Judges:</Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "text.secondary",
+                            mr: 1
+                          }}>Judges:</Typography>
                         <Box sx={{ display: 'flex', flexGrow: 1 }}>
                           {activity.judges.slice(0, 3).map((judge, idx) => (
                             <Avatar key={judge.id || idx} src={judge.profilePic} alt={judge.name} sx={{ width: 20, height: 20, fontSize: '0.75rem', ml: idx > 0 ? -0.5 : 0, border: '1px solid', borderColor: 'background.paper' }} />
@@ -734,7 +770,13 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                               <Typography variant="body2" sx={{ fontWeight: idx === 0 ? 600 : 400, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {winner.teamName}
                                 {winner.participants.length > 0 && (
-                                  <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>({winner.participants.map(p => p.name).join(', ')})</Typography>
+                                  <Typography
+                                    component="span"
+                                    variant="caption"
+                                    sx={{
+                                      color: "text.secondary",
+                                      ml: 0.5
+                                    }}>({winner.participants.map(p => p.name).join(', ')})</Typography>
                                 )}
                               </Typography>
                             </Box>
@@ -744,7 +786,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                       </Box>
                     </>
                   ) : status === 'completed' ? (
-                    <Box sx={{ textAlign: 'center', py: 2, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider', borderRadius: 1 }}><Typography color="text.secondary" variant="body2">Results to be announced</Typography></Box>
+                    <Box sx={{ textAlign: 'center', py: 2, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider', borderRadius: 1 }}><Typography variant="body2" sx={{
+                      color: "text.secondary"
+                    }}>Results to be announced</Typography></Box>
                   ) : null}
                 </>
               )}
@@ -787,7 +831,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
                       👥
                     </Avatar>
                   </Badge>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     {new Date(activity.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </Typography>
                 </Box>
@@ -796,7 +842,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, eventId, delay = 
 
             {status === 'upcoming' && (
               <Box sx={{ mt: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   Starts {activity.relativeStartTime}
                 </Typography>
               </Box>
